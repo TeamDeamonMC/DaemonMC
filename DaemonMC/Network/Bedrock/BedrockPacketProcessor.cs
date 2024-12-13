@@ -42,7 +42,6 @@ namespace DaemonMC.Network.Bedrock
                 force = false,
                 isAddon = false,
                 hasScripts = false,
-                forceServerPacks = false
             };
             ResourcePacksInfo.Encode(pk1);
         }

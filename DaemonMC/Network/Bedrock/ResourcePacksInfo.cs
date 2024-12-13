@@ -5,7 +5,8 @@
         public bool force { get; set; }
         public bool isAddon { get; set; }
         public bool hasScripts { get; set; }
-        public bool forceServerPacks { get; set; }
+        public Guid templateUUID { get; set; }
+        public string templateVersion { get; set; } = "";
         //behaviour packs todo
         //resource packs todo
     }
@@ -24,10 +25,9 @@
             DataTypes.WriteBool(fields.force);
             DataTypes.WriteBool(fields.isAddon);
             DataTypes.WriteBool(fields.hasScripts);
-            DataTypes.WriteBool(fields.forceServerPacks);
+            DataTypes.WriteUUID(fields.templateUUID);
+            DataTypes.WriteString(fields.templateVersion);
             DataTypes.WriteShort(0);
-            DataTypes.WriteShort(0);
-            DataTypes.WriteVarInt(0);
             PacketEncoder.handlePacket();
         }
     }

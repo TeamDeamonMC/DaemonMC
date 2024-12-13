@@ -31,7 +31,7 @@ namespace DaemonMC.Network.Handler
                 difficulty = 1,
                 dimension = 0,
                 seed = 9876,
-                generator = 9,
+                generator = 1,
             };
             StartGame.Encode(pk1);
 

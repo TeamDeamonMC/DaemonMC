@@ -104,8 +104,8 @@ namespace DaemonMC.Network.Bedrock
             DataTypes.WriteString("");
             DataTypes.WriteBool(false); //trial //ok
                 //synced movement settings
-                DataTypes.WriteSignedVarInt(fields.spawnBlockZ);
-                DataTypes.WriteSignedVarInt(fields.spawnBlockZ);
+                DataTypes.WriteSignedVarInt(0);
+                DataTypes.WriteSignedVarInt(0);
                 DataTypes.WriteBool(true);
                 //end of synced movement settings
             DataTypes.WriteLong(0);

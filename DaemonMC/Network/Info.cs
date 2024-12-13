@@ -2,8 +2,8 @@
 {
     public class Info
     {
-        public static string version = "1.21.20";
-        public static int protocolVersion = 705;
+        public static string version = "1.21.50";
+        public static int protocolVersion = 766;
 
         public enum Bedrock
         {

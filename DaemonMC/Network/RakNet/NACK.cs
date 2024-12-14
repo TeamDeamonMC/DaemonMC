@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class NACKPacket
     {
@@ -16,22 +18,22 @@
     public class NACK
     {
         public static byte id = 160;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var NACKs = new List<NACKdata>();
-            var count = DataTypes.ReadShort(buffer);
+            var count = decoder.ReadShort();
             for (int i = 0; i < count; ++i)
             {
                 var NACK = new NACKdata();
-                NACK.singleSequence = DataTypes.ReadBool(buffer);
+                NACK.singleSequence = decoder.ReadBool();
                 if (NACK.singleSequence == true)
                 {
-                    NACK.sequenceNumber = DataTypes.ReadUInt24LE(buffer);
+                    NACK.sequenceNumber = decoder.ReadUInt24LE();
                 }
                 else
                 {
-                    NACK.firstSequenceNumber = DataTypes.ReadUInt24LE(buffer);
-                    NACK.lastSequenceNumber = DataTypes.ReadUInt24LE(buffer);
+                    NACK.firstSequenceNumber = decoder.ReadUInt24LE();
+                    NACK.lastSequenceNumber = decoder.ReadUInt24LE();
                 }
                 NACKs.Add(NACK);
             }

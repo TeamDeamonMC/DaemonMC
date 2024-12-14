@@ -14,11 +14,11 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        public static void Encode(ChunkRadiusUpdatedPacket fields)
+        public static void Encode(ChunkRadiusUpdatedPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteVarInt(fields.radius);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteVarInt(fields.radius);
+            encoder.handlePacket();
         }
     }
 }

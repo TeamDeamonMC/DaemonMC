@@ -13,11 +13,11 @@
 
         }
 
-        public static void Encode(CreativeContentPacket fields)
+        public static void Encode(CreativeContentPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteVarInt(0);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteVarInt(0);
+            encoder.handlePacket();
         }
     }
 }

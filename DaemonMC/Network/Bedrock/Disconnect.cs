@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
@@ -16,14 +17,14 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        public static void Encode(DisconnectPacket fields)
+        public static void Encode(DisconnectPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteVarInt(0);
-            DataTypes.WriteBool(false);
-            DataTypes.WriteString(fields.message);
-            DataTypes.WriteString("");
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteVarInt(0);
+            encoder.WriteBool(false);
+            encoder.WriteString(fields.message);
+            encoder.WriteString("");
+            encoder.handlePacket();
         }
     }
 }

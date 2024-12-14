@@ -8,14 +8,14 @@
     public class RequestNetworkSettings
     {
         public const int id = 193;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new RequestNetworkSettingsPacket
             {
-                protocolVersion = DataTypes.ReadIntBE(buffer),
+                protocolVersion = decoder.ReadIntBE(),
             };
 
-            BedrockPacketProcessor.RequestNetworkSettings(packet);
+            BedrockPacketProcessor.RequestNetworkSettings(packet, decoder.endpoint);
         }
 
         public static void Encode(RequestNetworkSettingsPacket fields)

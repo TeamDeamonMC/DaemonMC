@@ -8,18 +8,18 @@
     public class RakDisconnect
     {
         public static byte id = 21;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new RakDisconnectPacket
             {
             };
-            RakPacketProcessor.Disconnect(packet);
+            RakPacketProcessor.Disconnect(packet, decoder.endpoint);
         }
 
-        public static void Encode(RakDisconnectPacket fields)
+        public static void Encode(RakDisconnectPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            PacketEncoder.handlePacket("raknet");
+            encoder.WriteByte(id);
+            encoder.handlePacket("raknet");
         }
     }
 }

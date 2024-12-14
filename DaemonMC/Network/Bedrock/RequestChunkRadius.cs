@@ -9,14 +9,14 @@
     public class RequestChunkRadius
     {
         public const int id = 69;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new RequestChunkRadiusPacket
             {
-                radius = DataTypes.ReadVarInt(buffer),
-                maxRadius = DataTypes.ReadByte(buffer)
+                radius = decoder.ReadVarInt(),
+                maxRadius = decoder.ReadByte()
             };
-            BedrockPacketProcessor.RequestChunkRadius(packet);
+            BedrockPacketProcessor.RequestChunkRadius(packet, decoder.endpoint);
         }
 
         public static void Encode(RequestChunkRadiusPacket fields)

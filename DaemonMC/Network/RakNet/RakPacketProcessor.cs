@@ -1,9 +1,12 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class RakPacketProcessor
     {
-        public static void UnconnectedPing(UnconnectedPingPacket packet)
+        public static void UnconnectedPing(UnconnectedPingPacket packet, IPEndPoint clientEp)
         {
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new UnconnectedPongPacket
             {
                 Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
@@ -11,40 +14,43 @@
                 Magic = "00ffff00fefefefefdfdfdfd12345678",
                 MOTD = $"MCPE;DaemonMC;100;{Info.version};0;{DaemonMC.maxOnline};12345678912345678912;World;Survival;1;19132;19133;"
             };
-            UnconnectedPong.Encode(pk);
+            UnconnectedPong.Encode(pk, encoder);
         }
 
-        public static void OpenConnectionRequest1(OpenConnectionRequest1Packet packet)
+        public static void OpenConnectionRequest1(OpenConnectionRequest1Packet packet, IPEndPoint clientEp)
         {
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new OpenConnectionReply1Packet
             {
                 Magic = "00ffff00fefefefefdfdfdfd12345678",
                 GUID = 1234567890123456789,
                 Mtu = packet.Mtu
             };
-            OpenConnectionReply1.Encode(pk);
+            OpenConnectionReply1.Encode(pk, encoder);
         }
 
-        public static void OpenConnectionRequest2(OpenConnectionRequest2Packet packet)
+        public static void OpenConnectionRequest2(OpenConnectionRequest2Packet packet, IPEndPoint clientEp)
         {
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new OpenConnectionReply2Packet
             {
                 Magic = "00ffff00fefefefefdfdfdfd12345678",
                 GUID = 1234567890123456789,
                 Mtu = packet.Mtu
             };
-            OpenConnectionReply2.Encode(pk);
+            OpenConnectionReply2.Encode(pk, encoder);
         }
 
-        public static void ConnectionRequest(ConnectionRequestPacket packet)
+        public static void ConnectionRequest(ConnectionRequestPacket packet, IPEndPoint clientEp)
         {
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new ConnectionRequestAcceptedPacket
             {
                 Time = packet.Time,
             };
-            RakSessionManager.addSession(Server.clientEp, packet.GUID);
+            RakSessionManager.addSession(clientEp, packet.GUID);
             //Console.WriteLine($"[Connection Request] --clientId: {packet.GUID}  time: {packet.Time} security: {packet.Security}");
-            ConnectionRequestAccepted.Encode(pk);
+            ConnectionRequestAccepted.Encode(pk, encoder);
         }
 
         public static void ACK(ACKPacket packet)
@@ -68,19 +74,20 @@
             //Log.warn($"NewIncomingConnectionPacket: {packet.serverAddress.IPAddress[0]}.{packet.serverAddress.IPAddress[1]}.{packet.serverAddress.IPAddress[2]}.{packet.serverAddress.IPAddress[3]}:{packet.serverAddress.Port} / {packet.incommingTime} / {packet.serverTime} / {packet.internalAddress.Count()}");
         }
 
-        public static void ConnectedPing(ConnectedPingPacket packet)
+        public static void ConnectedPing(ConnectedPingPacket packet, IPEndPoint clientEp)
         {
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new ConnectedPongPacket
             {
                 pingTime = packet.Time,
                 pongTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             };
-            ConnectedPong.Encode(pk);
+            ConnectedPong.Encode(pk, encoder);
         }
 
-        public static void Disconnect(RakDisconnectPacket packet)
+        public static void Disconnect(RakDisconnectPacket packet, IPEndPoint clientEp)
         {
-            RakSessionManager.deleteSession(Server.clientEp);
+            RakSessionManager.deleteSession(clientEp);
         }
     }
 }

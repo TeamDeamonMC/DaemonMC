@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class NewIncomingConnectionPacket
     {
@@ -12,14 +14,14 @@
     public class NewIncomingConnection
     {
         public static byte id = 19;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new NewIncomingConnectionPacket
             {
-                serverAddress = DataTypes.ReadAddress(buffer),
-                internalAddress = DataTypes.ReadInternalAddress(buffer, 20),
-                incommingTime = DataTypes.ReadLong(buffer),
-                serverTime = DataTypes.ReadLong(buffer)
+                serverAddress = decoder.ReadAddress(),
+                internalAddress = decoder.ReadInternalAddress(20),
+                incommingTime = decoder.ReadLong(),
+                serverTime = decoder.ReadLong()
             };
 
             RakPacketProcessor.NewIncomingConnection(packet);

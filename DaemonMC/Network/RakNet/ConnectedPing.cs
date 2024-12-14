@@ -8,21 +8,21 @@
     public class ConnectedPing
     {
         public static byte id = 0;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new ConnectedPingPacket
             {
-                Time = DataTypes.ReadLongLE(buffer),
+                Time = decoder.ReadLongLE(),
             };
 
-            RakPacketProcessor.ConnectedPing(packet);
+            RakPacketProcessor.ConnectedPing(packet, decoder.endpoint);
         }
 
-        public static void Encode(ConnectedPingPacket fields)
+        public static void Encode(ConnectedPingPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteLongLE(fields.Time);
-            PacketEncoder.handlePacket("raknet");
+            encoder.WriteByte(id);
+            encoder.WriteLongLE(fields.Time);
+            encoder.handlePacket("raknet");
         }
     }
 }

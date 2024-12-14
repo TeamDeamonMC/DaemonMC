@@ -19,16 +19,16 @@
 
         }
 
-        public static void Encode(ResourcePacksInfoPacket fields)
+        public static void Encode(ResourcePacksInfoPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteBool(fields.force);
-            DataTypes.WriteBool(fields.isAddon);
-            DataTypes.WriteBool(fields.hasScripts);
-            DataTypes.WriteUUID(fields.templateUUID);
-            DataTypes.WriteString(fields.templateVersion);
-            DataTypes.WriteShort(0);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteBool(fields.force);
+            encoder.WriteBool(fields.isAddon);
+            encoder.WriteBool(fields.hasScripts);
+            encoder.WriteUUID(fields.templateUUID);
+            encoder.WriteString(fields.templateVersion);
+            encoder.WriteShort(0);
+            encoder.handlePacket();
         }
     }
 }

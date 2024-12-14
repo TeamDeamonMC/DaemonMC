@@ -2,6 +2,7 @@
 using System.Net;
 using DaemonMC.Utils.Text;
 using DaemonMC.Network;
+using DaemonMC.Network.RakNet;
 
 namespace DaemonMC
 {
@@ -9,7 +10,8 @@ namespace DaemonMC
     {
         public static Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
         public static Socket sock { get; set; } = null!;
-        public static IPEndPoint clientEp { get; set; } = null!;
+        public static int datGrIn = 0;
+        public static int datGrOut = 0;
 
         private static long nextId = 10;
         private static Queue<long> availableIds = new Queue<long>();
@@ -65,17 +67,22 @@ namespace DaemonMC
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
             Log.info("Server listening on port 19132");
 
+            Thread titleMonitor = new Thread(titleUpdate);
+            titleMonitor.Start();
+
             while (true)
             {
                 EndPoint ep = iep;
-
                 byte[] buffer = new byte[8192];
                 int recv = sock.ReceiveFrom(buffer, ref ep);
 
                 if (recv != 0)
                 {
-                    clientEp = (IPEndPoint)ep;
-                    PacketDecoder.RakDecoder(buffer, recv);
+                    var client = (IPEndPoint)ep;
+                    RakSessionManager.createSession(client);
+
+                    PacketDecoder decoder = PacketDecoderPool.Get(buffer, client);
+                    decoder.RakDecoder(decoder, recv);
                 }
             }
         }
@@ -83,9 +90,17 @@ namespace DaemonMC
         public static void Send(byte[] trimmedBuffer, IPEndPoint client)
         {
             sock.SendTo(trimmedBuffer, client);
-            PacketEncoder.writeOffset = 0;
-            PacketEncoder.byteStream = new byte[1024];
         }
 
+        private static void titleUpdate()
+        {
+            while (true)
+            {
+                Console.Title = $"DaeamonMC | Players {onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
+                datGrIn = 0;
+                datGrOut = 0;
+                Thread.Sleep(1000);
+            }
+        }
     }
 }

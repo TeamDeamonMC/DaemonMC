@@ -1,5 +1,5 @@
-﻿using System.Net.Sockets;
-using DaemonMC.Utils.Text;
+﻿using System.Net;
+using System.Net.Sockets;
 
 namespace DaemonMC.Network.RakNet
 {
@@ -22,9 +22,9 @@ namespace DaemonMC.Network.RakNet
         public static uint reliableIndex = 0;
         public static Dictionary<short, FragmentedPacket> fragmentedPackets = new Dictionary<short, FragmentedPacket>();
 
-        public static void ReliabilityHandler(byte[] buffer, int recv)
+        public static void ReliabilityHandler(PacketDecoder decoder, int recv)
         {
-            uint sequence = DataTypes.ReadUInt24LE(buffer);
+            uint sequence = decoder.ReadUInt24LE();
             uint reliableIndex = 0;
             uint sequenceIndex = 0;
             uint orderIndex = 0;
@@ -34,10 +34,10 @@ namespace DaemonMC.Network.RakNet
             short compId = 0;
             int compIndex = 0;
 
-            while (PacketDecoder.readOffset < recv)
+            while (decoder.readOffset < recv)
             {
-                var flags = DataTypes.ReadByte(buffer);
-                var pLength = DataTypes.ReadShortBE(buffer);
+                var flags = decoder.ReadByte();
+                var pLength = decoder.ReadShortBE();
 
                 byte reliabilityType = (byte)((flags & 0b011100000) >> 5);
                 bool isFragmented = (flags & 0b00010000) > 0;
@@ -48,24 +48,24 @@ namespace DaemonMC.Network.RakNet
                 }
                 else if (reliabilityType == 1)
                 {
-                    reliableIndex = DataTypes.ReadUInt24LE(buffer);
-                    sequenceIndex = DataTypes.ReadUInt24LE(buffer);
+                    reliableIndex = decoder.ReadUInt24LE();
+                    sequenceIndex = decoder.ReadUInt24LE();
                 }
                 else if (reliabilityType == 2)
                 {
-                    reliableIndex = DataTypes.ReadUInt24LE(buffer);
+                    reliableIndex = decoder.ReadUInt24LE();
                 }
                 else if (reliabilityType == 3)
                 {
-                    reliableIndex = DataTypes.ReadUInt24LE(buffer);
-                    sequenceIndex = DataTypes.ReadUInt24LE(buffer);
-                    orderChannel = DataTypes.ReadByte(buffer);
+                    reliableIndex = decoder.ReadUInt24LE();
+                    sequenceIndex = decoder.ReadUInt24LE();
+                    orderChannel = decoder.ReadByte();
                 }
                 else if (reliabilityType == 4)
                 {
-                    reliableIndex = DataTypes.ReadUInt24LE(buffer);
-                    orderIndex = DataTypes.ReadUInt24LE(buffer);
-                    orderChannel = DataTypes.ReadByte(buffer);
+                    reliableIndex = decoder.ReadUInt24LE();
+                    orderIndex = decoder.ReadUInt24LE();
+                    orderChannel = decoder.ReadByte();
                 }
                 else if (reliabilityType == 5)
                 {
@@ -73,26 +73,26 @@ namespace DaemonMC.Network.RakNet
                 }
                 else if (reliabilityType == 6)
                 {
-                    reliableIndex = DataTypes.ReadUInt24LE(buffer);
+                    reliableIndex = decoder.ReadUInt24LE();
                 }
                 else if (reliabilityType == 7)
                 {
-                    reliableIndex = DataTypes.ReadUInt24LE(buffer);
-                    orderIndex = DataTypes.ReadUInt24LE(buffer);
-                    orderChannel = DataTypes.ReadByte(buffer);
+                    reliableIndex = decoder.ReadUInt24LE();
+                    orderIndex = decoder.ReadUInt24LE();
+                    orderChannel = decoder.ReadByte();
                 }
 
                 if (isFragmented)
                 {
-                    compSize = DataTypes.ReadIntBE(buffer);
-                    compId = DataTypes.ReadShortBE(buffer);
-                    compIndex = DataTypes.ReadIntBE(buffer);
+                    compSize = decoder.ReadIntBE();
+                    compId = decoder.ReadShortBE();
+                    compIndex = decoder.ReadIntBE();
                 }
 
                 int lengthInBytes = (pLength + 7) / 8;
                 byte[] body = new byte[lengthInBytes];
-                Array.Copy(buffer, PacketDecoder.readOffset, body, 0, lengthInBytes);
-                PacketDecoder.readOffset += lengthInBytes;
+                Array.Copy(decoder.buffer, decoder.readOffset, body, 0, lengthInBytes);
+                decoder.readOffset += lengthInBytes;
 
                 if (isFragmented)
                 {
@@ -108,27 +108,27 @@ namespace DaemonMC.Network.RakNet
                     if (compSize == compIndex+1)
                     {
                         byte[] fullPacket = ReassemblePacket(fragment);
-                        ProcessReassembledPacket(fullPacket);
+                        decoder.packetBuffers.Add(fullPacket);
                         fragmentedPackets.Remove(compId);
                     }
                 }
                 else
                 {
-                    PacketDecoder.packetBuffers.Add(body);
+                    decoder.packetBuffers.Add(body);
                 }
                 //Console.WriteLine($"[Frame Set Packet] seq: {sequence} f: {flags} pL: {pLength} rtype: {reliabilityType} frag: {isFragmented} relIndx: {reliableIndex} seqIndxL: {sequenceIndex} ordIndx: {orderIndex} ordCh: {orderChannel} compSize: {compSize} compIndx: {compIndex} compId: {compId}");
 
                 var ack = new ACKdata { sequenceNumber = sequence };
 
                 var acks = new List<ACKdata>();
-
                 acks.Add(ack);
 
+                PacketEncoder encoder = PacketEncoderPool.Get(decoder.endpoint);
                 var pk = new ACKPacket
                 {
                     ACKs = acks,
                 };
-                ACK.Encode(pk);
+                ACK.Encode(pk, encoder);
             }
         }
 
@@ -149,12 +149,8 @@ namespace DaemonMC.Network.RakNet
             return fullPacket;
         }
 
-        private static void ProcessReassembledPacket(byte[] packet)
-        {
-            PacketDecoder.packetBuffers.Add(packet);
-        }
-
         public static void ReliabilityHandler(
+    PacketEncoder encoder,
     byte[] body,
     byte reliabilityType = 2,
     bool isFragmented = false,
@@ -175,10 +171,10 @@ namespace DaemonMC.Network.RakNet
                 flags |= 0x00;
             }
 
-            DataTypes.WriteByte(128);
-            DataTypes.WriteUInt24LE(PacketEncoder.sequenceNumber);
-            DataTypes.WriteByte(flags);
-            DataTypes.WriteShortBE((ushort)(body.Count() * 8));
+            encoder.WriteByte(128);
+            encoder.WriteUInt24LE(RakSessionManager.getSession(encoder.clientEp).sequenceNumber);
+            encoder.WriteByte(flags);
+            encoder.WriteShortBE((ushort)(body.Count() * 8));
 
             if (reliabilityType == 0) // Unreliable
             {
@@ -186,25 +182,25 @@ namespace DaemonMC.Network.RakNet
             }
             else if (reliabilityType == 1) // Unreliable Sequenced
             {
-                DataTypes.WriteUInt24LE(reliableIndex);
-                DataTypes.WriteUInt24LE(sequenceIndex);
+                encoder.WriteUInt24LE(reliableIndex);
+                encoder.WriteUInt24LE(sequenceIndex);
             }
             else if (reliabilityType == 2) // Reliable
             {
-                DataTypes.WriteUInt24LE(reliableIndex);
+                encoder.WriteUInt24LE(reliableIndex);
                 reliableIndex++;
             }
             else if (reliabilityType == 3) // Ordered
             {
-                DataTypes.WriteUInt24LE(reliableIndex);
-                DataTypes.WriteUInt24LE(orderIndex);
-                DataTypes.WriteByte(orderChannel);
+                encoder.WriteUInt24LE(reliableIndex);
+                encoder.WriteUInt24LE(orderIndex);
+                encoder.WriteByte(orderChannel);
             }
             else if (reliabilityType == 4) // Reliable Ordered
             {
-                DataTypes.WriteUInt24LE(reliableIndex);
-                DataTypes.WriteUInt24LE(orderIndex);
-                DataTypes.WriteByte(orderChannel);
+                encoder.WriteUInt24LE(reliableIndex);
+                encoder.WriteUInt24LE(orderIndex);
+                encoder.WriteByte(orderChannel);
             }
             else if (reliabilityType == 5) // Reliable Sequenced
             {
@@ -212,25 +208,25 @@ namespace DaemonMC.Network.RakNet
             }
             else if (reliabilityType == 6) // Unreliable, ACK
             {
-                DataTypes.WriteUInt24LE(reliableIndex);
+                encoder.WriteUInt24LE(reliableIndex);
             }
             else if (reliabilityType == 7) // Reliable, ACK
             {
-                DataTypes.WriteUInt24LE(reliableIndex);
-                DataTypes.WriteUInt24LE(orderIndex);
-                DataTypes.WriteByte(orderChannel);
+                encoder.WriteUInt24LE(reliableIndex);
+                encoder.WriteUInt24LE(orderIndex);
+                encoder.WriteByte(orderChannel);
             }
 
-            Array.Copy(body, 0, PacketEncoder.byteStream, PacketEncoder.writeOffset, body.Length);
-            PacketEncoder.writeOffset += body.Length;
+            Array.Copy(body, 0, encoder.byteStream, encoder.writeOffset, body.Length);
+            encoder.writeOffset += body.Length;
 
             if (isFragmented)
             {
-                DataTypes.WriteInt(compSize);
-                DataTypes.WriteShort(compId);
-                DataTypes.WriteInt(compIndex);
+                encoder.WriteInt(compSize);
+                encoder.WriteShort(compId);
+                encoder.WriteInt(compIndex);
             }
-            PacketEncoder.SendPacket(128);
+            encoder.SendPacket(128);
         }
     }
 }

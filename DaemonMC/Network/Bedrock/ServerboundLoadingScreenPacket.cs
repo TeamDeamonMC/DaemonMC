@@ -9,12 +9,12 @@
     public class ServerboundLoadingScreen
     {
         public const int id = 312;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new ServerboundLoadingScreenPacket
             {
-                screenType = DataTypes.ReadVarInt(buffer),
-                screenId = DataTypes.ReadInt(buffer)
+                screenType = decoder.ReadVarInt(),
+                screenId = decoder.ReadInt()
             };
 
             BedrockPacketProcessor.ServerboundLoadingScreen(packet);

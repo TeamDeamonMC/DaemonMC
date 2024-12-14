@@ -11,14 +11,14 @@
     public class PacketViolationWarning
     {
         public const int id = 156;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new PacketViolationWarningPacket
             {
-                type = DataTypes.ReadSignedVarInt(buffer),
-                serverity = DataTypes.ReadSignedVarInt(buffer),
-                packetId = DataTypes.ReadSignedVarInt(buffer),
-                description = DataTypes.ReadString(buffer),
+                type = decoder.ReadSignedVarInt(),
+                serverity = decoder.ReadSignedVarInt(),
+                packetId = decoder.ReadSignedVarInt(),
+                description = decoder.ReadString(),
             };
 
             BedrockPacketProcessor.PacketViolationWarning(packet);

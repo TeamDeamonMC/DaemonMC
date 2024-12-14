@@ -14,12 +14,12 @@
 
         }
 
-        public static void Encode(ConnectedPongPacket fields)
+        public static void Encode(ConnectedPongPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteLongLE(fields.pingTime);
-            DataTypes.WriteLongLE(fields.pongTime);
-            PacketEncoder.handlePacket("raknet");
+            encoder.WriteByte(id);
+            encoder.WriteLongLE(fields.pingTime);
+            encoder.WriteLongLE(fields.pongTime);
+            encoder.handlePacket("raknet");
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using DaemonMC.Network.Handler;
+﻿using System.Net;
+using System.Text;
+using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 
@@ -6,9 +8,11 @@ namespace DaemonMC.Network.Bedrock
 {
     public class BedrockPacketProcessor
     {
-        public static void RequestNetworkSettings(RequestNetworkSettingsPacket packet)
+        public static void RequestNetworkSettings(RequestNetworkSettingsPacket packet, IPEndPoint clientEp)
         {
-            Log.debug($"New player ({RakSessionManager.getSession(Server.clientEp).GUID}) log in with protocol version: {packet.protocolVersion}");
+            Log.debug($"New player ({RakSessionManager.getSession(clientEp).GUID}) log in with protocol version: {packet.protocolVersion}");
+
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new NetworkSettingsPacket
             {
                 compressionThreshold = 0,
@@ -17,13 +21,14 @@ namespace DaemonMC.Network.Bedrock
                 clientThrottleScalar = 0,
                 clientThrottleThreshold = 0
             };
-            NetworkSettings.Encode(pk);
-            RakSessionManager.Compression(Server.clientEp, true);
+            NetworkSettings.Encode(pk, encoder);
+
+            RakSessionManager.Compression(clientEp, true);
         }
 
-        public static void Login(LoginPacket packet)
+        public static void Login(LoginPacket packet, IPEndPoint clientEp)
         {
-            Handler.Login.execute(packet);
+            Handler.Login.execute(packet, clientEp);
         }
 
         public static void PacketViolationWarning(PacketViolationWarningPacket packet)
@@ -32,48 +37,53 @@ namespace DaemonMC.Network.Bedrock
             Log.error(packet.description);
         }
 
-        public static void ClientCacheStatus(ClientCacheStatusPacket packet)
+        public static void ClientCacheStatus(ClientCacheStatusPacket packet, IPEndPoint clientEp)
         {
-            var player = RakSessionManager.getCurrentSession();
+            var player = RakSessionManager.getSession(clientEp);
             Log.debug($"{player.username} ClientCacheStatus = {packet.status}");
 
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk1 = new ResourcePacksInfoPacket
             {
                 force = false,
                 isAddon = false,
                 hasScripts = false,
             };
-            ResourcePacksInfo.Encode(pk1);
+            ResourcePacksInfo.Encode(pk1, encoder);
         }
 
-        public static void ResourcePackClientResponse(ResourcePackClientResponsePacket packet)
+        public static void ResourcePackClientResponse(ResourcePackClientResponsePacket packet, IPEndPoint clientEp)
         {
             Log.debug($"ResourcePackClientResponse = {packet.response}");
             if (packet.response == 3)
             {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new ResourcePackStackPacket
                 {
                     forceTexturePack = false,
                 };
-                ResourcePackStack.Encode(pk);
+                ResourcePackStack.Encode(pk, encoder);
             }
             else if (packet.response == 4) //start game
             {
-                preSpawn.execute();
+                preSpawn.execute(clientEp);
             }
         }
 
-        public static void RequestChunkRadius(RequestChunkRadiusPacket packet)
+        public static void RequestChunkRadius(RequestChunkRadiusPacket packet, IPEndPoint clientEp)
         {
-            var player = RakSessionManager.getCurrentSession();
+            var player = RakSessionManager.getSession(clientEp);
             Log.debug($"{player.username} requested chunks with radius {packet.radius}. Max radius = {packet.maxRadius}");
+
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new ChunkRadiusUpdatedPacket
             {
                 radius = packet.radius,
             };
-            ChunkRadiusUpdated.Encode(pk);
+            ChunkRadiusUpdated.Encode(pk, encoder);
+
             return;
-            for (int x = -20; x <= 20; x++)
+         /*   for (int x = -20; x <= 20; x++)
             {
                 for (int z = -20; z <= 20; z++)
                 {
@@ -86,7 +96,7 @@ namespace DaemonMC.Network.Bedrock
                     };
                     LevelChunk.Encode(pk1);
                 }
-            }
+            }*/
         }
 
         public static void MovePlayer(MovePlayerPacket packet)

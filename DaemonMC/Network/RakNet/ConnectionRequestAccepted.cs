@@ -13,20 +13,20 @@
 
         }
 
-        public static void Encode(ConnectionRequestAcceptedPacket fields)
+        public static void Encode(ConnectionRequestAcceptedPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteAddress();
-            DataTypes.WriteShort(0);
+            encoder.WriteByte(id);
+            encoder.WriteAddress();
+            encoder.WriteShort(0);
 
             for (int i = 0; i < 20; ++i)
             {
-                DataTypes.WriteAddress();
+                encoder.WriteAddress();
             }
 
-            DataTypes.WriteLongLE(fields.Time);
-            DataTypes.WriteLongLE(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            PacketEncoder.handlePacket("raknet");
+            encoder.WriteLongLE(fields.Time);
+            encoder.WriteLongLE(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            encoder.handlePacket("raknet");
         }
     }
 }

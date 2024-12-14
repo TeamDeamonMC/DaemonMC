@@ -13,11 +13,11 @@
 
         }
 
-        public static void Encode(PlayStatusPacket fields)
+        public static void Encode(PlayStatusPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteIntBE(fields.status);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteIntBE(fields.status);
+            encoder.handlePacket();
         }
     }
 }

@@ -19,14 +19,14 @@ namespace DaemonMC.Network.RakNet
 
         }
 
-        public static void Encode(OpenConnectionReply1Packet fields)
+        public static void Encode(OpenConnectionReply1Packet fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteMagic(fields.Magic);
-            DataTypes.WriteLongLE(fields.GUID);
-            DataTypes.WriteByte(0);
-            DataTypes.WriteShortBE((ushort)fields.Mtu);
-            PacketEncoder.SendPacket(id);
+            encoder.WriteByte(id);
+            encoder.WriteMagic(fields.Magic);
+            encoder.WriteLongLE(fields.GUID);
+            encoder.WriteByte(0);
+            encoder.WriteShortBE((ushort)fields.Mtu);
+            encoder.SendPacket(id);
         }
     }
 }

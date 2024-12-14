@@ -7,18 +7,25 @@ namespace DaemonMC.Network.RakNet
     {
         public static Dictionary<IPEndPoint, RakSession> sessions = new Dictionary<IPEndPoint, RakSession>();
 
+        public static void createSession(IPEndPoint ip)
+        {
+            if (sessions.TryGetValue(ip, out var session))
+            {
+                return;
+            }
+            sessions.Add(ip, new RakSession());
+        }
+
         public static void addSession(IPEndPoint ip, long guid)
         {
             if (sessions.TryGetValue(ip, out var session))
             {
-                Log.warn($"Couldn't create session, {ip.Address.ToString()} with session GUID {session.GUID} already connected.");
-                return;
+                sessions[ip].GUID = guid;
             }
-            sessions.Add(ip, new RakSession(guid));
-        }
-        public static RakSession getCurrentSession()
-        {
-            return getSession(Server.clientEp);
+            else
+            {
+                Log.warn($"Session for {ip.Address.ToString()} not found");
+            }
         }
 
         public static RakSession getSession(IPEndPoint ip)
@@ -29,14 +36,14 @@ namespace DaemonMC.Network.RakNet
             }
             else
             {
-                Log.warn($"Session for {ip.Address.ToString()}");
+                Log.warn($"Session for {ip.Address.ToString()} not found");
             }
             return null;
         }
 
         public static void deleteSession(IPEndPoint ip)
         {
-            Server.RemovePlayer(getSession(Server.clientEp).EntityID);
+            Server.RemovePlayer(getSession(ip).EntityID);
             if (!sessions.Remove(ip))
             {
                 Log.warn($"Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");

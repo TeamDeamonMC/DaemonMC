@@ -16,16 +16,16 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        public static void Encode(LevelChunkPacket fields)
+        public static void Encode(LevelChunkPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteSignedVarInt(fields.chunkX);
-            DataTypes.WriteSignedVarInt(fields.chunkZ);
-            DataTypes.WriteSignedVarInt(0);
-            DataTypes.WriteVarInt(0);
-            DataTypes.WriteBool(false);
-            DataTypes.WriteString(fields.data);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteSignedVarInt(fields.chunkX);
+            encoder.WriteSignedVarInt(fields.chunkZ);
+            encoder.WriteSignedVarInt(0);
+            encoder.WriteVarInt(0);
+            encoder.WriteBool(false);
+            encoder.WriteString(fields.data);
+            encoder.handlePacket();
         }
     }
 }

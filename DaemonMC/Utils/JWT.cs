@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Text;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
@@ -15,9 +16,9 @@ namespace DaemonMC.Utils
     {
         public const string RootKey = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
 
-        public static void processJWTchain(string jsonString)
+        public static void processJWTchain(string jsonString, IPEndPoint clientEp)
         {
-            var player = RakSessionManager.getCurrentSession();
+            var player = RakSessionManager.getSession(clientEp);
             JWTObject decodedObject = JsonConvert.DeserializeObject<JWTObject>(jsonString);
             var handler = new JwtSecurityTokenHandler();
 
@@ -52,9 +53,9 @@ namespace DaemonMC.Utils
             }
         }
 
-        public static void processJWTtoken(string rawToken)
+        public static void processJWTtoken(string rawToken, IPEndPoint clientEp)
         {
-            var player = RakSessionManager.getCurrentSession();
+            var player = RakSessionManager.getSession(clientEp);
             int index = rawToken.IndexOf("ey");
             string[] tokenParts = rawToken.Substring(index).Split('.');
 

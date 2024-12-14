@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class UnconnectedPingPacket
     {
@@ -10,16 +12,16 @@
     public class UnconnectedPing
     {
         public static byte id = 1;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new UnconnectedPingPacket
             {
-                Time = DataTypes.ReadLongLE(buffer),
-                Magic = DataTypes.ReadMagic(buffer),
-                ClientId = DataTypes.ReadLong(buffer)
+                Time = decoder.ReadLongLE(),
+                Magic = decoder.ReadMagic(),
+                ClientId = decoder.ReadLong()
             };
 
-            RakPacketProcessor.UnconnectedPing(packet);
+            RakPacketProcessor.UnconnectedPing(packet, decoder.endpoint);
         }
 
         public static void Encode(UnconnectedPingPacket fields)

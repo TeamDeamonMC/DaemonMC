@@ -14,11 +14,11 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        public static void Encode(ServerToClientHandshakePacket fields)
+        public static void Encode(ServerToClientHandshakePacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteString(fields.JWT);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteString(fields.JWT);
+            encoder.handlePacket();
         }
     }
 }

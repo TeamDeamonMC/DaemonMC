@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Net;
+using System.Numerics;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
@@ -8,9 +9,9 @@ namespace DaemonMC.Network.Handler
 {
     public class preSpawn
     {
-        public static void execute()
+        public static void execute(IPEndPoint clientEp)
         {
-            var session = RakSessionManager.getCurrentSession();
+            var session = RakSessionManager.getSession(clientEp);
 
             Player player = new Player();
             player.username = session.username;
@@ -18,6 +19,7 @@ namespace DaemonMC.Network.Handler
             long EntityId = Server.AddPlayer(player);
             session.EntityID = EntityId;
 
+            PacketEncoder encoder1 = PacketEncoderPool.Get(clientEp);
             var pk1 = new StartGamePacket
             {
                 EntityId = EntityId,
@@ -33,14 +35,16 @@ namespace DaemonMC.Network.Handler
                 seed = 9876,
                 generator = 1,
             };
-            StartGame.Encode(pk1);
+            StartGame.Encode(pk1, encoder1);
 
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new CreativeContentPacket
             {
 
             };
-            CreativeContent.Encode(pk);
+            CreativeContent.Encode(pk, encoder);
 
+            PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
             var pk2 = new BiomeDefinitionListPacket
             {
                 biomeData = new fNbt.NbtCompound("")
@@ -52,21 +56,23 @@ namespace DaemonMC.Network.Handler
                     }
                 }
             };
-            BiomeDefinitionList.Encode(pk2);
+            BiomeDefinitionList.Encode(pk2, encoder2);
 
+            PacketEncoder encoder3 = PacketEncoderPool.Get(clientEp);
             var pk3 = new LevelChunkPacket
             {
                 chunkX = 0,
                 chunkZ = 0,
                 data = ""
             };
-            LevelChunk.Encode(pk3);
+            LevelChunk.Encode(pk3, encoder3);
 
+            PacketEncoder encoder4 = PacketEncoderPool.Get(clientEp);
             var pk4 = new PlayStatusPacket
             {
                 status = 3,
             };
-            PlayStatus.Encode(pk4);
+            PlayStatus.Encode(pk4, encoder4);
             Log.info($"{player.username} spawned at X:{pk1.position.X} Y:{pk1.position.Y} Z:{pk1.position.Z}");
         }
     }

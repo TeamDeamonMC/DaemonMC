@@ -8,14 +8,14 @@
     public class ResourcePackClientResponse
     {
         public const int id = 8;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new ResourcePackClientResponsePacket
             {
-                response = DataTypes.ReadByte(buffer),
+                response = decoder.ReadByte(),
             };
-            DataTypes.ReadShort(buffer);
-            BedrockPacketProcessor.ResourcePackClientResponse(packet);
+            decoder.ReadShort();
+            BedrockPacketProcessor.ResourcePackClientResponse(packet, decoder.endpoint);
         }
 
         public static void Encode(ResourcePackClientResponsePacket fields)

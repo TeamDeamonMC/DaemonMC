@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Text;
 
 namespace DaemonMC.Network.RakNet
 {
@@ -18,22 +20,22 @@ namespace DaemonMC.Network.RakNet
     public class ACK
     {
         public static byte id = 192;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var ACKs = new List<ACKdata>();
-            var count = DataTypes.ReadShortBE(buffer);
+            var count = decoder.ReadShortBE();
             for (int i = 0; i < count; ++i)
             {
                 var ACK = new ACKdata();
-                ACK.singleSequence = DataTypes.ReadBool(buffer);
+                ACK.singleSequence = decoder.ReadBool();
                 if (ACK.singleSequence == true)
                 {
-                    ACK.sequenceNumber = DataTypes.ReadUInt24LE(buffer);
+                    ACK.sequenceNumber = decoder.ReadUInt24LE();
                 }
                 else
                 {
-                    ACK.firstSequenceNumber = DataTypes.ReadUInt24LE(buffer);
-                    ACK.lastSequenceNumber = DataTypes.ReadUInt24LE(buffer);
+                    ACK.firstSequenceNumber = decoder.ReadUInt24LE();
+                    ACK.lastSequenceNumber = decoder.ReadUInt24LE();
                 }
                 ACKs.Add(ACK);
             }
@@ -45,13 +47,13 @@ namespace DaemonMC.Network.RakNet
             RakPacketProcessor.ACK(packet);
         }
 
-        public static void Encode(ACKPacket fields)
+        public static void Encode(ACKPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteShortBE(1);
-            DataTypes.WriteBool(true);
-            DataTypes.WriteUInt24LE(fields.ACKs[0].sequenceNumber);
-            PacketEncoder.SendPacket(id);
+            encoder.WriteByte(id);
+            encoder.WriteShortBE(1);
+            encoder.WriteBool(true);
+            encoder.WriteUInt24LE(fields.ACKs[0].sequenceNumber);
+            encoder.SendPacket(id);
         }
     }
 }

@@ -9,12 +9,12 @@
     public class Interact
     {
         public const int id = 33;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new InteractPacket
             {
-                action = DataTypes.ReadByte(buffer),
-                actorRuntimeId = DataTypes.ReadVarLong(buffer)
+                action = decoder.ReadByte(),
+                actorRuntimeId = decoder.ReadVarLong()
             };
 
             BedrockPacketProcessor.Interact(packet);

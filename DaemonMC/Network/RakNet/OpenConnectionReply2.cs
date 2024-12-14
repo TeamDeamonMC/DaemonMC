@@ -17,15 +17,15 @@
 
         }
 
-        public static void Encode(OpenConnectionReply2Packet fields)
+        public static void Encode(OpenConnectionReply2Packet fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteMagic(fields.Magic);
-            DataTypes.WriteLongLE(fields.GUID);
-            DataTypes.WriteAddress(); //todo
-            DataTypes.WriteShortBE((ushort)fields.Mtu);
-            DataTypes.WriteByte(0); //todo
-            PacketEncoder.SendPacket(id);
+            encoder.WriteByte(id);
+            encoder.WriteMagic(fields.Magic);
+            encoder.WriteLongLE(fields.GUID);
+            encoder.WriteAddress(); //todo
+            encoder.WriteShortBE((ushort)fields.Mtu);
+            encoder.WriteByte(0); //todo
+            encoder.SendPacket(id);
         }
     }
 }

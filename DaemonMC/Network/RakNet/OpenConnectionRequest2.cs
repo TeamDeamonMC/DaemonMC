@@ -14,17 +14,16 @@ namespace DaemonMC.Network.RakNet
     public class OpenConnectionRequest2
     {
         public static byte id = 7;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new OpenConnectionRequest2Packet
             {
-                Magic = DataTypes.ReadMagic(buffer),
-                Address = DataTypes.ReadAddress(buffer),
-                Mtu = DataTypes.ReadShort(buffer),
-                ClientId = DataTypes.ReadLong(buffer)
+                Magic = decoder.ReadMagic(),
+                Address = decoder.ReadAddress(),
+                Mtu = decoder.ReadShort(),
+                ClientId = decoder.ReadLong()
             };
-
-            RakPacketProcessor.OpenConnectionRequest2(packet);
+            RakPacketProcessor.OpenConnectionRequest2(packet, decoder.endpoint);
         }
 
         public static void Encode(OpenConnectionRequest2Packet fields)

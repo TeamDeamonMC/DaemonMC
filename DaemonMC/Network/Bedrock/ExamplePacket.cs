@@ -13,10 +13,10 @@
 
         }
 
-        public static void Encode(ExamplePacket fields)
+        public static void Encode(ExamplePacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.handlePacket();
         }
     }
 }

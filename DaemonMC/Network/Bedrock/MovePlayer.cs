@@ -17,17 +17,17 @@ namespace DaemonMC.Network.Bedrock
     public class MovePlayer
     {
         public const int id = 19;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new MovePlayerPacket
             {
-                actorRuntimeId = DataTypes.ReadVarLong(buffer),
-                position = DataTypes.ReadVec3(buffer),
-                rotation = DataTypes.ReadVec2(buffer),
-                YheadRotation = DataTypes.ReadFloat(buffer),
-                positionMode = DataTypes.ReadByte(buffer),
-                isOnGround = DataTypes.ReadBool(buffer),
-                vehicleRuntimeId = DataTypes.ReadVarLong(buffer)
+                actorRuntimeId = decoder.ReadVarLong(),
+                position = decoder.ReadVec3(),
+                rotation = decoder.ReadVec2(),
+                YheadRotation = decoder.ReadFloat(),
+                positionMode = decoder.ReadByte(),
+                isOnGround = decoder.ReadBool(),
+                vehicleRuntimeId = decoder.ReadVarLong()
             };
 
             BedrockPacketProcessor.MovePlayer(packet);

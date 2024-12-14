@@ -17,15 +17,15 @@
 
         }
 
-        public static void Encode(NetworkSettingsPacket fields)
+        public static void Encode(NetworkSettingsPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteShort(fields.compressionThreshold);
-            DataTypes.WriteShort(fields.compressionAlgorithm);
-            DataTypes.WriteBool(fields.clientThrottleEnabled);
-            DataTypes.WriteByte(fields.clientThrottleThreshold);
-            DataTypes.WriteFloat(fields.clientThrottleScalar);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteShort(fields.compressionThreshold);
+            encoder.WriteShort(fields.compressionAlgorithm);
+            encoder.WriteBool(fields.clientThrottleEnabled);
+            encoder.WriteByte(fields.clientThrottleThreshold);
+            encoder.WriteFloat(fields.clientThrottleScalar);
+            encoder.handlePacket();
         }
     }
 }

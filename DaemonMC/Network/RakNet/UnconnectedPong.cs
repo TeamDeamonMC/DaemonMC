@@ -16,14 +16,14 @@
 
         }
 
-        public static void Encode(UnconnectedPongPacket fields)
+        public static void Encode(UnconnectedPongPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteLongLE(fields.Time);
-            DataTypes.WriteLongLE(fields.GUID);
-            DataTypes.WriteMagic(fields.Magic);
-            DataTypes.WriteRakString(fields.MOTD);
-            PacketEncoder.SendPacket(id);
+            encoder.WriteByte(id);
+            encoder.WriteLongLE(fields.Time);
+            encoder.WriteLongLE(fields.GUID);
+            encoder.WriteMagic(fields.Magic);
+            encoder.WriteRakString(fields.MOTD);
+            encoder.SendPacket(id);
         }
     }
 }

@@ -16,5 +16,26 @@ namespace DaemonMC
             bytes.Add((byte)(value & 127));
             return bytes.ToArray();
         }
+
+        public static int ReadVarInt(byte[] buffer)
+        {
+            int value = 0;
+            int size = 0;
+
+            while (true)
+            {
+                byte currentByte = buffer[size];
+                value |= (currentByte & 0x7F) << (size * 7);
+
+                if ((currentByte & 0x80) == 0)
+                {
+                    break;
+                }
+
+                size++;
+            }
+
+            return value;
+        }
     }
 }

@@ -30,99 +30,99 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        public static void Encode(StartGamePacket fields)
+        public static void Encode(StartGamePacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteSignedVarLong(fields.EntityId);
-            DataTypes.WriteVarLong((ulong)fields.EntityId);
-            DataTypes.WriteVarInt(fields.GameMode);
-            DataTypes.WriteVec3(fields.position);
-            DataTypes.WriteVec2(fields.rotation);
+            encoder.WriteVarInt(id);
+            encoder.WriteSignedVarLong(fields.EntityId);
+            encoder.WriteVarLong((ulong)fields.EntityId);
+            encoder.WriteVarInt(fields.GameMode);
+            encoder.WriteVec3(fields.position);
+            encoder.WriteVec2(fields.rotation);
             //Level settings
-            DataTypes.WriteLongLE(fields.seed);
+            encoder.WriteLongLE(fields.seed);
                     //Spawn settings
-                    DataTypes.WriteShort(fields.biomeType);
-                    DataTypes.WriteString(fields.biomeName);
-                    DataTypes.WriteVarInt(fields.dimension);
+                    encoder.WriteShort(fields.biomeType);
+                    encoder.WriteString(fields.biomeName);
+                    encoder.WriteVarInt(fields.dimension);
                     //End of Spawn settings
-                DataTypes.WriteSignedVarInt(fields.generator);
-                DataTypes.WriteSignedVarInt(fields.gameType);
-                DataTypes.WriteBool(false); //hardcore
-                DataTypes.WriteSignedVarInt(fields.difficulty);
-                DataTypes.WriteSignedVarInt(fields.spawnBlockX);
-                DataTypes.WriteVarInt(fields.spawnBlockY);
-                DataTypes.WriteSignedVarInt(fields.spawnBlockZ);
-                DataTypes.WriteBool(false); //achievements
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false); //editorCreated
-                DataTypes.WriteBool(false); //editorExported
-                DataTypes.WriteSignedVarInt(fields.stopTime);
-                DataTypes.WriteSignedVarInt(0);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteString("");
-                DataTypes.WriteFloat(0);
-                DataTypes.WriteFloat(0);
-                DataTypes.WriteBool(true); //platform content
-                DataTypes.WriteBool(true); //multiplayer?
-                DataTypes.WriteBool(true); //lan?
-                DataTypes.WriteVarInt(0); //xbox broadcast settings
-                DataTypes.WriteVarInt(0); //platform broadcast settings
-                DataTypes.WriteBool(true); //commands?
-                DataTypes.WriteBool(false); //texture packs?
-                DataTypes.WriteVarInt(0); //game rules
-                DataTypes.WriteInt(0); //experiments
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false); //bonus chest
-                DataTypes.WriteBool(false); //map
-                DataTypes.WriteByte(0); //permission level
-                DataTypes.WriteInt(0); //chunk tick range
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(true);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(false);
-                DataTypes.WriteString(Info.version);
-                DataTypes.WriteInt(0);
-                DataTypes.WriteInt(0);
-                DataTypes.WriteBool(false);
-                    DataTypes.WriteString("");
-                    DataTypes.WriteString("");
-                DataTypes.WriteBool(false);
-                DataTypes.WriteBool(true);
-                DataTypes.WriteBool(false);
+                encoder.WriteSignedVarInt(fields.generator);
+                encoder.WriteSignedVarInt(fields.gameType);
+                encoder.WriteBool(false); //hardcore
+                encoder.WriteSignedVarInt(fields.difficulty);
+                encoder.WriteSignedVarInt(fields.spawnBlockX);
+                encoder.WriteVarInt(fields.spawnBlockY);
+                encoder.WriteSignedVarInt(fields.spawnBlockZ);
+                encoder.WriteBool(false); //achievements
+                encoder.WriteBool(false);
+                encoder.WriteBool(false); //editorCreated
+                encoder.WriteBool(false); //editorExported
+                encoder.WriteSignedVarInt(fields.stopTime);
+                encoder.WriteSignedVarInt(0);
+                encoder.WriteBool(false);
+                encoder.WriteString("");
+                encoder.WriteFloat(0);
+                encoder.WriteFloat(0);
+                encoder.WriteBool(true); //platform content
+                encoder.WriteBool(true); //multiplayer?
+                encoder.WriteBool(true); //lan?
+                encoder.WriteVarInt(0); //xbox broadcast settings
+                encoder.WriteVarInt(0); //platform broadcast settings
+                encoder.WriteBool(true); //commands?
+                encoder.WriteBool(false); //texture packs?
+                encoder.WriteVarInt(0); //game rules
+                encoder.WriteInt(0); //experiments
+                encoder.WriteBool(false);
+                encoder.WriteBool(false); //bonus chest
+                encoder.WriteBool(false); //map
+                encoder.WriteByte(0); //permission level
+                encoder.WriteInt(0); //chunk tick range
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteBool(true);
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteBool(false);
+                encoder.WriteString(Info.version);
+                encoder.WriteInt(0);
+                encoder.WriteInt(0);
+                encoder.WriteBool(false);
+                    encoder.WriteString("");
+                    encoder.WriteString("");
+                encoder.WriteBool(false);
+                encoder.WriteBool(true);
+                encoder.WriteBool(false);
             //End of Level settings
-            DataTypes.WriteString("");
-            DataTypes.WriteString("");
-            DataTypes.WriteString("");
-            DataTypes.WriteString("");
-            DataTypes.WriteString("");
-            DataTypes.WriteString("");
-            DataTypes.WriteBool(false); //trial //ok
+            encoder.WriteString("");
+            encoder.WriteString("");
+            encoder.WriteString("");
+            encoder.WriteString("");
+            encoder.WriteString("");
+            encoder.WriteString("");
+            encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                DataTypes.WriteSignedVarInt(0);
-                DataTypes.WriteSignedVarInt(0);
-                DataTypes.WriteBool(true);
+                encoder.WriteSignedVarInt(0);
+                encoder.WriteSignedVarInt(0);
+                encoder.WriteBool(true);
                 //end of synced movement settings
-            DataTypes.WriteLong(0);
-            DataTypes.WriteSignedVarInt(0);
-            DataTypes.WriteVarInt(0); //block
-            DataTypes.WriteVarInt(0); //item
-            DataTypes.WriteString("");
-            DataTypes.WriteBool(true); //new inventory
-            DataTypes.WriteString(Info.version);
-            DataTypes.WriteCompoundTag(new fNbt.NbtCompound(""));
-            DataTypes.WriteLong(0); //blockstate checksum
+            encoder.WriteLong(0);
+            encoder.WriteSignedVarInt(0);
+            encoder.WriteVarInt(0); //block
+            encoder.WriteVarInt(0); //item
+            encoder.WriteString("");
+            encoder.WriteBool(true); //new inventory
+            encoder.WriteString(Info.version);
+            encoder.WriteCompoundTag(new fNbt.NbtCompound(""));
+            encoder.WriteLong(0); //blockstate checksum
             var uuid = Guid.NewGuid();
-            DataTypes.WriteUUID(uuid);
-            DataTypes.WriteBool(true);
-            DataTypes.WriteBool(false);
-            DataTypes.WriteBool(true);
-            PacketEncoder.handlePacket();
+            encoder.WriteUUID(uuid);
+            encoder.WriteBool(true);
+            encoder.WriteBool(false);
+            encoder.WriteBool(true);
+            encoder.handlePacket();
         }
     }
 }

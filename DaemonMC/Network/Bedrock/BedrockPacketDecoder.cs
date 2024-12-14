@@ -5,52 +5,52 @@ namespace DaemonMC.Network.Bedrock
 {
     public class BedrockPacketDecoder
     {
-        public static void BedrockDecoder(byte[] buffer)
+        public static void BedrockDecoder(PacketDecoder decoder)
         {
-            if (RakSessionManager.getSession(Server.clientEp) != null)
+            if (RakSessionManager.getSession(decoder.endpoint) != null)
             {
-                if (RakSessionManager.getSession(Server.clientEp).initCompression)
+                if (RakSessionManager.getSession(decoder.endpoint).initCompression)
                 {
-                    DataTypes.ReadByte(buffer);
+                    decoder.ReadByte();
                 }
             }
-            var size = DataTypes.ReadVarInt(buffer); //packet size
-            var pkid = DataTypes.ReadVarInt(buffer);
-            Log.debug($"[Server] <-- [{Server.clientEp.Address,-16}:{Server.clientEp.Port}] {(Info.Bedrock)pkid}");
+            var size = decoder.ReadVarInt(); //packet size
+            var pkid = decoder.ReadVarInt();
+            Log.debug($"[Server] <-- [{decoder.endpoint.Address,-16}:{decoder.endpoint.Port}] {(Info.Bedrock)pkid}");
 
             switch (pkid)
             {
                 case RequestNetworkSettings.id:
-                    RequestNetworkSettings.Decode(buffer);
+                    RequestNetworkSettings.Decode(decoder);
                     break;
                 case Login.id:
-                    Login.Decode(buffer);
+                    Login.Decode(decoder);
                     break;
                 case PacketViolationWarning.id:
-                    PacketViolationWarning.Decode(buffer);
+                    PacketViolationWarning.Decode(decoder);
                     break;
                 case ClientCacheStatus.id:
-                    ClientCacheStatus.Decode(buffer);
+                    ClientCacheStatus.Decode(decoder);
                     break;
                 case ResourcePackClientResponse.id:
-                    ResourcePackClientResponse.Decode(buffer);
+                    ResourcePackClientResponse.Decode(decoder);
                     break;
                 case RequestChunkRadius.id:
-                    RequestChunkRadius.Decode(buffer);
+                    RequestChunkRadius.Decode(decoder);
                     break;
                 case MovePlayer.id:
-                    MovePlayer.Decode(buffer);
+                    MovePlayer.Decode(decoder);
                     break;
                 case ServerboundLoadingScreen.id:
-                    ServerboundLoadingScreen.Decode(buffer);
+                    ServerboundLoadingScreen.Decode(decoder);
                     break;
                 case Interact.id:
-                    Interact.Decode(buffer);
+                    Interact.Decode(decoder);
                     break;
 
                 default:
                     Log.error($"[Server] Unknown Bedrock packet: {pkid}");
-                    DataTypes.HexDump(buffer, buffer.Length);
+                    DataTypes.HexDump(decoder.buffer, decoder.buffer.Length);
                     break;
             }
         }

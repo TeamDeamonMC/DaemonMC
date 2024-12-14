@@ -29,7 +29,7 @@ namespace DaemonMC
                 Server.ServerF();
             }else if (mode == "2")
             {
-                Client.ClientF();
+                //Client.ClientF();
             }
             else
             {

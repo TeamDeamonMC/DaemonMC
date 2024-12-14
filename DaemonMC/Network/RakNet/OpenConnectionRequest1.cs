@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class OpenConnectionRequest1Packet
     {
@@ -10,16 +12,16 @@
     public class OpenConnectionRequest1
     {
         public static byte id = 5;
-        public static void Decode(byte[] buffer, int recv)
+        public static void Decode(PacketDecoder decoder, int recv)
         {
             var packet = new OpenConnectionRequest1Packet
             {
-                Magic = DataTypes.ReadMagic(buffer),
-                Protocol = DataTypes.ReadByte(buffer),
-                Mtu = DataTypes.ReadMTU(buffer, recv),
+                Magic = decoder.ReadMagic(),
+                Protocol = decoder.ReadByte(),
+                Mtu = decoder.ReadMTU(recv),
             };
 
-            RakPacketProcessor.OpenConnectionRequest1(packet);
+            RakPacketProcessor.OpenConnectionRequest1(packet, decoder.endpoint);
         }
 
         public static void Encode(OpenConnectionRequest1Packet fields)

@@ -13,17 +13,17 @@
 
         }
 
-        public static void Encode(ResourcePackStackPacket fields)
+        public static void Encode(ResourcePackStackPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteBool(fields.forceTexturePack);
-            DataTypes.WriteVarInt(0); //add-on list
-            DataTypes.WriteVarInt(0); //texture pack list
-            DataTypes.WriteString(Info.version);
-            DataTypes.WriteInt(0); //experiments
-            DataTypes.WriteBool(false); //experiments was on
-            DataTypes.WriteBool(false); //editor packs
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteBool(fields.forceTexturePack);
+            encoder.WriteVarInt(0); //add-on list
+            encoder.WriteVarInt(0); //texture pack list
+            encoder.WriteString(Info.version);
+            encoder.WriteInt(0); //experiments
+            encoder.WriteBool(false); //experiments was on
+            encoder.WriteBool(false); //editor packs
+            encoder.handlePacket();
         }
     }
 }

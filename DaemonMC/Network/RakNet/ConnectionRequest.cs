@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class ConnectionRequestPacket
     {
@@ -10,25 +12,25 @@
     public class ConnectionRequest
     {
         public static byte id = 9;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new ConnectionRequestPacket
             {
-                GUID = DataTypes.ReadLong(buffer),
-                Time = DataTypes.ReadLongLE(buffer),
-                Security = DataTypes.ReadByte(buffer) //todo
+                GUID = decoder.ReadLong(),
+                Time = decoder.ReadLongLE(),
+                Security = decoder.ReadByte() //todo
             };
 
-            RakPacketProcessor.ConnectionRequest(packet);
+            RakPacketProcessor.ConnectionRequest(packet, decoder.endpoint);
         }
 
-        public static void Encode(ConnectionRequestPacket fields)
+        public static void Encode(ConnectionRequestPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteByte(id);
-            DataTypes.WriteLong(fields.GUID);
-            DataTypes.WriteLongLE(fields.Time);
-            DataTypes.WriteByte(fields.Security);
-            PacketEncoder.handlePacket("raknet");
+            encoder.WriteByte(id);
+            encoder.WriteLong(fields.GUID);
+            encoder.WriteLongLE(fields.Time);
+            encoder.WriteByte(fields.Security);
+            encoder.handlePacket("raknet");
         }
     }
 }

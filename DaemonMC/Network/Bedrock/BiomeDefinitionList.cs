@@ -14,11 +14,11 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        public static void Encode(BiomeDefinitionListPacket fields)
+        public static void Encode(BiomeDefinitionListPacket fields, PacketEncoder encoder)
         {
-            DataTypes.WriteVarInt(id);
-            DataTypes.WriteCompoundTag(fields.biomeData);
-            PacketEncoder.handlePacket();
+            encoder.WriteVarInt(id);
+            encoder.WriteCompoundTag(fields.biomeData);
+            encoder.handlePacket();
         }
     }
 }

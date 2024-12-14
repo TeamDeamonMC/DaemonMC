@@ -14,4 +14,8 @@
     <PackageReference Include="YamlDotNet" Version="16.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Level\" />
+  </ItemGroup>
+
 </Project>

@@ -7,10 +7,10 @@
         public string username { get; set; }
         public string identity { get; set; }
         public long EntityID { get; set; }
+        public uint sequenceNumber { get; set; } = 0;
 
-        public RakSession(long guid, bool compression = false)
+        public RakSession(bool compression = false)
         {
-            GUID = guid;
             initCompression = compression;
         }
     }

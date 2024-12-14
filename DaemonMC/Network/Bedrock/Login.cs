@@ -9,15 +9,15 @@
     public class Login
     {
         public const int id = 1;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
             var packet = new LoginPacket
             {
-                protocolVersion = DataTypes.ReadIntBE(buffer),
-                request = DataTypes.ReadString(buffer),
+                protocolVersion = decoder.ReadIntBE(),
+                request = decoder.ReadString(),
             };
 
-            BedrockPacketProcessor.Login(packet);
+            BedrockPacketProcessor.Login(packet, decoder.endpoint);
         }
 
         public static void Encode(LoginPacket fields)

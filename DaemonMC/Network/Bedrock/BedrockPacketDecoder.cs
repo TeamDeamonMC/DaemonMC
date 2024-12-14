@@ -47,6 +47,9 @@ namespace DaemonMC.Network.Bedrock
                 case Interact.id:
                     Interact.Decode(decoder);
                     break;
+                case TextMessage.id:
+                    TextMessage.Decode(decoder);
+                    break;
 
                 default:
                     Log.error($"[Server] Unknown Bedrock packet: {pkid}");

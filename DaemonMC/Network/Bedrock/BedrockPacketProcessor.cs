@@ -113,5 +113,21 @@ namespace DaemonMC.Network.Bedrock
         {
             //Log.debug($"Action for {packet.actorRuntimeId} / {packet.action}");
         }
+
+        public static void Text(TextMessagePacket packet, IPEndPoint clientEp)
+        {
+            var player = RakSessionManager.getSession(clientEp);
+
+            foreach (var dest in Server.onlinePlayers)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value.ep);
+                var pk = new TextMessagePacket
+                {
+                    Username = player.username,
+                    Message = packet.Message
+                };
+                TextMessage.Encode(pk, encoder);
+            }
+        }
     }
 }

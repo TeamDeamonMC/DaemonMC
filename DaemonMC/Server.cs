@@ -16,7 +16,7 @@ namespace DaemonMC
         private static long nextId = 10;
         private static Queue<long> availableIds = new Queue<long>();
 
-        public static long AddPlayer(Player player)
+        public static long AddPlayer(Player player, IPEndPoint ep)
         {
             long id;
 
@@ -29,6 +29,7 @@ namespace DaemonMC
                 id = nextId++;
             }
 
+            player.ep = ep;
             onlinePlayers.Add(id, player);
             Log.debug($"{player.username} has been added to server players with EntityID {id}");
             return id;

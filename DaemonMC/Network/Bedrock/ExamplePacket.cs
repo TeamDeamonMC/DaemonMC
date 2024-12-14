@@ -8,7 +8,7 @@
     public class Example
     {
         public static int id = 0;
-        public static void Decode(byte[] buffer)
+        public static void Decode(PacketDecoder decoder)
         {
 
         }

@@ -93,7 +93,7 @@ namespace DaemonMC.Network.Bedrock
                     encoder.WriteString("");
                     encoder.WriteString("");
                 encoder.WriteBool(false);
-                encoder.WriteBool(true);
+                encoder.WriteBool(false);
                 encoder.WriteBool(false);
             //End of Level settings
             encoder.WriteString("");

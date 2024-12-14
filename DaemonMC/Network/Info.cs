@@ -7,13 +7,14 @@
 
         public enum Bedrock
         {
-            Login = 1,                            //0x01
+            Login = 1,
             PlayStatus = 2,
             ServerToClientHandshake = 3,
-            Disconnect = 5,                       //0x05
+            Disconnect = 5,
             ResourcePacksInfo = 6,
             ResourcePackStack = 7,
             ResourcePackClientResponse = 8,
+            Text = 9,
             StartGame = 11,
             MovePlayer = 19,
             Interact = 33,
@@ -22,10 +23,10 @@
             ChunkRadiusUpdated = 70,
             BiomeDefinitionList = 122,
             ClientCacheStatus = 129,
-            NetworkSettings = 143,                //0xc1
+            NetworkSettings = 143,
             CreativeContent = 145,
-            PacketViolationWarningPacket = 156,   //
-            RequestNetworkSettings = 193,         //0x8F
+            PacketViolationWarningPacket = 156,
+            RequestNetworkSettings = 193,
             ServerboundLoadingScreen = 312
         }
 

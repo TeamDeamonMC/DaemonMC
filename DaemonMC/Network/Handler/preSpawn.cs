@@ -16,7 +16,7 @@ namespace DaemonMC.Network.Handler
             Player player = new Player();
             player.username = session.username;
 
-            long EntityId = Server.AddPlayer(player);
+            long EntityId = Server.AddPlayer(player, clientEp);
             session.EntityID = EntityId;
 
             PacketEncoder encoder1 = PacketEncoderPool.Get(clientEp);

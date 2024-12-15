@@ -21,6 +21,7 @@
             LevelChunkPacket = 58,
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
+            NetworkChunkPublisherUpdate = 121,
             BiomeDefinitionList = 122,
             ClientCacheStatus = 129,
             NetworkSettings = 143,

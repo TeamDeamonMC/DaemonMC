@@ -25,7 +25,7 @@ namespace DaemonMC.Network.Handler
                 EntityId = EntityId,
                 gameType = 0,
                 GameMode = 2,
-                position = new Vector3(0, 1, 0),
+                position = new Vector3(0, 5, 0),
                 rotation = new Vector2(0, 0),
                 spawnBlockX = 0,
                 spawnBlockY = 0,
@@ -57,15 +57,6 @@ namespace DaemonMC.Network.Handler
                 }
             };
             BiomeDefinitionList.Encode(pk2, encoder2);
-
-            PacketEncoder encoder3 = PacketEncoderPool.Get(clientEp);
-            var pk3 = new LevelChunkPacket
-            {
-                chunkX = 0,
-                chunkZ = 0,
-                data = ""
-            };
-            LevelChunk.Encode(pk3, encoder3);
 
             PacketEncoder encoder4 = PacketEncoderPool.Get(clientEp);
             var pk4 = new PlayStatusPacket

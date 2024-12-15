@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
     public class FragmentedPacket
     {
@@ -150,83 +147,107 @@ namespace DaemonMC.Network.RakNet
         }
 
         public static void ReliabilityHandler(
-    PacketEncoder encoder,
-    byte[] body,
-    byte reliabilityType = 2,
-    bool isFragmented = false,
-    uint sequenceIndex = 0,
-    uint orderIndex = 0,
-    byte orderChannel = 0,
-    int compSize = 0,
-    ushort compId = 0,
-    int compIndex = 0)
+        PacketEncoder encoder,
+        byte[] body,
+        byte reliabilityType = 2,
+        bool isFragmented = false,
+        uint sequenceIndex = 0,
+        uint orderIndex = 0,
+        byte orderChannel = 0,
+        int compSize = 0,
+        ushort compId = 0,
+        int compIndex = 0)
         {
-            byte flags = (byte)((reliabilityType << 5) & 0b01110000);
-            if (isFragmented)
-            {
-                flags |= 0b00010000;
-            }
-            else
-            {
-                flags |= 0x00;
-            }
+            int maxPayloadSize = 1500; //idk
+            isFragmented = body.Length > maxPayloadSize;
+            int totalFragments = isFragmented ? (int)Math.Ceiling((double)body.Length / maxPayloadSize) : 1;
 
-            encoder.WriteByte(128);
-            encoder.WriteUInt24LE(RakSessionManager.getSession(encoder.clientEp).sequenceNumber);
-            encoder.WriteByte(flags);
-            encoder.WriteShortBE((ushort)(body.Count() * 8));
+            compId = 0;
+            compIndex = 0;
 
-            if (reliabilityType == 0) // Unreliable
+            for (int i = 0; i < totalFragments; i++)
             {
-                // nothing
-            }
-            else if (reliabilityType == 1) // Unreliable Sequenced
-            {
-                encoder.WriteUInt24LE(reliableIndex);
-                encoder.WriteUInt24LE(sequenceIndex);
-            }
-            else if (reliabilityType == 2) // Reliable
-            {
-                encoder.WriteUInt24LE(reliableIndex);
-                reliableIndex++;
-            }
-            else if (reliabilityType == 3) // Ordered
-            {
-                encoder.WriteUInt24LE(reliableIndex);
-                encoder.WriteUInt24LE(orderIndex);
-                encoder.WriteByte(orderChannel);
-            }
-            else if (reliabilityType == 4) // Reliable Ordered
-            {
-                encoder.WriteUInt24LE(reliableIndex);
-                encoder.WriteUInt24LE(orderIndex);
-                encoder.WriteByte(orderChannel);
-            }
-            else if (reliabilityType == 5) // Reliable Sequenced
-            {
-                // nothing
-            }
-            else if (reliabilityType == 6) // Unreliable, ACK
-            {
-                encoder.WriteUInt24LE(reliableIndex);
-            }
-            else if (reliabilityType == 7) // Reliable, ACK
-            {
-                encoder.WriteUInt24LE(reliableIndex);
-                encoder.WriteUInt24LE(orderIndex);
-                encoder.WriteByte(orderChannel);
-            }
+                int start = i * maxPayloadSize;
+                int length = Math.Min(maxPayloadSize, body.Length - start);
 
-            Array.Copy(body, 0, encoder.byteStream, encoder.writeOffset, body.Length);
-            encoder.writeOffset += body.Length;
+                byte flags = (byte)((reliabilityType << 5) & 0b01110000);
+                if (isFragmented)
+                {
+                    flags |= 0b00010000;
+                }
+                else
+                {
+                    flags |= 0x00;
+                }
 
-            if (isFragmented)
-            {
-                encoder.WriteInt(compSize);
-                encoder.WriteShort(compId);
-                encoder.WriteInt(compIndex);
+                encoder.WriteByte(128);
+                encoder.WriteUInt24LE(RakSessionManager.getSession(encoder.clientEp).sequenceNumber);
+                encoder.WriteByte(flags);
+                encoder.WriteShortBE((ushort)(isFragmented ? length * 8 : body.Count() * 8));
+
+                if (reliabilityType == 0) // Unreliable
+                {
+                    // nothing
+                }
+                else if (reliabilityType == 1) // Unreliable Sequenced
+                {
+                    encoder.WriteUInt24LE(reliableIndex);
+                    encoder.WriteUInt24LE(sequenceIndex);
+                }
+                else if (reliabilityType == 2) // Reliable
+                {
+                    encoder.WriteUInt24LE(reliableIndex);
+                    reliableIndex++;
+                }
+                else if (reliabilityType == 3) // Ordered
+                {
+                    encoder.WriteUInt24LE(reliableIndex);
+                    encoder.WriteUInt24LE(orderIndex);
+                    encoder.WriteByte(orderChannel);
+                    reliableIndex++;
+                    orderIndex++;
+                }
+                else if (reliabilityType == 4) // Reliable Ordered
+                {
+                    encoder.WriteUInt24LE(reliableIndex);
+                    encoder.WriteUInt24LE(orderIndex);
+                    encoder.WriteByte(orderChannel);
+                }
+                else if (reliabilityType == 5) // Reliable Sequenced
+                {
+                    // nothing
+                }
+                else if (reliabilityType == 6) // Unreliable, ACK
+                {
+                    encoder.WriteUInt24LE(reliableIndex);
+                }
+                else if (reliabilityType == 7) // Reliable, ACK
+                {
+                    encoder.WriteUInt24LE(reliableIndex);
+                    encoder.WriteUInt24LE(orderIndex);
+                    encoder.WriteByte(orderChannel);
+                }
+
+                if (isFragmented)
+                {
+                    encoder.WriteIntBE(totalFragments);
+                    encoder.WriteShortBE(compId);
+                    encoder.WriteIntBE(compIndex);
+
+                    byte[] chunk = new byte[length];
+                    Array.Copy(body, start, chunk, 0, length);
+
+                    Array.Copy(body, start, encoder.byteStream, encoder.writeOffset, length);
+                    encoder.writeOffset += length;
+                    compIndex++;
+                }
+                else
+                {
+                    Array.Copy(body, 0, encoder.byteStream, encoder.writeOffset, body.Length);
+                    encoder.writeOffset += body.Length;
+                }
+                encoder.SendPacket(128);
             }
-            encoder.SendPacket(128);
         }
     }
 }

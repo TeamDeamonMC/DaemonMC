@@ -12,7 +12,7 @@ namespace DaemonMC.Network.Bedrock
         public ushort biomeType { get; set; } = 0;
         public string biomeName { get; set; } = "plains";
         public int dimension { get; set; } = 0;
-        public int generator { get; set; }
+        public int generator { get; set; } = 1;
         public int gameType { get; set; }
         public int difficulty { get; set; }
         public int spawnBlockX { get; set; }
@@ -74,7 +74,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false);
                 encoder.WriteBool(false); //bonus chest
                 encoder.WriteBool(false); //map
-                encoder.WriteByte(0); //permission level
+                encoder.WriteByte(2); //permission level
                 encoder.WriteInt(0); //chunk tick range
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
@@ -119,7 +119,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteLong(0); //blockstate checksum
             var uuid = Guid.NewGuid();
             encoder.WriteUUID(uuid);
-            encoder.WriteBool(true);
+            encoder.WriteBool(false);
             encoder.WriteBool(false);
             encoder.WriteBool(true);
             encoder.handlePacket();

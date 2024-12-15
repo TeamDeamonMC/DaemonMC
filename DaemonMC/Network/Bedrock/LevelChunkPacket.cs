@@ -1,11 +1,11 @@
-﻿using DaemonMC.Utils;
-namespace DaemonMC.Network.Bedrock
+﻿namespace DaemonMC.Network.Bedrock
 {
     public class LevelChunkPacket
     {
         public int chunkX { get; set; }
         public int chunkZ { get; set; }
-        public string data { get; set; }
+        public int count { get; set; }
+        public byte[] data { get; set; }
     }
 
     public class LevelChunk
@@ -22,9 +22,15 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteSignedVarInt(fields.chunkX);
             encoder.WriteSignedVarInt(fields.chunkZ);
             encoder.WriteSignedVarInt(0);
-            encoder.WriteVarInt(0);
+            encoder.WriteVarInt(fields.count);
             encoder.WriteBool(false);
-            encoder.WriteString(fields.data);
+
+            encoder.WriteVarInt(fields.data.Count());
+            foreach (var raw in fields.data)
+            {
+                encoder.WriteByte(raw);
+            }
+
             encoder.handlePacket();
         }
     }

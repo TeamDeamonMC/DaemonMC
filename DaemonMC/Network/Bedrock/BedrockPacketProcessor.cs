@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using System.Text;
+using DaemonMC.Level;
 using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
@@ -82,21 +82,33 @@ namespace DaemonMC.Network.Bedrock
             };
             ChunkRadiusUpdated.Encode(pk, encoder);
 
-            return;
-         /*   for (int x = -20; x <= 20; x++)
+            PacketEncoder encoder6 = PacketEncoderPool.Get(clientEp);
+            var pk6 = new NetworkChunkPublisherUpdatePacket
             {
-                for (int z = -20; z <= 20; z++)
-                {
-                    Log.debug($"({x}, {z})");
-                    var pk1 = new LevelChunkPacket
-                    {
-                        chunkX = x,
-                        chunkZ = z,
-                        data = ""
-                    };
-                    LevelChunk.Encode(pk1);
-                }
-            }*/
+                x = 0,
+                y = 1,
+                z = 0,
+                radius = 20
+            };
+            NetworkChunkPublisherUpdate.Encode(pk6, encoder6);
+
+              for (int x = -2; x <= 2; x++)
+              {
+                  for (int z = -2; z <= 2; z++)
+                  {
+                      PacketEncoder encoder21 = PacketEncoderPool.Get(clientEp);
+                      var pk11 = new LevelChunkPacket
+                      {
+                          chunkX = x,
+                          chunkZ = z,
+                          count = 20,
+                          data = testchunk.flat
+                          // data = new byte[0]
+                      };
+                      LevelChunk.Encode(pk11, encoder21);
+                  }
+              }
+
         }
 
         public static void MovePlayer(MovePlayerPacket packet)

@@ -8,57 +8,12 @@ namespace DaemonMC
 {
     public class Server
     {
-        public static Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
         public static Socket sock { get; set; } = null!;
+        public static Level.Level level { get; set; } = null!;
+        public static long nextId = 10;
+        public static Queue<long> availableIds = new Queue<long>();
         public static int datGrIn = 0;
         public static int datGrOut = 0;
-
-        private static long nextId = 10;
-        private static Queue<long> availableIds = new Queue<long>();
-
-        public static long AddPlayer(Player player, IPEndPoint ep)
-        {
-            long id;
-
-            if (availableIds.Count > 0)
-            {
-                id = availableIds.Dequeue();
-            }
-            else
-            {
-                id = nextId++;
-            }
-
-            player.ep = ep;
-            onlinePlayers.Add(id, player);
-            Log.debug($"{player.username} has been added to server players with EntityID {id}");
-            return id;
-        }
-
-        public static bool RemovePlayer(long id)
-        {
-            if (onlinePlayers.ContainsKey(id))
-            {
-                var username = GetPlayer(id).username;
-                onlinePlayers.Remove(id);
-                availableIds.Enqueue(id);
-                Log.debug($"Player {username} with EntityID {id} has been removed from the server.");
-                return true;
-            }
-            Log.error($"No player found with EntityID {id}");
-            return false;
-        }
-
-        public static Player GetPlayer(long id)
-        {
-            if (onlinePlayers.ContainsKey(id))
-            {
-                onlinePlayers.TryGetValue(id, out Player player);
-                return player;
-            }
-            Log.error($"No player found with EntityID {id}");
-            return null;
-        }
 
         public static void ServerF()
         {
@@ -66,6 +21,9 @@ namespace DaemonMC
             IPEndPoint iep = new IPEndPoint(IPAddress.Any, 19132);
             sock.Bind(iep);
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
+
+            level = new Level.Level("test level");
+
             Log.info("Server listening on port 19132");
 
             Thread titleMonitor = new Thread(titleUpdate);
@@ -97,7 +55,7 @@ namespace DaemonMC
         {
             while (true)
             {
-                Console.Title = $"DaeamonMC | Players {onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
+                Console.Title = $"DaeamonMC | Players {Server.level.onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
                 datGrIn = 0;
                 datGrOut = 0;
                 Thread.Sleep(1000);

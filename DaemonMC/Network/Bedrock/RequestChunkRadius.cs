@@ -14,7 +14,7 @@
                 radius = decoder.ReadVarInt(),
                 maxRadius = decoder.ReadByte()
             };
-            BedrockPacketProcessor.RequestChunkRadius(packet, decoder.endpoint);
+            decoder.player.PacketEvent_RequestChunkRadius(packet);
         }
 
         public void Encode(PacketEncoder encoder)

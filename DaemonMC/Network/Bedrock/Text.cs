@@ -18,7 +18,7 @@
                 Username = decoder.ReadString(),
                 Message = decoder.ReadString()
             };
-            BedrockPacketProcessor.Text(packet, decoder.endpoint);
+            decoder.player.PacketEvent_Text(packet);
         }
 
         public void Encode(PacketEncoder encoder)

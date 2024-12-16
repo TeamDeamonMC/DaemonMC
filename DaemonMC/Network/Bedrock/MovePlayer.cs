@@ -28,7 +28,7 @@ namespace DaemonMC.Network.Bedrock
                 vehicleRuntimeId = decoder.ReadVarLong()
             };
 
-            BedrockPacketProcessor.MovePlayer(packet);
+            decoder.player.PacketEvent_MovePlayer(packet);
         }
 
         public void Encode(PacketEncoder encoder)

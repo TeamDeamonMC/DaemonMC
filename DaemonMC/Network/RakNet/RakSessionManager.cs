@@ -43,7 +43,7 @@ namespace DaemonMC.Network.RakNet
 
         public static void deleteSession(IPEndPoint ip)
         {
-            Server.RemovePlayer(getSession(ip).EntityID);
+            Server.level.RemovePlayer(getSession(ip).EntityID);
             if (!sessions.Remove(ip))
             {
                 Log.warn($"Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");

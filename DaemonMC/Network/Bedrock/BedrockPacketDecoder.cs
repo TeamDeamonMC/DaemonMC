@@ -1,5 +1,4 @@
-﻿using System;
-using DaemonMC.Network.RakNet;
+﻿using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
@@ -13,6 +12,10 @@ namespace DaemonMC.Network.Bedrock
                 if (RakSessionManager.getSession(decoder.endpoint).initCompression)
                 {
                     decoder.ReadByte();
+                }
+                if (Server.level.onlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.endpoint).EntityID))
+                {
+                    decoder.player = Server.level.GetPlayer(RakSessionManager.getSession(decoder.endpoint).EntityID);
                 }
             }
             var size = decoder.ReadVarInt(); //packet size

@@ -13,6 +13,7 @@ namespace DaemonMC.Network
         public byte[] buffer;
         public int readOffset;
         public IPEndPoint endpoint;
+        public Player player;
 
         public PacketDecoder(byte[] byteBuffer, IPEndPoint clientEp)
         {

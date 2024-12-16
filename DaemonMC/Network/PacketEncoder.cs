@@ -305,6 +305,11 @@ namespace DaemonMC.Network
         public static int cached = 0;
         public static int inUse = 0;
 
+        public static PacketEncoder Get(Player player)
+        {
+            return Get(player.ep);
+        }
+
         public static PacketEncoder Get(IPEndPoint ep)
         {
             inUse++;

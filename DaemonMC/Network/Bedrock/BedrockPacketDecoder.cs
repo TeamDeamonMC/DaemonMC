@@ -1,4 +1,5 @@
-﻿using DaemonMC.Network.RakNet;
+﻿using System;
+using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
@@ -15,40 +16,40 @@ namespace DaemonMC.Network.Bedrock
                 }
             }
             var size = decoder.ReadVarInt(); //packet size
-            var pkid = decoder.ReadVarInt();
-            Log.debug($"[Server] <-- [{decoder.endpoint.Address,-16}:{decoder.endpoint.Port}] {(Info.Bedrock)pkid}");
+            var pkid = (Info.Bedrock) decoder.ReadVarInt();
+            Log.debug($"[Server] <-- [{decoder.endpoint.Address,-16}:{decoder.endpoint.Port}] {pkid}");
 
             switch (pkid)
             {
-                case RequestNetworkSettings.id:
-                    RequestNetworkSettings.Decode(decoder);
+                case Info.Bedrock.RequestNetworkSettings:
+                    new RequestNetworkSettings().Decode(decoder);
                     break;
-                case Login.id:
-                    Login.Decode(decoder);
+                case Info.Bedrock.Login:
+                    new Login().Decode(decoder);
                     break;
-                case PacketViolationWarning.id:
-                    PacketViolationWarning.Decode(decoder);
+                case Info.Bedrock.PacketViolationWarning:
+                    new PacketViolationWarning().Decode(decoder);
                     break;
-                case ClientCacheStatus.id:
-                    ClientCacheStatus.Decode(decoder);
+                case Info.Bedrock.ClientCacheStatus:
+                    new ClientCacheStatus().Decode(decoder);
                     break;
-                case ResourcePackClientResponse.id:
-                    ResourcePackClientResponse.Decode(decoder);
+                case Info.Bedrock.ResourcePackClientResponse:
+                    new ResourcePackClientResponse().Decode(decoder);
                     break;
-                case RequestChunkRadius.id:
-                    RequestChunkRadius.Decode(decoder);
+                case Info.Bedrock.RequestChunkRadius:
+                    new RequestChunkRadius().Decode(decoder);
                     break;
-                case MovePlayer.id:
-                    MovePlayer.Decode(decoder);
+                case Info.Bedrock.MovePlayer:
+                    new MovePlayer().Decode(decoder);
                     break;
-                case ServerboundLoadingScreen.id:
-                    ServerboundLoadingScreen.Decode(decoder);
+                case Info.Bedrock.ServerboundLoadingScreen:
+                    new ServerboundLoadingScreen().Decode(decoder);
                     break;
-                case Interact.id:
-                    Interact.Decode(decoder);
+                case Info.Bedrock.Interact:
+                    new Interact().Decode(decoder);
                     break;
-                case TextMessage.id:
-                    TextMessage.Decode(decoder);
+                case Info.Bedrock.TextMessage:
+                    new TextMessage().Decode(decoder);
                     break;
 
                 default:

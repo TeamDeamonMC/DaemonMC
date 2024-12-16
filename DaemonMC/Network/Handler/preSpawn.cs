@@ -20,7 +20,7 @@ namespace DaemonMC.Network.Handler
             session.EntityID = EntityId;
 
             PacketEncoder encoder1 = PacketEncoderPool.Get(clientEp);
-            var pk1 = new StartGamePacket
+            var pk1 = new StartGame
             {
                 EntityId = EntityId,
                 gameType = 0,
@@ -35,17 +35,17 @@ namespace DaemonMC.Network.Handler
                 seed = 9876,
                 generator = 1,
             };
-            StartGame.Encode(pk1, encoder1);
+            pk1.Encode(encoder1);
 
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new CreativeContentPacket
+            var pk = new CreativeContent
             {
 
             };
-            CreativeContent.Encode(pk, encoder);
+            pk.Encode(encoder);
 
             PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
-            var pk2 = new BiomeDefinitionListPacket
+            var pk2 = new BiomeDefinitionList
             {
                 biomeData = new fNbt.NbtCompound("")
                 {
@@ -56,14 +56,14 @@ namespace DaemonMC.Network.Handler
                     }
                 }
             };
-            BiomeDefinitionList.Encode(pk2, encoder2);
+            pk2.Encode(encoder2);
 
             PacketEncoder encoder4 = PacketEncoderPool.Get(clientEp);
-            var pk4 = new PlayStatusPacket
+            var pk4 = new PlayStatus
             {
                 status = 3,
             };
-            PlayStatus.Encode(pk4, encoder4);
+            pk4.Encode(encoder4);
             Log.info($"{player.username} spawned at X:{pk1.position.X} Y:{pk1.position.Y} Z:{pk1.position.Z}");
         }
     }

@@ -1,28 +1,22 @@
-﻿using System.Diagnostics;
-using System.Text;
-using DaemonMC.Utils.Text;
-
-namespace DaemonMC.Network.Bedrock
+﻿namespace DaemonMC.Network.Bedrock
 {
-    public class DisconnectPacket
-    {
-        public string message { get; set; }
-    }
-
     public class Disconnect
     {
-        public static int id = 5;
-        public static void Decode(byte[] buffer)
+        public Info.Bedrock id = Info.Bedrock.Disconnect;
+
+        public string message = "";
+
+        public void Decode(byte[] buffer)
         {
 
         }
 
-        public static void Encode(DisconnectPacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
+            encoder.PacketId(id);
             encoder.WriteVarInt(0);
             encoder.WriteBool(false);
-            encoder.WriteString(fields.message);
+            encoder.WriteString(message);
             encoder.WriteString("");
             encoder.handlePacket();
         }

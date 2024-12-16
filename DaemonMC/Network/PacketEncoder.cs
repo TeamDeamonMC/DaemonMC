@@ -73,7 +73,7 @@ namespace DaemonMC.Network
             }
         }
 
-        public void SendPacket(int pkid)
+        public void SendPacket(int pkid, bool pooled = true)
         {
             Server.datGrOut++;
             var clientIp = clientEp.Address.ToString();
@@ -84,7 +84,7 @@ namespace DaemonMC.Network
             Array.Copy(byteStream, trimmedBuffer, writeOffset);
             Server.Send(trimmedBuffer, clientEp);
             RakSessionManager.getSession(clientEp).sequenceNumber++;
-            PacketEncoderPool.Return(this);
+            if (pooled) { PacketEncoderPool.Return(this); }
         }
 
         //FE FF 0C 05 00 00 00 04 74 65 73 74 00 00 00 00
@@ -96,6 +96,11 @@ namespace DaemonMC.Network
         {
             byteStream = new byte[25000];
             writeOffset = 0;
+        }
+
+        public void PacketId(Info.Bedrock id)
+        {
+            WriteVarInt((int) id);
         }
 
         public void WriteBool(bool value)

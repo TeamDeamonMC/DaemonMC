@@ -1,23 +1,22 @@
 ﻿using fNbt;
+
 namespace DaemonMC.Network.Bedrock
 {
-    public class BiomeDefinitionListPacket
-    {
-        public NbtCompound biomeData { get; set; }
-    }
-
     public class BiomeDefinitionList
     {
-        public static int id = 122;
-        public static void Decode(byte[] buffer)
+        public Info.Bedrock id = Info.Bedrock.BiomeDefinitionList;
+
+        public NbtCompound biomeData = new NbtCompound();
+
+        public void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(BiomeDefinitionListPacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
-            encoder.WriteCompoundTag(fields.biomeData);
+            encoder.PacketId(id);
+            encoder.WriteCompoundTag(biomeData);
             encoder.handlePacket();
         }
     }

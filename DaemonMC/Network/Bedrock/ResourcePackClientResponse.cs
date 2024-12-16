@@ -1,16 +1,14 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePackClientResponsePacket
-    {
-        public byte response { get; set; }
-    }
-
     public class ResourcePackClientResponse
     {
-        public const int id = 8;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.ResourcePackClientResponse;
+
+        public byte response = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
-            var packet = new ResourcePackClientResponsePacket
+            var packet = new ResourcePackClientResponse
             {
                 response = decoder.ReadByte(),
             };
@@ -18,7 +16,7 @@
             BedrockPacketProcessor.ResourcePackClientResponse(packet, decoder.endpoint);
         }
 
-        public static void Encode(ResourcePackClientResponsePacket fields)
+        public void Encode(PacketEncoder encoder)
         {
 
         }

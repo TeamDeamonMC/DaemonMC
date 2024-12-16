@@ -8,12 +8,12 @@ namespace DaemonMC.Network.Bedrock
 {
     public class BedrockPacketProcessor
     {
-        public static void RequestNetworkSettings(RequestNetworkSettingsPacket packet, IPEndPoint clientEp)
+        public static void RequestNetworkSettings(RequestNetworkSettings packet, IPEndPoint clientEp)
         {
             Log.debug($"New player ({RakSessionManager.getSession(clientEp).GUID}) log in with protocol version: {packet.protocolVersion}");
 
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new NetworkSettingsPacket
+            var pk = new NetworkSettings
             {
                 compressionThreshold = 0,
                 compressionAlgorithm = 0,
@@ -21,48 +21,48 @@ namespace DaemonMC.Network.Bedrock
                 clientThrottleScalar = 0,
                 clientThrottleThreshold = 0
             };
-            NetworkSettings.Encode(pk, encoder);
+            pk.Encode(encoder);
 
             RakSessionManager.Compression(clientEp, true);
         }
 
-        public static void Login(LoginPacket packet, IPEndPoint clientEp)
+        public static void Login(Login packet, IPEndPoint clientEp)
         {
-            Handler.Login.execute(packet, clientEp);
+            LoginHandler.execute(packet, clientEp);
         }
 
-        public static void PacketViolationWarning(PacketViolationWarningPacket packet)
+        public static void PacketViolationWarning(PacketViolationWarning packet)
         {
             Log.error($"Client reported that server sent failed packet '{(Info.Bedrock)packet.packetId}'");
             Log.error(packet.description);
         }
 
-        public static void ClientCacheStatus(ClientCacheStatusPacket packet, IPEndPoint clientEp)
+        public static void ClientCacheStatus(ClientCacheStatus packet, IPEndPoint clientEp)
         {
             var player = RakSessionManager.getSession(clientEp);
             Log.debug($"{player.username} ClientCacheStatus = {packet.status}");
 
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk1 = new ResourcePacksInfoPacket
+            var pk1 = new ResourcePacksInfo
             {
                 force = false,
                 isAddon = false,
                 hasScripts = false,
             };
-            ResourcePacksInfo.Encode(pk1, encoder);
+            pk1.Encode(encoder);
         }
 
-        public static void ResourcePackClientResponse(ResourcePackClientResponsePacket packet, IPEndPoint clientEp)
+        public static void ResourcePackClientResponse(ResourcePackClientResponse packet, IPEndPoint clientEp)
         {
             Log.debug($"ResourcePackClientResponse = {packet.response}");
             if (packet.response == 3)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-                var pk = new ResourcePackStackPacket
+                var pk = new ResourcePackStack
                 {
                     forceTexturePack = false,
                 };
-                ResourcePackStack.Encode(pk, encoder);
+                pk.Encode(encoder);
             }
             else if (packet.response == 4) //start game
             {
@@ -70,75 +70,74 @@ namespace DaemonMC.Network.Bedrock
             }
         }
 
-        public static void RequestChunkRadius(RequestChunkRadiusPacket packet, IPEndPoint clientEp)
+        public static void RequestChunkRadius(RequestChunkRadius packet, IPEndPoint clientEp)
         {
             var player = RakSessionManager.getSession(clientEp);
             Log.debug($"{player.username} requested chunks with radius {packet.radius}. Max radius = {packet.maxRadius}");
 
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new ChunkRadiusUpdatedPacket
+            var pk = new ChunkRadiusUpdated
             {
                 radius = packet.radius,
             };
-            ChunkRadiusUpdated.Encode(pk, encoder);
+            pk.Encode(encoder);
 
             PacketEncoder encoder6 = PacketEncoderPool.Get(clientEp);
-            var pk6 = new NetworkChunkPublisherUpdatePacket
+            var pk6 = new NetworkChunkPublisherUpdate
             {
                 x = 0,
                 y = 1,
                 z = 0,
                 radius = 20
             };
-            NetworkChunkPublisherUpdate.Encode(pk6, encoder6);
+            pk6.Encode(encoder6);
 
               for (int x = -2; x <= 2; x++)
               {
                   for (int z = -2; z <= 2; z++)
                   {
                       PacketEncoder encoder21 = PacketEncoderPool.Get(clientEp);
-                      var pk11 = new LevelChunkPacket
+                      var pk11 = new LevelChunk
                       {
                           chunkX = x,
                           chunkZ = z,
                           count = 20,
                           data = testchunk.flat
-                          // data = new byte[0]
                       };
-                      LevelChunk.Encode(pk11, encoder21);
+                      pk11.Encode(encoder21);
                   }
               }
 
         }
 
-        public static void MovePlayer(MovePlayerPacket packet)
+        public static void MovePlayer(MovePlayer packet)
         {
             //Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z}");
         }
 
-        public static void ServerboundLoadingScreen(ServerboundLoadingScreenPacket packet)
+        public static void ServerboundLoadingScreen(ServerboundLoadingScreen packet)
         {
 
         }
 
-        public static void Interact(InteractPacket packet)
+        public static void Interact(Interact packet)
         {
             //Log.debug($"Action for {packet.actorRuntimeId} / {packet.action}");
         }
 
-        public static void Text(TextMessagePacket packet, IPEndPoint clientEp)
+        public static void Text(TextMessage packet, IPEndPoint clientEp)
         {
             var player = RakSessionManager.getSession(clientEp);
 
             foreach (var dest in Server.onlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value.ep);
-                var pk = new TextMessagePacket
+                var pk = new TextMessage
                 {
                     Username = player.username,
                     Message = packet.Message
                 };
-                TextMessage.Encode(pk, encoder);
+                pk.Encode(encoder);
             }
         }
     }

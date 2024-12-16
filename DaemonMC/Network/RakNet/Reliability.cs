@@ -246,8 +246,11 @@
                     Array.Copy(body, 0, encoder.byteStream, encoder.writeOffset, body.Length);
                     encoder.writeOffset += body.Length;
                 }
-                encoder.SendPacket(128);
+
+                encoder.SendPacket(128, false);
+                encoder.Reset();
             }
+            PacketEncoderPool.Return(encoder);
         }
     }
 }

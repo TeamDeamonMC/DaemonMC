@@ -6,9 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace DaemonMC.Network.Handler
 {
-    public class Login
+    public class LoginHandler
     {
-        public static void execute(LoginPacket packet, IPEndPoint clientEp)
+        public static void execute(Login packet, IPEndPoint clientEp)
         {
             byte[] jwtBuffer = Encoding.UTF8.GetBytes(packet.request);
 
@@ -23,11 +23,11 @@ namespace DaemonMC.Network.Handler
             JWT.processJWTtoken(Token, clientEp);
 
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new PlayStatusPacket
+            var pk = new PlayStatus
             {
                 status = 0,
             };
-            PlayStatus.Encode(pk, encoder);
+            pk.Encode(encoder);
         }
     }
 }

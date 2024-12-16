@@ -1,23 +1,20 @@
-﻿using DaemonMC.Utils;
-namespace DaemonMC.Network.Bedrock
+﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ChunkRadiusUpdatedPacket
-    {
-        public int radius { get; set; }
-    }
-
     public class ChunkRadiusUpdated
     {
-        public static int id = 70;
-        public static void Decode(byte[] buffer)
+        public Info.Bedrock id = Info.Bedrock.ChunkRadiusUpdated;
+
+        public int radius = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(ChunkRadiusUpdatedPacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
-            encoder.WriteVarInt(fields.radius);
+            encoder.PacketId(id);
+            encoder.WriteVarInt(radius);
             encoder.handlePacket();
         }
     }

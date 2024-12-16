@@ -1,30 +1,29 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class NetworkChunkPublisherUpdatePacket
-    {
-        public int x { get; set; }
-        public int y { get; set; }
-        public int z { get; set; }
-        public int radius { get; set; }
-    }
-
     public class NetworkChunkPublisherUpdate
     {
-        public static int id = 121;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.NetworkChunkPublisherUpdate;
+
+        public int x = 0;
+        public int y = 0;
+        public int z = 0;
+        public int radius = 0;
+
+
+        public void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(NetworkChunkPublisherUpdatePacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
+            encoder.PacketId(id);
 
-            encoder.WriteSignedVarInt(fields.x);
-            encoder.WriteVarInt(fields.y);
-            encoder.WriteSignedVarInt(fields.z);
+            encoder.WriteSignedVarInt(x);
+            encoder.WriteVarInt(y);
+            encoder.WriteSignedVarInt(z);
 
-            encoder.WriteVarInt(fields.radius * 16);
+            encoder.WriteVarInt(radius * 16);
 
             encoder.WriteInt(0);
 

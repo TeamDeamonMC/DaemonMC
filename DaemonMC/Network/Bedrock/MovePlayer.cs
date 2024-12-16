@@ -2,24 +2,22 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class MovePlayerPacket
-    {
-        public long actorRuntimeId { get; set; }
-        public Vector3 position { get; set; }
-        public Vector2 rotation { get; set; }
-        public float YheadRotation { get; set; }
-        public byte positionMode { get; set; }
-        public bool isOnGround { get; set; }
-        public long vehicleRuntimeId { get; set; }
-        public long tick { get; set; }
-    }
-
     public class MovePlayer
     {
-        public const int id = 19;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.MovePlayer;
+
+        public long actorRuntimeId = 0;
+        public Vector3 position = new Vector3();
+        public Vector2 rotation = new Vector2();
+        public float YheadRotation = 0;
+        public byte positionMode = 0;
+        public bool isOnGround = false;
+        public long vehicleRuntimeId = 0;
+        public long tick = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
-            var packet = new MovePlayerPacket
+            var packet = new MovePlayer
             {
                 actorRuntimeId = decoder.ReadVarLong(),
                 position = decoder.ReadVec3(),
@@ -33,7 +31,7 @@ namespace DaemonMC.Network.Bedrock
             BedrockPacketProcessor.MovePlayer(packet);
         }
 
-        public static void Encode(MovePlayerPacket fields)
+        public void Encode(PacketEncoder encoder)
         {
 
         }

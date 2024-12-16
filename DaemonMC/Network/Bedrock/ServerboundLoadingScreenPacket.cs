@@ -1,17 +1,15 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ServerboundLoadingScreenPacket
-    {
-        public int screenType { get; set; }
-        public int screenId { get; set; }
-    }
-
     public class ServerboundLoadingScreen
     {
-        public const int id = 312;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.ServerboundLoadingScreen;
+
+        public int screenType = 0;
+        public int screenId = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
-            var packet = new ServerboundLoadingScreenPacket
+            var packet = new ServerboundLoadingScreen
             {
                 screenType = decoder.ReadVarInt(),
                 screenId = decoder.ReadInt()
@@ -20,7 +18,7 @@
             BedrockPacketProcessor.ServerboundLoadingScreen(packet);
         }
 
-        public static void Encode(ServerboundLoadingScreenPacket fields)
+        public void Encode(PacketEncoder encoder)
         {
 
         }

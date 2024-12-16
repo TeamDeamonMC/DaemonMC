@@ -1,22 +1,20 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePackStackPacket
-    {
-        public bool forceTexturePack { get; set; }
-    }
-
     public class ResourcePackStack
     {
-        public static int id = 7;
-        public static void Decode(byte[] buffer)
+        public Info.Bedrock id = Info.Bedrock.ResourcePackStack;
+
+        public bool forceTexturePack = false;
+
+        public void Decode(byte[] buffer)
         {
 
         }
 
-        public static void Encode(ResourcePackStackPacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
-            encoder.WriteBool(fields.forceTexturePack);
+            encoder.PacketId(id);
+            encoder.WriteBool(forceTexturePack);
             encoder.WriteVarInt(0); //add-on list
             encoder.WriteVarInt(0); //texture pack list
             encoder.WriteString(Info.version);

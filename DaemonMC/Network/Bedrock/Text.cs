@@ -1,21 +1,17 @@
-﻿using DaemonMC.Utils.Text;
-
-namespace DaemonMC.Network.Bedrock
+﻿namespace DaemonMC.Network.Bedrock
 {
-    public class TextMessagePacket
-    {
-        public byte messageType { get; set; }
-        public bool Localized { get; set; }
-        public string Username { get; set; }
-        public string Message { get; set; }
-    }
-
     public class TextMessage
     {
-        public const int id = 9;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.TextMessage;
+
+        public byte messageType = 0;
+        public bool Localized = false;
+        public string Username = "";
+        public string Message = "";
+
+        public void Decode(PacketDecoder decoder)
         {
-            var packet = new TextMessagePacket
+            var packet = new TextMessage
             {
                 messageType = decoder.ReadByte(),
                 Localized = decoder.ReadBool(),
@@ -25,13 +21,13 @@ namespace DaemonMC.Network.Bedrock
             BedrockPacketProcessor.Text(packet, decoder.endpoint);
         }
 
-        public static void Encode(TextMessagePacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
+            encoder.PacketId(id);
             encoder.WriteByte(1);
-            encoder.WriteBool(fields.Localized);
-            encoder.WriteString(fields.Username);
-            encoder.WriteString(fields.Message);
+            encoder.WriteBool(Localized);
+            encoder.WriteString(Username);
+            encoder.WriteString(Message);
 
             encoder.WriteString(""); //xuid
             encoder.WriteString(""); //platform id

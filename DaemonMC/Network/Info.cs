@@ -7,6 +7,7 @@
 
         public enum Bedrock
         {
+            Example = 0,
             Login = 1,
             PlayStatus = 2,
             ServerToClientHandshake = 3,
@@ -14,11 +15,11 @@
             ResourcePacksInfo = 6,
             ResourcePackStack = 7,
             ResourcePackClientResponse = 8,
-            Text = 9,
+            TextMessage = 9,
             StartGame = 11,
             MovePlayer = 19,
             Interact = 33,
-            LevelChunkPacket = 58,
+            LevelChunk = 58,
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
             NetworkChunkPublisherUpdate = 121,
@@ -26,7 +27,7 @@
             ClientCacheStatus = 129,
             NetworkSettings = 143,
             CreativeContent = 145,
-            PacketViolationWarningPacket = 156,
+            PacketViolationWarning = 156,
             RequestNetworkSettings = 193,
             ServerboundLoadingScreen = 312
         }

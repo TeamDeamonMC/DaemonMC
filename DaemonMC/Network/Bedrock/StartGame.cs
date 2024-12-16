@@ -2,61 +2,59 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class StartGamePacket
-    {
-        public long EntityId { get; set; }
-        public int GameMode { get; set; }
-        public Vector3 position { get; set; }
-        public Vector2 rotation { get; set; }
-        public long seed { get; set; }
-        public ushort biomeType { get; set; } = 0;
-        public string biomeName { get; set; } = "plains";
-        public int dimension { get; set; } = 0;
-        public int generator { get; set; } = 1;
-        public int gameType { get; set; }
-        public int difficulty { get; set; }
-        public int spawnBlockX { get; set; }
-        public int spawnBlockY { get; set; }
-        public int spawnBlockZ { get; set; }
-        public int editorType { get; set; }
-        public int stopTime { get; set; }
-    }
-
     public class StartGame
     {
-        public static int id = 11;
-        public static void Decode(byte[] buffer)
+        public Info.Bedrock id = Info.Bedrock.StartGame;
+
+        public long EntityId = 0;
+        public int GameMode = 0;
+        public Vector3 position = new Vector3();
+        public Vector2 rotation = new Vector2();
+        public long seed = 0;
+        public ushort biomeType = 0;
+        public string biomeName = "plains";
+        public int dimension = 0;
+        public int generator = 1;
+        public int gameType = 0;
+        public int difficulty = 0;
+        public int spawnBlockX = 0;
+        public int spawnBlockY = 0;
+        public int spawnBlockZ = 0;
+        public int editorType = 0;
+        public int stopTime = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(StartGamePacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
-            encoder.WriteSignedVarLong(fields.EntityId);
-            encoder.WriteVarLong((ulong)fields.EntityId);
-            encoder.WriteVarInt(fields.GameMode);
-            encoder.WriteVec3(fields.position);
-            encoder.WriteVec2(fields.rotation);
+            encoder.PacketId(id);
+            encoder.WriteSignedVarLong(EntityId);
+            encoder.WriteVarLong((ulong)EntityId);
+            encoder.WriteVarInt(GameMode);
+            encoder.WriteVec3(position);
+            encoder.WriteVec2(rotation);
             //Level settings
-            encoder.WriteLongLE(fields.seed);
+            encoder.WriteLongLE(seed);
                     //Spawn settings
-                    encoder.WriteShort(fields.biomeType);
-                    encoder.WriteString(fields.biomeName);
-                    encoder.WriteVarInt(fields.dimension);
+                    encoder.WriteShort(biomeType);
+                    encoder.WriteString(biomeName);
+                    encoder.WriteVarInt(dimension);
                     //End of Spawn settings
-                encoder.WriteSignedVarInt(fields.generator);
-                encoder.WriteSignedVarInt(fields.gameType);
+                encoder.WriteSignedVarInt(generator);
+                encoder.WriteSignedVarInt(gameType);
                 encoder.WriteBool(false); //hardcore
-                encoder.WriteSignedVarInt(fields.difficulty);
-                encoder.WriteSignedVarInt(fields.spawnBlockX);
-                encoder.WriteVarInt(fields.spawnBlockY);
-                encoder.WriteSignedVarInt(fields.spawnBlockZ);
+                encoder.WriteSignedVarInt(difficulty);
+                encoder.WriteSignedVarInt(spawnBlockX);
+                encoder.WriteVarInt(spawnBlockY);
+                encoder.WriteSignedVarInt(spawnBlockZ);
                 encoder.WriteBool(false); //achievements
                 encoder.WriteBool(false);
                 encoder.WriteBool(false); //editorCreated
                 encoder.WriteBool(false); //editorExported
-                encoder.WriteSignedVarInt(fields.stopTime);
+                encoder.WriteSignedVarInt(stopTime);
                 encoder.WriteSignedVarInt(0);
                 encoder.WriteBool(false);
                 encoder.WriteString("");

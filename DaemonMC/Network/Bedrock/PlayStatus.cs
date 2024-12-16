@@ -1,22 +1,20 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class PlayStatusPacket
-    {
-        public int status { get; set; }
-    }
-
     public class PlayStatus
     {
-        public static int id = 2;
-        public static void Decode(byte[] buffer)
+        public Info.Bedrock id = Info.Bedrock.PlayStatus;
+
+        public int status = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(PlayStatusPacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
-            encoder.WriteIntBE(fields.status);
+            encoder.PacketId(id);
+            encoder.WriteIntBE(status);
             encoder.handlePacket();
         }
     }

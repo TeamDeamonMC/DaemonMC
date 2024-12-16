@@ -1,21 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ExamplePacket
-    {
-        public int variable { get; set; }
-    }
-
     public class Example
     {
-        public static int id = 0;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.Example;
+
+        public int variable = 0;
+
+        public void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(ExamplePacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(id);
+            encoder.PacketId(id);
             encoder.handlePacket();
         }
     }

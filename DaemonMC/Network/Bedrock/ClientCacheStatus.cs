@@ -1,16 +1,14 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ClientCacheStatusPacket
-    {
-        public bool status { get; set; }
-    }
-
     public class ClientCacheStatus
     {
-        public const int id = 129;
-        public static void Decode(PacketDecoder decoder)
+        public Info.Bedrock id = Info.Bedrock.ClientCacheStatus;
+
+        public bool status = false;
+
+        public void Decode(PacketDecoder decoder)
         {
-            var packet = new ClientCacheStatusPacket
+            var packet = new ClientCacheStatus
             {
                 status = decoder.ReadBool(),
             };
@@ -18,7 +16,7 @@
             BedrockPacketProcessor.ClientCacheStatus(packet, decoder.endpoint);
         }
 
-        public static void Encode(ClientCacheStatusPacket fields)
+        public void Encode(PacketEncoder encoder)
         {
 
         }

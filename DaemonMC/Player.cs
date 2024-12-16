@@ -6,6 +6,7 @@ using fNbt;
 using System.Numerics;
 using DaemonMC.Level;
 using DaemonMC.Utils;
+using System.Linq;
 
 namespace DaemonMC
 {
@@ -17,6 +18,11 @@ namespace DaemonMC
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
         public Level.Level currentLevel { get; set; }
+
+        private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
+        private bool SendQueueBusy = false;
+        private int LastChunkX = 0;
+        private int LastChunkZ = 0;
 
         public void spawn()
         {
@@ -109,7 +115,29 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
+        private async void ProcessSendQueue()
+        {
+            if (SendQueueBusy) { return; }
+            SendQueueBusy = true;
+            while (ChunkSendQueue.Count > 0)
+            {
+                var (chunkX, chunkZ) = ChunkSendQueue.Dequeue();
+                SendChunkToPlayer(chunkX, chunkZ);
+
+                await Task.Delay(50);
+            }
+            SendQueueBusy = false;
+        }
+
+
+
+
+        //
         //Packet processors for spawned player
+        //
+
+
+
 
         public void PacketEvent_MovePlayer(MovePlayer packet)
         {
@@ -121,12 +149,11 @@ namespace DaemonMC
             //Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z}");
         }
 
-        public async Task PacketEvent_RequestChunkRadius(RequestChunkRadius packet)
+        public void PacketEvent_RequestChunkRadius(RequestChunkRadius packet)
         {
             Log.debug($"{Username} requested chunks with radius {packet.radius}. Max radius = {packet.maxRadius}");
 
             UpdateChunkRadius(packet.radius);
-
 
             PacketEncoder encoder2 = PacketEncoderPool.Get(this);
             var packet2 = new NetworkChunkPublisherUpdate
@@ -138,16 +165,19 @@ namespace DaemonMC
             };
             packet2.Encode(encoder2);
 
-            int radius = Math.Min(packet.radius, packet.maxRadius) / 4;
+            int radius = Math.Min(packet.radius, packet.maxRadius) / 2;
 
-            List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, (int) Position.X, (int) Position.Z);
+            int currentChunkX = (int)Math.Floor(Position.X / 16.0);
+            int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
+
+            List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
 
             foreach (var (x, z) in chunkPositions)
             {
-                SendChunkToPlayer(x, z);
-
-                await Task.Delay(20);
+                ChunkSendQueue.Enqueue((x, z));
             }
+
+            ProcessSendQueue();
         }
 
         public void PacketEvent_Text(TextMessage packet)

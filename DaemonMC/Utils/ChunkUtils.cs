@@ -1,35 +1,45 @@
-﻿using System.Net.Sockets;
-
-namespace DaemonMC.Utils
+﻿namespace DaemonMC.Utils
 {
     public class ChunkUtils
     {
-        public static List<(int x, int z)> GetSequence(int radius, int posx, int posz)
+        public static List<(int x, int z)> GetSequence(int radius, int x, int z)
         {
             var positions = new List<(int x, int z)>();
-            int x = (int)Math.Floor(posx / 16.0);
-            int z = (int)Math.Floor(posz / 16.0);
-            int dx = 0, dz = -1;
+            var visited = new HashSet<(int x, int z)>();
 
-            for (int i = 0; i < (2 * radius + 1) * (2 * radius + 1); i++)
+            positions.Add((0, 0));
+            visited.Add((0, 0));
+
+            var queue = new Queue<(int x, int z)>();
+            queue.Enqueue((0, 0));
+
+            while (queue.Count > 0)
             {
-                if (Math.Abs(x) <= radius && Math.Abs(z) <= radius)
-                {
-                    positions.Add((x, z));
-                }
+                (x, z) = queue.Dequeue();
 
-                if (x == z || (x < 0 && x == -z) || (x > 0 && x == 1 - z))
+                foreach (var (nx, nz) in GetNear(x, z))
                 {
-                    int temp = dx;
-                    dx = -dz;
-                    dz = temp;
+                    if (!visited.Contains((nx, nz)) && Math.Sqrt(nx * nx + nz * nz) <= radius)
+                    {
+                        visited.Add((nx, nz));
+                        positions.Add((nx, nz));
+                        queue.Enqueue((nx, nz));
+                    }
                 }
-
-                x += dx;
-                z += dz;
             }
 
             return positions;
+        }
+
+        private static List<(int x, int z)> GetNear(int x, int z)
+        {
+            return new List<(int, int)>
+            {
+                (x + 1, z),
+                (x - 1, z),
+                (x, z + 1),
+                (x, z - 1)
+            };
         }
     }
 }

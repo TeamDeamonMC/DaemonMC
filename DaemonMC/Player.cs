@@ -153,6 +153,7 @@ namespace DaemonMC
         public void PacketEvent_Text(TextMessage packet)
         {
             foreach (var dest in currentLevel.onlinePlayers)
+            {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 var pk = new TextMessage
                 {

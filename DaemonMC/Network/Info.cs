@@ -18,6 +18,7 @@
             TextMessage = 9,
             StartGame = 11,
             MovePlayer = 19,
+            UpdateAttributes = 29,
             Interact = 33,
             LevelChunk = 58,
             RequestChunkRadius = 69,

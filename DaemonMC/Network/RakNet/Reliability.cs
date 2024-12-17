@@ -234,8 +234,8 @@
                     encoder.WriteShortBE(compId);
                     encoder.WriteIntBE(compIndex);
 
-                    byte[] chunk = new byte[length];
-                    Array.Copy(body, start, chunk, 0, length);
+                    byte[] fragment = new byte[length];
+                    Array.Copy(body, start, fragment, 0, length);
 
                     Array.Copy(body, start, encoder.byteStream, encoder.writeOffset, length);
                     encoder.writeOffset += length;

@@ -74,7 +74,7 @@ namespace DaemonMC.Network.Bedrock
 
                 long EntityId = player.currentLevel.AddPlayer(player, clientEp);
                 session.EntityID = EntityId;
-                player.EntityID = EntityId;
+                player.EntityID = (ulong)EntityId;
 
                 player.spawn();
             }

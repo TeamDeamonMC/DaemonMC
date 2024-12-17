@@ -6,18 +6,18 @@ using fNbt;
 using System.Numerics;
 using DaemonMC.Level;
 using DaemonMC.Utils;
-using System.Linq;
 
 namespace DaemonMC
 {
     public class Player
     {
         public string Username { get; set; }
-        public long EntityID { get; set; }
+        public ulong EntityID { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 5, 0);
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
         public Level.Level currentLevel { get; set; }
+        public AttributesValues attributes { get; set; } = new AttributesValues(0.1f);
 
         private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
         private bool SendQueueBusy = false;
@@ -30,6 +30,7 @@ namespace DaemonMC
             SendCreativeInventory();
             SendBiomeDefinitionList();
             SendPlayStatus(3);
+            UpdateAttributes();
             Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
@@ -111,6 +112,17 @@ namespace DaemonMC
             var packet = new ChunkRadiusUpdated
             {
                 radius = drawDistance,
+            };
+            packet.Encode(encoder);
+        }
+
+        private void UpdateAttributes()
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new UpdateAttributes
+            {
+                EntityId = EntityID,
+                Attributes = new List<Attribute> { attributes.Movement_speed() }
             };
             packet.Encode(encoder);
         }

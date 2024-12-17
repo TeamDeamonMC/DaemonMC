@@ -6,7 +6,7 @@ namespace DaemonMC.Network.Bedrock
     {
         public Info.Bedrock id = Info.Bedrock.StartGame;
 
-        public long EntityId = 0;
+        public ulong EntityId = 0;
         public int GameMode = 0;
         public Vector3 position = new Vector3();
         public Vector2 rotation = new Vector2();
@@ -31,8 +31,8 @@ namespace DaemonMC.Network.Bedrock
         public void Encode(PacketEncoder encoder)
         {
             encoder.PacketId(id);
-            encoder.WriteSignedVarLong(EntityId);
-            encoder.WriteVarLong((ulong)EntityId);
+            encoder.WriteVarLong(EntityId);
+            encoder.WriteVarLong(EntityId);
             encoder.WriteVarInt(GameMode);
             encoder.WriteVec3(position);
             encoder.WriteVec2(rotation);

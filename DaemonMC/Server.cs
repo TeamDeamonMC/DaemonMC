@@ -22,7 +22,7 @@ namespace DaemonMC
             sock.Bind(iep);
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
 
-            level = new Level.Level("test level");
+            level = new Level.Level("level");
 
             Log.info("Server listening on port 19132");
 

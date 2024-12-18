@@ -4,6 +4,13 @@ namespace DaemonMC
 {
     public static class ToDataTypes
     {
+        public static byte[] GetByteSum(byte[] byte1, byte[] byte2)
+        {
+            var result = new byte[byte1.Length + byte2.Length];
+            Buffer.BlockCopy(byte1, 0, result, 0, byte1.Length);
+            Buffer.BlockCopy(byte2, 0, result, byte1.Length, byte2.Length);
+            return result;
+        }
 
         public static byte[] GetVarint(int value)
         {

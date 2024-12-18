@@ -6,6 +6,7 @@ using fNbt;
 using System.Numerics;
 using DaemonMC.Level;
 using DaemonMC.Utils;
+using DaemonMC.Network.Enumerations;
 
 namespace DaemonMC
 {
@@ -18,6 +19,7 @@ namespace DaemonMC
         public IPEndPoint ep { get; set; }
         public Level.Level currentLevel { get; set; }
         public AttributesValues attributes { get; set; } = new AttributesValues(0.1f);
+        public Dictionary<ActorData, Metadata> metadata { get; set; } = new Dictionary<ActorData, Metadata>();
 
         private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
         private bool SendQueueBusy = false;
@@ -31,6 +33,7 @@ namespace DaemonMC
             SendBiomeDefinitionList();
             SendPlayStatus(3);
             UpdateAttributes();
+            SendMetadata();
             Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
@@ -92,7 +95,7 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        private void SendChunkToPlayer(int chunkX, int chunkZ)
+        public void SendChunkToPlayer(int chunkX, int chunkZ)
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var chunk = new LevelChunk
@@ -105,7 +108,7 @@ namespace DaemonMC
             chunk.Encode(encoder);
         }
 
-        private void UpdateChunkRadius(int radius)
+        public void UpdateChunkRadius(int radius)
         {
             drawDistance = radius;
             PacketEncoder encoder = PacketEncoderPool.Get(this);
@@ -116,13 +119,26 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        private void UpdateAttributes()
+        public void UpdateAttributes()
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new UpdateAttributes
             {
                 EntityId = EntityID,
-                Attributes = new List<Attribute> { attributes.Movement_speed() }
+                Attributes = new List<AttributeValue> { attributes.Movement_speed() }
+            };
+            packet.Encode(encoder);
+        }
+
+        public void SendMetadata()
+        {
+            metadata[ActorData.RESERVED_0] = new Metadata(844459290443776); //todo add dataflags
+
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new SetActorData
+            {
+                EntityId = EntityID,
+                Metadata = metadata
             };
             packet.Encode(encoder);
         }
@@ -150,6 +166,17 @@ namespace DaemonMC
 
 
 
+        public void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
+        {
+            if (Position != packet.Position)
+            {
+                Position = packet.Position;
+                int currentChunkX = (int)Math.Floor(packet.Position.X / 16.0);
+                int currentChunkZ = (int)Math.Floor(packet.Position.Z / 16.0);
+
+                Log.debug($"{packet.Position.X} : {packet.Position.Y} : {packet.Position.Z} Data: {string.Join(" | ", packet.InputData)}");
+            }
+        }
 
         public void PacketEvent_MovePlayer(MovePlayer packet)
         {

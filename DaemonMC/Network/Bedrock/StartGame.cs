@@ -102,8 +102,8 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                encoder.WriteSignedVarInt(0);
-                encoder.WriteSignedVarInt(0);
+                encoder.WriteSignedVarInt(3);
+                encoder.WriteSignedVarInt(40);
                 encoder.WriteBool(true);
                 //end of synced movement settings
             encoder.WriteLong(0);

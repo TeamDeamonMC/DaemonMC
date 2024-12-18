@@ -1,6 +1,6 @@
-﻿namespace DaemonMC
+﻿namespace DaemonMC.Utils
 {
-    public class Attribute
+    public class AttributeValue
     {
         public float MinValue { get; set; }
         public float MaxValue { get; set; }
@@ -10,7 +10,7 @@
         public float DefaultValue { get; set; }
         public string Name { get; set; }
 
-        public Attribute(string name, float minValue, float maxValue, float currentValue, float defaultMinValue, float defaultMaxValue, float defaultValue)
+        public AttributeValue(string name, float minValue, float maxValue, float currentValue, float defaultMinValue, float defaultMaxValue, float defaultValue)
         {
             Name = name;
             MinValue = minValue;
@@ -31,9 +31,9 @@
             MovementSpeed = movementSpeed;
         }
 
-        public Attribute Movement_speed()
+        public AttributeValue Movement_speed()
         {
-            return new Attribute("minecraft:movement", 0, float.MaxValue, MovementSpeed, 0, float.MaxValue, MovementSpeed);
+            return new AttributeValue("minecraft:movement", 0, float.MaxValue, MovementSpeed, 0, float.MaxValue, MovementSpeed);
         }
     }
 }

@@ -1,11 +1,13 @@
-﻿namespace DaemonMC.Network.Bedrock
+﻿using DaemonMC.Utils;
+
+namespace DaemonMC.Network.Bedrock
 {
     public class UpdateAttributes
     {
         public Info.Bedrock id = Info.Bedrock.UpdateAttributes;
 
         public ulong EntityId = 0;
-        public List<Attribute> Attributes = new List<Attribute>();
+        public List<AttributeValue> Attributes = new List<AttributeValue>();
 
         public void Decode(PacketDecoder decoder)
         {

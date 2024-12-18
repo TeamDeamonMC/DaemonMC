@@ -364,6 +364,22 @@ namespace DaemonMC.Network
             };
             return value;
         }
+
+        public List<TEnum> Read<TEnum>() where TEnum : Enum
+        {
+            ulong value = (ulong)ReadVarLong();
+            List<TEnum> result = new List<TEnum>();
+
+            foreach (TEnum enumValue in Enum.GetValues(typeof(TEnum)))
+            {
+                int index = Convert.ToInt32(enumValue);
+                if ((value & (1UL << index)) != 0)
+                {
+                    result.Add(enumValue);
+                }
+            }
+            return result;
+        }
     }
 
     public static class PacketDecoderPool

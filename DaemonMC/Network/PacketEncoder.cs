@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using System.Numerics;
 using System.Text;
+using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 using fNbt;
 
@@ -296,6 +298,55 @@ namespace DaemonMC.Network
         {
             WriteFloat(vec.X);
             WriteFloat(vec.Y);
+        }
+
+        public void WriteMetadata(Dictionary<ActorData, Metadata> metadata)
+        {
+            WriteVarInt(metadata.Count);
+            foreach (var entry in metadata)
+            {
+                WriteVarInt((int) entry.Key);
+
+                switch (entry.Value.Value)
+                {
+                    case byte value:
+                        WriteVarInt(0);
+                        WriteByte(value);
+                        break;
+                    case short value:
+                        WriteVarInt(1);
+                        WriteShort((ushort) value);
+                        break;
+                    case int value:
+                        WriteVarInt(2);
+                        WriteSignedVarInt(value);
+                        break;
+                    case float value:
+                        WriteVarInt(3);
+                        WriteFloat(value);
+                        break;
+                    case string value:
+                        WriteVarInt(4);
+                        WriteString(value);
+                        break;
+                    case NbtCompound value:
+                        WriteVarInt(5);
+                        WriteCompoundTag(value);
+                        break;
+                    /*case BlockPos value: //todo
+                        WriteVarInt(6);
+                        WriteBlockPos(value);
+                        break;*/
+                    case long value:
+                        WriteVarInt(7);
+                        WriteSignedVarLong(value);
+                        break;
+                    case Vector3 value:
+                        WriteVarInt(8);
+                        WriteVec3(value);
+                        break;
+                }
+            }
         }
     }
 

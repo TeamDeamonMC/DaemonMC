@@ -54,6 +54,9 @@ namespace DaemonMC.Network.Bedrock
                 case Info.Bedrock.TextMessage:
                     new TextMessage().Decode(decoder);
                     break;
+                case Info.Bedrock.PlayerAuthInput:
+                    new PlayerAuthInput().Decode(decoder);
+                    break;
 
                 default:
                     Log.error($"[Server] Unknown Bedrock packet: {pkid}");

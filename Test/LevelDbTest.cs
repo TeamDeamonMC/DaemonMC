@@ -1,4 +1,5 @@
-﻿using fNbt;
+﻿using DaemonMC.Utils;
+using fNbt;
 using MiNET.LevelDB;
 using MiNET.LevelDB.Utils;
 
@@ -10,7 +11,7 @@ namespace DaemonMC.Tests
         [TestMethod]
         public void ChunkLoadTest()
         {
-            string levelName = "level";
+            string levelName = "My World";
             int x = 0;
             int z = 0;
             int count = 0;
@@ -22,12 +23,12 @@ namespace DaemonMC.Tests
             Console.WriteLine();
 
             byte[] index = ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z));
-            byte[] version = db.Get(ToDataTypes.GetByteSum(index, new byte[] { 0x76 }));
+            byte[] version = db.Get(ToDataTypes.GetByteSum(index, new byte[] { 0x2c }));
             byte[] dataKey = ToDataTypes.GetByteSum(index, new byte[] { 0x2f, 0 });
 
-            for (byte y = 0; y < 20; y++)
+            for (int y = -4; y < 20; y++)
             {
-                dataKey[^1] = y;
+                dataKey[^1] = (byte)y;
                 byte[] chunk = db.Get(dataKey);
 
                 if (chunk != null)
@@ -61,8 +62,22 @@ namespace DaemonMC.Tests
                 int blocksPerWord = (int)Math.Floor(32d / bitsPerBlock);
                 int wordCount = (int)Math.Ceiling(4096d / blocksPerWord);
 
-                long blockIndex = reader.Position;
-                reader.Position += wordCount * 4;
+                int[] blocks = new int[4096];
+                int position = 0;
+                for (int wordIdx = 0; wordIdx < wordCount; wordIdx++)
+                {
+                    uint word = reader.ReadUInt32();
+
+                    for (int block = 0; block < blocksPerWord; block++)
+                    {
+                        if (position >= 4096) continue;
+
+                        int state = (int)((word >> ((position % blocksPerWord) * bitsPerBlock)) & ((1 << bitsPerBlock) - 1));
+
+                        blocks[position] = state;
+                        position++;
+                    }
+                }
 
                 int paletteSize = reader.ReadInt32();
                 Console.WriteLine($"bitsPerBlock: {bitsPerBlock} | paletteSize: {paletteSize}");
@@ -100,42 +115,36 @@ namespace DaemonMC.Tests
                             }
                             compound.Add(statesCompound);
                         }
-
+                        Console.WriteLine(compound);
                         palette.Add(compound);
                     }
                 }
 
-                long nextStore = reader.Position;
-                reader.Position = (int)blockIndex;
-
-                Console.WriteLine();
-
-                int position = 0;
-                for (int wordIdx = 0; wordIdx < wordCount; wordIdx++)
+                foreach (var block in blocks)
                 {
-                    uint word = reader.ReadUInt32();
-                    for (int block = 0; block < blocksPerWord; block++)
+                    int x = (position >> 8) & 0xF;
+                    int y = position & 0xF;
+                    int z = (position >> 4) & 0xF;
+
+                    if (block < palette.Count)
                     {
-                        if (position >= 4096) continue;
-
-                        int state = (int)((word >> ((position % blocksPerWord) * bitsPerBlock)) & ((1 << bitsPerBlock) - 1));
-                        int x = (position >> 8) & 0xF;
-                        int y = position & 0xF;
-                        int z = (position >> 4) & 0xF;
-
-                        if (state < palette.Count)
+                        Console.WriteLine($"block x:{x}, y:{y}, z:{z}");
+                        var nbt = new NbtFile
                         {
-                            Console.WriteLine($"block x:{x}, y:{y}, z:{z}");
-                            Console.WriteLine(palette[state].ToString());
-                        }
-                        else
-                        {
-                            Console.WriteLine($"unknown block x:{x}, y:{y}, z:{z} state:{state}");
-                        }
-                        position++;
+                            BigEndian = false,
+                            UseVarInt = false,
+                            RootTag = palette[block],
+                        };
+
+                        byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
+
+                        Console.WriteLine(Fnv1aHash.Hash32(saveToBuffer));
+                    }
+                    else
+                    {
+                        Console.WriteLine($"unknown block x:{x}, y:{y}, z:{z} state:{block}");
                     }
                 }
-                reader.Position = (int)nextStore;
             }
         }
     }

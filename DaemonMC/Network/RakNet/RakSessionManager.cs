@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.RakNet
@@ -41,17 +42,18 @@ namespace DaemonMC.Network.RakNet
             return null;
         }
 
-        public static void deleteSession(IPEndPoint ip)
+        public static bool deleteSession(IPEndPoint ip)
         {
-            Server.level.RemovePlayer(getSession(ip).EntityID);
+            var player = getSession(ip);
             if (!sessions.Remove(ip))
             {
                 Log.warn($"Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
-                return;
+                return false;
             }
             else
             {
-                Log.info($"{ip.Address.ToString()} Requested disconnect and got disconnected successfully.");
+                Log.info($"{player.username} Requested disconnect and got disconnected successfully.");
+                return true;
             }
         }
 
@@ -63,6 +65,20 @@ namespace DaemonMC.Network.RakNet
                 return;
             }
             sessions[ip].initCompression = enable;
+        }
+
+        public static void Close()
+        {
+            foreach (var player in sessions)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(player.Key);
+                var packet = new Disconnect
+                {
+                    message = "Server closed"
+                };
+                packet.Encode(encoder);
+            }
+            sessions.Clear();
         }
     }
 }

@@ -87,9 +87,9 @@ namespace DaemonMC.Network
                 {
                     ConnectedPing.Decode(decoder);
                 }
-                else if (pkid == RakDisconnect.id)
+                else if (pkid == (byte)Info.RakNet.Disconnect)
                 {
-                    RakDisconnect.Decode(decoder);
+                    new RakDisconnect().Decode(decoder);
                 }
                 else
                 {

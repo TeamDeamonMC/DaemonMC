@@ -87,6 +87,10 @@ namespace DaemonMC.Network.RakNet
 
         public static void Disconnect(RakDisconnectPacket packet, IPEndPoint clientEp)
         {
+            if (RakSessionManager.getSession(clientEp) != null)
+            {
+                Server.level.RemovePlayer(RakSessionManager.getSession(clientEp).EntityID);
+            }
             RakSessionManager.deleteSession(clientEp);
         }
     }

@@ -14,6 +14,7 @@ namespace DaemonMC
         public static Queue<long> availableIds = new Queue<long>();
         public static int datGrIn = 0;
         public static int datGrOut = 0;
+        public static bool crash = false;
 
         public static void ServerF()
         {
@@ -22,32 +23,52 @@ namespace DaemonMC
             sock.Bind(iep);
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
 
-            level = new Level.Level("level");
+            level = new Level.Level("My World");
+            level.load();
 
             Log.info("Server listening on port 19132");
 
             Thread titleMonitor = new Thread(titleUpdate);
             titleMonitor.Start();
 
-            while (true)
+            while (!crash)
             {
                 EndPoint ep = iep;
-                byte[] buffer = new byte[8192];
-                int recv = sock.ReceiveFrom(buffer, ref ep);
-
-                if (recv != 0)
+                try
                 {
-                    var client = (IPEndPoint)ep;
-                    RakSessionManager.createSession(client);
+                    byte[] buffer = new byte[8192];
+                    int recv = sock.ReceiveFrom(buffer, ref ep);
 
-                    PacketDecoder decoder = PacketDecoderPool.Get(buffer, client);
-                    decoder.RakDecoder(decoder, recv);
+                    if (recv != 0)
+                    {
+                        var client = (IPEndPoint)ep;
+                        RakSessionManager.createSession(client);
+
+                        PacketDecoder decoder = PacketDecoderPool.Get(buffer, client);
+                        decoder.RakDecoder(decoder, recv);
+                    }
+                }
+                catch (SocketException ex)
+                {
+                    Log.error($"SocketException: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Log.error($"Exception: {ex.Message}");
                 }
             }
+
+            RakSessionManager.Close();
+            Log.error("Server closed because of fatal error");
         }
 
         public static void Send(byte[] trimmedBuffer, IPEndPoint client)
         {
+            if (!RakSessionManager.sessions.TryGetValue(client, out var session))
+            {
+                Log.warn($"Tried to send data to disconnected client {client.Address}");
+                return;
+            }
             sock.SendTo(trimmedBuffer, client);
         }
 

@@ -12,7 +12,7 @@ namespace DaemonMC
             return result;
         }
 
-        public static byte[] GetVarint(int value)
+        public static byte[] WriteVarint(int value)
         {
             List<byte> bytes = new List<byte>();
             while ((value & -128) != 0)
@@ -43,6 +43,22 @@ namespace DaemonMC
             }
 
             return value;
+        }
+
+        public static uint ReadUInt32(Stream stream)
+        {
+            using (BinaryReader reader = new BinaryReader(stream, System.Text.Encoding.Default, true))
+            {
+                return reader.ReadUInt32();
+            }
+        }
+
+        public static void WriteUInt32(Stream stream, uint value)
+        {
+            using (BinaryWriter writer = new BinaryWriter(stream, System.Text.Encoding.Default, true))
+            {
+                writer.Write(value);
+            }
         }
     }
 }

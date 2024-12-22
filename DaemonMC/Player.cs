@@ -7,6 +7,7 @@ using System.Numerics;
 using DaemonMC.Level;
 using DaemonMC.Utils;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Network.RakNet;
 
 namespace DaemonMC
 {
@@ -103,7 +104,7 @@ namespace DaemonMC
                 chunkX = chunkX,
                 chunkZ = chunkZ,
                 count = 20,
-                data = testchunk.flat
+                data = currentLevel.temporary ? testchunk.generateChunks() : new LevelDBInterface().GetChunk(currentLevel.levelName, chunkX, chunkZ).networkSerialize(this)
             };
             chunk.Encode(encoder);
         }
@@ -149,6 +150,10 @@ namespace DaemonMC
             SendQueueBusy = true;
             while (ChunkSendQueue.Count > 0)
             {
+                if (!Server.level.onlinePlayers.ContainsValue(this)) {
+                    ChunkSendQueue.Clear();
+                    break;
+                }
                 var (chunkX, chunkZ) = ChunkSendQueue.Dequeue();
                 SendChunkToPlayer(chunkX, chunkZ);
 
@@ -157,6 +162,17 @@ namespace DaemonMC
             SendQueueBusy = false;
         }
 
+        public void Kick(string msg)
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new Disconnect
+            {
+                message = msg
+            };
+            packet.Encode(encoder);
+            Server.level.RemovePlayer((long)EntityID);
+            RakSessionManager.deleteSession(ep);
+        }
 
 
 

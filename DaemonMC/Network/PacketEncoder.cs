@@ -13,7 +13,7 @@ namespace DaemonMC.Network
     {
         public IPEndPoint clientEp = null!;
         public int writeOffset = 0;
-        public byte[] byteStream = new byte[25000];
+        public byte[] byteStream = new byte[35000];
 
         public static Dictionary<uint, byte[]> sentPackets = new Dictionary<uint, byte[]>();
 
@@ -21,7 +21,7 @@ namespace DaemonMC.Network
         {
             clientEp = ep;
             writeOffset = 0;
-            byteStream = new byte[25000];
+            byteStream = new byte[35000];
         }
 
         public void handlePacket(string type = "bedrock")
@@ -30,6 +30,11 @@ namespace DaemonMC.Network
             Array.Copy(byteStream, trimmedBuffer, writeOffset);
             if (type == "bedrock")
             {
+                if (RakSessionManager.getSession(clientEp) == null)
+                {
+                    return;
+                }
+
                 var packetID = ToDataTypes.ReadVarInt(trimmedBuffer);
 
                 Log.debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {(Info.Bedrock)packetID}");
@@ -43,7 +48,7 @@ namespace DaemonMC.Network
                     }
                 }
 
-                byte[] lengthVarInt = ToDataTypes.GetVarint(writeOffset);
+                byte[] lengthVarInt = ToDataTypes.WriteVarint(writeOffset);
 
                 byte[] header = new byte[bedrockId.Length + lengthVarInt.Length];
                 Array.Copy(bedrockId, 0, header, 0, bedrockId.Length);
@@ -54,7 +59,7 @@ namespace DaemonMC.Network
                 Array.Copy(trimmedBuffer, 0, newtrimmedBuffer, header.Length, trimmedBuffer.Length);
 
                 writeOffset = 0;
-                byteStream = new byte[25000];
+                byteStream = new byte[35000];
 
                 Reliability.ReliabilityHandler(this, newtrimmedBuffer);
                 return;
@@ -63,7 +68,7 @@ namespace DaemonMC.Network
             Log.debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {(Info.RakNet)trimmedBuffer[0]}");
 
             writeOffset = 0;
-            byteStream = new byte[25000];
+            byteStream = new byte[35000];
 
             if (trimmedBuffer[0] == 3)
             {
@@ -96,7 +101,7 @@ namespace DaemonMC.Network
 
         public void Reset()
         {
-            byteStream = new byte[25000];
+            byteStream = new byte[35000];
             writeOffset = 0;
         }
 

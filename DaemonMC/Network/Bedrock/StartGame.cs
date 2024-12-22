@@ -102,8 +102,8 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                encoder.WriteSignedVarInt(3);
-                encoder.WriteSignedVarInt(40);
+                encoder.WriteSignedVarInt(0); //0 server auth off, need fix
+                encoder.WriteSignedVarInt(80);
                 encoder.WriteBool(true);
                 //end of synced movement settings
             encoder.WriteLong(0);
@@ -118,7 +118,7 @@ namespace DaemonMC.Network.Bedrock
             var uuid = Guid.NewGuid();
             encoder.WriteUUID(uuid);
             encoder.WriteBool(false);
-            encoder.WriteBool(false);
+            encoder.WriteBool(true); //we use hashed block ids
             encoder.WriteBool(true);
             encoder.handlePacket();
         }

@@ -7,8 +7,8 @@
 
     public class RakDisconnect
     {
-        public static byte id = 21;
-        public static void Decode(PacketDecoder decoder)
+        public byte id = 21;
+        public void Decode(PacketDecoder decoder)
         {
             var packet = new RakDisconnectPacket
             {
@@ -16,7 +16,7 @@
             RakPacketProcessor.Disconnect(packet, decoder.endpoint);
         }
 
-        public static void Encode(RakDisconnectPacket fields, PacketEncoder encoder)
+        public void Encode(PacketEncoder encoder)
         {
             encoder.WriteByte(id);
             encoder.handlePacket("raknet");

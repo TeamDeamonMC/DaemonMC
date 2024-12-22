@@ -24,7 +24,7 @@
         public void Encode(PacketEncoder encoder)
         {
             encoder.PacketId(id);
-            encoder.WriteByte(1);
+            encoder.WriteByte(messageType);
             encoder.WriteBool(Localized);
             encoder.WriteString(Username);
             encoder.WriteString(Message);

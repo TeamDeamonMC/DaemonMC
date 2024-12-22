@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using DaemonMC.Level;
 using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
@@ -29,6 +28,14 @@ namespace DaemonMC.Network.Bedrock
         public static void Login(Login packet, IPEndPoint clientEp)
         {
             LoginHandler.execute(packet, clientEp);
+            var session = RakSessionManager.getSession(clientEp);
+
+            Player player = new Player();
+            player.Username = session.username;
+
+            long EntityId = Server.AddPlayer(player, clientEp);
+            session.EntityID = EntityId;
+            player.EntityID = EntityId;
         }
 
         public static void PacketViolationWarning(PacketViolationWarning packet)
@@ -66,16 +73,8 @@ namespace DaemonMC.Network.Bedrock
             }
             else if (packet.response == 4) //start game
             {
-                var session = RakSessionManager.getSession(clientEp);
-
-                Player player = new Player();
-                player.Username = session.username;
-                player.currentLevel = Server.level;
-
-                long EntityId = player.currentLevel.AddPlayer(player, clientEp);
-                session.EntityID = EntityId;
-                player.EntityID = (ulong)EntityId;
-
+                var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
+                player.currentLevel = Server.levels[0];
                 player.spawn();
             }
         }

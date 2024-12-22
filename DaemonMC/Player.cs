@@ -14,11 +14,11 @@ namespace DaemonMC
     public class Player
     {
         public string Username { get; set; }
-        public ulong EntityID { get; set; }
-        public Vector3 Position { get; set; } = new Vector3(0, 5, 0);
+        public long EntityID { get; set; }
+        public Vector3 Position { get; set; }
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
-        public Level.Level currentLevel { get; set; }
+        public World currentLevel { get; set; }
         public AttributesValues attributes { get; set; } = new AttributesValues(0.1f);
         public Dictionary<ActorData, Metadata> metadata { get; set; } = new Dictionary<ActorData, Metadata>();
 
@@ -43,18 +43,19 @@ namespace DaemonMC
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new StartGame
             {
+                LevelName = currentLevel.LevelDisplayName,
                 EntityId = EntityID,
-                gameType = 0,
+                GameType = 0,
                 GameMode = 2,
-                position = Position,
-                rotation = new Vector2(0, 0),
-                spawnBlockX = 0,
-                spawnBlockY = 0,
-                spawnBlockZ = 0,
-                difficulty = 1,
-                dimension = 0,
-                seed = 9876,
-                generator = 1,
+                Position = new Vector3(currentLevel.spawnX, 5, currentLevel.spawnZ),
+                Rotation = new Vector2(0, 0),
+                SpawnBlockX = currentLevel.spawnX,
+                SpawnBlockY = 0,
+                SpawnBlockZ = currentLevel.spawnZ,
+                Difficulty = 1,
+                Dimension = 0,
+                Seed = currentLevel.RandomSeed,
+                Generator = 1,
             };
             packet.Encode(encoder);
         }
@@ -150,7 +151,7 @@ namespace DaemonMC
             SendQueueBusy = true;
             while (ChunkSendQueue.Count > 0)
             {
-                if (!Server.level.onlinePlayers.ContainsValue(this)) {
+                if (!Server.onlinePlayers.ContainsValue(this)) {
                     ChunkSendQueue.Clear();
                     break;
                 }
@@ -170,8 +171,19 @@ namespace DaemonMC
                 message = msg
             };
             packet.Encode(encoder);
-            Server.level.RemovePlayer((long)EntityID);
+            Server.RemovePlayer((long)EntityID);
             RakSessionManager.deleteSession(ep);
+        }
+
+        public void SendMessage(string message)
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var pk = new TextMessage
+            {
+                messageType = 1,
+                Message = message
+            };
+            pk.Encode(encoder);
         }
 
 
@@ -237,11 +249,12 @@ namespace DaemonMC
 
         public void PacketEvent_Text(TextMessage packet)
         {
-            foreach (var dest in currentLevel.onlinePlayers)
+            foreach (var dest in Server.onlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 var pk = new TextMessage
                 {
+                    messageType = 1,
                     Username = Username,
                     Message = packet.Message
                 };

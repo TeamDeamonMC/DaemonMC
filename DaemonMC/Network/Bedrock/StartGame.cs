@@ -6,22 +6,23 @@ namespace DaemonMC.Network.Bedrock
     {
         public Info.Bedrock id = Info.Bedrock.StartGame;
 
-        public ulong EntityId = 0;
+        public string LevelName;
+        public long EntityId = 0;
         public int GameMode = 0;
-        public Vector3 position = new Vector3();
-        public Vector2 rotation = new Vector2();
-        public long seed = 0;
-        public ushort biomeType = 0;
-        public string biomeName = "plains";
-        public int dimension = 0;
-        public int generator = 1;
-        public int gameType = 0;
-        public int difficulty = 0;
-        public int spawnBlockX = 0;
-        public int spawnBlockY = 0;
-        public int spawnBlockZ = 0;
-        public int editorType = 0;
-        public int stopTime = 0;
+        public Vector3 Position = new Vector3();
+        public Vector2 Rotation = new Vector2();
+        public long Seed = 0;
+        public ushort BiomeType = 0;
+        public string BiomeName = "plains";
+        public int Dimension = 0;
+        public int Generator = 1;
+        public int GameType = 0;
+        public int Difficulty = 0;
+        public int SpawnBlockX = 0;
+        public int SpawnBlockY = 0;
+        public int SpawnBlockZ = 0;
+        public int EditorType = 0;
+        public int StopTime = 0;
 
         public void Decode(PacketDecoder decoder)
         {
@@ -31,30 +32,30 @@ namespace DaemonMC.Network.Bedrock
         public void Encode(PacketEncoder encoder)
         {
             encoder.PacketId(id);
-            encoder.WriteVarLong(EntityId);
-            encoder.WriteVarLong(EntityId);
+            encoder.WriteVarLong((ulong) EntityId);
+            encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteVarInt(GameMode);
-            encoder.WriteVec3(position);
-            encoder.WriteVec2(rotation);
+            encoder.WriteVec3(Position);
+            encoder.WriteVec2(Rotation);
             //Level settings
-            encoder.WriteLongLE(seed);
+                encoder.WriteLongLE(Seed);
                     //Spawn settings
-                    encoder.WriteShort(biomeType);
-                    encoder.WriteString(biomeName);
-                    encoder.WriteVarInt(dimension);
+                    encoder.WriteShort(BiomeType);
+                    encoder.WriteString(BiomeName);
+                    encoder.WriteVarInt(Dimension);
                     //End of Spawn settings
-                encoder.WriteSignedVarInt(generator);
-                encoder.WriteSignedVarInt(gameType);
+                encoder.WriteSignedVarInt(Generator);
+                encoder.WriteSignedVarInt(GameType);
                 encoder.WriteBool(false); //hardcore
-                encoder.WriteSignedVarInt(difficulty);
-                encoder.WriteSignedVarInt(spawnBlockX);
-                encoder.WriteVarInt(spawnBlockY);
-                encoder.WriteSignedVarInt(spawnBlockZ);
+                encoder.WriteSignedVarInt(Difficulty);
+                encoder.WriteSignedVarInt(SpawnBlockX);
+                encoder.WriteVarInt(SpawnBlockY);
+                encoder.WriteSignedVarInt(SpawnBlockZ);
                 encoder.WriteBool(false); //achievements
                 encoder.WriteBool(false);
                 encoder.WriteBool(false); //editorCreated
                 encoder.WriteBool(false); //editorExported
-                encoder.WriteSignedVarInt(stopTime);
+                encoder.WriteSignedVarInt(StopTime);
                 encoder.WriteSignedVarInt(0);
                 encoder.WriteBool(false);
                 encoder.WriteString("");
@@ -98,7 +99,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteString("");
             encoder.WriteString("");
-            encoder.WriteString("");
+            encoder.WriteString(LevelName); //level name?
             encoder.WriteString("");
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings

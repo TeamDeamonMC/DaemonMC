@@ -7,7 +7,7 @@ namespace DaemonMC.Network.Bedrock
     {
         public Info.Bedrock id = Info.Bedrock.SetActorData;
 
-        public ulong EntityId = 0;
+        public long EntityId = 0;
         public Dictionary<ActorData, Metadata> Metadata = new Dictionary<ActorData, Metadata>();
 
         public void Decode(PacketDecoder decoder)
@@ -18,7 +18,7 @@ namespace DaemonMC.Network.Bedrock
         public void Encode(PacketEncoder encoder)
         {
             encoder.PacketId(id);
-            encoder.WriteVarLong(EntityId);
+            encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteMetadata(Metadata);
             encoder.WriteVarInt(0);
             encoder.WriteVarInt(0); //todo here

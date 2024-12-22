@@ -3,18 +3,20 @@ using System.Net;
 using DaemonMC.Utils.Text;
 using DaemonMC.Network;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Level;
 
 namespace DaemonMC
 {
     public class Server
     {
         public static Socket sock { get; set; } = null!;
-        public static Level.Level level { get; set; } = null!;
+        public static Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
         public static long nextId = 10;
         public static Queue<long> availableIds = new Queue<long>();
         public static int datGrIn = 0;
         public static int datGrOut = 0;
         public static bool crash = false;
+        public static List<World> levels = new List<World>();
 
         public static void ServerF()
         {
@@ -23,8 +25,7 @@ namespace DaemonMC
             sock.Bind(iep);
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
 
-            level = new Level.Level("My World");
-            level.load();
+            levels.Add(new World("My World"));
 
             Log.info("Server listening on port 19132");
 
@@ -62,6 +63,50 @@ namespace DaemonMC
             Log.error("Server closed because of fatal error");
         }
 
+        public static long AddPlayer(Player player, IPEndPoint ep)
+        {
+            long id;
+
+            if (Server.availableIds.Count > 0)
+            {
+                id = availableIds.Dequeue();
+            }
+            else
+            {
+                id = nextId++;
+            }
+
+            player.ep = ep;
+            onlinePlayers.Add(id, player);
+            Log.debug($"{player.Username} has been added to server players with EntityID {id}");
+            return id;
+        }
+
+        public static bool RemovePlayer(long id)
+        {
+            if (onlinePlayers.ContainsKey(id))
+            {
+                var player = GetPlayer(id);
+                onlinePlayers.Remove(id);
+                availableIds.Enqueue(id);
+                Log.debug($"Bedrock session closed for {player.Username} with EntityID {id}");
+                return true;
+            }
+            Log.error($"No player found with EntityID {id}");
+            return false;
+        }
+
+        public static Player GetPlayer(long id)
+        {
+            if (onlinePlayers.ContainsKey(id))
+            {
+                onlinePlayers.TryGetValue(id, out Player player);
+                return player;
+            }
+            Log.error($"No player found with EntityID {id}");
+            return null;
+        }
+
         public static void Send(byte[] trimmedBuffer, IPEndPoint client)
         {
             if (!RakSessionManager.sessions.TryGetValue(client, out var session))
@@ -76,7 +121,7 @@ namespace DaemonMC
         {
             while (true)
             {
-                Console.Title = $"DaeamonMC | Players {Server.level.onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
+                Console.Title = $"DaeamonMC | Players {onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
                 datGrIn = 0;
                 datGrOut = 0;
                 Thread.Sleep(1000);

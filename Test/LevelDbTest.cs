@@ -1,4 +1,5 @@
-﻿using DaemonMC.Utils;
+﻿using System.IO.Compression;
+using DaemonMC.Utils;
 using fNbt;
 using MiNET.LevelDB;
 using MiNET.LevelDB.Utils;
@@ -8,6 +9,42 @@ namespace DaemonMC.Tests
     [TestClass]
     public class LevelDbTest
     {
+        [TestMethod]
+        public void InfoLoadTest()
+        {
+            string levelName = "My World";
+            using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{levelName}.mcworld"))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    if (entry.FullName.EndsWith("level.dat", StringComparison.OrdinalIgnoreCase))
+                    {
+                        using (Stream stream = entry.Open())
+                        {
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                stream.CopyTo(memoryStream);
+
+                                memoryStream.Position = 8;
+
+                                var nbt = new NbtFile
+                                {
+                                    BigEndian = false,
+                                    UseVarInt = false
+                                };
+
+                                nbt.LoadFromStream(memoryStream, NbtCompression.None);
+                                Console.WriteLine(nbt.RootTag);
+                                //NbtTag tag = nbt.RootTag;
+                                //string LevelName = tag["LevelName"].StringValue;
+                                //Console.WriteLine(LevelName);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         [TestMethod]
         public void ChunkLoadTest()
         {
@@ -41,6 +78,8 @@ namespace DaemonMC.Tests
                     Console.WriteLine($"Empty subchunk (Air?) at x:{x} z:{z} | y:{y}");
                 }
             }
+
+            db.Close();
         }
 
         private void DecodeChunk(ReadOnlySpan<byte> data)

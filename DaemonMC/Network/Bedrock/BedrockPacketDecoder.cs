@@ -13,9 +13,9 @@ namespace DaemonMC.Network.Bedrock
                 {
                     decoder.ReadByte();
                 }
-                if (Server.level.onlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.endpoint).EntityID))
+                if (Server.onlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.endpoint).EntityID))
                 {
-                    decoder.player = Server.level.GetPlayer(RakSessionManager.getSession(decoder.endpoint).EntityID);
+                    decoder.player = Server.GetPlayer(RakSessionManager.getSession(decoder.endpoint).EntityID);
                 }
             }
             var size = decoder.ReadVarInt(); //packet size

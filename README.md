@@ -5,3 +5,6 @@ From "one night project for fun" this thing now have almost fully working RakNet
 
 **Update 2024.08.18**
 It is now possible to join the server. I actually didn't think that I will make it so far but it happened.
+
+**Update 2024.12.22**
+That was really hard. Lack of chunk serialization docs and knowledge BUT... It works. Now it is possible to load mcworld World files. Still unstable but simple and flat words works. I know where is the problem, just need to figure out how to fix. Merry Christmas!

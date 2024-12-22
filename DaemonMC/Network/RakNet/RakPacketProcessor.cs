@@ -89,7 +89,7 @@ namespace DaemonMC.Network.RakNet
         {
             if (RakSessionManager.getSession(clientEp) != null)
             {
-                Server.level.RemovePlayer(RakSessionManager.getSession(clientEp).EntityID);
+                Server.RemovePlayer(RakSessionManager.getSession(clientEp).EntityID);
             }
             RakSessionManager.deleteSession(clientEp);
         }

@@ -6,7 +6,7 @@ namespace DaemonMC.Network.Bedrock
     {
         public Info.Bedrock id = Info.Bedrock.UpdateAttributes;
 
-        public ulong EntityId = 0;
+        public long EntityId = 0;
         public List<AttributeValue> Attributes = new List<AttributeValue>();
 
         public void Decode(PacketDecoder decoder)
@@ -17,7 +17,7 @@ namespace DaemonMC.Network.Bedrock
         public void Encode(PacketEncoder encoder)
         {
             encoder.PacketId(id);
-            encoder.WriteVarLong(EntityId);
+            encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteVarInt(Attributes.Count);
             foreach (var attribute in Attributes)
             {

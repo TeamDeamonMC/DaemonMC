@@ -60,12 +60,6 @@ namespace DaemonMC.Level
                             int blockHash = Fnv1aHash.Hash32(saveToBuffer);
                             VarInt.WriteSInt32(stream, blockHash);
                         }
-
-                        if ((wordsPerChunk * blocksPerWord) != 4096)
-                        {
-                            Log.error($"LevelDB read error. Wrong block count in subchunk. {wordsPerChunk * blocksPerWord} != 4096");
-                            player.Kick($"LevelDB read error. Wrong block count in subchunk. {wordsPerChunk * blocksPerWord} != 4096"); //not sure what to do so. This shouldn't happen. crash client
-                        }
                     }
                 }
 

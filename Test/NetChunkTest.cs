@@ -11,10 +11,11 @@ namespace DaemonMC
         {
             //var chunkData = generateChunks();
             //var chunkData = testchunk.flat;
-            var chunkData = new LevelDBInterface().GetChunk("level", 0, 0).networkSerialize();
-            var stream = new MemoryStream(chunkData);
+            var leveldb = new LevelDBInterface();
+            var chunk = leveldb.GetChunk("My World", 0, 0);
+            var stream = new MemoryStream(chunk.networkSerialize());
             {
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < chunk.chunks.Count; i++)
                 {
                     Console.WriteLine($"reading sunchunk: {i}");
 
@@ -85,9 +86,6 @@ namespace DaemonMC
                             }
                         }
                         stream.Position = afterPos;
-
-                        var verifyBlocks = (wordsPerChunk * blocksPerWord) == 4096 ? "OK" : "FAIL";
-                        Console.WriteLine($"Block read {verifyBlocks}");
                     }
                 }
 

@@ -69,6 +69,10 @@ namespace DaemonMC.Utils
                                 {
                                     statesCompound.Add(new NbtString(stateTag.Name, stringState.Value));
                                 }
+                                else if (stateTag is NbtByte byteState)
+                                {
+                                    statesCompound.Add(new NbtByte(stateTag.Name, byteState.Value));
+                                }
                             }
                             compound.Add(statesCompound);
                         }

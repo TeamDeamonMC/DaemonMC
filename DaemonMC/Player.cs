@@ -47,7 +47,7 @@ namespace DaemonMC
                 EntityId = EntityID,
                 GameType = 0,
                 GameMode = 2,
-                Position = new Vector3(currentLevel.spawnX, 5, currentLevel.spawnZ),
+                Position = new Vector3(currentLevel.spawnX, 150, currentLevel.spawnZ),
                 Rotation = new Vector2(0, 0),
                 SpawnBlockX = currentLevel.spawnX,
                 SpawnBlockY = 0,
@@ -158,7 +158,7 @@ namespace DaemonMC
                 var (chunkX, chunkZ) = ChunkSendQueue.Dequeue();
                 SendChunkToPlayer(chunkX, chunkZ);
 
-                await Task.Delay(50);
+                await Task.Delay(100);
             }
             SendQueueBusy = false;
         }

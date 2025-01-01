@@ -4,7 +4,7 @@ namespace DaemonMC.Level
 {
     public class testchunk
     {
-        public static byte[] generateChunks()
+        public byte[] generateChunks()
         {
             using (var stream = new MemoryStream())
             {

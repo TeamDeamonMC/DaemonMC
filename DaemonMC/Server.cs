@@ -87,6 +87,8 @@ namespace DaemonMC
             if (onlinePlayers.ContainsKey(id))
             {
                 var player = GetPlayer(id);
+                player.currentLevel.removePlayer(player);
+
                 onlinePlayers.Remove(id);
                 availableIds.Enqueue(id);
                 Log.debug($"Bedrock session closed for {player.Username} with EntityID {id}");

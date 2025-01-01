@@ -33,7 +33,13 @@ namespace DaemonMC.Network.Bedrock
 
         public void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteVarLong((ulong)actorRuntimeId);
+            encoder.WriteVec3(position);
+            encoder.WriteVec2(rotation);
+            encoder.WriteFloat(YheadRotation);
+            encoder.WriteByte(0);
+            encoder.WriteBool(isOnGround);
+            encoder.WriteVarLong((ulong)vehicleRuntimeId);
         }
     }
 }

@@ -22,6 +22,11 @@ namespace DaemonMC.Utils
             JWTObject decodedObject = JsonConvert.DeserializeObject<JWTObject>(jsonString);
             var handler = new JwtSecurityTokenHandler();
 
+            if (decodedObject == null)
+            {
+                return;
+            }
+
             foreach (var jwtToken in decodedObject.Chain)
             {
                 var jsonToken = handler.ReadToken(jwtToken) as JwtSecurityToken;

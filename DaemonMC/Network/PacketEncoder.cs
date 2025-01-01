@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using System.Numerics;
 using System.Text;
 using DaemonMC.Network.Enumerations;
@@ -13,6 +14,7 @@ namespace DaemonMC.Network
     {
         public IPEndPoint clientEp = null!;
         public int writeOffset = 0;
+        public int protocolVersion = 0;
         public byte[] byteStream = new byte[35000];
 
         public static Dictionary<uint, byte[]> sentPackets = new Dictionary<uint, byte[]>();
@@ -22,6 +24,7 @@ namespace DaemonMC.Network
             clientEp = ep;
             writeOffset = 0;
             byteStream = new byte[35000];
+            protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
         }
 
         public void handlePacket(string type = "bedrock")
@@ -101,6 +104,7 @@ namespace DaemonMC.Network
 
         public void Reset()
         {
+            clientEp = null;
             byteStream = new byte[35000];
             writeOffset = 0;
         }
@@ -357,34 +361,34 @@ namespace DaemonMC.Network
 
     public class PacketEncoderPool
     {
-        public static Stack<PacketEncoder> pool = new Stack<PacketEncoder>();
-        public static int cached = 0;
-        public static int inUse = 0;
+        private static ConcurrentStack<PacketEncoder> pool = new ConcurrentStack<PacketEncoder>();
+        public static int cached;
+        public static int inUse;
 
-        public static PacketEncoder Get(Player player)
-        {
-            return Get(player.ep);
-        }
+             public static PacketEncoder Get(Player player)
+     {
+         return Get(player.ep);
+     }
 
         public static PacketEncoder Get(IPEndPoint ep)
         {
-            inUse++;
-            if (pool.Count > 0)
+            Interlocked.Increment(ref inUse);
+            if (pool.TryPop(out var encoder))
             {
-                var encoder = pool.Pop();
                 encoder.clientEp = ep;
+                encoder.protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
                 return encoder;
             }
 
-            cached++;
+            Interlocked.Increment(ref cached);
             return new PacketEncoder(ep);
         }
 
         public static void Return(PacketEncoder encoder)
         {
-            inUse--;
             encoder.Reset();
             pool.Push(encoder);
+            Interlocked.Decrement(ref inUse);
         }
     }
 }

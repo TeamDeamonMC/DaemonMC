@@ -14,8 +14,9 @@ namespace DaemonMC
     public class Player
     {
         public string Username { get; set; }
+        public Guid UUID { get; set; }
         public long EntityID { get; set; }
-        public Vector3 Position { get; set; }
+        public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
         public World currentLevel { get; set; }
@@ -24,6 +25,7 @@ namespace DaemonMC
 
         private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
         private bool SendQueueBusy = false;
+        public bool Spawned = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
 
@@ -35,6 +37,7 @@ namespace DaemonMC
             SendPlayStatus(3);
             UpdateAttributes();
             SendMetadata();
+            currentLevel.addPlayer(this);
             Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
@@ -47,11 +50,11 @@ namespace DaemonMC
                 EntityId = EntityID,
                 GameType = 0,
                 GameMode = 2,
-                Position = new Vector3(currentLevel.spawnX, 150, currentLevel.spawnZ),
+                Position = new Vector3(Position.X, Position.Y, Position.Z),
                 Rotation = new Vector2(0, 0),
-                SpawnBlockX = currentLevel.spawnX,
-                SpawnBlockY = 0,
-                SpawnBlockZ = currentLevel.spawnZ,
+                SpawnBlockX = (int)Position.X,
+                SpawnBlockY = (int)Position.Y,
+                SpawnBlockZ = (int)Position.Z,
                 Difficulty = 1,
                 Dimension = 0,
                 Seed = currentLevel.RandomSeed,
@@ -105,7 +108,7 @@ namespace DaemonMC
                 chunkX = chunkX,
                 chunkZ = chunkZ,
                 count = 20,
-                data = currentLevel.temporary ? testchunk.generateChunks() : new LevelDBInterface().GetChunk(currentLevel.levelName, chunkX, chunkZ).networkSerialize(this)
+                data = currentLevel.temporary ? new testchunk().generateChunks() : new LevelDBInterface().GetChunk(currentLevel.levelName, chunkX, chunkZ).networkSerialize(this)
             };
             chunk.Encode(encoder);
         }
@@ -208,12 +211,32 @@ namespace DaemonMC
 
         public void PacketEvent_MovePlayer(MovePlayer packet)
         {
-            Position = packet.position;
+            if (packet.position != Position)
+            {
+                Position = packet.position;
 
-            int currentChunkX = (int)Math.Floor(packet.position.X / 16.0);
-            int currentChunkZ = (int)Math.Floor(packet.position.Z / 16.0);
+                ushort header = 0; //todo
+                header |= 0x01;
+                header |= 0x02;
+                header |= 0x04;
+                /*header |= 0x08;
+                header |= 0x10;
+                header |= 0x20;*/
 
-            //Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z}");
+                foreach (Player player in currentLevel.onlinePlayers.Values)
+                {
+                    if (player == this) { continue; }
+                    PacketEncoder encoder = PacketEncoderPool.Get(player);
+                    var movePk = new MoveActorDelta
+                    {
+                        EntityId = EntityID,
+                        Header = header,
+                        Position = Position
+                    };
+                    movePk.Encode(encoder);
+                }
+                Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z}");
+            }
         }
 
         public void PacketEvent_RequestChunkRadius(RequestChunkRadius packet)
@@ -249,7 +272,7 @@ namespace DaemonMC
 
         public void PacketEvent_Text(TextMessage packet)
         {
-            foreach (var dest in Server.onlinePlayers)
+            foreach (var dest in currentLevel.onlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 var pk = new TextMessage
@@ -259,6 +282,14 @@ namespace DaemonMC
                     Message = packet.Message
                 };
                 pk.Encode(encoder);
+            }
+        }
+
+        public void PacketEvent_ServerboundLoadingScreen(ServerboundLoadingScreen packet)
+        {
+            if (packet.screenType == 4)
+            {
+                Spawned = true;
             }
         }
     }

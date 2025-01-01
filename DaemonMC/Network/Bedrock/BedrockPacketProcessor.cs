@@ -23,6 +23,18 @@ namespace DaemonMC.Network.Bedrock
             pk.Encode(encoder);
 
             RakSessionManager.Compression(clientEp, true);
+            RakSessionManager.getSession(clientEp).protocolVersion = packet.protocolVersion;
+
+            if (!Info.protocolVersion.Contains(packet.protocolVersion))
+            {
+                PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
+                var packet2 = new Disconnect
+                {
+                    message = "Unsupported Minecraft version"
+                };
+                packet2.Encode(encoder2);
+                RakSessionManager.deleteSession(clientEp);
+            }
         }
 
         public static void Login(Login packet, IPEndPoint clientEp)
@@ -77,11 +89,6 @@ namespace DaemonMC.Network.Bedrock
                 player.currentLevel = Server.levels[0];
                 player.spawn();
             }
-        }
-
-        public static void ServerboundLoadingScreen(ServerboundLoadingScreen packet)
-        {
-
         }
 
         public static void Interact(Interact packet)

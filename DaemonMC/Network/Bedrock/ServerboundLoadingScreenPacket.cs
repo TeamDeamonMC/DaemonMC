@@ -15,7 +15,7 @@
                 screenId = decoder.ReadInt()
             };
 
-            BedrockPacketProcessor.ServerboundLoadingScreen(packet);
+            decoder.player.PacketEvent_ServerboundLoadingScreen(packet);
         }
 
         public void Encode(PacketEncoder encoder)

@@ -3,11 +3,14 @@
     public class Info
     {
         public static string version = "1.21.50";
-        public static int protocolVersion = 766;
+        public static int[] protocolVersion = [748, 766];
+
+        public static int v1_21_40 = 748;
+        public static int v1_21_50 = 766;
 
         public enum Bedrock
         {
-            Example = 0,
+            Example = -1,
             Login = 1,
             PlayStatus = 2,
             ServerToClientHandshake = 3,
@@ -17,13 +20,16 @@
             ResourcePackClientResponse = 8,
             TextMessage = 9,
             StartGame = 11,
+            AddPlayer = 12,
             MovePlayer = 19,
             UpdateAttributes = 29,
             Interact = 33,
             SetActorData = 39,
+            SetActorMotion = 40,
             LevelChunk = 58,
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
+            MoveActorDelta = 111,
             NetworkChunkPublisherUpdate = 121,
             BiomeDefinitionList = 122,
             ClientCacheStatus = 129,

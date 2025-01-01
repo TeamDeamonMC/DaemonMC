@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using DaemonMC.Network;
+using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Text;
 using fNbt;
 
@@ -10,9 +11,9 @@ namespace DaemonMC.Level
         public bool temporary;
         public string levelName;
         public LevelDBInterface levelDB = new LevelDBInterface();
-        public static Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
+        public Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
         public string LevelDisplayName { get; set; } = "DaemonMC Temp World";
-        public int Version { get; set; } = Info.protocolVersion;
+        public int Version { get; set; } = Info.protocolVersion.Last();
         public int spawnX { get; set; } = 0;
         public int spawnZ { get; set; } = 0;
         public long RandomSeed { get; set; } = 0;
@@ -25,7 +26,42 @@ namespace DaemonMC.Level
 
         public void addPlayer(Player player)
         {
+            foreach (Player onlinePlayer in onlinePlayers.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
+                var packet = new AddPlayer
+                {
+                    Username = player.Username,
+                    EntityId = player.EntityID,
+                    Position = player.Position,
+                    Metadata = player.metadata
+                };
+                packet.Encode(encoder);
+
+                PacketEncoder encoder2 = PacketEncoderPool.Get(player);
+                var packet2 = new AddPlayer
+                {
+                    Username = onlinePlayer.Username,
+                    EntityId = onlinePlayer.EntityID,
+                    Position = onlinePlayer.Position,
+                    Metadata = onlinePlayer.metadata
+                };
+                packet2.Encode(encoder2);
+            }
+
             onlinePlayers.Add(player.EntityID, player);
+        }
+
+        public void removePlayer(Player player)
+        {
+            if (!onlinePlayers.Remove(player.EntityID))
+            {
+                Log.warn($"Couldn't despawn {player.Username} from World {player.currentLevel.levelName}.");
+            }
+            else
+            {
+                Log.debug($"Despawned {player.Username} from World {player.currentLevel.levelName}");
+            }
         }
 
         public void load()

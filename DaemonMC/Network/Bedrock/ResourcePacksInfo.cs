@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.Bedrock
+﻿using DaemonMC.Utils.Text;
+
+namespace DaemonMC.Network.Bedrock
 {
     public class ResourcePacksInfo
     {
@@ -21,9 +23,12 @@
             encoder.WriteBool(force);
             encoder.WriteBool(isAddon);
             encoder.WriteBool(hasScripts);
-            encoder.WriteUUID(templateUUID);
-            encoder.WriteString(templateVersion);
-            encoder.WriteShort(0);
+            if (encoder.protocolVersion >= Info.v1_21_50)
+            {
+                encoder.WriteUUID(templateUUID);
+                encoder.WriteString(templateVersion);
+            }
+            encoder.WriteShort(0);//texture packs
             encoder.handlePacket();
         }
     }

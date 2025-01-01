@@ -1,4 +1,5 @@
-﻿using DaemonMC.Utils;
+﻿using System.Linq;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 using fNbt;
 using MiNET.LevelDB.Utils;
@@ -23,7 +24,7 @@ namespace DaemonMC.Level
                     {
                         bool isRuntime = chunks[i].isRuntime;
                         int bitsPerBlock = chunks[i].bitsPerBlock;
-
+                        Console.WriteLine(bitsPerBlock);
                         byte flag = (byte)((bitsPerBlock << 1) | (isRuntime ? 1 : 0));
                         stream.WriteByte(flag);
 

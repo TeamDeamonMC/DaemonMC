@@ -8,6 +8,7 @@
         public string identity { get; set; }
         public long EntityID { get; set; }
         public uint sequenceNumber { get; set; } = 0;
+        public int protocolVersion { get; set; }
 
         public RakSession(bool compression = false)
         {

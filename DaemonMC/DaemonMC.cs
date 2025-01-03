@@ -6,9 +6,12 @@ namespace DaemonMC
     public static class DaemonMC
     {
         public static string servername = "DaemonMC";
+        public static string worldname = "Nice new server";
         public static string maxOnline = "10";
         public static void Main()
         {
+            Config.Set();
+
             Console.WriteLine(" _____                                ______   ______ ");
             Console.WriteLine("(____ \\                              |  ___ \\ / _____)");
             Console.WriteLine(" _   \\ \\ ____  ____ ____   ___  ____ | | _ | | /      ");
@@ -18,7 +21,6 @@ namespace DaemonMC
             Console.WriteLine("");
             Log.info($"Setting up server for {maxOnline} players with Minecraft {Info.version}");
 
-            Config.Set();
             //Console.WriteLine("Choose DaemonMC mode");
             //Console.WriteLine("1 - Server");
             //Console.WriteLine("2 - Client");

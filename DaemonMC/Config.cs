@@ -6,23 +6,43 @@ namespace DaemonMC
 {
     public class Config
     {
-        public string serverName { get; set; }
-        public string maxOnline { get; set; }
-        public bool debug { get; set; }
+        public string serverName { get; set; } = "DaemonMC";
+        public string worldName { get; set; } = "Nice new server";
+        public string maxOnline { get; set; } = "10";
+        public bool debug { get; set; } = false;
 
         public static void Set()
         {
             string configFile = "DaemonMC.yaml";
-            string yamlContent = File.ReadAllText(configFile);
 
-            var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
+            Config config = new Config();
 
-            Config config = deserializer.Deserialize<Config>(yamlContent);
+            if (!File.Exists(configFile))
+            {
+                var serializer = new SerializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+
+                string yamlContent = serializer.Serialize(config);
+                File.WriteAllText(configFile, yamlContent);
+
+                Log.warn($"Configuration file '{configFile}' was not found. New '{configFile}' been created with default values.");
+            }
+            else
+            {
+                string fileContent = File.ReadAllText(configFile);
+
+                var deserializer = new DeserializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+
+                config = deserializer.Deserialize<Config>(fileContent);
+
+            }
 
             Log.debugMode = config.debug;
             DaemonMC.servername = config.serverName;
+            DaemonMC.worldname = config.worldName;
             DaemonMC.maxOnline = config.maxOnline;
         }
     }

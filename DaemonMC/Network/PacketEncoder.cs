@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Text;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
-using DaemonMC.Utils;
+using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 using fNbt;
 
@@ -353,6 +353,32 @@ namespace DaemonMC.Network
                     case Vector3 value:
                         WriteVarInt(8);
                         WriteVec3(value);
+                        break;
+                }
+            }
+        }
+
+        public void WriteGameRulesData(Dictionary<string, GameRule> gamerule)
+        {
+            WriteVarInt(gamerule.Count);
+            foreach (var entry in gamerule)
+            {
+                WriteString(entry.Key);
+                WriteBool(true);
+
+                switch (entry.Value.Value)
+                {
+                    case bool value:
+                        WriteVarInt(1);
+                        WriteBool(value);
+                        break;
+                    case int value:
+                        WriteVarInt(2);
+                        WriteSignedVarInt(value);
+                        break;
+                    case float value:
+                        WriteVarInt(3);
+                        WriteFloat(value);
                         break;
                 }
             }

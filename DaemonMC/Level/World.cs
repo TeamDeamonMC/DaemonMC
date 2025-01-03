@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 using fNbt;
 
@@ -12,6 +13,7 @@ namespace DaemonMC.Level
         public string levelName;
         public LevelDBInterface levelDB = new LevelDBInterface();
         public Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
+        public Dictionary<string, GameRule> GameRules = new Dictionary<string, GameRule>();
         public string LevelDisplayName { get; set; } = "DaemonMC Temp World";
         public int Version { get; set; } = Info.protocolVersion.Last();
         public int spawnX { get; set; } = 0;
@@ -112,6 +114,7 @@ namespace DaemonMC.Level
             else
             {
                 Log.warn($"World Worlds/{levelName}.mcworld not found. Generating temporary flat world...");
+                GameRules.Add("showCoordinates", new GameRule(true));
                 temporary = true;
             }
         }

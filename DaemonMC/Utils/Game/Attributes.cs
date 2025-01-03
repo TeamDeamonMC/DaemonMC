@@ -1,4 +1,4 @@
-﻿namespace DaemonMC.Utils
+﻿namespace DaemonMC.Utils.Game
 {
     public class AttributeValue
     {

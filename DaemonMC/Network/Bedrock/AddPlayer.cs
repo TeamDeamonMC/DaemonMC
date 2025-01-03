@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using DaemonMC.Network.Enumerations;
-using DaemonMC.Utils;
+using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {

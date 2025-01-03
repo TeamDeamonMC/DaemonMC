@@ -8,6 +8,7 @@ using DaemonMC.Level;
 using DaemonMC.Utils;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Utils.Game;
 
 namespace DaemonMC
 {
@@ -35,6 +36,7 @@ namespace DaemonMC
             SendCreativeInventory();
             SendBiomeDefinitionList();
             SendPlayStatus(3);
+            SendGameRules();
             UpdateAttributes();
             SendMetadata();
             currentLevel.addPlayer(this);
@@ -144,6 +146,16 @@ namespace DaemonMC
             {
                 EntityId = EntityID,
                 Metadata = metadata
+            };
+            packet.Encode(encoder);
+        }
+
+        public void SendGameRules()
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new GameRulesChanged
+            {
+                GameRules = currentLevel.GameRules
             };
             packet.Encode(encoder);
         }

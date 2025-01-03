@@ -30,7 +30,7 @@ namespace DaemonMC.Network.Bedrock
                 PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
                 var packet2 = new Disconnect
                 {
-                    message = "Unsupported Minecraft version"
+                    message = $"Unsupported Minecraft version \nSupported protocol versions: {string.Join(", ", Info.protocolVersion)}"
                 };
                 packet2.Encode(encoder2);
                 RakSessionManager.deleteSession(clientEp);

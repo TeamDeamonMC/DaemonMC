@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using DaemonMC.Utils;
 using fNbt;
 using MiNET.LevelDB;
 using MiNET.LevelDB.Utils;
@@ -49,8 +48,8 @@ namespace DaemonMC.Tests
         public void ChunkLoadTest()
         {
             string levelName = "My World";
-            int x = 0;
-            int z = 0;
+            int x = 3;
+            int z = -3;
             int count = 0;
 
             using var db = new Database(new DirectoryInfo($"Worlds/{levelName}.mcworld"));
@@ -167,7 +166,7 @@ namespace DaemonMC.Tests
 
                     if (block < palette.Count)
                     {
-                        Console.WriteLine($"block x:{x}, y:{y}, z:{z}");
+                       // Console.WriteLine($"block x:{x}, y:{y}, z:{z}");
                         var nbt = new NbtFile
                         {
                             BigEndian = false,
@@ -177,13 +176,14 @@ namespace DaemonMC.Tests
 
                         byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
 
-                        Console.WriteLine(Fnv1aHash.Hash32(saveToBuffer));
+                        //Console.WriteLine(Fnv1aHash.Hash32(saveToBuffer));
                     }
                     else
                     {
                         Console.WriteLine($"unknown block x:{x}, y:{y}, z:{z} state:{block}");
                     }
                 }
+                return;
             }
         }
     }

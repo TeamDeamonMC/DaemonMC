@@ -1,6 +1,7 @@
-﻿using System.Linq;
+﻿using DaemonMC.Level.Format;
+using DaemonMC.Network;
+using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
-using DaemonMC.Utils.Text;
 using fNbt;
 using MiNET.LevelDB.Utils;
 
@@ -12,6 +13,13 @@ namespace DaemonMC.Level
 
         public byte[] networkSerialize(Player player = null)
         {
+            int protocol = Info.protocolVersion.Last();
+
+            if (player != null)
+            {
+                protocol = RakSessionManager.getSession(player.ep).protocolVersion;
+            }
+
             using (var stream = new MemoryStream())
             {
                 for (int i = 0; i < chunks.Count; i++)
@@ -24,7 +32,6 @@ namespace DaemonMC.Level
                     {
                         bool isRuntime = chunks[i].isRuntime;
                         int bitsPerBlock = chunks[i].bitsPerBlock;
-                        Console.WriteLine(bitsPerBlock);
                         byte flag = (byte)((bitsPerBlock << 1) | (isRuntime ? 1 : 0));
                         stream.WriteByte(flag);
 
@@ -47,13 +54,15 @@ namespace DaemonMC.Level
                         int paletteSize = chunks[i].palette.Count;
                         VarInt.WriteSInt32(stream, paletteSize);
 
+                        var blockPalette = StateConverter.process(chunks[i].palette, protocol);
+
                         for (int v = 0; v < paletteSize; v++)
                         {
                             var nbt = new NbtFile
                             {
                                 BigEndian = false,
                                 UseVarInt = false,
-                                RootTag = chunks[i].palette[v],
+                                RootTag = blockPalette[v],
                             };
 
                             byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);

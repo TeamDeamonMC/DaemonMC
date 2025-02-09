@@ -33,5 +33,10 @@
             Console.WriteLine($"[ERROR] {message}");
             Console.ResetColor();
         }
+
+        public static void line()
+        {
+            Console.WriteLine();
+        }
     }
 }

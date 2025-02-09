@@ -1,18 +1,14 @@
-﻿using MiNET.LevelDB.Utils;
+﻿using DaemonMC.Blocks;
+using MiNET.LevelDB.Utils;
 
-namespace DaemonMC.Level
+namespace DaemonMC.Level.Generators
 {
-    public class testchunk
+    public class SuperFlat
     {
         public byte[] generateChunks()
         {
             using (var stream = new MemoryStream())
             {
-                for (int i = 0; i < 3; i++)//lets write some empty chunks
-                {
-                    stream.WriteByte(8);//chunk version
-                    stream.WriteByte(0);//storage size
-                }
                 for (int i = 0; i < 1; i++)
                 {
                     byte version = 8; //chunk version
@@ -25,7 +21,7 @@ namespace DaemonMC.Level
                     {
                         bool isRuntime = true; // Is palette runtime/hash or that second NBT type
                         int bitsPerBlock = 2;
-                        byte flag = (byte)((bitsPerBlock << 1) | (isRuntime ? 1 : 0));
+                        byte flag = (byte)(bitsPerBlock << 1 | (isRuntime ? 1 : 0));
                         stream.WriteByte(flag);
 
                         int blocksPerWord = (int)Math.Floor(32f / bitsPerBlock);
@@ -39,24 +35,37 @@ namespace DaemonMC.Level
                             for (int block = 0; block < blocksPerWord; block++)
                             {
                                 int state = 0;
-                                word |= (uint)(state & ((1 << bitsPerBlock) - 1)) << ((position % blocksPerWord) * bitsPerBlock);
+
+                                int x = position % 16;
+                                int y = position / 256;
+                                int z = position / 16 % 16;
+
+                                if (x == 3) // add grass
+                                {
+                                    state = 1;
+                                }
+                                if (x == 2 || x == 1) // add dirt
+                                {
+                                    state = 2;
+                                }
+
+                                word |= (uint)(state & (1 << bitsPerBlock) - 1) << position % blocksPerWord * bitsPerBlock;
                                 position++;
                             }
                             ToDataTypes.WriteUInt32(stream, word);
                         }
 
                         // Write palette
-                        int paletteSize = 1; // How many block types are in palette?
-                        VarInt.WriteSInt32(stream, paletteSize);
+                        int[] pallette = new int[] { new Air().GetHash(), new GrassBlock().GetHash(), new Dirt().GetHash() };
+                        VarInt.WriteSInt32(stream, pallette.Count());// How many block types are in palette?
 
-                        for (int v = 0; v < paletteSize; v++)
+                        foreach (var block in pallette)
                         {
-                            int itemRuntimeId = -567203660; // grass hash runtime id (block type)
-                            VarInt.WriteSInt32(stream, itemRuntimeId);
+                            VarInt.WriteSInt32(stream, block);
                         }
                     }
                 }
-                for (int i = 0; i < 16; i++)//empty chunks again
+                for (int i = 0; i < 19; i++)//empty chunks again
                 {
                     stream.WriteByte(8);//version
                     stream.WriteByte(0);//storage size

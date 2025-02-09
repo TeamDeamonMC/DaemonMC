@@ -4,6 +4,7 @@ using DaemonMC.Utils.Text;
 using DaemonMC.Network;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Level;
+using DaemonMC.Plugin.Plugin;
 
 namespace DaemonMC
 {
@@ -25,9 +26,12 @@ namespace DaemonMC
             sock.Bind(iep);
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
 
+            PluginManager.LoadPlugins("Plugins");
+
             levels.Add(new World("My World"));
 
             Log.info("Server listening on port 19132");
+            Log.line();
 
             Thread titleMonitor = new Thread(titleUpdate);
             titleMonitor.Start();
@@ -53,14 +57,23 @@ namespace DaemonMC
                 {
                     Log.error($"SocketException: {ex.Message}");
                 }
-                catch (Exception ex)
-                {
-                    Log.error($"Exception: {ex.Message}");
-                }
             }
 
             RakSessionManager.Close();
             Log.error("Server closed because of fatal error");
+            ServerClose();
+        }
+
+        public static void ServerClose()
+        {
+            Log.line();
+            Log.info("Shutting down...");
+            PluginManager.UnloadPlugins();
+            foreach (var level in levels)
+            {
+                level.unload();
+            }
+            Thread.Sleep(2000);
         }
 
         public static long AddPlayer(Player player, IPEndPoint ep)

@@ -49,7 +49,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false); //hardcore
                 encoder.WriteSignedVarInt(Difficulty);
                 encoder.WriteSignedVarInt(SpawnBlockX);
-                encoder.WriteVarInt(SpawnBlockY);
+                encoder.WriteSignedVarInt(SpawnBlockY);
                 encoder.WriteSignedVarInt(SpawnBlockZ);
                 encoder.WriteBool(false); //achievements
                 encoder.WriteBool(false);
@@ -103,14 +103,17 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                encoder.WriteSignedVarInt(0); //0 server auth off, need fix
+                encoder.WriteSignedVarInt(2); //0 server auth off, need fix
                 encoder.WriteSignedVarInt(40);
                 encoder.WriteBool(true);
                 //end of synced movement settings
             encoder.WriteLong(0);
             encoder.WriteSignedVarInt(0);
             encoder.WriteVarInt(0); //block
-            encoder.WriteVarInt(0); //item
+            if (encoder.protocolVersion <= Info.v1_21_50)
+            {
+                encoder.WriteVarInt(0); //item
+            }
             encoder.WriteString("");
             encoder.WriteBool(true); //new inventory
             encoder.WriteString(Info.version);

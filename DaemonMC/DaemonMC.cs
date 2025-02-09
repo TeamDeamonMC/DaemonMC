@@ -10,6 +10,9 @@ namespace DaemonMC
         public static string maxOnline = "10";
         public static void Main()
         {
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnExit);
+
             Config.Set();
 
             Console.WriteLine(" _____                                ______   ______ ");
@@ -39,6 +42,11 @@ namespace DaemonMC
                 Console.WriteLine("");
                 Main();
             }
+        }
+
+        static void OnExit(object? sender, EventArgs e)
+        {
+            Server.ServerClose();
         }
     }
 }

@@ -20,7 +20,7 @@
             encoder.PacketId(id);
 
             encoder.WriteSignedVarInt(x);
-            encoder.WriteVarInt(y);
+            encoder.WriteSignedVarInt(y);
             encoder.WriteSignedVarInt(z);
 
             encoder.WriteVarInt(radius * 16);

@@ -2,11 +2,12 @@
 {
     public class Info
     {
-        public static string version = "1.21.50";
-        public static int[] protocolVersion = [748, 766];
+        public static string version = "1.21.60";
+        public static int[] protocolVersion = [748, 766, 776];
 
         public static int v1_21_40 = 748;
         public static int v1_21_50 = 766;
+        public static int v1_21_60 = 776;
 
         public enum Bedrock
         {
@@ -38,6 +39,7 @@
             PlayerAuthInput = 144,
             CreativeContent = 145,
             PacketViolationWarning = 156,
+            ItemRegistry = 162,
             RequestNetworkSettings = 193,
             ServerboundLoadingScreen = 312
         }

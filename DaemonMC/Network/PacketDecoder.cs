@@ -136,7 +136,7 @@ namespace DaemonMC.Network
 
         public float ReadFloat()
         {
-            float a = BitConverter.ToInt32(buffer, readOffset);
+            float a = BitConverter.ToSingle(buffer, readOffset);
             readOffset += 4;
             return a;
         }

@@ -80,8 +80,9 @@ namespace DaemonMC.Utils
                         subChunk.palette.Add(compound);
                     }
                 }
+                return subChunk; //todo fix and remove here. this usually works but will not always. multiple storages thorw error
             }
-            return subChunk;
+            return subChunk; //keep this
         }
 
         public static List<(int x, int z)> GetSequence(int radius, int x, int z)

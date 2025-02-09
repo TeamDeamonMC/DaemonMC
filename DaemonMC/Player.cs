@@ -9,6 +9,9 @@ using DaemonMC.Utils;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
+using DaemonMC.Level.Generators;
+using DaemonMC.Plugin;
+using DaemonMC.Plugin.Plugin;
 
 namespace DaemonMC
 {
@@ -33,6 +36,7 @@ namespace DaemonMC
         public void spawn()
         {
             SendStartGame();
+            SendItemData();
             SendCreativeInventory();
             SendBiomeDefinitionList();
             SendPlayStatus(3);
@@ -41,6 +45,7 @@ namespace DaemonMC
             SendMetadata();
             currentLevel.addPlayer(this);
             Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
+            PluginManager.OnPlayerJoin(this);
         }
 
         public void SendStartGame()
@@ -61,6 +66,16 @@ namespace DaemonMC
                 Dimension = 0,
                 Seed = currentLevel.RandomSeed,
                 Generator = 1,
+            };
+            packet.Encode(encoder);
+        }
+
+        public void SendItemData()
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new ItemRegistry
+            {
+
             };
             packet.Encode(encoder);
         }
@@ -105,12 +120,32 @@ namespace DaemonMC
         public void SendChunkToPlayer(int chunkX, int chunkZ)
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
+            List<byte> chunkData = new List<byte>();
+            int chunkCount = 0;
+
+            if (currentLevel.temporary)
+            {
+                chunkData = new List<byte>(new SuperFlat().generateChunks());
+                chunkCount = 20;
+            }
+            else
+            {
+                var chunkRaw = currentLevel.GetChunk(chunkX, chunkZ);
+                chunkData = new List<byte>(chunkRaw.networkSerialize(this));
+                chunkCount = chunkRaw.chunks.Count();
+                if (chunkRaw.chunks.Count == 0)
+                {
+                    chunkData = new List<byte>(new SuperFlat().generateChunks());
+                    chunkCount = 20;
+                }
+            }
+
             var chunk = new LevelChunk
             {
                 chunkX = chunkX,
                 chunkZ = chunkZ,
-                count = 20,
-                data = currentLevel.temporary ? new testchunk().generateChunks() : new LevelDBInterface().GetChunk(currentLevel.levelName, chunkX, chunkZ).networkSerialize(this)
+                count = chunkCount,
+                data = chunkData.ToArray()
             };
             chunk.Encode(encoder);
         }
@@ -173,7 +208,7 @@ namespace DaemonMC
                 var (chunkX, chunkZ) = ChunkSendQueue.Dequeue();
                 SendChunkToPlayer(chunkX, chunkZ);
 
-                await Task.Delay(100);
+                await Task.Delay(10);
             }
             SendQueueBusy = false;
         }
@@ -208,16 +243,76 @@ namespace DaemonMC
         //
 
 
+        private HashSet<(int x, int z)> sentChunks = new();
 
         public void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
         {
             if (Position != packet.Position)
             {
                 Position = packet.Position;
-                int currentChunkX = (int)Math.Floor(packet.Position.X / 16.0);
-                int currentChunkZ = (int)Math.Floor(packet.Position.Z / 16.0);
+
+                ushort header = 0; //todo
+                header |= 0x01;
+                header |= 0x02;
+                header |= 0x04;
+                /*header |= 0x08;
+                header |= 0x10;
+                header |= 0x20;*/
+
+                foreach (Player player in currentLevel.onlinePlayers.Values)
+                {
+                    if (player == this) { continue; }
+                    PacketEncoder encoder = PacketEncoderPool.Get(player);
+                    var movePk = new MoveActorDelta
+                    {
+                        EntityId = EntityID,
+                        Header = header,
+                        Position = Position
+                    };
+                    movePk.Encode(encoder);
+                }
 
                 Log.debug($"{packet.Position.X} : {packet.Position.Y} : {packet.Position.Z} Data: {string.Join(" | ", packet.InputData)}");
+
+                int currentChunkX = (int)Math.Floor(Position.X / 16.0);
+                int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
+
+                if (currentChunkX == LastChunkX && currentChunkZ == LastChunkZ)
+                    return; // No movement, no update needed
+
+                LastChunkX = currentChunkX;
+                LastChunkZ = currentChunkZ;
+
+                PacketEncoder encoder2 = PacketEncoderPool.Get(this);
+                var packet2 = new NetworkChunkPublisherUpdate
+                {
+                    x = (int)Position.X,
+                    y = (int)0,
+                    z = (int)Position.Z,
+                    radius = 20
+                };
+                packet2.Encode(encoder2);
+
+                HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(20, currentChunkX, currentChunkZ));
+
+                foreach (var chunk in newChunks)
+                {
+                    if (!sentChunks.Contains(chunk))
+                    {
+                        sentChunks.Add(chunk);
+                        ChunkSendQueue.Enqueue(chunk);
+                    }
+                }
+
+                foreach (var chunk in sentChunks.ToList())
+                {
+                    if (!newChunks.Contains(chunk))
+                    {
+                        sentChunks.Remove(chunk);
+                    }
+                }
+
+                ProcessSendQueue();
             }
         }
 
@@ -247,7 +342,7 @@ namespace DaemonMC
                     };
                     movePk.Encode(encoder);
                 }
-                Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z}");
+                Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z} / onground {packet.isOnGround}");
             }
         }
 
@@ -276,7 +371,11 @@ namespace DaemonMC
 
             foreach (var (x, z) in chunkPositions)
             {
-                ChunkSendQueue.Enqueue((x, z));
+                if (!sentChunks.Contains((x, z)))
+                {
+                    sentChunks.Add((x, z));
+                    ChunkSendQueue.Enqueue((x, z));
+                }
             }
 
             ProcessSendQueue();

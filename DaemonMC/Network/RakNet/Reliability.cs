@@ -248,7 +248,8 @@
                 }
 
                 encoder.SendPacket(128, false);
-                encoder.Reset();
+                encoder.byteStream = new byte[35000];
+                encoder.writeOffset = 0;
             }
             PacketEncoderPool.Return(encoder);
         }

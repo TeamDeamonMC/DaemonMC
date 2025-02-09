@@ -11,8 +11,8 @@ namespace DaemonMC
         {
             //var chunkData = generateChunks();
             //var chunkData = testchunk.flat;
-            var leveldb = new LevelDBInterface();
-            var chunk = leveldb.GetChunk("My World", 0, 0);
+            var level = new World("My World");
+            var chunk = level.GetChunk(0, 0);
             var stream = new MemoryStream(chunk.networkSerialize());
             {
                 for (int i = 0; i < chunk.chunks.Count; i++)

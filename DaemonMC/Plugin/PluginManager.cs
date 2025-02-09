@@ -5,7 +5,7 @@ namespace DaemonMC.Plugin.Plugin
 {
     public class PluginManager
     {
-        private static readonly List<IPlayerPlugin> _plugins = new();
+        private static readonly List<Plugin> _plugins = new();
 
         public static void LoadPlugins(string pluginDirectory)
         {
@@ -23,9 +23,9 @@ namespace DaemonMC.Plugin.Plugin
                 foreach (var type in assembly.GetTypes())
                 {
                     Log.info($"Loading plugin: {file}");
-                    if (typeof(IPlayerPlugin).IsAssignableFrom(type) && !type.IsInterface)
+                    if (typeof(Plugin).IsAssignableFrom(type) && !type.IsInterface)
                     {
-                        IPlayerPlugin plugin = (IPlayerPlugin)Activator.CreateInstance(type)!;
+                        Plugin plugin = (Plugin)Activator.CreateInstance(type)!;
                         _plugins.Add(plugin);
                         plugin.OnLoad();
                     }

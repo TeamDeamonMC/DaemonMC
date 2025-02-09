@@ -1,13 +1,10 @@
 ﻿namespace DaemonMC.Plugin.Plugin
 {
-    public interface IPlugin
+    public interface Plugin
     {
         void OnLoad();
         void OnUnload();
-    }
 
-    public interface IPlayerPlugin : IPlugin
-    {
         void OnPlayerJoin(Player player);
     }
 }

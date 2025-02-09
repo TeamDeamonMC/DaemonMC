@@ -10,7 +10,6 @@ using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
 using DaemonMC.Level.Generators;
-using DaemonMC.Plugin;
 using DaemonMC.Plugin.Plugin;
 
 namespace DaemonMC
@@ -45,7 +44,6 @@ namespace DaemonMC
             SendMetadata();
             currentLevel.addPlayer(this);
             Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
-            PluginManager.OnPlayerJoin(this);
         }
 
         public void SendStartGame()
@@ -236,6 +234,18 @@ namespace DaemonMC
             pk.Encode(encoder);
         }
 
+        public void Teleport(Vector3 position)
+        {
+            Position = position;
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var movePk = new MovePlayer
+            {
+                actorRuntimeId = EntityID,
+                position = position
+            };
+            movePk.Encode(encoder);
+        }
+
 
 
         //
@@ -402,6 +412,7 @@ namespace DaemonMC
             {
                 Spawned = true;
             }
+            PluginManager.OnPlayerJoin(this);
         }
     }
 }

@@ -25,7 +25,8 @@ namespace DaemonMC.Network.Bedrock
                 YheadRotation = decoder.ReadFloat(),
                 positionMode = decoder.ReadByte(),
                 isOnGround = decoder.ReadBool(),
-                vehicleRuntimeId = decoder.ReadVarLong()
+                vehicleRuntimeId = decoder.ReadVarLong(),
+                tick = decoder.ReadVarLong()
             };
 
             decoder.player.PacketEvent_MovePlayer(packet);
@@ -33,6 +34,7 @@ namespace DaemonMC.Network.Bedrock
 
         public void Encode(PacketEncoder encoder)
         {
+            encoder.PacketId(id);
             encoder.WriteVarLong((ulong)actorRuntimeId);
             encoder.WriteVec3(position);
             encoder.WriteVec2(rotation);
@@ -40,6 +42,8 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteByte(0);
             encoder.WriteBool(isOnGround);
             encoder.WriteVarLong((ulong)vehicleRuntimeId);
+            encoder.WriteVarLong((ulong)tick);
+            encoder.handlePacket();
         }
     }
 }

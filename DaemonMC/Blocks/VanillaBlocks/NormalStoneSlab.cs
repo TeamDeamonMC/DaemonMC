@@ -6,7 +6,6 @@
         {
             Name = "minecraft:normal_stone_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

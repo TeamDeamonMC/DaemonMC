@@ -6,7 +6,6 @@
         {
             Name = "minecraft:piston";
 
-
             States["facing_direction"] = 0;
         }
     }

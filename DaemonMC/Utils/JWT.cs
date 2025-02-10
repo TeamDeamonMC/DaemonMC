@@ -45,6 +45,7 @@ namespace DaemonMC.Utils
                         ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
                         player.username = extraData.displayName;
                         player.identity = extraData.identity;
+                        player.XUID = extraData.XUID;
                     }
                     else
                     {
@@ -71,6 +72,32 @@ namespace DaemonMC.Utils
             JwtPayload payload = JsonConvert.DeserializeObject<JwtPayload>(payloadJson);
 
             string publicKey = header["x5u"].ToString();
+
+            player.skin = new Skin()
+            {
+                ArmSize = payload.ArmSize,
+                OverrideSkin = payload.OverrideSkin,
+                PersonaSkin = payload.PersonaSkin,
+                PlayFabId = payload.PlayFabId,
+                PremiumSkin = payload.PremiumSkin,
+                SkinAnimationData = payload.SkinAnimationData,
+                SkinColor = payload.SkinColor,
+                SkinData = payload.SkinData,
+                SkinGeometryData = payload.SkinGeometryData,
+                SkinGeometryDataEngineVersion = payload.SkinGeometryDataEngineVersion,
+                SkinId = payload.SkinId,
+                SkinImageHeight = payload.SkinImageHeight,
+                SkinImageWidth = payload.SkinImageWidth,
+                SkinResourcePatch = payload.SkinResourcePatch,
+                Cape = new Cape()
+                {
+                    CapeData = payload.CapeData,
+                    CapeId = payload.CapeId,
+                    CapeImageHeight = payload.CapeImageHeight,
+                    CapeImageWidth = payload.CapeImageWidth,
+                    CapeOnClassicSkin = payload.CapeOnClassicSkin
+                }
+            };
 
             Log.debug($"Public Key (x5u): {publicKey}");
             Log.info($"{player.username} with client version {payload.GameVersion} doing login...");

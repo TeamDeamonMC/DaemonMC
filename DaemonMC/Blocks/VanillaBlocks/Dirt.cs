@@ -5,6 +5,7 @@
         public Dirt()
         {
             Name = "minecraft:dirt";
+
         }
     }
 }

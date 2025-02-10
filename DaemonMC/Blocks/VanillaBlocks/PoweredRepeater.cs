@@ -6,7 +6,6 @@
         {
             Name = "minecraft:powered_repeater";
 
-
             States["minecraft:cardinal_direction"] = "south";
             States["repeater_delay"] = 0;
         }

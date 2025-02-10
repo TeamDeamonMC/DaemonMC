@@ -5,6 +5,7 @@
         public CrackedNetherBricks()
         {
             Name = "minecraft:cracked_nether_bricks";
+
         }
     }
 }

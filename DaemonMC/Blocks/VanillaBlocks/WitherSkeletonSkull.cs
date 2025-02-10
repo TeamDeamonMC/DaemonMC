@@ -6,7 +6,6 @@
         {
             Name = "minecraft:wither_skeleton_skull";
 
-
             States["facing_direction"] = 0;
         }
     }

@@ -5,6 +5,7 @@
         public TuffBricks()
         {
             Name = "minecraft:tuff_bricks";
+
         }
     }
 }

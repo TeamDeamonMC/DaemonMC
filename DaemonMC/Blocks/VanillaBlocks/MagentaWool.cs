@@ -5,6 +5,7 @@
         public MagentaWool()
         {
             Name = "minecraft:magenta_wool";
+
         }
     }
 }

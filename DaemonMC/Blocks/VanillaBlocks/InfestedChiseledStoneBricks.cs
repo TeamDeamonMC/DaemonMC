@@ -5,6 +5,7 @@
         public InfestedChiseledStoneBricks()
         {
             Name = "minecraft:infested_chiseled_stone_bricks";
+
         }
     }
 }

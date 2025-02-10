@@ -5,6 +5,7 @@
         public PinkTerracotta()
         {
             Name = "minecraft:pink_terracotta";
+
         }
     }
 }

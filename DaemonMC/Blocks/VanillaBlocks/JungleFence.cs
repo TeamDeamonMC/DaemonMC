@@ -5,6 +5,7 @@
         public JungleFence()
         {
             Name = "minecraft:jungle_fence";
+
         }
     }
 }

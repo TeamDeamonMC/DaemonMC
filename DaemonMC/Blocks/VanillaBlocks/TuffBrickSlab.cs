@@ -6,7 +6,6 @@
         {
             Name = "minecraft:tuff_brick_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

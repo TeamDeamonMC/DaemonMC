@@ -6,7 +6,6 @@
         {
             Name = "minecraft:structure_block";
 
-
             States["structure_block_type"] = "data";
         }
     }

@@ -5,6 +5,7 @@
         public LapisBlock()
         {
             Name = "minecraft:lapis_block";
+
         }
     }
 }

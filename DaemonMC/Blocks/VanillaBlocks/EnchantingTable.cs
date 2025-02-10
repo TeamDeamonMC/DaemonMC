@@ -5,6 +5,7 @@
         public EnchantingTable()
         {
             Name = "minecraft:enchanting_table";
+
         }
     }
 }

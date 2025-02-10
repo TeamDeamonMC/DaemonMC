@@ -6,7 +6,6 @@
         {
             Name = "minecraft:gray_candle";
 
-
             States["candles"] = 0;
             States["lit"] = (byte)0;
         }

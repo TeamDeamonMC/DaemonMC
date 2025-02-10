@@ -5,6 +5,7 @@
         public LightGrayShulkerBox()
         {
             Name = "minecraft:light_gray_shulker_box";
+
         }
     }
 }

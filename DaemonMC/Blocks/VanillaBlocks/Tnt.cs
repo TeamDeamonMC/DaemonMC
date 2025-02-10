@@ -6,7 +6,6 @@
         {
             Name = "minecraft:tnt";
 
-
             States["explode_bit"] = (byte)0;
         }
     }

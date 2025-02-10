@@ -5,6 +5,7 @@
         public Element7()
         {
             Name = "minecraft:element_7";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:creeper_head";
 
-
             States["facing_direction"] = 0;
         }
     }

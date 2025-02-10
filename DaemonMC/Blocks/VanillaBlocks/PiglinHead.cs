@@ -6,7 +6,6 @@
         {
             Name = "minecraft:piglin_head";
 
-
             States["facing_direction"] = 0;
         }
     }

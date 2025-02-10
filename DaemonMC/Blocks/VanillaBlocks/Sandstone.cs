@@ -5,6 +5,7 @@
         public Sandstone()
         {
             Name = "minecraft:sandstone";
+
         }
     }
 }

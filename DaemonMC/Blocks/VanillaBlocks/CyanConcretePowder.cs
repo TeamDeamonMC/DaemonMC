@@ -5,6 +5,7 @@
         public CyanConcretePowder()
         {
             Name = "minecraft:cyan_concrete_powder";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:composter";
 
-
             States["composter_fill_level"] = 0;
         }
     }

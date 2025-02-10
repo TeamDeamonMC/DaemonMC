@@ -5,6 +5,7 @@
         public Stone()
         {
             Name = "minecraft:stone";
+
         }
     }
 }

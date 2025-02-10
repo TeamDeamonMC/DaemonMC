@@ -5,6 +5,7 @@
         public MossCarpet()
         {
             Name = "minecraft:moss_carpet";
+
         }
     }
 }

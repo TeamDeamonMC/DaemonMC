@@ -6,7 +6,6 @@
         {
             Name = "minecraft:birch_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

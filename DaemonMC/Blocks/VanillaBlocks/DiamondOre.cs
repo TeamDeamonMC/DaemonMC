@@ -5,6 +5,7 @@
         public DiamondOre()
         {
             Name = "minecraft:diamond_ore";
+
         }
     }
 }

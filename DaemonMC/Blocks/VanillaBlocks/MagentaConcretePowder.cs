@@ -5,6 +5,7 @@
         public MagentaConcretePowder()
         {
             Name = "minecraft:magenta_concrete_powder";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:waxed_exposed_copper_door";
 
-
             States["door_hinge_bit"] = (byte)0;
             States["minecraft:cardinal_direction"] = "south";
             States["open_bit"] = (byte)0;

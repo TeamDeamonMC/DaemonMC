@@ -5,6 +5,7 @@
         public CoarseDirt()
         {
             Name = "minecraft:coarse_dirt";
+
         }
     }
 }

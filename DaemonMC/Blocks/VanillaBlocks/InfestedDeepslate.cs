@@ -6,7 +6,6 @@
         {
             Name = "minecraft:infested_deepslate";
 
-
             States["pillar_axis"] = "y";
         }
     }

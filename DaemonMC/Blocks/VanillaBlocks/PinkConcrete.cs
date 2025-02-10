@@ -5,6 +5,7 @@
         public PinkConcrete()
         {
             Name = "minecraft:pink_concrete";
+
         }
     }
 }

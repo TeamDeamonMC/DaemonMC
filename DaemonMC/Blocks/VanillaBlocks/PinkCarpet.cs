@@ -5,6 +5,7 @@
         public PinkCarpet()
         {
             Name = "minecraft:pink_carpet";
+
         }
     }
 }

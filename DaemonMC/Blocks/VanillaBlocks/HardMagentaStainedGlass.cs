@@ -5,6 +5,7 @@
         public HardMagentaStainedGlass()
         {
             Name = "minecraft:hard_magenta_stained_glass";
+
         }
     }
 }

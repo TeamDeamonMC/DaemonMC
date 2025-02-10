@@ -5,6 +5,7 @@
         public PaleMossBlock()
         {
             Name = "minecraft:pale_moss_block";
+
         }
     }
 }

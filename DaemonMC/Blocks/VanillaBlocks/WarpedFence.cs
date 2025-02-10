@@ -5,6 +5,7 @@
         public WarpedFence()
         {
             Name = "minecraft:warped_fence";
+
         }
     }
 }

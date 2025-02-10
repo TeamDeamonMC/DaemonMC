@@ -5,6 +5,7 @@
         public StoneBricks()
         {
             Name = "minecraft:stone_bricks";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public SoulSand()
         {
             Name = "minecraft:soul_sand";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public RedNetherBrick()
         {
             Name = "minecraft:red_nether_brick";
+
         }
     }
 }

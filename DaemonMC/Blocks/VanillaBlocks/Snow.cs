@@ -5,6 +5,7 @@
         public Snow()
         {
             Name = "minecraft:snow";
+
         }
     }
 }

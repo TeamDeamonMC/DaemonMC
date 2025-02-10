@@ -6,7 +6,6 @@
         {
             Name = "minecraft:sniffer_egg";
 
-
             States["cracked_state"] = "no_cracks";
         }
     }

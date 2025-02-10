@@ -5,6 +5,7 @@
         public CartographyTable()
         {
             Name = "minecraft:cartography_table";
+
         }
     }
 }

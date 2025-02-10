@@ -5,6 +5,7 @@
         public ChiseledRedSandstone()
         {
             Name = "minecraft:chiseled_red_sandstone";
+
         }
     }
 }

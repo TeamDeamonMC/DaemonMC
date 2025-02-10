@@ -5,6 +5,7 @@
         public DeepslateCopperOre()
         {
             Name = "minecraft:deepslate_copper_ore";
+
         }
     }
 }

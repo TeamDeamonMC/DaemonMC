@@ -5,6 +5,7 @@
         public ChiseledResinBricks()
         {
             Name = "minecraft:chiseled_resin_bricks";
+
         }
     }
 }

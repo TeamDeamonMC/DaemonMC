@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bamboo_mosaic_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

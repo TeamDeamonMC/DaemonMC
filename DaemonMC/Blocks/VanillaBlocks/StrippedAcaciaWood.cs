@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_acacia_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

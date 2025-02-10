@@ -5,6 +5,7 @@
         public GoldBlock()
         {
             Name = "minecraft:gold_block";
+
         }
     }
 }

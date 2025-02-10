@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_warped_hyphae";
 
-
             States["pillar_axis"] = "y";
         }
     }

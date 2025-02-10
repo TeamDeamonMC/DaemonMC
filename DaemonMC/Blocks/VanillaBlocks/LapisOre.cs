@@ -5,6 +5,7 @@
         public LapisOre()
         {
             Name = "minecraft:lapis_ore";
+
         }
     }
 }

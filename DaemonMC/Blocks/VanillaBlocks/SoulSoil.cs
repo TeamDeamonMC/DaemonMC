@@ -5,6 +5,7 @@
         public SoulSoil()
         {
             Name = "minecraft:soul_soil";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public DeadTubeCoral()
         {
             Name = "minecraft:dead_tube_coral";
+
         }
     }
 }

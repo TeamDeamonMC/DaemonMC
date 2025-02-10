@@ -5,6 +5,7 @@
         public Diorite()
         {
             Name = "minecraft:diorite";
+
         }
     }
 }

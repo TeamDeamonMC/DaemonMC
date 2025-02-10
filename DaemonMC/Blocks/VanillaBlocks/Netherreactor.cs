@@ -5,6 +5,7 @@
         public Netherreactor()
         {
             Name = "minecraft:netherreactor";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:underwater_tnt";
 
-
             States["explode_bit"] = (byte)0;
         }
     }

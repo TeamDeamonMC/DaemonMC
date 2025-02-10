@@ -5,6 +5,7 @@
         public BrownCarpet()
         {
             Name = "minecraft:brown_carpet";
+
         }
     }
 }

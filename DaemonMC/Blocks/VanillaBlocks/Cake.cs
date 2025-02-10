@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cake";
 
-
             States["bite_counter"] = 0;
         }
     }

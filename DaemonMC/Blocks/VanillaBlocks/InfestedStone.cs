@@ -5,6 +5,7 @@
         public InfestedStone()
         {
             Name = "minecraft:infested_stone";
+
         }
     }
 }

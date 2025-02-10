@@ -6,7 +6,6 @@
         {
             Name = "minecraft:lightning_rod";
 
-
             States["facing_direction"] = 0;
         }
     }

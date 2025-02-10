@@ -6,7 +6,6 @@
         {
             Name = "minecraft:grindstone";
 
-
             States["attachment"] = "standing";
             States["direction"] = 0;
         }

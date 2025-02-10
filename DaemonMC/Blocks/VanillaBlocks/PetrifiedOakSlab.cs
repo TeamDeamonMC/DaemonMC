@@ -6,7 +6,6 @@
         {
             Name = "minecraft:petrified_oak_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

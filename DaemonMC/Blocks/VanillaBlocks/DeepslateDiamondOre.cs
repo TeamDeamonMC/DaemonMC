@@ -5,6 +5,7 @@
         public DeepslateDiamondOre()
         {
             Name = "minecraft:deepslate_diamond_ore";
+
         }
     }
 }

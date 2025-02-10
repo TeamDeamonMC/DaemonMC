@@ -5,6 +5,7 @@
         public LightBlueTerracotta()
         {
             Name = "minecraft:light_blue_terracotta";
+
         }
     }
 }

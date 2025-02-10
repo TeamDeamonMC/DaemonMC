@@ -5,6 +5,7 @@
         public DriedKelpBlock()
         {
             Name = "minecraft:dried_kelp_block";
+
         }
     }
 }

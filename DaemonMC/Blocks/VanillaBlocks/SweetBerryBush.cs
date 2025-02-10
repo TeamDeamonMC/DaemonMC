@@ -6,7 +6,6 @@
         {
             Name = "minecraft:sweet_berry_bush";
 
-
             States["growth"] = 0;
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:piston_arm_collision";
 
-
             States["facing_direction"] = 0;
         }
     }

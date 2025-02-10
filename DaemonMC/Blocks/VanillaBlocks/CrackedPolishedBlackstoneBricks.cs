@@ -5,6 +5,7 @@
         public CrackedPolishedBlackstoneBricks()
         {
             Name = "minecraft:cracked_polished_blackstone_bricks";
+
         }
     }
 }

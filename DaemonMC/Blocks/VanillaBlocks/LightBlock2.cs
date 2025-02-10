@@ -5,6 +5,7 @@
         public LightBlock2()
         {
             Name = "minecraft:light_block_2";
+
         }
     }
 }

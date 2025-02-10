@@ -6,7 +6,6 @@
         {
             Name = "minecraft:soul_fire";
 
-
             States["age"] = 0;
         }
     }

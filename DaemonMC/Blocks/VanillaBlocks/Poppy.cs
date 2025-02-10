@@ -5,6 +5,7 @@
         public Poppy()
         {
             Name = "minecraft:poppy";
+
         }
     }
 }

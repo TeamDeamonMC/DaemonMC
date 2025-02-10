@@ -6,7 +6,6 @@
         {
             Name = "minecraft:chalkboard";
 
-
             States["direction"] = 0;
         }
     }

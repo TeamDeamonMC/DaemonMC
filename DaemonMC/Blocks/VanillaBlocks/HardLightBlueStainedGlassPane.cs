@@ -5,6 +5,7 @@
         public HardLightBlueStainedGlassPane()
         {
             Name = "minecraft:hard_light_blue_stained_glass_pane";
+
         }
     }
 }

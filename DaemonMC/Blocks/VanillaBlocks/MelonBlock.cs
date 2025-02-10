@@ -5,6 +5,7 @@
         public MelonBlock()
         {
             Name = "minecraft:melon_block";
+
         }
     }
 }

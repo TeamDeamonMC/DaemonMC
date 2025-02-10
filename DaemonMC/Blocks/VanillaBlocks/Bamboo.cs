@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bamboo";
 
-
             States["age_bit"] = (byte)0;
             States["bamboo_leaf_size"] = "no_leaves";
             States["bamboo_stalk_thickness"] = "thin";

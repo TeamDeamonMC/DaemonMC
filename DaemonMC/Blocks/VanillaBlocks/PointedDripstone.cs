@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pointed_dripstone";
 
-
             States["dripstone_thickness"] = "tip";
             States["hanging"] = (byte)0;
         }

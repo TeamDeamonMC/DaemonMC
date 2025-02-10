@@ -5,6 +5,7 @@
         public PinkConcretePowder()
         {
             Name = "minecraft:pink_concrete_powder";
+
         }
     }
 }

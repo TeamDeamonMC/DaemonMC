@@ -5,6 +5,7 @@
         public InfoUpdate()
         {
             Name = "minecraft:info_update";
+
         }
     }
 }

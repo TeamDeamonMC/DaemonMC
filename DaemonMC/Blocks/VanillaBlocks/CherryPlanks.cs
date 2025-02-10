@@ -5,6 +5,7 @@
         public CherryPlanks()
         {
             Name = "minecraft:cherry_planks";
+
         }
     }
 }

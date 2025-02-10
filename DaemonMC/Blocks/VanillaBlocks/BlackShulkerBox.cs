@@ -5,6 +5,7 @@
         public BlackShulkerBox()
         {
             Name = "minecraft:black_shulker_box";
+
         }
     }
 }

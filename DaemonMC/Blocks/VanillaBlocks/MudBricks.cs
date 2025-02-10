@@ -5,6 +5,7 @@
         public MudBricks()
         {
             Name = "minecraft:mud_bricks";
+
         }
     }
 }

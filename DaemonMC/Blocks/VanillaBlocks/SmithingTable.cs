@@ -5,6 +5,7 @@
         public SmithingTable()
         {
             Name = "minecraft:smithing_table";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public HoneycombBlock()
         {
             Name = "minecraft:honeycomb_block";
+
         }
     }
 }

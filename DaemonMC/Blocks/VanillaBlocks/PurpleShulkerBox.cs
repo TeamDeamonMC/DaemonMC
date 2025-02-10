@@ -5,6 +5,7 @@
         public PurpleShulkerBox()
         {
             Name = "minecraft:purple_shulker_box";
+
         }
     }
 }

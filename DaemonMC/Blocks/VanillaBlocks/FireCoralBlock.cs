@@ -5,6 +5,7 @@
         public FireCoralBlock()
         {
             Name = "minecraft:fire_coral_block";
+
         }
     }
 }

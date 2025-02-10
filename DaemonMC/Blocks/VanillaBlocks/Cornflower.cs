@@ -5,6 +5,7 @@
         public Cornflower()
         {
             Name = "minecraft:cornflower";
+
         }
     }
 }

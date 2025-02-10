@@ -5,6 +5,7 @@
         public CrimsonFence()
         {
             Name = "minecraft:crimson_fence";
+
         }
     }
 }

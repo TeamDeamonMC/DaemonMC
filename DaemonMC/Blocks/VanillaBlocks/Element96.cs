@@ -5,6 +5,7 @@
         public Element96()
         {
             Name = "minecraft:element_96";
+
         }
     }
 }

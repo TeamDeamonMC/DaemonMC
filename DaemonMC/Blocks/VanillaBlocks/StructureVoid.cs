@@ -5,6 +5,7 @@
         public StructureVoid()
         {
             Name = "minecraft:structure_void";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public AmethystBlock()
         {
             Name = "minecraft:amethyst_block";
+
         }
     }
 }

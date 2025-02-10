@@ -5,6 +5,7 @@
         public ClosedEyeblossom()
         {
             Name = "minecraft:closed_eyeblossom";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:spruce_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

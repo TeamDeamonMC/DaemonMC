@@ -5,6 +5,7 @@
         public BambooMosaic()
         {
             Name = "minecraft:bamboo_mosaic";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public SeaLantern()
         {
             Name = "minecraft:sea_lantern";
+
         }
     }
 }

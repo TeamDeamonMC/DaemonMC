@@ -5,6 +5,7 @@
         public ResinBlock()
         {
             Name = "minecraft:resin_block";
+
         }
     }
 }

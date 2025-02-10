@@ -6,7 +6,6 @@
         {
             Name = "minecraft:resin_brick_wall";
 
-
             States["wall_connection_type_east"] = "none";
             States["wall_connection_type_north"] = "none";
             States["wall_connection_type_south"] = "none";

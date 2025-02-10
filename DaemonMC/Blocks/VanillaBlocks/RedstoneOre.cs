@@ -5,6 +5,7 @@
         public RedstoneOre()
         {
             Name = "minecraft:redstone_ore";
+
         }
     }
 }

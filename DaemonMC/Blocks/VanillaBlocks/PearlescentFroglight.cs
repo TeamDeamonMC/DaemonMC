@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pearlescent_froglight";
 
-
             States["pillar_axis"] = "y";
         }
     }

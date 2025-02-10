@@ -5,6 +5,7 @@
         public CoalOre()
         {
             Name = "minecraft:coal_ore";
+
         }
     }
 }

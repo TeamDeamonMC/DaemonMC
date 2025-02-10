@@ -6,7 +6,6 @@
         {
             Name = "minecraft:redstone_wire";
 
-
             States["redstone_signal"] = 0;
         }
     }

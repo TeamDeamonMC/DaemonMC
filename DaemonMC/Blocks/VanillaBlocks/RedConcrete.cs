@@ -5,6 +5,7 @@
         public RedConcrete()
         {
             Name = "minecraft:red_concrete";
+
         }
     }
 }

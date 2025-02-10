@@ -248,7 +248,7 @@
                 }
 
                 encoder.SendPacket(128, false);
-                encoder.byteStream = new byte[35000];
+                encoder.byteStream = new byte[512000];
                 encoder.writeOffset = 0;
             }
             PacketEncoderPool.Return(encoder);

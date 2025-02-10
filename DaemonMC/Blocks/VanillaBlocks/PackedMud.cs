@@ -5,6 +5,7 @@
         public PackedMud()
         {
             Name = "minecraft:packed_mud";
+
         }
     }
 }

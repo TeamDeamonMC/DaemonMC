@@ -6,7 +6,6 @@
         {
             Name = "minecraft:sculk_catalyst";
 
-
             States["bloom"] = (byte)0;
         }
     }

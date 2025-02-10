@@ -5,6 +5,7 @@
         public Beacon()
         {
             Name = "minecraft:beacon";
+
         }
     }
 }

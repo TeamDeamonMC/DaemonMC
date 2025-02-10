@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bamboo_pressure_plate";
 
-
             States["redstone_signal"] = 0;
         }
     }

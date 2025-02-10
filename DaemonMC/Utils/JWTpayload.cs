@@ -2,8 +2,17 @@
 {
     public class JwtPayload
     {
+        public List<object> AnimatedImageData { get; set; }
         public string ArmSize { get; set; }
+        public string CapeData { get; set; }
+        public string CapeId { get; set; }
+        public int CapeImageHeight { get; set; }
+        public int CapeImageWidth { get; set; }
+        public bool CapeOnClassicSkin { get; set; }
         public long ClientRandomId { get; set; }
+        public bool CompatibleWithClientSideChunkGen { get; set; }
+        public int CurrentInputMode { get; set; }
+        public int DefaultInputMode { get; set; }
         public string DeviceId { get; set; }
         public string DeviceModel { get; set; }
         public int DeviceOS { get; set; }
@@ -11,11 +20,31 @@
         public int GuiScale { get; set; }
         public bool IsEditorMode { get; set; }
         public string LanguageCode { get; set; }
+        public int MaxViewDistance { get; set; }
+        public int MemoryTier { get; set; }
+        public bool OverrideSkin { get; set; }
+        public List<object> PersonaPieces { get; set; }
+        public bool PersonaSkin { get; set; }
+        public List<object> PieceTintColors { get; set; }
+        public string PlatformOfflineId { get; set; }
+        public string PlatformOnlineId { get; set; }
+        public int PlatformType { get; set; }
+        public string PlayFabId { get; set; }
+        public bool PremiumSkin { get; set; }
         public string SelfSignedId { get; set; }
         public string ServerAddress { get; set; }
+        public string SkinAnimationData { get; set; }
         public string SkinColor { get; set; }
         public string SkinData { get; set; }
         public string SkinGeometryData { get; set; }
-        // ..... todo
+        public string SkinGeometryDataEngineVersion { get; set; }
+        public string SkinId { get; set; }
+        public int SkinImageHeight { get; set; }
+        public int SkinImageWidth { get; set; }
+        public string SkinResourcePatch { get; set; }
+        public string ThirdPartyName { get; set; }
+        public bool ThirdPartyNameOnly { get; set; }
+        public bool TrustedSkin { get; set; }
+        public int UIProfile { get; set; }
     }
 }

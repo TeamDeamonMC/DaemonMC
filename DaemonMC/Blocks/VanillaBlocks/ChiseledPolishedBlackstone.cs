@@ -5,6 +5,7 @@
         public ChiseledPolishedBlackstone()
         {
             Name = "minecraft:chiseled_polished_blackstone";
+
         }
     }
 }

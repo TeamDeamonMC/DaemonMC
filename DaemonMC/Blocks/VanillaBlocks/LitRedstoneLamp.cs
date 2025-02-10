@@ -5,6 +5,7 @@
         public LitRedstoneLamp()
         {
             Name = "minecraft:lit_redstone_lamp";
+
         }
     }
 }

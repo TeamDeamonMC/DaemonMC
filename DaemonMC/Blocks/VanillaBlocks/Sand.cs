@@ -5,6 +5,7 @@
         public Sand()
         {
             Name = "minecraft:sand";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public HeavyCore()
         {
             Name = "minecraft:heavy_core";
+
         }
     }
 }

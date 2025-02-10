@@ -6,7 +6,6 @@
         {
             Name = "minecraft:farmland";
 
-
             States["moisturized_amount"] = 0;
         }
     }

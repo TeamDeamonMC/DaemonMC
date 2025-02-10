@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cave_vines_body_with_berries";
 
-
             States["growing_plant_age"] = 0;
         }
     }

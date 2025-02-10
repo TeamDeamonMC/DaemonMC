@@ -5,6 +5,7 @@
         public CherryFence()
         {
             Name = "minecraft:cherry_fence";
+
         }
     }
 }

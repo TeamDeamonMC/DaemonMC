@@ -5,6 +5,7 @@
         public CraftingTable()
         {
             Name = "minecraft:crafting_table";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public Target()
         {
             Name = "minecraft:target";
+
         }
     }
 }

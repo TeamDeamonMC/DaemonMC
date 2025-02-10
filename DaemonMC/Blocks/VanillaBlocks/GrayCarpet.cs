@@ -5,6 +5,7 @@
         public GrayCarpet()
         {
             Name = "minecraft:gray_carpet";
+
         }
     }
 }

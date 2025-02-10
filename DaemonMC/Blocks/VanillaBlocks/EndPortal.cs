@@ -5,6 +5,7 @@
         public EndPortal()
         {
             Name = "minecraft:end_portal";
+
         }
     }
 }

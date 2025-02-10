@@ -6,7 +6,6 @@
         {
             Name = "minecraft:portal";
 
-
             States["portal_axis"] = "unknown";
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:anvil";
 
-
             States["minecraft:cardinal_direction"] = "south";
         }
     }

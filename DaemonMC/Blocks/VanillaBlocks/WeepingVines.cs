@@ -6,7 +6,6 @@
         {
             Name = "minecraft:weeping_vines";
 
-
             States["weeping_vines_age"] = 0;
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:jungle_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

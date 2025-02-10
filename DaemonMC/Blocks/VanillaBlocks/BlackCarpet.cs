@@ -5,6 +5,7 @@
         public BlackCarpet()
         {
             Name = "minecraft:black_carpet";
+
         }
     }
 }

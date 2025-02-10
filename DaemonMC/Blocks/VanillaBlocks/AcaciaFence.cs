@@ -5,6 +5,7 @@
         public AcaciaFence()
         {
             Name = "minecraft:acacia_fence";
+
         }
     }
 }

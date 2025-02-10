@@ -5,6 +5,7 @@
         public BlueCarpet()
         {
             Name = "minecraft:blue_carpet";
+
         }
     }
 }

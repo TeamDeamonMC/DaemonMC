@@ -6,7 +6,6 @@
         {
             Name = "minecraft:acacia_sapling";
 
-
             States["age_bit"] = (byte)0;
         }
     }

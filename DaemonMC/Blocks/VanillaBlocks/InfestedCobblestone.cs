@@ -5,6 +5,7 @@
         public InfestedCobblestone()
         {
             Name = "minecraft:infested_cobblestone";
+
         }
     }
 }

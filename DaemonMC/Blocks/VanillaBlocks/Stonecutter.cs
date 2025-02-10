@@ -5,6 +5,7 @@
         public Stonecutter()
         {
             Name = "minecraft:stonecutter";
+
         }
     }
 }

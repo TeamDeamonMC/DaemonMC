@@ -5,6 +5,7 @@
         public WhiteWool()
         {
             Name = "minecraft:white_wool";
+
         }
     }
 }

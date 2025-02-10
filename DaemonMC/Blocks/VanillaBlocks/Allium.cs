@@ -5,6 +5,7 @@
         public Allium()
         {
             Name = "minecraft:allium";
+
         }
     }
 }

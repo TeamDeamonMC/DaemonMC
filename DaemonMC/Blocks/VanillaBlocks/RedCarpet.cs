@@ -5,6 +5,7 @@
         public RedCarpet()
         {
             Name = "minecraft:red_carpet";
+
         }
     }
 }

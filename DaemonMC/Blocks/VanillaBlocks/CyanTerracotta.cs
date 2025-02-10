@@ -5,6 +5,7 @@
         public CyanTerracotta()
         {
             Name = "minecraft:cyan_terracotta";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public OrangeCarpet()
         {
             Name = "minecraft:orange_carpet";
+
         }
     }
 }

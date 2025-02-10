@@ -5,6 +5,7 @@
         public WaxedOxidizedCopperGrate()
         {
             Name = "minecraft:waxed_oxidized_copper_grate";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:rail";
 
-
             States["rail_direction"] = 0;
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:red_mushroom_block";
 
-
             States["huge_mushroom_bits"] = 0;
         }
     }

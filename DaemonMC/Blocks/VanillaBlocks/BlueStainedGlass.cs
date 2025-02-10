@@ -5,6 +5,7 @@
         public BlueStainedGlass()
         {
             Name = "minecraft:blue_stained_glass";
+
         }
     }
 }

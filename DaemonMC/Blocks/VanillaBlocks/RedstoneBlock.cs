@@ -5,6 +5,7 @@
         public RedstoneBlock()
         {
             Name = "minecraft:redstone_block";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public FletchingTable()
         {
             Name = "minecraft:fletching_table";
+
         }
     }
 }

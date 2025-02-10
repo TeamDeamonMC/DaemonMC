@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_acacia_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

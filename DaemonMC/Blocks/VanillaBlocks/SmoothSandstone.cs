@@ -5,6 +5,7 @@
         public SmoothSandstone()
         {
             Name = "minecraft:smooth_sandstone";
+
         }
     }
 }

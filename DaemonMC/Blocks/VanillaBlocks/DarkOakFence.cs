@@ -5,6 +5,7 @@
         public DarkOakFence()
         {
             Name = "minecraft:dark_oak_fence";
+
         }
     }
 }

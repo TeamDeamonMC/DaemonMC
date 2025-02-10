@@ -5,6 +5,7 @@
         public ChiseledCopper()
         {
             Name = "minecraft:chiseled_copper";
+
         }
     }
 }

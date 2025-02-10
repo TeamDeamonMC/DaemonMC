@@ -5,6 +5,7 @@
         public MangroveFence()
         {
             Name = "minecraft:mangrove_fence";
+
         }
     }
 }

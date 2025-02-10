@@ -6,7 +6,6 @@
         {
             Name = "minecraft:dark_oak_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

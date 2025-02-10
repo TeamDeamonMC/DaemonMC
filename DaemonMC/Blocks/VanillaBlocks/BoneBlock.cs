@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bone_block";
 
-
             States["deprecated"] = 0;
             States["pillar_axis"] = "y";
         }

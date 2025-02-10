@@ -5,6 +5,7 @@
         public BrickBlock()
         {
             Name = "minecraft:brick_block";
+
         }
     }
 }

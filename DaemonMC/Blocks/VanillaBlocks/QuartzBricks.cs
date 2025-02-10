@@ -5,6 +5,7 @@
         public QuartzBricks()
         {
             Name = "minecraft:quartz_bricks";
+
         }
     }
 }

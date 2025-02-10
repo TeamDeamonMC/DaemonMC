@@ -6,7 +6,6 @@
         {
             Name = "minecraft:quartz_pillar";
 
-
             States["pillar_axis"] = "y";
         }
     }

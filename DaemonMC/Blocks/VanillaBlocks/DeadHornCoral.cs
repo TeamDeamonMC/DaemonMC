@@ -5,6 +5,7 @@
         public DeadHornCoral()
         {
             Name = "minecraft:dead_horn_coral";
+
         }
     }
 }

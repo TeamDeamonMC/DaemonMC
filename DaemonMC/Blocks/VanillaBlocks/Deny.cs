@@ -5,6 +5,7 @@
         public Deny()
         {
             Name = "minecraft:deny";
+
         }
     }
 }

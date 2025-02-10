@@ -5,6 +5,7 @@
         public WaxedWeatheredCopper()
         {
             Name = "minecraft:waxed_weathered_copper";
+
         }
     }
 }

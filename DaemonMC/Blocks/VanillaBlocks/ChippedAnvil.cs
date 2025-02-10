@@ -6,7 +6,6 @@
         {
             Name = "minecraft:chipped_anvil";
 
-
             States["minecraft:cardinal_direction"] = "south";
         }
     }

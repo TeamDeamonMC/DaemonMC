@@ -6,7 +6,6 @@
         {
             Name = "minecraft:mangrove_propagule";
 
-
             States["hanging"] = (byte)0;
             States["propagule_stage"] = 0;
         }

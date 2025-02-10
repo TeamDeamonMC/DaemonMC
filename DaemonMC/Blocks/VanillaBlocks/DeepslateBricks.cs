@@ -5,6 +5,7 @@
         public DeepslateBricks()
         {
             Name = "minecraft:deepslate_bricks";
+
         }
     }
 }

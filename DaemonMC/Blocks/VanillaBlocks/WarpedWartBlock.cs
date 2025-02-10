@@ -5,6 +5,7 @@
         public WarpedWartBlock()
         {
             Name = "minecraft:warped_wart_block";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cobblestone_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

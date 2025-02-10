@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pale_oak_sapling";
 
-
             States["age_bit"] = (byte)0;
         }
     }

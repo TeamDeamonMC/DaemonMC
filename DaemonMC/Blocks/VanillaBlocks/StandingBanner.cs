@@ -6,7 +6,6 @@
         {
             Name = "minecraft:standing_banner";
 
-
             States["ground_sign_direction"] = 0;
         }
     }

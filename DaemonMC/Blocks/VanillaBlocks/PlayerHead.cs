@@ -6,7 +6,6 @@
         {
             Name = "minecraft:player_head";
 
-
             States["facing_direction"] = 0;
         }
     }

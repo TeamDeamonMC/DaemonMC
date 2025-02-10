@@ -6,7 +6,6 @@
         {
             Name = "minecraft:reeds";
 
-
             States["age"] = 0;
         }
     }

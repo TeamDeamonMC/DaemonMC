@@ -5,6 +5,7 @@
         public ChiseledNetherBricks()
         {
             Name = "minecraft:chiseled_nether_bricks";
+
         }
     }
 }

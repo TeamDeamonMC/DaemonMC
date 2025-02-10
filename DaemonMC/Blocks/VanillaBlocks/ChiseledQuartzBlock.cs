@@ -6,7 +6,6 @@
         {
             Name = "minecraft:chiseled_quartz_block";
 
-
             States["pillar_axis"] = "y";
         }
     }

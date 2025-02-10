@@ -5,6 +5,7 @@
         public Granite()
         {
             Name = "minecraft:granite";
+
         }
     }
 }

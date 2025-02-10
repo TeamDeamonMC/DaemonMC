@@ -5,6 +5,7 @@
         public InvisibleBedrock()
         {
             Name = "minecraft:invisible_bedrock";
+
         }
     }
 }

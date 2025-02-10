@@ -5,6 +5,7 @@
         public DeepslateGoldOre()
         {
             Name = "minecraft:deepslate_gold_ore";
+
         }
     }
 }

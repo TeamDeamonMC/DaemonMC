@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pale_hanging_moss";
 
-
             States["tip"] = (byte)0;
         }
     }

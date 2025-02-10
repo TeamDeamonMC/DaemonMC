@@ -6,7 +6,6 @@
         {
             Name = "minecraft:turtle_egg";
 
-
             States["cracked_state"] = "no_cracks";
             States["turtle_egg_count"] = "one_egg";
         }

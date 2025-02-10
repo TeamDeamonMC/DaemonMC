@@ -5,6 +5,7 @@
         public BambooFence()
         {
             Name = "minecraft:bamboo_fence";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:dragon_head";
 
-
             States["facing_direction"] = 0;
         }
     }

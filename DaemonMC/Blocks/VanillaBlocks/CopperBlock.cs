@@ -5,6 +5,7 @@
         public CopperBlock()
         {
             Name = "minecraft:copper_block";
+
         }
     }
 }

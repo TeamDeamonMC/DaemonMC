@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bubble_column";
 
-
             States["drag_down"] = (byte)0;
         }
     }

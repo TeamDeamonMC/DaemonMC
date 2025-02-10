@@ -5,6 +5,7 @@
         public CutCopper()
         {
             Name = "minecraft:cut_copper";
+
         }
     }
 }

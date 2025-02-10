@@ -5,6 +5,7 @@
         public Deadbush()
         {
             Name = "minecraft:deadbush";
+
         }
     }
 }

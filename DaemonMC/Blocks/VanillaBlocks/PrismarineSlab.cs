@@ -6,7 +6,6 @@
         {
             Name = "minecraft:prismarine_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

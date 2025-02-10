@@ -5,6 +5,7 @@
         public HardGlassPane()
         {
             Name = "minecraft:hard_glass_pane";
+
         }
     }
 }

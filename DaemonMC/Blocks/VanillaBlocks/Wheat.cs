@@ -6,7 +6,6 @@
         {
             Name = "minecraft:wheat";
 
-
             States["growth"] = 0;
         }
     }

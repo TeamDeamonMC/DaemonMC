@@ -5,6 +5,7 @@
         public DripstoneBlock()
         {
             Name = "minecraft:dripstone_block";
+
         }
     }
 }

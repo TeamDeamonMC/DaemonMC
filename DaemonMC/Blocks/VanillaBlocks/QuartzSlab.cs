@@ -6,7 +6,6 @@
         {
             Name = "minecraft:quartz_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

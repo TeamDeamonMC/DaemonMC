@@ -5,6 +5,7 @@
         public HardenedClay()
         {
             Name = "minecraft:hardened_clay";
+
         }
     }
 }

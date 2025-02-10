@@ -6,7 +6,6 @@
         {
             Name = "minecraft:end_rod";
 
-
             States["facing_direction"] = 0;
         }
     }

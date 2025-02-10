@@ -5,6 +5,7 @@
         public HardOrangeStainedGlass()
         {
             Name = "minecraft:hard_orange_stained_glass";
+
         }
     }
 }

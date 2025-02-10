@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cauldron";
 
-
             States["cauldron_liquid"] = "water";
             States["fill_level"] = 0;
         }

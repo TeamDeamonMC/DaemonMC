@@ -5,6 +5,7 @@
         public Jukebox()
         {
             Name = "minecraft:jukebox";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:azalea_leaves_flowered";
 
-
             States["persistent_bit"] = (byte)0;
             States["update_bit"] = (byte)0;
         }

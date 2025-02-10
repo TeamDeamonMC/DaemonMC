@@ -5,6 +5,7 @@
         public CopperOre()
         {
             Name = "minecraft:copper_ore";
+
         }
     }
 }

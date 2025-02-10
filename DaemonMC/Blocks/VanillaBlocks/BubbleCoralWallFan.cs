@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bubble_coral_wall_fan";
 
-
             States["coral_direction"] = 0;
         }
     }

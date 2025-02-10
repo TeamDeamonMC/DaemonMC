@@ -5,6 +5,7 @@
         public GildedBlackstone()
         {
             Name = "minecraft:gilded_blackstone";
+
         }
     }
 }

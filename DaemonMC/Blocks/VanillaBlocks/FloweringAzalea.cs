@@ -5,6 +5,7 @@
         public FloweringAzalea()
         {
             Name = "minecraft:flowering_azalea";
+
         }
     }
 }

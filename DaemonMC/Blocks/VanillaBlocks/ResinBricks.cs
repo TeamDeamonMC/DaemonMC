@@ -5,6 +5,7 @@
         public ResinBricks()
         {
             Name = "minecraft:resin_bricks";
+
         }
     }
 }

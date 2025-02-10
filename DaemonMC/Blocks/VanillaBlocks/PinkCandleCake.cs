@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pink_candle_cake";
 
-
             States["lit"] = (byte)0;
         }
     }

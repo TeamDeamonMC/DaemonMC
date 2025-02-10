@@ -5,6 +5,7 @@
         public TubeCoralBlock()
         {
             Name = "minecraft:tube_coral_block";
+
         }
     }
 }

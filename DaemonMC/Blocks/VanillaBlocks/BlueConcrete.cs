@@ -5,6 +5,7 @@
         public BlueConcrete()
         {
             Name = "minecraft:blue_concrete";
+
         }
     }
 }

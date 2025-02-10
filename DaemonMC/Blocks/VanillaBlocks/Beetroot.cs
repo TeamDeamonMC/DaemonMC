@@ -6,7 +6,6 @@
         {
             Name = "minecraft:beetroot";
 
-
             States["growth"] = 0;
         }
     }

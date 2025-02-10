@@ -5,6 +5,7 @@
         public DeadFireCoral()
         {
             Name = "minecraft:dead_fire_coral";
+
         }
     }
 }

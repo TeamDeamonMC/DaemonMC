@@ -5,6 +5,7 @@
         public WitherRose()
         {
             Name = "minecraft:wither_rose";
+
         }
     }
 }

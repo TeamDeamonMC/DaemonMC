@@ -5,6 +5,7 @@
         public MagentaShulkerBox()
         {
             Name = "minecraft:magenta_shulker_box";
+
         }
     }
 }

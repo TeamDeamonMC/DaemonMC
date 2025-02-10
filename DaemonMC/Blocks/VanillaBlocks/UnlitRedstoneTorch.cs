@@ -6,7 +6,6 @@
         {
             Name = "minecraft:unlit_redstone_torch";
 
-
             States["torch_facing_direction"] = "unknown";
         }
     }

@@ -5,6 +5,7 @@
         public LightGrayConcrete()
         {
             Name = "minecraft:light_gray_concrete";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:chain";
 
-
             States["pillar_axis"] = "y";
         }
     }

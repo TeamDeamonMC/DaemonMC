@@ -6,7 +6,6 @@
         {
             Name = "minecraft:flower_pot";
 
-
             States["update_bit"] = (byte)0;
         }
     }

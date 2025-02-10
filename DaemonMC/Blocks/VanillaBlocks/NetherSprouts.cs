@@ -5,6 +5,7 @@
         public NetherSprouts()
         {
             Name = "minecraft:nether_sprouts";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public CyanShulkerBox()
         {
             Name = "minecraft:cyan_shulker_box";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public BlackWool()
         {
             Name = "minecraft:black_wool";
+
         }
     }
 }

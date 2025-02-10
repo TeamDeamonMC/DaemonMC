@@ -5,6 +5,7 @@
         public DeadBubbleCoralBlock()
         {
             Name = "minecraft:dead_bubble_coral_block";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public MangrovePlanks()
         {
             Name = "minecraft:mangrove_planks";
+
         }
     }
 }

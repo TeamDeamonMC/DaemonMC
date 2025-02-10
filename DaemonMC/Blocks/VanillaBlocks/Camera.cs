@@ -5,6 +5,7 @@
         public Camera()
         {
             Name = "minecraft:camera";
+
         }
     }
 }

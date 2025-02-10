@@ -5,6 +5,7 @@
         public PinkShulkerBox()
         {
             Name = "minecraft:pink_shulker_box";
+
         }
     }
 }

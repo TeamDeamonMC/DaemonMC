@@ -5,6 +5,7 @@
         public Torchflower()
         {
             Name = "minecraft:torchflower";
+
         }
     }
 }

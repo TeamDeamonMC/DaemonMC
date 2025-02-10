@@ -6,7 +6,6 @@
         {
             Name = "minecraft:flowing_water";
 
-
             States["liquid_depth"] = 0;
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pale_moss_carpet";
 
-
             States["pale_moss_carpet_side_east"] = "none";
             States["pale_moss_carpet_side_north"] = "none";
             States["pale_moss_carpet_side_south"] = "none";

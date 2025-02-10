@@ -5,6 +5,7 @@
         public EmeraldBlock()
         {
             Name = "minecraft:emerald_block";
+
         }
     }
 }

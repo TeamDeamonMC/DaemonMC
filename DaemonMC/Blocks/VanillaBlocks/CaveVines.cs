@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cave_vines";
 
-
             States["growing_plant_age"] = 0;
         }
     }

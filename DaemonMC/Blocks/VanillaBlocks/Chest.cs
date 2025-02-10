@@ -6,7 +6,6 @@
         {
             Name = "minecraft:chest";
 
-
             States["minecraft:cardinal_direction"] = "south";
         }
     }

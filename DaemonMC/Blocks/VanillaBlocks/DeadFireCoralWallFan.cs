@@ -6,7 +6,6 @@
         {
             Name = "minecraft:dead_fire_coral_wall_fan";
 
-
             States["coral_direction"] = 0;
         }
     }

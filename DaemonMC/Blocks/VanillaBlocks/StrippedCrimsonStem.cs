@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_crimson_stem";
 
-
             States["pillar_axis"] = "y";
         }
     }

@@ -5,6 +5,7 @@
         public BambooPlanks()
         {
             Name = "minecraft:bamboo_planks";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:seagrass";
 
-
             States["sea_grass_type"] = "default";
         }
     }

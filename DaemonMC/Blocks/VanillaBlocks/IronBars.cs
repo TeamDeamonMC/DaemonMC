@@ -5,6 +5,7 @@
         public IronBars()
         {
             Name = "minecraft:iron_bars";
+
         }
     }
 }

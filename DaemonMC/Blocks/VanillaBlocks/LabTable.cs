@@ -6,7 +6,6 @@
         {
             Name = "minecraft:lab_table";
 
-
             States["direction"] = 0;
         }
     }

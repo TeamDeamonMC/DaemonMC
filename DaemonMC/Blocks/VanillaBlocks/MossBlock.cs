@@ -5,6 +5,7 @@
         public MossBlock()
         {
             Name = "minecraft:moss_block";
+
         }
     }
 }

@@ -28,6 +28,7 @@
             SetActorData = 39,
             SetActorMotion = 40,
             LevelChunk = 58,
+            PlayerList = 63,
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
             GameRulesChanged = 72,

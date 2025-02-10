@@ -5,6 +5,7 @@
         public IronBlock()
         {
             Name = "minecraft:iron_block";
+
         }
     }
 }

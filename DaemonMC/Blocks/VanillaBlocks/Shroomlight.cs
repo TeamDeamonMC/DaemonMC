@@ -5,6 +5,7 @@
         public Shroomlight()
         {
             Name = "minecraft:shroomlight";
+
         }
     }
 }

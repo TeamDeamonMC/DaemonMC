@@ -5,6 +5,7 @@
         public YellowCarpet()
         {
             Name = "minecraft:yellow_carpet";
+
         }
     }
 }

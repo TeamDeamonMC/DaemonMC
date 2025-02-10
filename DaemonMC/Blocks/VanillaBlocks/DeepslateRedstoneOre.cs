@@ -5,6 +5,7 @@
         public DeepslateRedstoneOre()
         {
             Name = "minecraft:deepslate_redstone_ore";
+
         }
     }
 }

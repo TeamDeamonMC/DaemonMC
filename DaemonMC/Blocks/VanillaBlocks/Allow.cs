@@ -5,6 +5,7 @@
         public Allow()
         {
             Name = "minecraft:allow";
+
         }
     }
 }

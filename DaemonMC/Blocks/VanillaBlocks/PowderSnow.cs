@@ -5,6 +5,7 @@
         public PowderSnow()
         {
             Name = "minecraft:powder_snow";
+
         }
     }
 }

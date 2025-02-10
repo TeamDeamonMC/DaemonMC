@@ -5,6 +5,7 @@
         public CopperGrate()
         {
             Name = "minecraft:copper_grate";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_jungle_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

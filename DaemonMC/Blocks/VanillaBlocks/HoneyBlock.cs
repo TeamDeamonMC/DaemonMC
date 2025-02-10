@@ -5,6 +5,7 @@
         public HoneyBlock()
         {
             Name = "minecraft:honey_block";
+
         }
     }
 }

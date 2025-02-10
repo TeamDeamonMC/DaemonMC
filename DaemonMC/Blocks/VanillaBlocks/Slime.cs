@@ -5,6 +5,7 @@
         public Slime()
         {
             Name = "minecraft:slime";
+
         }
     }
 }

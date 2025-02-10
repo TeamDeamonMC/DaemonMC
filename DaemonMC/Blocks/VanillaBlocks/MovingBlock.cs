@@ -5,6 +5,7 @@
         public MovingBlock()
         {
             Name = "minecraft:moving_block";
+
         }
     }
 }

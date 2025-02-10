@@ -5,6 +5,7 @@
         public Tuff()
         {
             Name = "minecraft:tuff";
+
         }
     }
 }

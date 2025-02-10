@@ -5,6 +5,7 @@
         public WarpedFungus()
         {
             Name = "minecraft:warped_fungus";
+
         }
     }
 }

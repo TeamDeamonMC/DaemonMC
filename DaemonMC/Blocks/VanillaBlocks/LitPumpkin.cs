@@ -6,7 +6,6 @@
         {
             Name = "minecraft:lit_pumpkin";
 
-
             States["minecraft:cardinal_direction"] = "south";
         }
     }

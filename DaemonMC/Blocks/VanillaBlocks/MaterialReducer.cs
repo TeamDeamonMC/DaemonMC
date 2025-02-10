@@ -6,7 +6,6 @@
         {
             Name = "minecraft:material_reducer";
 
-
             States["direction"] = 0;
         }
     }

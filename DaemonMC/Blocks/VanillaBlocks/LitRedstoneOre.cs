@@ -5,6 +5,7 @@
         public LitRedstoneOre()
         {
             Name = "minecraft:lit_redstone_ore";
+
         }
     }
 }

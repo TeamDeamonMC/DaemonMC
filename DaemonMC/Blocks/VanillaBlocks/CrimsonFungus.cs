@@ -5,6 +5,7 @@
         public CrimsonFungus()
         {
             Name = "minecraft:crimson_fungus";
+
         }
     }
 }

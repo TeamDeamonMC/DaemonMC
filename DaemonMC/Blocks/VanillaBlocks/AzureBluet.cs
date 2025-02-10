@@ -5,6 +5,7 @@
         public AzureBluet()
         {
             Name = "minecraft:azure_bluet";
+
         }
     }
 }

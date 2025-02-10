@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cobbled_deepslate_double_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

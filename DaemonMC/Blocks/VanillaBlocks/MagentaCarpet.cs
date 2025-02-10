@@ -5,6 +5,7 @@
         public MagentaCarpet()
         {
             Name = "minecraft:magenta_carpet";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:loom";
 
-
             States["direction"] = 0;
         }
     }

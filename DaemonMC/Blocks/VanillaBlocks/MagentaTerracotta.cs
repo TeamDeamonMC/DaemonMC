@@ -5,6 +5,7 @@
         public MagentaTerracotta()
         {
             Name = "minecraft:magenta_terracotta";
+
         }
     }
 }

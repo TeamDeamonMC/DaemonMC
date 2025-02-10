@@ -5,6 +5,7 @@
         public Magma()
         {
             Name = "minecraft:magma";
+
         }
     }
 }

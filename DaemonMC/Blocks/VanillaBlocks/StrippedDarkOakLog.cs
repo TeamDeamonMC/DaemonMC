@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_dark_oak_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

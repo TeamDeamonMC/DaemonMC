@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_cherry_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

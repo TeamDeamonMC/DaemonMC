@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_birch_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

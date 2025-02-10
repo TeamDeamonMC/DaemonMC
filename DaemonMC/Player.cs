@@ -17,7 +17,9 @@ namespace DaemonMC
     public class Player
     {
         public string Username { get; set; }
-        public Guid UUID { get; set; }
+        public Skin Skin { get; set; }
+        public Guid UUID { get; set; } = new Guid();
+        public string XUID { get; set; }
         public long EntityID { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         public int drawDistance { get; set; }

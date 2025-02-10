@@ -44,6 +44,9 @@ namespace DaemonMC.Network.Bedrock
 
             Player player = new Player();
             player.Username = session.username;
+            player.UUID = new Guid(session.identity);
+            player.XUID = session.XUID;
+            player.Skin = session.skin;
 
             long EntityId = Server.AddPlayer(player, clientEp);
             session.EntityID = EntityId;
@@ -87,6 +90,7 @@ namespace DaemonMC.Network.Bedrock
             {
                 var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
                 player.currentLevel = Server.levels[0];
+                if (!player.currentLevel.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
                 player.spawn();
             }
         }

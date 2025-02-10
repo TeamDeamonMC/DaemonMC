@@ -5,6 +5,7 @@
         public Mud()
         {
             Name = "minecraft:mud";
+
         }
     }
 }

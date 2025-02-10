@@ -5,6 +5,7 @@
         public NetherBrick()
         {
             Name = "minecraft:nether_brick";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public HornCoralBlock()
         {
             Name = "minecraft:horn_coral_block";
+
         }
     }
 }

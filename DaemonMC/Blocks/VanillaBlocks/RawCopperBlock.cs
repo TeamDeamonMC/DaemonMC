@@ -5,6 +5,7 @@
         public RawCopperBlock()
         {
             Name = "minecraft:raw_copper_block";
+
         }
     }
 }

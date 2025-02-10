@@ -5,6 +5,7 @@
         public WaxedExposedCutCopper()
         {
             Name = "minecraft:waxed_exposed_cut_copper";
+
         }
     }
 }

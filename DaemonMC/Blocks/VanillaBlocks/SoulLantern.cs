@@ -6,7 +6,6 @@
         {
             Name = "minecraft:soul_lantern";
 
-
             States["hanging"] = (byte)0;
         }
     }

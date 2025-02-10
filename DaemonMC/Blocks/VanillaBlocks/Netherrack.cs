@@ -5,6 +5,7 @@
         public Netherrack()
         {
             Name = "minecraft:netherrack";
+
         }
     }
 }

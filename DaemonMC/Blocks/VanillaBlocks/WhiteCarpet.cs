@@ -5,6 +5,7 @@
         public WhiteCarpet()
         {
             Name = "minecraft:white_carpet";
+
         }
     }
 }

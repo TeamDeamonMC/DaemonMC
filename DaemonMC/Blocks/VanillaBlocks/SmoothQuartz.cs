@@ -6,7 +6,6 @@
         {
             Name = "minecraft:smooth_quartz";
 
-
             States["pillar_axis"] = "y";
         }
     }

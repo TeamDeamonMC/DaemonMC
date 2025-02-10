@@ -6,7 +6,6 @@
         {
             Name = "minecraft:spruce_double_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

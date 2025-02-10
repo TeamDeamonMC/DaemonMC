@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_mangrove_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

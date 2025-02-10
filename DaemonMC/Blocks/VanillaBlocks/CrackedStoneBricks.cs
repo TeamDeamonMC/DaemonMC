@@ -5,6 +5,7 @@
         public CrackedStoneBricks()
         {
             Name = "minecraft:cracked_stone_bricks";
+
         }
     }
 }

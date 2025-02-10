@@ -5,6 +5,7 @@
         public DiamondBlock()
         {
             Name = "minecraft:diamond_block";
+
         }
     }
 }

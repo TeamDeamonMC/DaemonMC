@@ -5,6 +5,7 @@
         public CyanWool()
         {
             Name = "minecraft:cyan_wool";
+
         }
     }
 }

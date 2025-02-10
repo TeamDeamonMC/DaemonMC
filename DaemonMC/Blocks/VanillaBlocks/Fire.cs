@@ -6,7 +6,6 @@
         {
             Name = "minecraft:fire";
 
-
             States["age"] = 0;
         }
     }

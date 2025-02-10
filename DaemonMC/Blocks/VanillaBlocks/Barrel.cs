@@ -6,7 +6,6 @@
         {
             Name = "minecraft:barrel";
 
-
             States["facing_direction"] = 0;
             States["open_bit"] = (byte)0;
         }

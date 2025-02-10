@@ -6,7 +6,6 @@
         {
             Name = "minecraft:wall_banner";
 
-
             States["facing_direction"] = 0;
         }
     }

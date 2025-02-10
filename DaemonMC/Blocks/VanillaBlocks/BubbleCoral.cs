@@ -5,6 +5,7 @@
         public BubbleCoral()
         {
             Name = "minecraft:bubble_coral";
+
         }
     }
 }

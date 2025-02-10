@@ -5,6 +5,7 @@
         public Web()
         {
             Name = "minecraft:web";
+
         }
     }
 }

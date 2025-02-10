@@ -6,7 +6,6 @@
         {
             Name = "minecraft:brain_coral_fan";
 
-
             States["coral_fan_direction"] = 0;
         }
     }

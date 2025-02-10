@@ -5,6 +5,7 @@
         public WarpedNylium()
         {
             Name = "minecraft:warped_nylium";
+
         }
     }
 }

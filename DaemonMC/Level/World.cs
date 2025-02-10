@@ -35,6 +35,7 @@ namespace DaemonMC.Level
                 PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
                 var packet = new AddPlayer
                 {
+                    UUID = player.UUID,
                     Username = player.Username,
                     EntityId = player.EntityID,
                     Position = player.Position,
@@ -45,18 +46,39 @@ namespace DaemonMC.Level
                 PacketEncoder encoder2 = PacketEncoderPool.Get(player);
                 var packet2 = new AddPlayer
                 {
+                    UUID = onlinePlayer.UUID,
                     Username = onlinePlayer.Username,
                     EntityId = onlinePlayer.EntityID,
                     Position = onlinePlayer.Position,
                     Metadata = onlinePlayer.metadata
                 };
                 packet2.Encode(encoder2);
-            }
 
-            onlinePlayers.Add(player.EntityID, player);
+                PacketEncoder encoder3 = PacketEncoderPool.Get(onlinePlayer);
+                var packet3 = new PlayerList
+                {
+                    UUID = player.UUID,
+                    EntityId = player.EntityID,
+                    Username = player.Username,
+                    XUID = player.XUID,
+                    Skin = player.Skin
+                };
+                packet3.Encode(encoder3);
+
+                PacketEncoder encoder4 = PacketEncoderPool.Get(player);
+                var packet4 = new PlayerList
+                {
+                    UUID = onlinePlayer.UUID,
+                    EntityId = onlinePlayer.EntityID,
+                    Username = onlinePlayer.Username,
+                    XUID = onlinePlayer.XUID,
+                    Skin = onlinePlayer.Skin
+                };
+                packet4.Encode(encoder4);
+            }
         }
 
-        public void removePlayer(Player player)
+            public void removePlayer(Player player)
         {
             if (!onlinePlayers.Remove(player.EntityID))
             {

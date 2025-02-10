@@ -6,7 +6,6 @@
         {
             Name = "minecraft:birch_sapling";
 
-
             States["age_bit"] = (byte)0;
         }
     }

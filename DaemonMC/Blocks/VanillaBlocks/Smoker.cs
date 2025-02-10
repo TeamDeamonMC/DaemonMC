@@ -6,7 +6,6 @@
         {
             Name = "minecraft:smoker";
 
-
             States["minecraft:cardinal_direction"] = "south";
         }
     }

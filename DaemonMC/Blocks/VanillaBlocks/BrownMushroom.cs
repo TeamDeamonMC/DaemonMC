@@ -5,6 +5,7 @@
         public BrownMushroom()
         {
             Name = "minecraft:brown_mushroom";
+
         }
     }
 }

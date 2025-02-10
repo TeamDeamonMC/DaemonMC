@@ -6,7 +6,6 @@
         {
             Name = "minecraft:colored_torch_blue";
 
-
             States["torch_facing_direction"] = "unknown";
         }
     }

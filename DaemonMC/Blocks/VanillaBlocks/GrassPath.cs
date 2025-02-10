@@ -5,6 +5,7 @@
         public GrassPath()
         {
             Name = "minecraft:grass_path";
+
         }
     }
 }

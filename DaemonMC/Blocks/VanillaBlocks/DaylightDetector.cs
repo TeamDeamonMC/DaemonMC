@@ -6,7 +6,6 @@
         {
             Name = "minecraft:daylight_detector";
 
-
             States["redstone_signal"] = 0;
         }
     }

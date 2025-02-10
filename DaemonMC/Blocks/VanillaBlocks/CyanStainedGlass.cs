@@ -5,6 +5,7 @@
         public CyanStainedGlass()
         {
             Name = "minecraft:cyan_stained_glass";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public IronOre()
         {
             Name = "minecraft:iron_ore";
+
         }
     }
 }

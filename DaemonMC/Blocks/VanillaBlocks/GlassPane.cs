@@ -5,6 +5,7 @@
         public GlassPane()
         {
             Name = "minecraft:glass_pane";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:amethyst_cluster";
 
-
             States["minecraft:block_face"] = "down";
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_crimson_hyphae";
 
-
             States["pillar_axis"] = "y";
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:basalt";
 
-
             States["pillar_axis"] = "y";
         }
     }

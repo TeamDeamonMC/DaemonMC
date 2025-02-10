@@ -5,6 +5,7 @@
         public Lodestone()
         {
             Name = "minecraft:lodestone";
+
         }
     }
 }

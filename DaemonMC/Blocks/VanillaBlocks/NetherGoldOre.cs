@@ -5,6 +5,7 @@
         public NetherGoldOre()
         {
             Name = "minecraft:nether_gold_ore";
+
         }
     }
 }

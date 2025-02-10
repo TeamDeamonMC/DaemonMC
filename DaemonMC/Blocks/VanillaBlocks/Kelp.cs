@@ -6,7 +6,6 @@
         {
             Name = "minecraft:kelp";
 
-
             States["kelp_age"] = 0;
         }
     }

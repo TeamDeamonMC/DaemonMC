@@ -5,6 +5,7 @@
         public SprucePlanks()
         {
             Name = "minecraft:spruce_planks";
+
         }
     }
 }

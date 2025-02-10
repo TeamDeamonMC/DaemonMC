@@ -6,7 +6,6 @@
         {
             Name = "minecraft:trip_wire";
 
-
             States["attached_bit"] = (byte)0;
             States["disarmed_bit"] = (byte)0;
             States["powered_bit"] = (byte)0;

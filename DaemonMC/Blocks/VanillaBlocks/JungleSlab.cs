@@ -6,7 +6,6 @@
         {
             Name = "minecraft:jungle_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

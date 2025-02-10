@@ -5,6 +5,7 @@
         public Ice()
         {
             Name = "minecraft:ice";
+
         }
     }
 }

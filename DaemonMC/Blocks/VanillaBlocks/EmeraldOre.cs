@@ -5,6 +5,7 @@
         public EmeraldOre()
         {
             Name = "minecraft:emerald_ore";
+
         }
     }
 }

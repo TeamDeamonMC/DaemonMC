@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bedrock";
 
-
             States["infiniburn_bit"] = (byte)0;
         }
     }

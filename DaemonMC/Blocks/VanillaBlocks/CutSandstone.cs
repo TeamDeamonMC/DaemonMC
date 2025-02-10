@@ -5,6 +5,7 @@
         public CutSandstone()
         {
             Name = "minecraft:cut_sandstone";
+
         }
     }
 }

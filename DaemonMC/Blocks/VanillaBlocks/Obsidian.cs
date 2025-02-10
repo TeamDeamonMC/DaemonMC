@@ -5,6 +5,7 @@
         public Obsidian()
         {
             Name = "minecraft:obsidian";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public CrimsonNylium()
         {
             Name = "minecraft:crimson_nylium";
+
         }
     }
 }

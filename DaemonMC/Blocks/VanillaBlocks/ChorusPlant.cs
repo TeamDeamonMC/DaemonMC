@@ -5,6 +5,7 @@
         public ChorusPlant()
         {
             Name = "minecraft:chorus_plant";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public DeadBrainCoral()
         {
             Name = "minecraft:dead_brain_coral";
+
         }
     }
 }

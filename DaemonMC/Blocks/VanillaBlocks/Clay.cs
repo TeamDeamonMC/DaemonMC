@@ -5,6 +5,7 @@
         public Clay()
         {
             Name = "minecraft:clay";
+
         }
     }
 }

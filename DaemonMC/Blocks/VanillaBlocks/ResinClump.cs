@@ -6,7 +6,6 @@
         {
             Name = "minecraft:resin_clump";
 
-
             States["multi_face_direction_bits"] = 0;
         }
     }

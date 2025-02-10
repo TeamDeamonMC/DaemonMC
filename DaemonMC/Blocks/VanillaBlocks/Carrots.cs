@@ -6,7 +6,6 @@
         {
             Name = "minecraft:carrots";
 
-
             States["growth"] = 0;
         }
     }

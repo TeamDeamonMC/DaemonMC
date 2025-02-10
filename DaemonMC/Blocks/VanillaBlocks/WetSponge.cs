@@ -5,6 +5,7 @@
         public WetSponge()
         {
             Name = "minecraft:wet_sponge";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public GoldOre()
         {
             Name = "minecraft:gold_ore";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public WeatheredCopperGrate()
         {
             Name = "minecraft:weathered_copper_grate";
+
         }
     }
 }

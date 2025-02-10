@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pitcher_plant";
 
-
             States["upper_block_bit"] = (byte)0;
         }
     }

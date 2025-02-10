@@ -5,6 +5,7 @@
         public PinkWool()
         {
             Name = "minecraft:pink_wool";
+
         }
     }
 }

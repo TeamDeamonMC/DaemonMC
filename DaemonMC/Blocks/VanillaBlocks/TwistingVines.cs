@@ -6,7 +6,6 @@
         {
             Name = "minecraft:twisting_vines";
 
-
             States["twisting_vines_age"] = 0;
         }
     }

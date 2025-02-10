@@ -5,6 +5,7 @@
         public BuddingAmethyst()
         {
             Name = "minecraft:budding_amethyst";
+
         }
     }
 }

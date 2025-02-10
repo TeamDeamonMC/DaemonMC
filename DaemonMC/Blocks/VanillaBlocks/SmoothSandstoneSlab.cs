@@ -6,7 +6,6 @@
         {
             Name = "minecraft:smooth_sandstone_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

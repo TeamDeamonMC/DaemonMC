@@ -6,7 +6,6 @@
         {
             Name = "minecraft:torch";
 
-
             States["torch_facing_direction"] = "unknown";
         }
     }

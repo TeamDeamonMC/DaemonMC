@@ -5,6 +5,7 @@
         public CrimsonPlanks()
         {
             Name = "minecraft:crimson_planks";
+
         }
     }
 }

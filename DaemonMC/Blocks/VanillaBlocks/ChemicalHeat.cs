@@ -5,6 +5,7 @@
         public ChemicalHeat()
         {
             Name = "minecraft:chemical_heat";
+
         }
     }
 }

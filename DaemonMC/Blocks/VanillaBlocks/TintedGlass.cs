@@ -5,6 +5,7 @@
         public TintedGlass()
         {
             Name = "minecraft:tinted_glass";
+
         }
     }
 }

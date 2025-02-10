@@ -5,6 +5,7 @@
         public Barrier()
         {
             Name = "minecraft:barrier";
+
         }
     }
 }

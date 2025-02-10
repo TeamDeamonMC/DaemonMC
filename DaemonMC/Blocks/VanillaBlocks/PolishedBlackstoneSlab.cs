@@ -6,7 +6,6 @@
         {
             Name = "minecraft:polished_blackstone_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

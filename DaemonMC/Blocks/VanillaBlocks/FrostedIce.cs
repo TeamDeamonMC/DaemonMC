@@ -6,7 +6,6 @@
         {
             Name = "minecraft:frosted_ice";
 
-
             States["age"] = 0;
         }
     }

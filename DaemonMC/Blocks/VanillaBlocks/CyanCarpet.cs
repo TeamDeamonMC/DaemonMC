@@ -5,6 +5,7 @@
         public CyanCarpet()
         {
             Name = "minecraft:cyan_carpet";
+
         }
     }
 }

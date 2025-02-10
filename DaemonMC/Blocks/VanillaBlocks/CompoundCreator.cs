@@ -6,7 +6,6 @@
         {
             Name = "minecraft:compound_creator";
 
-
             States["direction"] = 0;
         }
     }

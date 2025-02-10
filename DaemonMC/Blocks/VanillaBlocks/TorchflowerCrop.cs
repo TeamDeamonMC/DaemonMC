@@ -6,7 +6,6 @@
         {
             Name = "minecraft:torchflower_crop";
 
-
             States["growth"] = 0;
         }
     }

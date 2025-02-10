@@ -5,6 +5,7 @@
         public NetherBrickFence()
         {
             Name = "minecraft:nether_brick_fence";
+
         }
     }
 }

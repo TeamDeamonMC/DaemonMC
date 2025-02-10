@@ -6,7 +6,6 @@
         {
             Name = "minecraft:jungle_sapling";
 
-
             States["age_bit"] = (byte)0;
         }
     }

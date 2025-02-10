@@ -5,6 +5,7 @@
         public GrayTerracotta()
         {
             Name = "minecraft:gray_terracotta";
+
         }
     }
 }

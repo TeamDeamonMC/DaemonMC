@@ -5,6 +5,7 @@
         public EndGateway()
         {
             Name = "minecraft:end_gateway";
+
         }
     }
 }

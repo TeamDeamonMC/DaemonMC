@@ -6,7 +6,6 @@
         {
             Name = "minecraft:warped_stem";
 
-
             States["pillar_axis"] = "y";
         }
     }

@@ -5,6 +5,7 @@
         public UndyedShulkerBox()
         {
             Name = "minecraft:undyed_shulker_box";
+
         }
     }
 }

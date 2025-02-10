@@ -6,7 +6,6 @@
         {
             Name = "minecraft:deprecated_purpur_block_2";
 
-
             States["pillar_axis"] = "y";
         }
     }

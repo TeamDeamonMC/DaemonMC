@@ -5,6 +5,7 @@
         public BirchFence()
         {
             Name = "minecraft:birch_fence";
+
         }
     }
 }

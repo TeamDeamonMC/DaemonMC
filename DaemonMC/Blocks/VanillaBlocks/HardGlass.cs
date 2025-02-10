@@ -5,6 +5,7 @@
         public HardGlass()
         {
             Name = "minecraft:hard_glass";
+
         }
     }
 }

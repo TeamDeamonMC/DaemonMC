@@ -6,7 +6,6 @@
         {
             Name = "minecraft:cactus";
 
-
             States["age"] = 0;
         }
     }

@@ -5,6 +5,7 @@
         public EndBricks()
         {
             Name = "minecraft:end_bricks";
+
         }
     }
 }

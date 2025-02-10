@@ -6,7 +6,6 @@
         {
             Name = "minecraft:water";
 
-
             States["liquid_depth"] = 0;
         }
     }

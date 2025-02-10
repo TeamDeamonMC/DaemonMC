@@ -5,6 +5,7 @@
         public PaleOakPlanks()
         {
             Name = "minecraft:pale_oak_planks";
+
         }
     }
 }

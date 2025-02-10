@@ -6,7 +6,6 @@
         {
             Name = "minecraft:jungle_wood";
 
-
             States["pillar_axis"] = "y";
         }
     }

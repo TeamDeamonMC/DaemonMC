@@ -6,7 +6,6 @@
         {
             Name = "minecraft:deepslate";
 
-
             States["pillar_axis"] = "y";
         }
     }

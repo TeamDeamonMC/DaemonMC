@@ -6,7 +6,6 @@
         {
             Name = "minecraft:acacia_leaves";
 
-
             States["persistent_bit"] = (byte)0;
             States["update_bit"] = (byte)0;
         }

@@ -5,6 +5,7 @@
         public MobSpawner()
         {
             Name = "minecraft:mob_spawner";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:flowing_lava";
 
-
             States["liquid_depth"] = 0;
         }
     }

@@ -5,6 +5,7 @@
         public CoalBlock()
         {
             Name = "minecraft:coal_block";
+
         }
     }
 }

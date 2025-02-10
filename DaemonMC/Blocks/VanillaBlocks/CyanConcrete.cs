@@ -5,6 +5,7 @@
         public CyanConcrete()
         {
             Name = "minecraft:cyan_concrete";
+
         }
     }
 }

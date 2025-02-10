@@ -6,7 +6,6 @@
         {
             Name = "minecraft:purpur_block";
 
-
             States["pillar_axis"] = "y";
         }
     }

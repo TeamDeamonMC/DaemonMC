@@ -5,6 +5,7 @@
         public DeepslateCoalOre()
         {
             Name = "minecraft:deepslate_coal_ore";
+
         }
     }
 }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:element_constructor";
 
-
             States["direction"] = 0;
         }
     }

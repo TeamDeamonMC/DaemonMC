@@ -5,6 +5,7 @@
         public GrayWool()
         {
             Name = "minecraft:gray_wool";
+
         }
     }
 }

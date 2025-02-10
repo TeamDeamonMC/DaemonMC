@@ -6,7 +6,6 @@
         {
             Name = "minecraft:warped_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

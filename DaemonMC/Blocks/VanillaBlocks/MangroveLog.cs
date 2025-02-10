@@ -6,7 +6,6 @@
         {
             Name = "minecraft:mangrove_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

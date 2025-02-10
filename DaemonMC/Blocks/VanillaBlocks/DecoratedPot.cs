@@ -6,7 +6,6 @@
         {
             Name = "minecraft:decorated_pot";
 
-
             States["direction"] = 0;
         }
     }

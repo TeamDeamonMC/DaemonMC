@@ -6,7 +6,6 @@
         {
             Name = "minecraft:black_glazed_terracotta";
 
-
             States["facing_direction"] = 0;
         }
     }

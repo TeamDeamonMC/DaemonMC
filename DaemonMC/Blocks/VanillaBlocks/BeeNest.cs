@@ -6,7 +6,6 @@
         {
             Name = "minecraft:bee_nest";
 
-
             States["direction"] = 0;
             States["honey_level"] = 0;
         }

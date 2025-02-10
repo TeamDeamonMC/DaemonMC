@@ -6,7 +6,6 @@
         {
             Name = "minecraft:oak_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

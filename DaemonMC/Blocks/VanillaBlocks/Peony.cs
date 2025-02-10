@@ -6,7 +6,6 @@
         {
             Name = "minecraft:peony";
 
-
             States["upper_block_bit"] = (byte)0;
         }
     }

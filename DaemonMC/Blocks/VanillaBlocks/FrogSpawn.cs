@@ -5,6 +5,7 @@
         public FrogSpawn()
         {
             Name = "minecraft:frog_spawn";
+
         }
     }
 }

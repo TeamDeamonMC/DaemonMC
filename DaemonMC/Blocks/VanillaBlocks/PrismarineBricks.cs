@@ -5,6 +5,7 @@
         public PrismarineBricks()
         {
             Name = "minecraft:prismarine_bricks";
+
         }
     }
 }

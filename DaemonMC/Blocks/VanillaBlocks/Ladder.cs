@@ -6,7 +6,6 @@
         {
             Name = "minecraft:ladder";
 
-
             States["facing_direction"] = 0;
         }
     }

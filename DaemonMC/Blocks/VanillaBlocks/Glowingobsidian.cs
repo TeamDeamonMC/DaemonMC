@@ -5,6 +5,7 @@
         public Glowingobsidian()
         {
             Name = "minecraft:glowingobsidian";
+
         }
     }
 }

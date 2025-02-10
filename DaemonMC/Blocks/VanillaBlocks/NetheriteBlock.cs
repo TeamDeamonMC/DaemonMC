@@ -5,6 +5,7 @@
         public NetheriteBlock()
         {
             Name = "minecraft:netherite_block";
+
         }
     }
 }

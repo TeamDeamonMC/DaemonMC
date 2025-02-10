@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_jungle_log";
 
-
             States["pillar_axis"] = "y";
         }
     }

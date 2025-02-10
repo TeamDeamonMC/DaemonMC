@@ -6,7 +6,6 @@
         {
             Name = "minecraft:lantern";
 
-
             States["hanging"] = (byte)0;
         }
     }

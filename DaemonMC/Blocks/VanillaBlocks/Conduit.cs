@@ -5,6 +5,7 @@
         public Conduit()
         {
             Name = "minecraft:conduit";
+
         }
     }
 }

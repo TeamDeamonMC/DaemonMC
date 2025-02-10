@@ -5,6 +5,7 @@
         public PackedIce()
         {
             Name = "minecraft:packed_ice";
+
         }
     }
 }

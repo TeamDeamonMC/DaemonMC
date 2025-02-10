@@ -6,7 +6,6 @@
         {
             Name = "minecraft:pink_petals";
 
-
             States["growth"] = 0;
             States["minecraft:cardinal_direction"] = "south";
         }

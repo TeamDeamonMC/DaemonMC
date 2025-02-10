@@ -5,6 +5,7 @@
         public MagentaStainedGlass()
         {
             Name = "minecraft:magenta_stained_glass";
+
         }
     }
 }

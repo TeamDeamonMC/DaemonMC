@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 using fNbt;
@@ -15,7 +16,7 @@ namespace DaemonMC.Network
         public IPEndPoint clientEp = null!;
         public int writeOffset = 0;
         public int protocolVersion = 0;
-        public byte[] byteStream = new byte[35000];
+        public byte[] byteStream = new byte[512000];
 
         public static Dictionary<uint, byte[]> sentPackets = new Dictionary<uint, byte[]>();
 
@@ -23,7 +24,7 @@ namespace DaemonMC.Network
         {
             clientEp = ep;
             writeOffset = 0;
-            byteStream = new byte[35000];
+            byteStream = new byte[512000];
             protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
         }
 
@@ -62,7 +63,7 @@ namespace DaemonMC.Network
                 Array.Copy(trimmedBuffer, 0, newtrimmedBuffer, header.Length, trimmedBuffer.Length);
 
                 writeOffset = 0;
-                byteStream = new byte[35000];
+                byteStream = new byte[512000];
 
                 Reliability.ReliabilityHandler(this, newtrimmedBuffer);
                 return;
@@ -71,7 +72,7 @@ namespace DaemonMC.Network
             Log.debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {(Info.RakNet)trimmedBuffer[0]}");
 
             writeOffset = 0;
-            byteStream = new byte[35000];
+            byteStream = new byte[512000];
 
             if (trimmedBuffer[0] == 3)
             {
@@ -105,7 +106,7 @@ namespace DaemonMC.Network
         public void Reset()
         {
             clientEp = null;
-            byteStream = new byte[35000];
+            byteStream = new byte[512000];
             writeOffset = 0;
         }
 
@@ -307,6 +308,35 @@ namespace DaemonMC.Network
         {
             WriteFloat(vec.X);
             WriteFloat(vec.Y);
+        }
+
+        public void WriteSkin(Skin skin)
+        {
+            Log.error(skin.SkinData.Count().ToString());
+            WriteString(skin.SkinId);
+            WriteString(skin.PlayFabId);
+            WriteString(skin.SkinResourcePatch);
+            WriteInt(skin.SkinImageWidth);
+            WriteInt(skin.SkinImageHeight);
+            WriteString(skin.SkinData);
+            WriteInt(0); //animations todo
+            WriteInt(skin.Cape.CapeImageWidth);
+            WriteInt(skin.Cape.CapeImageWidth);
+            WriteString(skin.Cape.CapeData);
+            WriteString(skin.SkinGeometryData);
+            WriteString(skin.SkinGeometryDataEngineVersion);
+            WriteString(skin.SkinAnimationData);
+            WriteString(skin.Cape.CapeId);
+            WriteString(skin.SkinId + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            WriteString(skin.ArmSize);
+            WriteString(skin.SkinColor);
+            WriteInt(0); //persona todo
+            WriteInt(0); //PieceTintColors
+            WriteBool(skin.PremiumSkin);
+            WriteBool(skin.PersonaSkin);
+            WriteBool(false);
+            WriteBool(true);
+            WriteBool(false);
         }
 
         public void WriteMetadata(Dictionary<ActorData, Metadata> metadata)

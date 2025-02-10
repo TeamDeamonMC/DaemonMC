@@ -5,6 +5,7 @@
         public RedSand()
         {
             Name = "minecraft:red_sand";
+
         }
     }
 }

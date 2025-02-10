@@ -5,6 +5,7 @@
         public DeepslateLapisOre()
         {
             Name = "minecraft:deepslate_lapis_ore";
+
         }
     }
 }

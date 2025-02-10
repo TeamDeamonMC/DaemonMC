@@ -6,7 +6,6 @@
         {
             Name = "minecraft:large_amethyst_bud";
 
-
             States["minecraft:block_face"] = "down";
         }
     }

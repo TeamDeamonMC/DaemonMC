@@ -5,6 +5,7 @@
         public InfestedMossyStoneBricks()
         {
             Name = "minecraft:infested_mossy_stone_bricks";
+
         }
     }
 }

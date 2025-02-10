@@ -5,6 +5,7 @@
         public BlueIce()
         {
             Name = "minecraft:blue_ice";
+
         }
     }
 }

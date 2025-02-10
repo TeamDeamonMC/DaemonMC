@@ -5,6 +5,7 @@
         public OxidizedCopper()
         {
             Name = "minecraft:oxidized_copper";
+
         }
     }
 }

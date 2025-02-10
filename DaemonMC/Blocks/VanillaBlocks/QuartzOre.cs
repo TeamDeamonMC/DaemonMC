@@ -5,6 +5,7 @@
         public QuartzOre()
         {
             Name = "minecraft:quartz_ore";
+
         }
     }
 }

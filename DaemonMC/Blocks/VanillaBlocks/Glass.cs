@@ -5,6 +5,7 @@
         public Glass()
         {
             Name = "minecraft:glass";
+
         }
     }
 }

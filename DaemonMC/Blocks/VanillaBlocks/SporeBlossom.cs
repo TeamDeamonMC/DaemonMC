@@ -5,6 +5,7 @@
         public SporeBlossom()
         {
             Name = "minecraft:spore_blossom";
+
         }
     }
 }

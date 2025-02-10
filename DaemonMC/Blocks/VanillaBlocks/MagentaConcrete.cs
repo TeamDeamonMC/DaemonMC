@@ -5,6 +5,7 @@
         public MagentaConcrete()
         {
             Name = "minecraft:magenta_concrete";
+
         }
     }
 }

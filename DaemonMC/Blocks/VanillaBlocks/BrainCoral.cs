@@ -5,6 +5,7 @@
         public BrainCoral()
         {
             Name = "minecraft:brain_coral";
+
         }
     }
 }

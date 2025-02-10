@@ -6,7 +6,6 @@
         {
             Name = "minecraft:stripped_bamboo_block";
 
-
             States["pillar_axis"] = "y";
         }
     }

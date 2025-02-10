@@ -5,6 +5,7 @@
         public EndStone()
         {
             Name = "minecraft:end_stone";
+
         }
     }
 }

@@ -5,6 +5,7 @@
         public JunglePlanks()
         {
             Name = "minecraft:jungle_planks";
+
         }
     }
 }

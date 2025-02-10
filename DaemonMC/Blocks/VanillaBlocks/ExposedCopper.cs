@@ -5,6 +5,7 @@
         public ExposedCopper()
         {
             Name = "minecraft:exposed_copper";
+
         }
     }
 }

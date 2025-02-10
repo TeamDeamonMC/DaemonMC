@@ -5,6 +5,7 @@
         public CryingObsidian()
         {
             Name = "minecraft:crying_obsidian";
+
         }
     }
 }

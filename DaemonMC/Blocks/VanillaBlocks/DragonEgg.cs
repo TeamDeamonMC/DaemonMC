@@ -5,6 +5,7 @@
         public DragonEgg()
         {
             Name = "minecraft:dragon_egg";
+
         }
     }
 }

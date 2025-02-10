@@ -6,7 +6,6 @@
         {
             Name = "minecraft:jungle_wall_sign";
 
-
             States["facing_direction"] = 0;
         }
     }

@@ -6,7 +6,6 @@
         {
             Name = "minecraft:mossy_stone_brick_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

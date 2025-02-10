@@ -5,6 +5,7 @@
         public RedMushroom()
         {
             Name = "minecraft:red_mushroom";
+
         }
     }
 }

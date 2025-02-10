@@ -5,6 +5,7 @@
         public HardPurpleStainedGlass()
         {
             Name = "minecraft:hard_purple_stained_glass";
+
         }
     }
 }

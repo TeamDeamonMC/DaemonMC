@@ -6,7 +6,6 @@
         {
             Name = "minecraft:scaffolding";
 
-
             States["stability"] = 0;
             States["stability_check"] = (byte)0;
         }

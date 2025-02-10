@@ -6,7 +6,6 @@
         {
             Name = "minecraft:blast_furnace";
 
-
             States["minecraft:cardinal_direction"] = "south";
         }
     }

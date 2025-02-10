@@ -6,7 +6,6 @@
         {
             Name = "minecraft:nether_wart";
 
-
             States["age"] = 0;
         }
     }

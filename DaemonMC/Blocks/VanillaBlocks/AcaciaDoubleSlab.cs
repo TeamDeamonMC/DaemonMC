@@ -6,7 +6,6 @@
         {
             Name = "minecraft:acacia_double_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

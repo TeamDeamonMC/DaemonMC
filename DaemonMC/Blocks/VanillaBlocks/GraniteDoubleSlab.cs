@@ -6,7 +6,6 @@
         {
             Name = "minecraft:granite_double_slab";
 
-
             States["minecraft:vertical_half"] = "bottom";
         }
     }

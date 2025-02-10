@@ -5,6 +5,7 @@
         public LightBlueConcrete()
         {
             Name = "minecraft:light_blue_concrete";
+
         }
     }
 }

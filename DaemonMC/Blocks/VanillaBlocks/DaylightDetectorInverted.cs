@@ -6,7 +6,6 @@
         {
             Name = "minecraft:daylight_detector_inverted";
 
-
             States["redstone_signal"] = 0;
         }
     }

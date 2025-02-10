@@ -5,6 +5,7 @@
         public PurpleWool()
         {
             Name = "minecraft:purple_wool";
+
         }
     }
 }

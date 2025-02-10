@@ -5,6 +5,7 @@
         public SmoothBasalt()
         {
             Name = "minecraft:smooth_basalt";
+
         }
     }
 }

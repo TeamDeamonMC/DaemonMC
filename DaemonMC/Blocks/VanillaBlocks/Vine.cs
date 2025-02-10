@@ -6,7 +6,6 @@
         {
             Name = "minecraft:vine";
 
-
             States["vine_direction_bits"] = 0;
         }
     }

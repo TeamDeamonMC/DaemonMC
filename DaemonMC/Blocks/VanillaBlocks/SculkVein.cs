@@ -6,7 +6,6 @@
         {
             Name = "minecraft:sculk_vein";
 
-
             States["multi_face_direction_bits"] = 0;
         }
     }

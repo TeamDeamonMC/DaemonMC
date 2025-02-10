@@ -6,7 +6,6 @@
         {
             Name = "minecraft:muddy_mangrove_roots";
 
-
             States["pillar_axis"] = "y";
         }
     }

@@ -48,6 +48,10 @@ namespace DaemonMC.Level.Generators
                                 {
                                     state = 2;
                                 }
+                                if (x == 0) // add bedrock
+                                {
+                                    state = 3;
+                                }
 
                                 word |= (uint)(state & (1 << bitsPerBlock) - 1) << position % blocksPerWord * bitsPerBlock;
                                 position++;
@@ -56,7 +60,7 @@ namespace DaemonMC.Level.Generators
                         }
 
                         // Write palette
-                        int[] pallette = new int[] { new Air().GetHash(), new GrassBlock().GetHash(), new Dirt().GetHash() };
+                        int[] pallette = new int[] { new Air().GetHash(), new GrassBlock().GetHash(), new Dirt().GetHash(), new Bedrock().GetHash() };
                         VarInt.WriteSInt32(stream, pallette.Count());// How many block types are in palette?
 
                         foreach (var block in pallette)

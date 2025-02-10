@@ -5,6 +5,7 @@ using DaemonMC.Network;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Level;
 using DaemonMC.Plugin.Plugin;
+using DaemonMC.Blocks;
 
 namespace DaemonMC
 {
@@ -25,6 +26,8 @@ namespace DaemonMC
             IPEndPoint iep = new IPEndPoint(IPAddress.Any, 19132);
             sock.Bind(iep);
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
+
+            Palette.buildPalette();
 
             PluginManager.LoadPlugins("Plugins");
 

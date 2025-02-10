@@ -6,13 +6,37 @@ namespace DaemonMC.Blocks
     public abstract class Block
     {
         protected string Name = "minecraft:air";
+        protected Dictionary<string, object> States = new Dictionary<string, object>();
 
         public int GetHash()
         {
-            NbtCompound compound = new NbtCompound("") {
-                            new NbtString("name", Name),
-                            new NbtCompound("states"),
-                        };
+            var statesCompound = new NbtCompound("states");
+
+            foreach (var state in States)
+            {
+                if (state.Value is int intValue)
+                {
+                    statesCompound.Add(new NbtInt(state.Key, intValue));
+                }
+                else if (state.Value is byte byteValue)
+                {
+                    statesCompound.Add(new NbtByte(state.Key, byteValue));
+                }
+                else if (state.Value is string stringValue)
+                {
+                    statesCompound.Add(new NbtString(state.Key, stringValue));
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unsupported state type for {state.Key}");
+                }
+            }
+
+            NbtCompound compound = new NbtCompound("")
+            {
+                new NbtString("name", Name),
+                statesCompound
+            };
 
             var nbt = new NbtFile
             {
@@ -22,10 +46,7 @@ namespace DaemonMC.Blocks
             };
 
             byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
-
-            int hash = Fnv1aHash.Hash32(saveToBuffer);
-
-            return hash;
+            return Fnv1aHash.Hash32(saveToBuffer);
         }
     }
 }

@@ -235,19 +235,17 @@
                     byte[] fragment = new byte[length];
                     Array.Copy(body, start, fragment, 0, length);
 
-                    Array.Copy(body, start, encoder.byteStream, encoder.writeOffset, length);
-                    encoder.writeOffset += length;
+                    encoder.byteStream.Write(fragment, 0, length);
                     compIndex++;
                 }
                 else
                 {
-                    Array.Copy(body, 0, encoder.byteStream, encoder.writeOffset, body.Length);
-                    encoder.writeOffset += body.Length;
+                    encoder.byteStream.Write(body, 0, body.Length);
                 }
 
                 encoder.SendPacket(128, false);
-                encoder.byteStream = new byte[512000];
-                encoder.writeOffset = 0;
+                encoder.byteStream.SetLength(0);
+                encoder.byteStream.Position = 0;
             }
             PacketEncoderPool.Return(encoder);
         }

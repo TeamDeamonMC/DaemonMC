@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.IO;
 using System.Net;
 using System.Numerics;
 using System.Text;
@@ -15,24 +14,22 @@ namespace DaemonMC.Network
     public class PacketEncoder
     {
         public IPEndPoint clientEp = null!;
-        public int writeOffset = 0;
         public int protocolVersion = 0;
-        public byte[] byteStream = new byte[512000];
+        public MemoryStream byteStream;
 
         public static Dictionary<uint, byte[]> sentPackets = new Dictionary<uint, byte[]>();
 
         public PacketEncoder(IPEndPoint ep)
         {
             clientEp = ep;
-            writeOffset = 0;
-            byteStream = new byte[512000];
+            byteStream = new MemoryStream();
             protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
         }
 
         public void handlePacket(string type = "bedrock")
         {
-            byte[] trimmedBuffer = new byte[writeOffset];
-            Array.Copy(byteStream, trimmedBuffer, writeOffset);
+            byte[] trimmedBuffer = new byte[byteStream.Position];
+            Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
             if (type == "bedrock")
             {
                 if (RakSessionManager.getSession(clientEp) == null)
@@ -53,7 +50,7 @@ namespace DaemonMC.Network
                     }
                 }
 
-                byte[] lengthVarInt = ToDataTypes.WriteVarint(writeOffset);
+                byte[] lengthVarInt = ToDataTypes.WriteVarint((int)byteStream.Position);
 
                 byte[] header = new byte[bedrockId.Length + lengthVarInt.Length];
                 Array.Copy(bedrockId, 0, header, 0, bedrockId.Length);
@@ -63,8 +60,8 @@ namespace DaemonMC.Network
                 Array.Copy(header, 0, newtrimmedBuffer, 0, header.Length);
                 Array.Copy(trimmedBuffer, 0, newtrimmedBuffer, header.Length, trimmedBuffer.Length);
 
-                writeOffset = 0;
-                byteStream = new byte[512000];
+                byteStream.SetLength(0);
+                byteStream.Position = 0;
 
                 Reliability.ReliabilityHandler(this, newtrimmedBuffer);
                 return;
@@ -72,8 +69,8 @@ namespace DaemonMC.Network
 
             Log.debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {(Info.RakNet)trimmedBuffer[0]}");
 
-            writeOffset = 0;
-            byteStream = new byte[512000];
+            byteStream.SetLength(0);
+            byteStream.Position = 0;
 
             if (trimmedBuffer[0] == 3)
             {
@@ -92,8 +89,8 @@ namespace DaemonMC.Network
 
             var clientPort = clientEp.Port;
             if (pkid <= 127 || pkid >= 141) { Log.debug($"[Server] --> [{clientIp,-16}:{clientPort}] {(Info.RakNet)pkid}"); };
-            byte[] trimmedBuffer = new byte[writeOffset];
-            Array.Copy(byteStream, trimmedBuffer, writeOffset);
+            byte[] trimmedBuffer = new byte[byteStream.Position];
+            Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
             Server.Send(trimmedBuffer, clientEp);
             RakSessionManager.getSession(clientEp).sequenceNumber++;
             if (pooled) { PacketEncoderPool.Return(this); }
@@ -107,8 +104,8 @@ namespace DaemonMC.Network
         public void Reset()
         {
             clientEp = null;
-            byteStream = new byte[512000];
-            writeOffset = 0;
+            byteStream.SetLength(0);
+            byteStream.Position = 0;
         }
 
         public void PacketId(Info.Bedrock id)
@@ -118,40 +115,36 @@ namespace DaemonMC.Network
 
         public void WriteBool(bool value)
         {
-            byteStream[writeOffset] = value == true ? (byte)1 : (byte)0;
-            writeOffset += 1;
+            byteStream.WriteByte(value ? (byte)1 : (byte)0);
         }
 
         public void WriteInt(int value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            Array.Copy(bytes, 0, byteStream, writeOffset, 4);
-            writeOffset += 4;
+            byteStream.Write(bytes, 0, bytes.Length);
         }
 
         public void WriteIntBE(int value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
             Array.Reverse(bytes);
-            Array.Copy(bytes, 0, byteStream, writeOffset, 4);
-            writeOffset += 4;
+            byteStream.Write(bytes, 0, bytes.Length);
         }
 
         public void WriteFloat(float value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-            Array.Copy(bytes, 0, byteStream, writeOffset, 4);
-            writeOffset += 4;
+            byteStream.Write(bytes, 0, bytes.Length);
         }
 
         public void WriteVarInt(int value)
         {
             while ((value & -128) != 0)
             {
-                byteStream[writeOffset++] = (byte)((value & 127) | 128);
+                byteStream.WriteByte((byte)((value & 127) | 128));
                 value >>= 7;
             }
-            byteStream[writeOffset++] = (byte)(value & 127);
+            byteStream.WriteByte((byte)(value & 127));
         }
 
         public void WriteSignedVarInt(int value)
@@ -162,43 +155,37 @@ namespace DaemonMC.Network
 
         public void WriteShort(ushort value)
         {
-            byteStream[writeOffset] = (byte)value;
-            byteStream[writeOffset + 1] = (byte)(value >> 8);
-            writeOffset += 2;
+            byteStream.WriteByte((byte)value);
+            byteStream.WriteByte((byte)(value >> 8));
         }
 
         public void WriteShortBE(ushort value)
         {
-            byteStream[writeOffset] = (byte)(value >> 8);
-            byteStream[writeOffset + 1] = (byte)value;
-            writeOffset += 2;
+            byteStream.WriteByte((byte)(value >> 8));
+            byteStream.WriteByte((byte)value);
         }
 
         public void WriteByte(byte value)
         {
-            byteStream[writeOffset] = value;
-            writeOffset += 1;
+            byteStream.WriteByte(value);
         }
 
         private void WriteBytes(byte[] data)
         {
-            Array.Copy(data, 0, byteStream, writeOffset, data.Length);
-            writeOffset += data.Length;
+            byteStream.Write(data, 0, data.Length);
         }
 
         public void WriteLongLE(long value)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
             Array.Reverse(valueBytes);
-            Array.Copy(valueBytes, 0, byteStream, writeOffset, 8);
-            writeOffset += 8;
+            byteStream.Write(valueBytes, 0, valueBytes.Length);
         }
 
         public void WriteLong(long value)
         {
             byte[] valueBytes = BitConverter.GetBytes(value);
-            Array.Copy(valueBytes, 0, byteStream, writeOffset, 8);
-            writeOffset += 8;
+            byteStream.Write(valueBytes, 0, valueBytes.Length);
         }
 
         public void WriteMagic(string magic)
@@ -207,7 +194,7 @@ namespace DaemonMC.Network
             {
                 string byteString = magic.Substring(i, 2);
                 byte b = byte.Parse(byteString, System.Globalization.NumberStyles.HexNumber);
-                byteStream[writeOffset++] = b;
+                byteStream.WriteByte(b);
             }
         }
 
@@ -216,20 +203,17 @@ namespace DaemonMC.Network
             ushort length = (ushort)str.Length;
             byte[] lengthBytes = BitConverter.GetBytes(length);
             Array.Reverse(lengthBytes);
-            Array.Copy(lengthBytes, 0, byteStream, writeOffset, 2);
-            writeOffset += 2;
+            byteStream.Write(lengthBytes, 0, lengthBytes.Length);
 
             byte[] strBytes = Encoding.UTF8.GetBytes(str);
-            Array.Copy(strBytes, 0, byteStream, writeOffset, strBytes.Length);
-            writeOffset += strBytes.Length;
+            byteStream.Write(strBytes, 0, strBytes.Length);
         }
 
         public void WriteString(string str)
         {
             byte[] strBytes = Encoding.UTF8.GetBytes(str);
             WriteVarInt(strBytes.Length);
-            Array.Copy(strBytes, 0, byteStream, writeOffset, strBytes.Length);
-            writeOffset += strBytes.Length;
+            byteStream.Write(strBytes, 0, strBytes.Length);
         }
 
         public void WriteAddress(string ip = "127.0.0.1")
@@ -238,34 +222,30 @@ namespace DaemonMC.Network
             byte[] ipAddress = new byte[] { byte.Parse(ipParts[0]), byte.Parse(ipParts[1]), byte.Parse(ipParts[2]), byte.Parse(ipParts[3]) };
             ushort port = 19132;
 
-            byteStream[writeOffset] = 4;
-            writeOffset++;
+            byteStream.WriteByte(4);
 
-            Array.Copy(ipAddress, 0, byteStream, writeOffset, ipAddress.Length);
-            writeOffset += ipAddress.Length;
+            byteStream.Write(ipAddress, 0, ipAddress.Length);
 
             byte[] portBytes = BitConverter.GetBytes(port);
             Array.Reverse(portBytes);
-            Array.Copy(portBytes, 0, byteStream, writeOffset, portBytes.Length);
-            writeOffset += portBytes.Length;
+            byteStream.Write(portBytes, 0, portBytes.Length);
         }
 
         public void WriteUInt24LE(uint value)
         {
-            byteStream[writeOffset] = (byte)(value & 0xFF);
-            byteStream[writeOffset + 1] = (byte)((value >> 8) & 0xFF);
-            byteStream[writeOffset + 2] = (byte)((value >> 16) & 0xFF);
-            writeOffset += 3;
+            byteStream.WriteByte((byte)(value & 0xFF));
+            byteStream.WriteByte((byte)((value >> 8) & 0xFF));
+            byteStream.WriteByte((byte)((value >> 16) & 0xFF));
         }
 
         public void WriteVarLong(ulong value)
         {
             while ((value & ~0x7FUL) != 0)
             {
-                byteStream[writeOffset++] = (byte)((value & 0x7FUL) | 0x80UL);
+                byteStream.WriteByte((byte)((value & 0x7FUL) | 0x80UL));
                 value >>= 7;
             }
-            byteStream[writeOffset++] = (byte)(value & 0x7FUL);
+            byteStream.WriteByte((byte)(value & 0x7FUL));
         }
 
         public void WriteSignedVarLong(long value)
@@ -283,9 +263,7 @@ namespace DaemonMC.Network
 
             byte[] serializedTag = file.SaveToBuffer(NbtCompression.None);
 
-            Array.Copy(serializedTag, 0, byteStream, writeOffset, serializedTag.Length);
-
-            writeOffset += serializedTag.Length;
+            byteStream.Write(serializedTag, 0, serializedTag.Length);
         }
 
         public void WriteUUID(Guid uuid)

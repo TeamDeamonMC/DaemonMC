@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.IO;
 using System.Net;
 using System.Numerics;
 using System.Text;
@@ -293,9 +294,23 @@ namespace DaemonMC.Network
             byte[] mostSignificantBits = uuidBytes.Take(8).Reverse().ToArray();
             byte[] leastSignificantBits = uuidBytes.Skip(8).Take(8).Reverse().ToArray();
 
-            WriteBytes(mostSignificantBits);
+            byte[] reordered = new byte[8];
+
+            reordered[0] = mostSignificantBits[1];
+            reordered[1] = mostSignificantBits[0];
+            reordered[2] = mostSignificantBits[3];
+            reordered[3] = mostSignificantBits[2];
+
+            reordered[4] = mostSignificantBits[7];
+            reordered[5] = mostSignificantBits[6];
+
+            reordered[6] = mostSignificantBits[5];
+            reordered[7] = mostSignificantBits[4];
+
+            WriteBytes(reordered);
             WriteBytes(leastSignificantBits);
         }
+
 
         public void WriteVec3(Vector3 vec)
         {
@@ -312,17 +327,29 @@ namespace DaemonMC.Network
 
         public void WriteSkin(Skin skin)
         {
-            Log.error(skin.SkinData.Count().ToString());
             WriteString(skin.SkinId);
             WriteString(skin.PlayFabId);
             WriteString(skin.SkinResourcePatch);
             WriteInt(skin.SkinImageWidth);
             WriteInt(skin.SkinImageHeight);
-            WriteString(skin.SkinData);
-            WriteInt(0); //animations todo
+            WriteVarInt(skin.SkinData.Count());
+            WriteBytes(skin.SkinData);
+            WriteInt(skin.AnimatedImageData.Count());
+            foreach (var animation in skin.AnimatedImageData)
+            {
+                WriteInt(animation.ImageWidth);
+                WriteInt(animation.ImageHeight);
+                byte[] imageData = Convert.FromBase64String(animation.Image);
+                WriteVarInt(imageData.Count());
+                WriteBytes(imageData);
+                WriteInt(animation.Type);
+                WriteFloat(animation.Frames);
+                WriteInt(animation.AnimationExpression);
+            }
             WriteInt(skin.Cape.CapeImageWidth);
-            WriteInt(skin.Cape.CapeImageWidth);
-            WriteString(skin.Cape.CapeData);
+            WriteInt(skin.Cape.CapeImageHeight);
+            WriteVarInt(skin.Cape.CapeData.Count());
+            WriteBytes(skin.Cape.CapeData);
             WriteString(skin.SkinGeometryData);
             WriteString(skin.SkinGeometryDataEngineVersion);
             WriteString(skin.SkinAnimationData);
@@ -330,12 +357,27 @@ namespace DaemonMC.Network
             WriteString(skin.SkinId + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             WriteString(skin.ArmSize);
             WriteString(skin.SkinColor);
-            WriteInt(0); //persona todo
-            WriteInt(0); //PieceTintColors
+            WriteInt(skin.PersonaPieces.Count());
+            foreach (var part in skin.PersonaPieces)
+            {
+                WriteString(part.PieceId);
+                WriteString(part.PieceType);
+                WriteString(part.PackId);
+                WriteBool(part.IsDefault);
+                WriteString(part.ProductId);
+            }
+            WriteInt(skin.PieceTintColors.Count());
+            foreach (var color in skin.PieceTintColors)
+            {
+                WriteString(color.Colors[0]);
+                WriteString(color.Colors[1]);
+                WriteString(color.Colors[2]);
+                WriteString(color.Colors[3]);
+            }
             WriteBool(skin.PremiumSkin);
             WriteBool(skin.PersonaSkin);
-            WriteBool(false);
             WriteBool(true);
+            WriteBool(false);
             WriteBool(false);
         }
 
@@ -421,7 +463,7 @@ namespace DaemonMC.Network
         public static int cached;
         public static int inUse;
 
-             public static PacketEncoder Get(Player player)
+     public static PacketEncoder Get(Player player)
      {
          return Get(player.ep);
      }

@@ -32,28 +32,6 @@ namespace DaemonMC.Level
         {
             foreach (Player onlinePlayer in onlinePlayers.Values)
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
-                var packet = new AddPlayer
-                {
-                    UUID = player.UUID,
-                    Username = player.Username,
-                    EntityId = player.EntityID,
-                    Position = player.Position,
-                    Metadata = player.metadata
-                };
-                packet.Encode(encoder);
-
-                PacketEncoder encoder2 = PacketEncoderPool.Get(player);
-                var packet2 = new AddPlayer
-                {
-                    UUID = onlinePlayer.UUID,
-                    Username = onlinePlayer.Username,
-                    EntityId = onlinePlayer.EntityID,
-                    Position = onlinePlayer.Position,
-                    Metadata = onlinePlayer.metadata
-                };
-                packet2.Encode(encoder2);
-
                 PacketEncoder encoder3 = PacketEncoderPool.Get(onlinePlayer);
                 var packet3 = new PlayerList
                 {
@@ -75,6 +53,30 @@ namespace DaemonMC.Level
                     Skin = onlinePlayer.Skin
                 };
                 packet4.Encode(encoder4);
+
+                if (onlinePlayer == player) { continue; }
+
+                PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
+                var packet = new AddPlayer
+                {
+                    UUID = player.UUID,
+                    Username = player.Username,
+                    EntityId = player.EntityID,
+                    Position = player.Position,
+                    Metadata = player.metadata
+                };
+                packet.Encode(encoder);
+
+                PacketEncoder encoder2 = PacketEncoderPool.Get(player);
+                var packet2 = new AddPlayer
+                {
+                    UUID = onlinePlayer.UUID,
+                    Username = onlinePlayer.Username,
+                    EntityId = onlinePlayer.EntityID,
+                    Position = onlinePlayer.Position,
+                    Metadata = onlinePlayer.metadata
+                };
+                packet2.Encode(encoder2);
             }
         }
 

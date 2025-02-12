@@ -103,7 +103,10 @@ namespace DaemonMC
             if (onlinePlayers.ContainsKey(id))
             {
                 var player = GetPlayer(id);
-                player.currentLevel.removePlayer(player);
+                if (player.currentLevel != null)
+                {
+                    player.currentLevel.removePlayer(player);
+                }
 
                 onlinePlayers.Remove(id);
                 availableIds.Enqueue(id);

@@ -206,6 +206,12 @@ namespace DaemonMC.Network
             return b;
         }
 
+        private void ReadBytes(byte[] data)
+        {
+            Array.Copy(buffer, readOffset, data, 0, data.Length);
+            readOffset += data.Length;
+        }
+
         public long ReadLong()
         {
             long value = BitConverter.ToInt64(buffer, readOffset);
@@ -342,6 +348,21 @@ namespace DaemonMC.Network
             }
 
             return value;
+        }
+
+        public Guid ReadUUID()
+        {
+            byte[] mostSignificantBits = new byte[8];
+            byte[] leastSignificantBits = new byte[8];
+
+            ReadBytes(mostSignificantBits);
+            ReadBytes(leastSignificantBits);
+
+            mostSignificantBits = mostSignificantBits.Reverse().ToArray();
+            leastSignificantBits = leastSignificantBits.Reverse().ToArray();
+
+            byte[] uuidBytes = mostSignificantBits.Concat(leastSignificantBits).ToArray();
+            return new Guid(uuidBytes);
         }
 
         public Vector3 ReadVec3()

@@ -32,7 +32,7 @@ namespace DaemonMC.Network.Bedrock
         public void Encode(PacketEncoder encoder)
         {
             encoder.PacketId(id);
-            encoder.WriteVarLong((ulong) EntityId);
+            encoder.WriteSignedVarLong(EntityId);
             encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteVarInt(GameMode);
             encoder.WriteVec3(Position);

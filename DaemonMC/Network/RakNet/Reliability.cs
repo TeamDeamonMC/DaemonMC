@@ -131,19 +131,17 @@
 
         private static byte[] ReassemblePacket(FragmentedPacket fragment)
         {
-            byte[] fullPacket = new byte[600000]; //todo better to know size of the packet
-            int offset = 0;
-
-            foreach (var part in fragment.Fragments)
+            using (MemoryStream stream = new MemoryStream())
             {
-                if (part != null)
+                foreach (var part in fragment.Fragments)
                 {
-                    Array.Copy(part, 0, fullPacket, offset, part.Length);
-                    offset += part.Length;
+                    if (part != null)
+                    {
+                        stream.Write(part, 0, part.Length);
+                    }
                 }
+                return stream.ToArray();
             }
-
-            return fullPacket;
         }
 
         public static void ReliabilityHandler(

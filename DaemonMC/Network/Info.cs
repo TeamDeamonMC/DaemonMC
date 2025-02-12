@@ -32,6 +32,7 @@
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
             GameRulesChanged = 72,
+            PlayerSkin = 93,
             MoveActorDelta = 111,
             NetworkChunkPublisherUpdate = 121,
             BiomeDefinitionList = 122,

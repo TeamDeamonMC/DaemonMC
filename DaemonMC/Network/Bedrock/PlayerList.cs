@@ -30,9 +30,9 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteByte(action);
             if (action == 0)
             {
-                encoder.WriteVarLong(1);
+                encoder.WriteVarInt(1);
                 encoder.WriteUUID(UUID);
-                encoder.WriteVarLong((ulong)EntityId);
+                encoder.WriteSignedVarLong(EntityId);
                 encoder.WriteString(Username);
                 encoder.WriteString(XUID);
                 encoder.WriteString(PlatformChatId);
@@ -41,6 +41,12 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(IsTeacher);
                 encoder.WriteBool(IsHost);
                 encoder.WriteBool(IsSubclient);
+                encoder.WriteBool(true);
+            }
+            else
+            {
+                encoder.WriteVarInt(1);
+                encoder.WriteUUID(UUID);
             }
             encoder.handlePacket();
         }

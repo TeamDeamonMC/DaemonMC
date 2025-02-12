@@ -17,11 +17,12 @@ namespace DaemonMC
     public class Player
     {
         public string Username { get; set; }
-        public Skin Skin { get; set; }
+        public Skin Skin { get; set; } = new Skin();
         public Guid UUID { get; set; } = new Guid();
         public string XUID { get; set; }
         public long EntityID { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
+        public Vector2 Rotation { get; set; } = new Vector2(0, 0);
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
         public World currentLevel { get; set; }
@@ -259,17 +260,18 @@ namespace DaemonMC
 
         public void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
         {
-            if (Position != packet.Position)
+            if (Position != packet.Position || Rotation != packet.Rotation)
             {
                 Position = packet.Position;
+                Rotation = packet.Rotation;
 
-                ushort header = 0; //todo
+                ushort header = 0;
                 header |= 0x01;
                 header |= 0x02;
                 header |= 0x04;
-                /*header |= 0x08;
+                header |= 0x08;
                 header |= 0x10;
-                header |= 0x20;*/
+                header |= 0x20;
 
                 foreach (Player player in currentLevel.onlinePlayers.Values)
                 {
@@ -279,7 +281,9 @@ namespace DaemonMC
                     {
                         EntityId = EntityID,
                         Header = header,
-                        Position = Position
+                        Position = Position,
+                        Rotation = Rotation,
+                        YheadRotation = packet.HeadRotation
                     };
                     movePk.Encode(encoder);
                 }

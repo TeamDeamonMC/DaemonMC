@@ -23,9 +23,9 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVarLong((ulong)EntityId);
             encoder.WriteShort(Header);
             encoder.WriteVec3(Position);
-            /*/encoder.WriteByte((byte)(Rotation.X / 1.40625));
+            encoder.WriteByte((byte)(Rotation.X / 1.40625));
             encoder.WriteByte((byte)(Rotation.Y / 1.40625));
-            encoder.WriteByte((byte)(YheadRotation / 1.40625));*/
+            encoder.WriteByte((byte)(YheadRotation / 1.40625));
             encoder.handlePacket();
         }
     }

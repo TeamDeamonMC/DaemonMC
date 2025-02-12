@@ -1,6 +1,8 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
+using DaemonMC.Network.Bedrock;
+using DaemonMC.Network;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 using Newtonsoft.Json;
@@ -73,31 +75,47 @@ namespace DaemonMC.Utils
 
             string publicKey = header["x5u"].ToString();
 
-            player.skin = new Skin()
+            try
             {
-                ArmSize = payload.ArmSize,
-                OverrideSkin = payload.OverrideSkin,
-                PersonaSkin = payload.PersonaSkin,
-                PlayFabId = payload.PlayFabId,
-                PremiumSkin = payload.PremiumSkin,
-                SkinAnimationData = payload.SkinAnimationData,
-                SkinColor = payload.SkinColor,
-                SkinData = payload.SkinData,
-                SkinGeometryData = payload.SkinGeometryData,
-                SkinGeometryDataEngineVersion = payload.SkinGeometryDataEngineVersion,
-                SkinId = payload.SkinId,
-                SkinImageHeight = payload.SkinImageHeight,
-                SkinImageWidth = payload.SkinImageWidth,
-                SkinResourcePatch = payload.SkinResourcePatch,
-                Cape = new Cape()
+                player.skin = new Skin()
                 {
-                    CapeData = payload.CapeData,
-                    CapeId = payload.CapeId,
-                    CapeImageHeight = payload.CapeImageHeight,
-                    CapeImageWidth = payload.CapeImageWidth,
-                    CapeOnClassicSkin = payload.CapeOnClassicSkin
-                }
-            };
+                    ArmSize = payload.ArmSize,
+                    AnimatedImageData = payload.AnimatedImageData,
+                    OverrideSkin = payload.OverrideSkin,
+                    PersonaPieces = payload.PersonaPieces,
+                    PersonaSkin = payload.PersonaSkin,
+                    PlayFabId = payload.PlayFabId,
+                    PremiumSkin = payload.PremiumSkin,
+                    SkinAnimationData = payload.SkinAnimationData,
+                    SkinColor = payload.SkinColor,
+                    PieceTintColors = payload.PieceTintColors,
+                    SkinData = Convert.FromBase64String(payload.SkinData),
+                    SkinGeometryData = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinGeometryData)),
+                    SkinGeometryDataEngineVersion = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinGeometryDataEngineVersion)),
+                    SkinId = payload.SkinId,
+                    SkinImageHeight = payload.SkinImageHeight,
+                    SkinImageWidth = payload.SkinImageWidth,
+                    SkinResourcePatch = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinResourcePatch)),
+                    Cape = new Cape()
+                    {
+                        CapeData = Convert.FromBase64String(payload.CapeData),
+                        CapeId = payload.CapeId,
+                        CapeImageHeight = payload.CapeImageHeight,
+                        CapeImageWidth = payload.CapeImageWidth,
+                        CapeOnClassicSkin = payload.CapeOnClassicSkin
+                    }
+                };
+            }
+            catch (FormatException ex)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var packet = new Disconnect
+                {
+                    message = $"Skin decoding failed"
+                };
+                packet.Encode(encoder);
+                Log.error($"Skin decoding failed: {ex.Message}");
+            }
 
             Log.debug($"Public Key (x5u): {publicKey}");
             Log.info($"{player.username} with client version {payload.GameVersion} doing login...");

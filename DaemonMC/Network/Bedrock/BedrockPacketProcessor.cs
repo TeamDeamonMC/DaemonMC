@@ -41,10 +41,11 @@ namespace DaemonMC.Network.Bedrock
         {
             LoginHandler.execute(packet, clientEp);
             var session = RakSessionManager.getSession(clientEp);
+            session.protocolVersion = packet.protocolVersion;
 
             Player player = new Player();
             player.Username = session.username;
-            player.UUID = new Guid(session.identity);
+            player.UUID = session.identity == null ? new Guid() : new Guid(session.identity);
             player.XUID = session.XUID;
             player.Skin = session.skin;
 

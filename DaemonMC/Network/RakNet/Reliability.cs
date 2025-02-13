@@ -249,6 +249,7 @@
                 encoder.SendPacket(128, false);
                 encoder.byteStream.SetLength(0);
                 encoder.byteStream.Position = 0;
+                RakSessionManager.getSession(encoder.clientEp).sequenceNumber++;
             }
             PacketEncoderPool.Return(encoder);
         }

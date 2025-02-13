@@ -1,7 +1,19 @@
-﻿namespace DaemonMC.Utils.Text
+﻿using System.Net;
+using DaemonMC.Network;
+
+namespace DaemonMC.Utils.Text
 {
     public class Log
     {
+        public static List<Info.Bedrock> ignoredPackets = new List<Info.Bedrock> {
+            Info.Bedrock.PlayerAuthInput,
+            Info.Bedrock.LevelChunk
+        };
+
+        public static List<Info.RakNet> ignoredRakPackets = new List<Info.RakNet> {
+            Info.RakNet.ACK
+        };
+
         public static bool debugMode = false;
         public static void debug(string message)
         {
@@ -11,6 +23,29 @@
                 Console.WriteLine($"[DEBUG] {message}");
                 Console.ResetColor();
             }
+        }
+        public static void packetIn(IPEndPoint clientEp, Info.RakNet id)
+        {
+            if (ignoredRakPackets.Contains(id)) { return; }
+            debug($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+        }
+
+        public static void packetOut(IPEndPoint clientEp, Info.RakNet id)
+        {
+            if (ignoredRakPackets.Contains(id)) { return; }
+            debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+        }
+
+        public static void packetIn(IPEndPoint clientEp, Info.Bedrock id)
+        {
+            if (ignoredPackets.Contains(id)) { return; }
+            debug($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+        }
+
+        public static void packetOut(IPEndPoint clientEp, Info.Bedrock id)
+        {
+            if (ignoredPackets.Contains(id)) { return; }
+            debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
         }
 
         public static void debug(int message)

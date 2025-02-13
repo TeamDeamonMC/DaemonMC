@@ -39,7 +39,7 @@ namespace DaemonMC.Network
 
                 var packetID = ToDataTypes.ReadVarInt(trimmedBuffer);
 
-                Log.debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {(Info.Bedrock)packetID}");
+                Log.packetOut(clientEp, (Info.Bedrock)packetID);
                 byte[] bedrockId = new byte[] { 254 };
 
                 if (RakSessionManager.getSession(clientEp) != null)
@@ -67,7 +67,7 @@ namespace DaemonMC.Network
                 return;
             }
 
-            Log.debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {(Info.RakNet)trimmedBuffer[0]}");
+            Log.packetOut(clientEp, (Info.RakNet)trimmedBuffer[0]);
 
             byteStream.SetLength(0);
             byteStream.Position = 0;
@@ -88,11 +88,10 @@ namespace DaemonMC.Network
             var clientIp = clientEp.Address.ToString();
 
             var clientPort = clientEp.Port;
-            if (pkid <= 127 || pkid >= 141) { Log.debug($"[Server] --> [{clientIp,-16}:{clientPort}] {(Info.RakNet)pkid}"); };
+            if (pkid <= 127 || pkid >= 141) { Log.packetOut(clientEp, (Info.RakNet)pkid); };
             byte[] trimmedBuffer = new byte[byteStream.Position];
             Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
             Server.Send(trimmedBuffer, clientEp);
-            RakSessionManager.getSession(clientEp).sequenceNumber++;
             if (pooled) { PacketEncoderPool.Return(this); }
         }
 

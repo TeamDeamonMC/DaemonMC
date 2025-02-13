@@ -26,11 +26,9 @@ namespace DaemonMC.Network
         public void RakDecoder(PacketDecoder decoder, int recv)
         {
             Server.datGrIn++;
-            var clientIp = decoder.endpoint.Address.ToString();
-            var clientPort = decoder.endpoint.Port;
 
             var pkid = decoder.ReadByte();
-            if (pkid <= 127 || pkid >= 141) { Log.debug($"[Server] <-- [{clientIp,-16}:{clientPort}] {(Info.RakNet)pkid}"); }
+            if (pkid <= 127 || pkid >= 141) { Log.packetIn(decoder.endpoint, (Info.RakNet)pkid); }
 
 
             if (pkid == UnconnectedPing.id)
@@ -75,7 +73,7 @@ namespace DaemonMC.Network
             {
                 PacketDecoder decoder = PacketDecoderPool.Get(buffer, decoderT.endpoint);
                 var pkid = decoder.ReadByte();
-                if (pkid != 254) { Log.debug($"[Server] <-- [{decoder.endpoint.Address,-16}:{decoder.endpoint.Port}] {(Info.RakNet)pkid}"); }
+                if (pkid != 254) { Log.packetIn(decoder.endpoint, (Info.RakNet)pkid); }
                 if (pkid == ConnectionRequest.id)
                 {
                     ConnectionRequest.Decode(decoder);
@@ -261,7 +259,6 @@ namespace DaemonMC.Network
         public string ReadString()
         {
             int length = ReadVarInt();
-            Log.error($"{length} {buffer.Count() - readOffset}");
             string str = Encoding.UTF8.GetString(buffer, readOffset, length);
             readOffset += length;
 

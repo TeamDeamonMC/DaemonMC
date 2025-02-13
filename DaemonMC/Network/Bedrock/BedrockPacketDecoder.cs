@@ -20,7 +20,7 @@ namespace DaemonMC.Network.Bedrock
             }
             var size = decoder.ReadVarInt(); //packet size
             var pkid = (Info.Bedrock) decoder.ReadVarInt();
-            Log.debug($"[Server] <-- [{decoder.endpoint.Address,-16}:{decoder.endpoint.Port}] {pkid}");
+            Log.packetIn(decoder.endpoint, pkid);
 
             switch (pkid)
             {

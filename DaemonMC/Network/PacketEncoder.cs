@@ -345,18 +345,20 @@ namespace DaemonMC.Network
                 WriteString(part.ProductId);
             }
             WriteInt(skin.PieceTintColors.Count());
-            foreach (var color in skin.PieceTintColors)
+            foreach (var part in skin.PieceTintColors)
             {
-                WriteString(color.Colors[0]);
-                WriteString(color.Colors[1]);
-                WriteString(color.Colors[2]);
-                WriteString(color.Colors[3]);
+                WriteString(part.PieceType);
+                WriteInt(part.Colors.Count());
+                foreach (var color in part.Colors)
+                {
+                    WriteString(color);
+                }
             }
             WriteBool(skin.PremiumSkin);
             WriteBool(skin.PersonaSkin);
-            WriteBool(true);
-            WriteBool(false);
-            WriteBool(false);
+            WriteBool(skin.CapeOnClassicSkin);
+            WriteBool(false); //todo whats this?
+            WriteBool(skin.OverrideSkin);
         }
 
         public void WriteMetadata(Dictionary<ActorData, Metadata> metadata)

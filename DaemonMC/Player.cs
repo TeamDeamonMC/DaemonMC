@@ -420,5 +420,24 @@ namespace DaemonMC
             }
             PluginManager.OnPlayerJoin(this);
         }
+
+        public void PacketEvent_PlayerSkin(PlayerSkin packet)
+        {
+            foreach (var dest in currentLevel.onlinePlayers)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                var pk = new PlayerSkin
+                {
+                    UUID = UUID,
+                    playerSkin = packet.playerSkin,
+                    Name = packet.Name,
+                    oldName = Skin.SkinId,
+                    Trusted = packet.Trusted,
+                };
+                pk.Encode(encoder);
+            }
+
+            Skin = packet.playerSkin;
+        }
     }
 }

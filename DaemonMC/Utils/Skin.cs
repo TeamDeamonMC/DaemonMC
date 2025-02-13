@@ -20,6 +20,7 @@
         public int SkinImageWidth { get; set; }
         public string SkinResourcePatch { get; set; } = "";
         public Cape Cape { get; set; } = new Cape();
+        public bool CapeOnClassicSkin { get; set; }
     }
 
     public class Cape

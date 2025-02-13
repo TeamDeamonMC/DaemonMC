@@ -96,6 +96,7 @@ namespace DaemonMC.Utils
                     SkinImageHeight = payload.SkinImageHeight,
                     SkinImageWidth = payload.SkinImageWidth,
                     SkinResourcePatch = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinResourcePatch)),
+                    CapeOnClassicSkin = payload.CapeOnClassicSkin,
                     Cape = new Cape()
                     {
                         CapeData = Convert.FromBase64String(payload.CapeData),

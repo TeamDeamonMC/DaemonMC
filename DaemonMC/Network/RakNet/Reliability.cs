@@ -4,12 +4,14 @@
     {
         public int TotalSize;
         public int ReceivedSize;
+        public int Count;
         public byte[][] Fragments;
 
         public FragmentedPacket(int totalSize, int fragmentCount)
         {
             TotalSize = totalSize;
             ReceivedSize = 0;
+            Count = 0;
             Fragments = new byte[fragmentCount][];
         }
     }
@@ -86,7 +88,7 @@
                     compIndex = decoder.ReadIntBE();
                 }
 
-                int lengthInBytes = (pLength + 7) / 8;
+                int lengthInBytes = (pLength + 7) >> 3;
                 byte[] body = new byte[lengthInBytes];
                 Array.Copy(decoder.buffer, decoder.readOffset, body, 0, lengthInBytes);
                 decoder.readOffset += lengthInBytes;
@@ -101,8 +103,9 @@
                     var fragment = fragmentedPackets[compId];
                     fragment.Fragments[compIndex] = body;
                     fragment.ReceivedSize += body.Length;
+                    fragment.Count++;
 
-                    if (compSize == compIndex+1)
+                    if (compSize == fragment.Count)
                     {
                         byte[] fullPacket = ReassemblePacket(fragment);
                         decoder.packetBuffers.Add(fullPacket);

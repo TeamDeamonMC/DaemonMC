@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Text;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network
@@ -206,10 +207,19 @@ namespace DaemonMC.Network
             return b;
         }
 
-        private void ReadBytes(byte[] data)
+        public void ReadBytes(byte[] data)
         {
             Array.Copy(buffer, readOffset, data, 0, data.Length);
             readOffset += data.Length;
+        }
+
+        public byte[] ReadBytes(int count)
+        {
+            byte[] result = new byte[count];
+            Array.Copy(buffer, readOffset, result, 0, count);
+            readOffset += count;
+
+            return result;
         }
 
         public long ReadLong()
@@ -251,6 +261,7 @@ namespace DaemonMC.Network
         public string ReadString()
         {
             int length = ReadVarInt();
+            Log.error($"{length} {buffer.Count() - readOffset}");
             string str = Encoding.UTF8.GetString(buffer, readOffset, length);
             readOffset += length;
 
@@ -384,6 +395,90 @@ namespace DaemonMC.Network
                 Y = ReadFloat()
             };
             return value;
+        }
+
+        public Skin ReadSkin()
+        {
+            Skin skin = new Skin();
+
+            skin.SkinId = ReadString();
+            skin.PlayFabId = ReadString();
+            skin.SkinResourcePatch = ReadString();
+            skin.SkinImageWidth = ReadInt();
+            skin.SkinImageHeight = ReadInt();
+            int skinDataLength = ReadVarInt();
+            skin.SkinData = ReadBytes(skinDataLength);
+
+            int animatedDataCount = ReadInt();
+            skin.AnimatedImageData = new List<AnimatedImageData>();
+
+            for (int i = 0; i < animatedDataCount; i++)
+            {
+                AnimatedImageData animation = new AnimatedImageData();
+                animation.ImageWidth = ReadInt();
+                animation.ImageHeight = ReadInt();
+                int imageDataLength = ReadVarInt();
+                animation.Image = Convert.ToBase64String(ReadBytes(imageDataLength));
+                animation.Type = ReadInt();
+                animation.Frames = ReadFloat();
+                animation.AnimationExpression = ReadInt();
+
+                skin.AnimatedImageData.Add(animation);
+            }
+
+            skin.Cape = new Cape();
+            skin.Cape.CapeImageWidth = ReadInt();
+            skin.Cape.CapeImageHeight = ReadInt();
+            int capeDataLength = ReadVarInt();
+            skin.Cape.CapeData = ReadBytes(capeDataLength);
+            skin.SkinGeometryData = ReadString();
+            skin.SkinGeometryDataEngineVersion = ReadString();
+            skin.SkinAnimationData = ReadString();
+            skin.Cape.CapeId = ReadString();
+            ReadString();
+            skin.ArmSize = ReadString();
+            skin.SkinColor = ReadString();
+
+            int personaPieceCount = ReadInt();
+            skin.PersonaPieces = new List<PersonaPiece>();
+
+            for (int i = 0; i < personaPieceCount; i++)
+            {
+                PersonaPiece part = new PersonaPiece();
+                part.PieceId = ReadString();
+                part.PieceType = ReadString();
+                part.PackId = ReadString();
+                part.IsDefault = ReadBool();
+                part.ProductId = ReadString();
+
+                skin.PersonaPieces.Add(part);
+            }
+
+            int pieceTintCount = ReadInt();
+            skin.PieceTintColors = new List<PieceTintColor>();
+
+            for (int i = 0; i < pieceTintCount; i++)
+            {
+                PieceTintColor part = new PieceTintColor();
+                part.PieceType = ReadString();
+                int colorCount = ReadInt();
+                part.Colors = new List<string>();
+
+                for (int j = 0; j < colorCount; j++)
+                {
+                    part.Colors.Add(ReadString());
+                }
+
+                skin.PieceTintColors.Add(part);
+            }
+
+            skin.PremiumSkin = ReadBool();
+            skin.PersonaSkin = ReadBool();
+            skin.CapeOnClassicSkin = ReadBool();
+            ReadBool(); // is primary user
+            skin.OverrideSkin = ReadBool();
+
+            return skin;
         }
 
         public List<TEnum> Read<TEnum>() where TEnum : Enum

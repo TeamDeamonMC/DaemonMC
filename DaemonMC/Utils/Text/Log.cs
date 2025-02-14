@@ -15,6 +15,7 @@ namespace DaemonMC.Utils.Text
         };
 
         public static bool debugMode = false;
+        public static bool pkLog = false;
         public static void debug(string message)
         {
             if (debugMode)
@@ -26,26 +27,34 @@ namespace DaemonMC.Utils.Text
         }
         public static void packetIn(IPEndPoint clientEp, Info.RakNet id)
         {
-            if (ignoredRakPackets.Contains(id)) { return; }
-            debug($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            if (ignoredRakPackets.Contains(id) || !pkLog) { return; }
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            Console.ResetColor();
         }
 
         public static void packetOut(IPEndPoint clientEp, Info.RakNet id)
         {
-            if (ignoredRakPackets.Contains(id)) { return; }
-            debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            if (ignoredRakPackets.Contains(id) || !pkLog) { return; }
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            Console.ResetColor();
         }
 
         public static void packetIn(IPEndPoint clientEp, Info.Bedrock id)
         {
-            if (ignoredPackets.Contains(id)) { return; }
-            debug($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            if (ignoredPackets.Contains(id) || !pkLog) { return; }
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            Console.ResetColor();
         }
 
         public static void packetOut(IPEndPoint clientEp, Info.Bedrock id)
         {
-            if (ignoredPackets.Contains(id)) { return; }
-            debug($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            if (ignoredPackets.Contains(id) || !pkLog) { return; }
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            Console.ResetColor();
         }
 
         public static void debug(int message)

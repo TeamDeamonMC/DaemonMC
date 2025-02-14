@@ -21,6 +21,8 @@ namespace DaemonMC
         public Guid UUID { get; set; } = new Guid();
         public string XUID { get; set; }
         public long EntityID { get; set; }
+        public long dataValue { get; set; }
+        public long Tick { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
         public int drawDistance { get; set; }
@@ -28,6 +30,7 @@ namespace DaemonMC
         public World currentLevel { get; set; }
         public AttributesValues attributes { get; set; } = new AttributesValues(0.1f);
         public Dictionary<ActorData, Metadata> metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public List<AuthInputData> InputData = new List<AuthInputData>();
 
         private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
         private bool SendQueueBusy = false;
@@ -44,7 +47,7 @@ namespace DaemonMC
             SendPlayStatus(3);
             SendGameRules();
             UpdateAttributes();
-            SendMetadata();
+            SendMetadata(true);
             currentLevel.addPlayer(this);
             Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
@@ -173,17 +176,36 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        public void SendMetadata()
+        public void SendMetadata(bool broadcast = false)
         {
-            metadata[ActorData.RESERVED_0] = new Metadata(844459290443776); //todo add dataflags
-
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
-            var packet = new SetActorData
+            if (dataValue == 0)
             {
-                EntityId = EntityID,
-                Metadata = metadata
-            };
-            packet.Encode(encoder);
+                setFlag(ActorFlags.ALWAYS_SHOW_NAME, true);
+                setFlag(ActorFlags.HAS_COLLISION, true);
+                setFlag(ActorFlags.HAS_GRAVITY, true);
+                setFlag(ActorFlags.FIRE_IMMUNE, true);
+            }
+
+            metadata[ActorData.RESERVED_0] = new Metadata(dataValue);
+
+            Dictionary<long, Player> players = new Dictionary<long, Player>(){ { EntityID, this } };
+
+            if (broadcast)
+            {
+                players = currentLevel.onlinePlayers;
+            }
+
+            foreach (var dest in players)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                var packet = new SetActorData
+                {
+                    EntityId = EntityID,
+                    Metadata = metadata,
+                    Tick = Tick
+                };
+                packet.Encode(encoder);
+            }
         }
 
         public void SendGameRules()
@@ -249,6 +271,38 @@ namespace DaemonMC
             movePk.Encode(encoder);
         }
 
+        public void setFlag(ActorFlags flag, bool enable)
+        {
+            if (enable)
+            {
+                dataValue |= (1L << (int)flag);
+            }
+            else
+            {
+                dataValue &= ~(1L << (int)flag);
+            }
+        }
+
+        public void updateFlags(List<AuthInputData> flags)
+        {
+            if (flags.Contains(AuthInputData.Sneaking))
+            {
+                setFlag(ActorFlags.SNEAKING, true);
+            }
+            if (flags.Contains(AuthInputData.StopSneaking))
+            {
+                setFlag(ActorFlags.SNEAKING, false);
+            }
+            if (flags.Contains(AuthInputData.StartSprinting))
+            {
+                setFlag(ActorFlags.SPRINTING, true);
+            }
+            if (flags.Contains(AuthInputData.StopSprinting))
+            {
+                setFlag(ActorFlags.SPRINTING, false);
+            }
+            SendMetadata(true);
+        }
 
 
         //
@@ -260,6 +314,13 @@ namespace DaemonMC
 
         public void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
         {
+            Tick = packet.Tick;
+            if (!InputData.SequenceEqual(packet.InputData))
+            {
+                Log.debug($"Data: {string.Join(" | ", packet.InputData)}");
+                updateFlags(packet.InputData);
+                InputData = packet.InputData;
+            }
             if (Position != packet.Position || Rotation != packet.Rotation)
             {
                 Position = packet.Position;
@@ -287,8 +348,6 @@ namespace DaemonMC
                     };
                     movePk.Encode(encoder);
                 }
-
-                Log.debug($"{packet.Position.X} : {packet.Position.Y} : {packet.Position.Z} Data: {string.Join(" | ", packet.InputData)}");
 
                 int currentChunkX = (int)Math.Floor(Position.X / 16.0);
                 int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);

@@ -12,6 +12,12 @@ namespace DaemonMC.Network.Bedrock
         public Vector2 MoveVector = new Vector2();
         public float HeadRotation = 0;
         public List<AuthInputData> InputData = new List<AuthInputData>();
+        public int InputMode = 0;
+        public int PlayMode = 0;
+        public int InteractionModel = 0;
+        public Vector2 InteractRotation = new Vector2();
+        public long Tick = 0;
+        public Vector2 PosDelta = new Vector2();
 
         public void Decode(PacketDecoder decoder)
         {
@@ -21,8 +27,13 @@ namespace DaemonMC.Network.Bedrock
                 Position = decoder.ReadVec3(),
                 MoveVector = decoder.ReadVec2(),
                 HeadRotation = decoder.ReadFloat(),
-                InputData = decoder.Read<AuthInputData>()
-
+                InputData = decoder.Read<AuthInputData>(),
+                InputMode = decoder.ReadVarInt(),
+                PlayMode = decoder.ReadVarInt(),
+                InteractionModel = decoder.ReadVarInt(),
+                InteractRotation = decoder.ReadVec2(),
+                Tick = decoder.ReadVarLong(),
+                PosDelta = decoder.ReadVec2(),
             };
 
             decoder.player.PacketEvent_PlayerAuthInput(packet);

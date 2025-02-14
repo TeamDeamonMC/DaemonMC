@@ -9,6 +9,7 @@ namespace DaemonMC.Network.Bedrock
 
         public long EntityId = 0;
         public Dictionary<ActorData, Metadata> Metadata = new Dictionary<ActorData, Metadata>();
+        public long Tick = 0;
 
         public void Decode(PacketDecoder decoder)
         {
@@ -22,7 +23,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteMetadata(Metadata);
             encoder.WriteVarInt(0);
             encoder.WriteVarInt(0); //todo here
-            encoder.WriteVarInt(0);
+            encoder.WriteVarLong((ulong) Tick);
             encoder.handlePacket();
         }
     }

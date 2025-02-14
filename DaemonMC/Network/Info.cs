@@ -22,6 +22,8 @@
             TextMessage = 9,
             StartGame = 11,
             AddPlayer = 12,
+            AddActor = 13,
+            RemoveActor = 14,
             MovePlayer = 19,
             UpdateAttributes = 29,
             Interact = 33,

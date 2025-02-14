@@ -5,8 +5,8 @@ namespace DaemonMC.Blocks
 {
     public abstract class Block
     {
-        protected string Name = "minecraft:air";
-        protected Dictionary<string, object> States = new Dictionary<string, object>();
+        public string Name { get; protected set; } = "minecraft:air";
+        public Dictionary<string, object> States { get; set; } = new Dictionary<string, object>();
 
         public int GetHash()
         {

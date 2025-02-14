@@ -21,7 +21,7 @@ namespace DaemonMC
         public Guid UUID { get; set; } = new Guid();
         public string XUID { get; set; }
         public long EntityID { get; set; }
-        public long dataValue { get; set; }
+        private long dataValue { get; set; }
         public long Tick { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
@@ -180,10 +180,10 @@ namespace DaemonMC
         {
             if (dataValue == 0)
             {
-                setFlag(ActorFlags.ALWAYS_SHOW_NAME, true);
-                setFlag(ActorFlags.HAS_COLLISION, true);
-                setFlag(ActorFlags.HAS_GRAVITY, true);
-                setFlag(ActorFlags.FIRE_IMMUNE, true);
+                SetFlag(ActorFlags.ALWAYS_SHOW_NAME, true);
+                SetFlag(ActorFlags.HAS_COLLISION, true);
+                SetFlag(ActorFlags.HAS_GRAVITY, true);
+                SetFlag(ActorFlags.FIRE_IMMUNE, true);
             }
 
             metadata[ActorData.RESERVED_0] = new Metadata(dataValue);
@@ -271,7 +271,7 @@ namespace DaemonMC
             movePk.Encode(encoder);
         }
 
-        public void setFlag(ActorFlags flag, bool enable)
+        public void SetFlag(ActorFlags flag, bool enable)
         {
             if (enable)
             {
@@ -281,27 +281,27 @@ namespace DaemonMC
             {
                 dataValue &= ~(1L << (int)flag);
             }
+            SendMetadata(true);
         }
 
-        public void updateFlags(List<AuthInputData> flags)
+        public void UpdateFlags(List<AuthInputData> flags)
         {
             if (flags.Contains(AuthInputData.Sneaking))
             {
-                setFlag(ActorFlags.SNEAKING, true);
+                SetFlag(ActorFlags.SNEAKING, true);
             }
             if (flags.Contains(AuthInputData.StopSneaking))
             {
-                setFlag(ActorFlags.SNEAKING, false);
+                SetFlag(ActorFlags.SNEAKING, false);
             }
             if (flags.Contains(AuthInputData.StartSprinting))
             {
-                setFlag(ActorFlags.SPRINTING, true);
+                SetFlag(ActorFlags.SPRINTING, true);
             }
             if (flags.Contains(AuthInputData.StopSprinting))
             {
-                setFlag(ActorFlags.SPRINTING, false);
+                SetFlag(ActorFlags.SPRINTING, false);
             }
-            SendMetadata(true);
         }
 
 
@@ -318,7 +318,7 @@ namespace DaemonMC
             if (!InputData.SequenceEqual(packet.InputData))
             {
                 Log.debug($"Data: {string.Join(" | ", packet.InputData)}");
-                updateFlags(packet.InputData);
+                UpdateFlags(packet.InputData);
                 InputData = packet.InputData;
             }
             if (Position != packet.Position || Rotation != packet.Rotation)

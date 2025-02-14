@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils;
@@ -14,6 +15,7 @@ namespace DaemonMC.Level
         public bool temporary;
         public string levelName;
         public Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
+        public Dictionary<long, Entity> Entities = new Dictionary<long, Entity>();
         public Dictionary<string, GameRule> GameRules = new Dictionary<string, GameRule>();
         public Database db;
         public string LevelDisplayName { get; set; } = "DaemonMC Temp World";
@@ -80,7 +82,7 @@ namespace DaemonMC.Level
             }
         }
 
-            public void removePlayer(Player player)
+        public void removePlayer(Player player)
         {
             if (!onlinePlayers.Remove(player.EntityID))
             {
@@ -88,6 +90,15 @@ namespace DaemonMC.Level
             }
             else
             {
+                foreach (var dest in onlinePlayers.Values)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(dest);
+                    var pk = new RemoveActor
+                    {
+                        EntityId = player.EntityID
+                    };
+                    pk.Encode(encoder);
+                }
                 Log.debug($"Despawned {player.Username} from World {player.currentLevel.levelName}");
             }
         }

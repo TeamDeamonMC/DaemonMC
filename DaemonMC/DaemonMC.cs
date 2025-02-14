@@ -1,7 +1,8 @@
 ﻿using DaemonMC.Utils.Text;
 using DaemonMC.Network;
 using DaemonMC.Network.Enumerations;
-
+using DaemonMC.Network.Bedrock;
+using DaemonMC.Utils.Game;
 namespace DaemonMC
 {
     public static class DaemonMC
@@ -47,10 +48,14 @@ namespace DaemonMC
                     Log.info("/shutdown - Close server");
                     Log.info("/dev - Debugging mode");
                     Log.info("/list - Player list");
+                    Log.info("/liste - Entity list");
                     Log.line();
                     break;
                 case "/list":
                     Playerlist();
+                    break;
+                case "/liste":
+                    Entitylist();
                     break;
                 case "/shutdown":
                     Server.ServerClose();
@@ -63,7 +68,8 @@ namespace DaemonMC
                     Log.info("Available commands:");
                     Log.line();
                     Log.info("/exit - Leave debugging mode");
-                    Log.info("/actorflags <ActorFlags (int)> <enable (bool)> - Modify specific actorflags for players");
+                    Log.info("/actorflags <EntityID (long)> <ActorFlags (int)> - Send specific actorflags value to entity or player");
+                    Log.info("/list - Spawned entities list");
                     Log.info("/pklog <enable (bool)> - Enable packet logger");
                     Command2();
                     break;
@@ -90,6 +96,28 @@ namespace DaemonMC
             Log.info(table);
         }
 
+        static void Entitylist()
+        {
+            string table = "\n\n";
+
+            table += string.Format("{0,-35} {1,-15} {2,-10}\n", "Entity", "EntityID", "World");
+            table += new string('-', 65) + "\n";
+
+            foreach (var world in Server.levels)
+            {
+                foreach (var entity in world.Entities.Values)
+                {
+                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", entity.ActorType, entity.EntityId, world.levelName);
+                }
+                foreach (var entity in world.onlinePlayers.Values)
+                {
+                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", $"minecraft:player ({entity.Username})", entity.EntityID, world.levelName);
+                }
+            }
+
+            Log.info(table);
+        }
+
         static void Command2()
         {
             string cmd = Console.ReadLine();
@@ -101,6 +129,9 @@ namespace DaemonMC
                     Log.warn("Leaving Debugging mode");
                     Command();
                     break;
+                case "/list":
+                    Entitylist();
+                    break;
                 case "/pklog":
                     if (parts.Length == 2 && bool.TryParse(parts[1], out bool boolValue))
                     {
@@ -108,17 +139,17 @@ namespace DaemonMC
                     }
                     else
                     {
-                        Log.error("Invalid usage. /pklog <enable (bool)>");
+                        Log.error("Invalid usage. /pklog <Enable (bool)>");
                     }
                     break;
                 case "/actorflags":
-                    if (parts.Length == 3 && int.TryParse(parts[1], out int actorDataId) && bool.TryParse(parts[2], out bool boolValue1))
+                    if (parts.Length == 3 && int.TryParse(parts[1], out int entityID) && int.TryParse(parts[2], out int actorDataId2))
                     {
-                        SendMetadata(actorDataId, boolValue1);
+                        SendMetadata2(actorDataId2, entityID);
                     }
                     else
                     {
-                        Log.error("Invalid usage. /actorflags <ActorFlags (int)> <enable (bool)>");
+                        Log.error("Invalid usage. /actorflags <EntityID (long)> <ActorFlags (int)>");
                     }
                     break;
                 default:
@@ -129,15 +160,22 @@ namespace DaemonMC
             Command2();
         }
 
-        public static void SendMetadata(int value, bool enable)
+        public static void SendMetadata2(int value, long entityID)
         {
+            long dataValue = 0;
+            dataValue |= (1L << value);
+
             foreach (var dest in Server.onlinePlayers)
             {
-                var player = dest.Value;
-                player.setFlag((ActorFlags)value, enable);
-                player.SendMetadata();
-                Log.info($"Updated actorflags {(ActorFlags)value}:{enable} for {player.Username}");
+                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                var packet = new SetActorData
+                {
+                    EntityId = entityID,
+                    Metadata = new Dictionary<ActorData, Metadata>() { { ActorData.RESERVED_0,  new Metadata(dataValue) } }
+                };
+                packet.Encode(encoder);
             }
+            Log.info($"Sent actorflags {(ActorFlags)value}:true for entity {entityID}");
         }
     }
 }

@@ -10,6 +10,7 @@ namespace DaemonMC
         public string worldName { get; set; } = "Nice new server";
         public string maxOnline { get; set; } = "10";
         public bool debug { get; set; } = false;
+        public string spawnWorld { get; set; } = "My World";
 
         public static void Set()
         {
@@ -30,6 +31,7 @@ namespace DaemonMC
             }
             else
             {
+                Log.info("Loading config: DaemonMC.yaml");
                 string fileContent = File.ReadAllText(configFile);
 
                 var deserializer = new DeserializerBuilder()
@@ -44,6 +46,7 @@ namespace DaemonMC
             DaemonMC.servername = config.serverName;
             DaemonMC.worldname = config.worldName;
             DaemonMC.maxOnline = config.maxOnline;
+            DaemonMC.defaultWorld = config.spawnWorld;
         }
     }
 }

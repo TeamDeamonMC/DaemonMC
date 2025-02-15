@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using DaemonMC.Level;
 using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
@@ -90,7 +91,17 @@ namespace DaemonMC.Network.Bedrock
             else if (packet.response == 4) //start game
             {
                 var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
-                player.currentLevel = Server.levels[0];
+
+                World spawnWorld = Server.levels.FirstOrDefault(w => w.levelName == DaemonMC.defaultWorld);
+                if (spawnWorld != null)
+                {
+                    player.currentLevel = spawnWorld;
+                }
+                else
+                {
+                    player.currentLevel = Server.levels[0];
+                }
+
                 if (!player.currentLevel.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
                 player.spawn();
             }

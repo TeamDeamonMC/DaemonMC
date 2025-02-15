@@ -181,7 +181,7 @@ namespace DaemonMC.Level
                                         string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
                                         if (stringVersion != Info.version)
                                         {
-                                            Log.error("Unsupported world version!");
+                                            Log.error($"Unsupported world version {stringVersion}!");
                                             Log.warn($"This server software doesn't support world format updating, please open Worlds/{levelName}.mcworld with Minecraft client {Info.version} and export mcworld file again to update world.");
                                             Server.crash = true;
                                         }

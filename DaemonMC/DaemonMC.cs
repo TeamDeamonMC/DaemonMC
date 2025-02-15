@@ -10,12 +10,11 @@ namespace DaemonMC
         public static string servername = "DaemonMC";
         public static string worldname = "Nice new server";
         public static string maxOnline = "10";
+        public static string defaultWorld = "My World";
         public static void Main()
         {
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnExit);
-
-            Config.Set();
 
             Console.WriteLine(" _____                                ______   ______ ");
             Console.WriteLine("(____ \\                              |  ___ \\ / _____)");
@@ -25,6 +24,8 @@ namespace DaemonMC
             Console.WriteLine("|_____/ \\_||_|\\____)_|_|_|\\___/|_| |_|_||_||_|\\______)");
             Console.WriteLine("");
             Log.info($"Setting up server for {maxOnline} players with Minecraft {Info.version}");
+
+            Config.Set();
 
             Thread serverThread = new Thread(new ThreadStart(Server.ServerF));
             serverThread.Start();

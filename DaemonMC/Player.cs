@@ -49,7 +49,7 @@ namespace DaemonMC
             UpdateAttributes();
             SendMetadata(true);
             currentLevel.addPlayer(this);
-            Log.info($"{Username} spawned at X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
+            Log.info($"{Username} spawned in World:'{currentLevel.levelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
         public void SendStartGame()

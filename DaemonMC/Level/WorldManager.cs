@@ -16,6 +16,18 @@ namespace DaemonMC.Level
             {
                 Server.levels.Add(new World(Path.GetFileNameWithoutExtension(file)));
             }
+
+            var matchingLevels = Server.levels
+                .Select((world, index) => new { World = world, Index = index })
+                .Where(w => w.World.levelName == DaemonMC.defaultWorld)
+                .ToList();
+
+            if (matchingLevels.Count == 0)
+            {
+                Log.warn($"World name {DaemonMC.defaultWorld} specified in DaemonMC.yaml not found in Worlds directory.");
+                Log.warn($"Check if DaemonMC.yaml 'spawnWorld' contains correct world name without extension.");
+                Log.warn($"Players will be spawned in next found available world.");
+            }
         }
     }
 }

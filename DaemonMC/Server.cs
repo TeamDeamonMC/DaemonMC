@@ -31,7 +31,7 @@ namespace DaemonMC
 
             PluginManager.LoadPlugins("Plugins");
 
-            levels.Add(new World("My World"));
+            WorldManager.LoadWorlds("Worlds");
 
             Log.info("Server listening on port 19132");
             Log.line();

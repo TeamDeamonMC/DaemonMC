@@ -13,7 +13,7 @@ namespace DaemonMC.Plugin.Plugin
             {
                 Log.warn($"{pluginDirectory}/ not found. Creating new folder...");
             }
-                Directory.CreateDirectory(pluginDirectory);
+            Directory.CreateDirectory(pluginDirectory);
 
 
             foreach (var file in Directory.GetFiles(pluginDirectory, "*.dll"))

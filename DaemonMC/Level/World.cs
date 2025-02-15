@@ -117,7 +117,16 @@ namespace DaemonMC.Level
 
                 if (subChunk != null)
                 {
-                    chunk.chunks.Add(ChunkUtils.DecodeSubChunk(subChunk));
+                    try
+                    {
+                        chunk.chunks.Add(ChunkUtils.DecodeSubChunk(subChunk));
+                    }
+                    catch(Exception ex)
+                    {
+                        Log.error($"Chunk x:{x}; z:{z} decoding failed. Fix this. Sent empty chunk");
+                        Log.error(ex.ToString());
+                        return chunk;
+                    }
                 }
                 else
                 {
@@ -136,7 +145,7 @@ namespace DaemonMC.Level
             }
             if (File.Exists($"Worlds/{levelName}.mcworld"))
             {
-                Log.info($"Loading world: {levelName}.mcworld");
+                Log.info($"Loading world: Worlds\\{levelName}.mcworld");
 
                 using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{levelName}.mcworld"))
                 {

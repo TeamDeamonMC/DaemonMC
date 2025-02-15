@@ -1,8 +1,8 @@
 ﻿namespace DaemonMC.Entities.VanillaEntities
 {
-    public class Player : Entity
+    public class PlayerEntity : Entity
     {
-        public Player()
+        public PlayerEntity()
         {
             ActorType = "minecraft:player";
         }

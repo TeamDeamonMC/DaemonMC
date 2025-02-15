@@ -38,7 +38,7 @@ namespace DaemonMC
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
 
-        public void spawn()
+        internal void spawn()
         {
             SendStartGame();
             SendItemData();
@@ -52,7 +52,7 @@ namespace DaemonMC
             Log.info($"{Username} spawned in World:'{currentLevel.levelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
-        public void SendStartGame()
+        internal void SendStartGame()
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new StartGame
@@ -74,7 +74,7 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        public void SendItemData()
+        internal void SendItemData()
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new ItemRegistry
@@ -84,7 +84,7 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        public void SendCreativeInventory()
+        internal void SendCreativeInventory()
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new CreativeContent
@@ -94,7 +94,7 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        public void SendBiomeDefinitionList()
+        internal void SendBiomeDefinitionList()
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new BiomeDefinitionList
@@ -176,7 +176,7 @@ namespace DaemonMC
             packet.Encode(encoder);
         }
 
-        public void SendMetadata(bool broadcast = false)
+        public void SendMetadata(bool broadcast = true)
         {
             if (dataValue == 0)
             {
@@ -244,6 +244,11 @@ namespace DaemonMC
                 message = msg
             };
             packet.Encode(encoder);
+            PacketEncoder encoder2 = PacketEncoderPool.Get(this);
+            var packet2 = new RakDisconnect
+            {
+            };
+            packet2.Encode(encoder2);
             Server.RemovePlayer((long)EntityID);
             RakSessionManager.deleteSession(ep);
         }
@@ -281,7 +286,6 @@ namespace DaemonMC
             {
                 dataValue &= ~(1L << (int)flag);
             }
-            SendMetadata(true);
         }
 
         public void UpdateFlags(List<AuthInputData> flags)
@@ -302,6 +306,7 @@ namespace DaemonMC
             {
                 SetFlag(ActorFlags.SPRINTING, false);
             }
+            SendMetadata(true);
         }
 
 
@@ -312,7 +317,7 @@ namespace DaemonMC
 
         private HashSet<(int x, int z)> sentChunks = new();
 
-        public void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
+        internal void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
         {
             Tick = packet.Tick;
             if (!InputData.SequenceEqual(packet.InputData))
@@ -391,7 +396,7 @@ namespace DaemonMC
             }
         }
 
-        public void PacketEvent_MovePlayer(MovePlayer packet)
+        internal void PacketEvent_MovePlayer(MovePlayer packet)
         {
             if (packet.position != Position)
             {
@@ -421,7 +426,7 @@ namespace DaemonMC
             }
         }
 
-        public void PacketEvent_RequestChunkRadius(RequestChunkRadius packet)
+        internal void PacketEvent_RequestChunkRadius(RequestChunkRadius packet)
         {
             Log.debug($"{Username} requested chunks with radius {packet.radius}. Max radius = {packet.maxRadius}");
 
@@ -456,7 +461,7 @@ namespace DaemonMC
             ProcessSendQueue();
         }
 
-        public void PacketEvent_Text(TextMessage packet)
+        internal void PacketEvent_Text(TextMessage packet)
         {
             foreach (var dest in currentLevel.onlinePlayers)
             {
@@ -471,7 +476,7 @@ namespace DaemonMC
             }
         }
 
-        public void PacketEvent_ServerboundLoadingScreen(ServerboundLoadingScreen packet)
+        internal void PacketEvent_ServerboundLoadingScreen(ServerboundLoadingScreen packet)
         {
             if (packet.screenType == 4)
             {
@@ -480,7 +485,7 @@ namespace DaemonMC
             PluginManager.OnPlayerJoin(this);
         }
 
-        public void PacketEvent_PlayerSkin(PlayerSkin packet)
+        internal void PacketEvent_PlayerSkin(PlayerSkin packet)
         {
             foreach (var dest in currentLevel.onlinePlayers)
             {

@@ -32,6 +32,19 @@ namespace DaemonMC.Level
 
         public void addPlayer(Player player)
         {
+            foreach (var entity in Entities.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(player);
+                var pk = new AddActor
+                {
+                    EntityId = entity.EntityId,
+                    ActorType = entity.ActorType,
+                    Position = entity.Position,
+                    Metadata = entity.Metadata
+                };
+                pk.Encode(encoder);
+            }
+
             foreach (Player onlinePlayer in onlinePlayers.Values)
             {
                 PacketEncoder encoder3 = PacketEncoderPool.Get(onlinePlayer);

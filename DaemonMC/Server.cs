@@ -29,9 +29,9 @@ namespace DaemonMC
 
             Palette.buildPalette();
 
-            PluginManager.LoadPlugins("Plugins");
-
             WorldManager.LoadWorlds("Worlds");
+
+            PluginManager.LoadPlugins("Plugins");
 
             Log.info("Server listening on port 19132");
             Log.line();
@@ -117,6 +117,20 @@ namespace DaemonMC
             return false;
         }
 
+        public static World GetWorld(string WorldName)
+        {
+            World world = levels.FirstOrDefault(w => w.levelName == WorldName);
+            if (world != null)
+            {
+                return world;
+            }
+            else
+            {
+                Log.error($"World with name {WorldName} not found");
+                return null;
+            }
+        }
+
         public static Player GetPlayer(long id)
         {
             if (onlinePlayers.ContainsKey(id))
@@ -126,6 +140,11 @@ namespace DaemonMC
             }
             Log.error($"No player found with EntityID {id}");
             return null;
+        }
+
+        public static Player[] GetOnlinePlayers()
+        {
+            return onlinePlayers.Values.ToArray();
         }
 
         public static void Send(byte[] trimmedBuffer, IPEndPoint client)

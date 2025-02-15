@@ -57,7 +57,7 @@ namespace DaemonMC.Entities
 
         public void Despawn()
         {
-            if (currentLevel.Entities.ContainsKey(EntityId))
+            if (currentLevel.Entities.Remove(EntityId))
             {
                 foreach (var player in currentLevel.onlinePlayers.Values)
                 {

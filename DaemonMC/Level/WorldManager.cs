@@ -1,4 +1,5 @@
-﻿using DaemonMC.Utils.Text;
+﻿using DaemonMC.Utils.Game;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Level
 {
@@ -15,6 +16,11 @@ namespace DaemonMC.Level
             foreach (string file in Directory.GetFiles(worldDirectory))
             {
                 Server.levels.Add(new World(Path.GetFileNameWithoutExtension(file)));
+            }
+
+            if(Server.levels.Count == 0)
+            {
+                Server.levels.Add(new World("Temp"));
             }
 
             var matchingLevels = Server.levels

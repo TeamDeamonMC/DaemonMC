@@ -1,7 +1,9 @@
 ﻿using System.IO.Compression;
+using System.Numerics;
 using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.Enumerations;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
@@ -28,6 +30,21 @@ namespace DaemonMC.Level
         {
             levelName = LevelName;
             load();
+        }
+
+        public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
+        {
+            foreach (var dest in onlinePlayers)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                var packet = new LevelEvent
+                {
+                    EventID = value,
+                    Position = pos,
+                    Data = data
+                };
+                packet.Encode(encoder);
+            }
         }
 
         public void addPlayer(Player player)

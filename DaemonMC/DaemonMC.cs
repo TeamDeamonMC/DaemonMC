@@ -3,6 +3,7 @@ using DaemonMC.Network;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Game;
+using System.Numerics;
 namespace DaemonMC
 {
     public static class DaemonMC
@@ -65,11 +66,12 @@ namespace DaemonMC
                     Log.line();
                     Log.warn("================== DaemonMC Debugging mode ==================");
                     Log.line();
-                    Log.warn("Warning: These commands are only for testing and shouldn't be used for production");
+                    Log.warn("Warning: These commands are only for testing and shouldn't be used for production servers");
                     Log.info("Available commands:");
                     Log.line();
                     Log.info("/exit - Leave debugging mode");
                     Log.info("/actorflags <EntityID (long)> <ActorFlags (int)> - Send specific actorflags value to entity or player");
+                    Log.info("/levelevent <Position (X Y Z)> <LevelEvents (int)> - Send specific level event to players");
                     Log.info("/list - Spawned entities list");
                     Log.info("/pklog <enable (bool)> - Enable packet logger");
                     Command2();
@@ -153,12 +155,37 @@ namespace DaemonMC
                         Log.error("Invalid usage. /actorflags <EntityID (long)> <ActorFlags (int)>");
                     }
                     break;
+                case "/levelevent":
+                    if (parts.Length == 5 && int.TryParse(parts[1], out int x) && int.TryParse(parts[2], out int y) && int.TryParse(parts[3], out int z) && int.TryParse(parts[4], out int eventData))
+                    {
+                        SendLevelEvent(eventData, new Vector3(x, y, z));
+                    }
+                    else
+                    {
+                        Log.error("Invalid usage. /levelevent <Position (X Y Z)> <LevelEvents (int)>");
+                    }
+                    break;
                 default:
                     Log.error("Unknown command");
                     Log.line();
                     break;
             }
             Command2();
+        }
+
+        public static void SendLevelEvent(int value, Vector3 pos)
+        {
+            foreach (var dest in Server.onlinePlayers)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                var packet = new LevelEvent
+                {
+                    EventID = (LevelEvents)value,
+                    Position = pos
+                };
+                packet.Encode(encoder);
+            }
+            Log.info($"Sent level event {(LevelEvents)value} for all players at position {pos.X}; {pos.Y}; {pos.Z}");
         }
 
         public static void SendMetadata2(int value, long entityID)

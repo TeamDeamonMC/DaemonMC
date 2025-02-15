@@ -25,6 +25,7 @@
             AddActor = 13,
             RemoveActor = 14,
             MovePlayer = 19,
+            LevelEvent = 25,
             UpdateAttributes = 29,
             Interact = 33,
             SetActorData = 39,

@@ -309,6 +309,18 @@ namespace DaemonMC
             SendMetadata(true);
         }
 
+        public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new LevelEvent
+            {
+                EventID = value,
+                Position = pos,
+                Data = data
+            };
+            packet.Encode(encoder);
+        }
+
 
         //
         //Packet processors for spawned player

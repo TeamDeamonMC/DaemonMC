@@ -21,7 +21,7 @@ namespace DaemonMC.Network.RakNet
         public static void Decode(PacketDecoder decoder)
         {
             var NACKs = new List<NACKdata>();
-            var count = decoder.ReadShort();
+            var count = decoder.ReadSignedShort();
             for (int i = 0; i < count; ++i)
             {
                 var NACK = new NACKdata();

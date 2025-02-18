@@ -3,6 +3,7 @@ using DaemonMC.Level;
 using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
+using System.Security.Cryptography;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -69,9 +70,8 @@ namespace DaemonMC.Network.Bedrock
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk1 = new ResourcePacksInfo
             {
-                force = false,
-                isAddon = false,
-                hasScripts = false,
+                force = ResourcePackManager.ForcePacks,
+                packs = Server.packs
             };
             pk1.Encode(encoder);
         }
@@ -79,12 +79,32 @@ namespace DaemonMC.Network.Bedrock
         public static void ResourcePackClientResponse(ResourcePackClientResponse packet, IPEndPoint clientEp)
         {
             Log.debug($"ResourcePackClientResponse = {packet.response}");
-            if (packet.response == 3)
+            if (packet.response == 2)
+            {
+                foreach (var pack in packet.packs)
+                {
+                    ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == pack.Substring(0, 36));
+
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new ResourcePackDataInfo
+                    {
+                        PackName = resourcePack.ContentId,
+                        ChunkSize = ResourcePackManager.ChunkSize,
+                        ChunkCount = (int)Math.Ceiling((double)resourcePack.PackContent.Length / ResourcePackManager.ChunkSize),
+                        PackSize = resourcePack.PackContent.Length,
+                        Hash = SHA256.Create().ComputeHash(resourcePack.PackContent),
+                        IsPremium = false,
+                        PackType = 6
+                    };
+                    pk.Encode(encoder);
+                }
+            }
+            else if (packet.response == 3)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new ResourcePackStack
                 {
-                    forceTexturePack = false,
+                    packs = Server.packs
                 };
                 pk.Encode(encoder);
             }
@@ -105,6 +125,21 @@ namespace DaemonMC.Network.Bedrock
                 if (!player.currentLevel.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
                 player.spawn();
             }
+        }
+
+        public static void ResourcePackChunkRequest(ResourcePackChunkRequest packet, IPEndPoint clientEp)
+        {
+            ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == packet.PackName);
+
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+            var pk = new ResourcePackChunkData
+            {
+                PackName = packet.PackName,
+                Chunk = packet.Chunk,
+                Offset = ResourcePackManager.ChunkSize * packet.Chunk,
+                Data = ResourcePackManager.GetData(packet.PackName, packet.Chunk)
+            };
+            pk.Encode(encoder);
         }
 
         public static void Interact(Interact packet)

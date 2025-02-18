@@ -41,7 +41,6 @@ namespace DaemonMC
 
         static void Command()
         {
-            Log.info("Type /help to see available commands");
             string cmd = Console.ReadLine();
             switch (cmd)
             {
@@ -77,7 +76,7 @@ namespace DaemonMC
                     Command2();
                     break;
                 default:
-                    Log.error("Unknown command");
+                    Log.error("Unknown command. Type /help to see available commands");
                     Log.line();
                     break;
             }

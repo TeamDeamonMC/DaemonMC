@@ -20,7 +20,7 @@ namespace DaemonMC.Network.RakNet
             {
                 Magic = decoder.ReadMagic(),
                 Address = decoder.ReadAddress(),
-                Mtu = decoder.ReadShort(),
+                Mtu = decoder.ReadSignedShort(),
                 ClientId = decoder.ReadLong()
             };
             RakPacketProcessor.OpenConnectionRequest2(packet, decoder.endpoint);

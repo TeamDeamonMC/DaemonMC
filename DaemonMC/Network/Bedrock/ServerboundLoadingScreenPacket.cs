@@ -5,14 +5,14 @@
         public Info.Bedrock id = Info.Bedrock.ServerboundLoadingScreen;
 
         public int screenType = 0;
-        public int screenId = 0;
+        public int? screenId = 0;
 
         public void Decode(PacketDecoder decoder)
         {
             var packet = new ServerboundLoadingScreen
             {
                 screenType = decoder.ReadVarInt(),
-                screenId = decoder.ReadInt()
+                screenId = decoder.ReadOptional(() => decoder.ReadInt())
             };
 
             decoder.player.PacketEvent_ServerboundLoadingScreen(packet);

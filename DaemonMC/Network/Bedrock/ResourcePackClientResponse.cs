@@ -5,14 +5,15 @@
         public Info.Bedrock id = Info.Bedrock.ResourcePackClientResponse;
 
         public byte response = 0;
+        public List<string> packs = new List<string>();
 
         public void Decode(PacketDecoder decoder)
         {
             var packet = new ResourcePackClientResponse
             {
                 response = decoder.ReadByte(),
+                packs = decoder.ReadPackNames()
             };
-            decoder.ReadShort();
             BedrockPacketProcessor.ResourcePackClientResponse(packet, decoder.endpoint);
         }
 

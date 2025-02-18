@@ -11,6 +11,7 @@ namespace DaemonMC.Network.Bedrock
         public bool hasScripts = false;
         public Guid templateUUID = new Guid();
         public string templateVersion = "";
+        public List<ResourcePack> packs = new List<ResourcePack>();
 
         public void Decode(byte[] buffer)
         {
@@ -28,7 +29,20 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteUUID(templateUUID);
                 encoder.WriteString(templateVersion);
             }
-            encoder.WriteShort(0);//texture packs
+            encoder.WriteShort((ushort) packs.Count());
+            foreach (var pack in packs)
+            {
+                encoder.WriteUUID(pack.UUID);
+                encoder.WriteString(pack.PackIdVersion);
+                encoder.WriteLong(pack.PackContent.Length);
+                encoder.WriteString(pack.ContentKey);
+                encoder.WriteString(pack.SubpackName);
+                encoder.WriteString(pack.ContentId);
+                encoder.WriteBool(pack.HasScripts);
+                encoder.WriteBool(pack.IsAddon);
+                encoder.WriteBool(pack.RayTracking);
+                encoder.WriteString(pack.CdnUrl);
+            }
             encoder.handlePacket();
         }
     }

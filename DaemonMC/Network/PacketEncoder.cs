@@ -169,7 +169,7 @@ namespace DaemonMC.Network
             byteStream.WriteByte(value);
         }
 
-        private void WriteBytes(byte[] data)
+        public void WriteBytes(byte[] data)
         {
             byteStream.Write(data, 0, data.Length);
         }

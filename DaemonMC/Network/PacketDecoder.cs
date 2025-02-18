@@ -63,6 +63,10 @@ namespace DaemonMC.Network
                     DataTypes.HexDump(buffer, recv);
                 }
             }
+            if (decoder.readOffset < recv)
+            {
+                Log.warn($"{recv - decoder.readOffset} bytes left while reading {(Info.RakNet)pkid}");
+            }
             packetHandler(decoder);
             PacketDecoderPool.Return(decoder);
         }
@@ -101,6 +105,10 @@ namespace DaemonMC.Network
                         Log.error($"[Server] Unknown RakNet packet2: {pkid}");
                     }
                 }
+                if (decoder.readOffset < decoder.buffer.Length && pkid != 254)
+                {
+                    Log.warn($"{decoder.buffer.Length - decoder.readOffset} bytes left while reading {(Info.RakNet)pkid}");
+                }
                 PacketDecoderPool.Return(decoder);
             }
         }
@@ -124,13 +132,6 @@ namespace DaemonMC.Network
             int a = BitConverter.ToInt32(buffer, readOffset);
             readOffset += 4;
             return a;
-        }
-
-        public uint ReadUInt()
-        {
-            uint value = BitConverter.ToUInt32(buffer, readOffset);
-            readOffset += 4;
-            return value;
         }
 
         public float ReadFloat()
@@ -177,7 +178,7 @@ namespace DaemonMC.Network
             return value;
         }
 
-        public short ReadShort()
+        public short ReadSignedShort()
         {
             short value = (short)((buffer[readOffset] << 8) | buffer[readOffset + 1]);
             readOffset += 2;
@@ -191,11 +192,11 @@ namespace DaemonMC.Network
             return value;
         }
 
-        public ushort ReadUShort()
+        public ushort ReadShort()
         {
             ushort value = (ushort)((buffer[readOffset] << 8) | buffer[readOffset + 1]);
             readOffset += 2;
-            return value;
+            return (ushort)((value >> 8) | (value << 8));
         }
 
         public byte ReadByte()
@@ -394,6 +395,17 @@ namespace DaemonMC.Network
             return value;
         }
 
+        public List<string> ReadPackNames()
+        {
+            List<string> packs = new List<string>();
+            ushort packCount = ReadShort();
+            for (int i = 0; i < packCount; i++)
+            {
+                packs.Add(ReadString());
+            }
+            return packs;
+        }
+
         public Skin ReadSkin()
         {
             Skin skin = new Skin();
@@ -476,6 +488,11 @@ namespace DaemonMC.Network
             skin.OverrideSkin = ReadBool();
 
             return skin;
+        }
+
+        public T? ReadOptional<T>(Func<T> readFunction) where T : struct
+        {
+            return ReadBool() ? readFunction() : (T?)null;
         }
 
         public List<TEnum> Read<TEnum>() where TEnum : Enum

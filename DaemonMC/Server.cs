@@ -19,6 +19,7 @@ namespace DaemonMC
         public static int datGrOut = 0;
         public static bool crash = false;
         public static List<World> levels = new List<World>();
+        public static List<ResourcePack> packs = new List<ResourcePack>();
 
         public static void ServerF()
         {
@@ -31,10 +32,13 @@ namespace DaemonMC
 
             WorldManager.LoadWorlds("Worlds");
 
+            ResourcePackManager.LoadPacks("Resource Packs");
+
             PluginManager.LoadPlugins("Plugins");
 
             Log.info("Server listening on port 19132");
             Log.line();
+            Log.info("Type /help to see available commands");
 
             Thread titleMonitor = new Thread(titleUpdate);
             titleMonitor.Start();

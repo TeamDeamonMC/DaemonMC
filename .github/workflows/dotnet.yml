@@ -30,4 +30,4 @@ jobs:
         tag_name: ${{ github.ref_name }}
         files: DaemonMC.zip
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.actionpat }}

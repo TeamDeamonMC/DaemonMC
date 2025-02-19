@@ -1,9 +1,20 @@
-﻿using DaemonMC.Network;
-
-namespace DaemonMC
+﻿namespace DaemonMC
 {
-    public static class ToDataTypes
+    public class ToDataTypes
     {
+        public static void HexDump(byte[] buffer, int lenght)
+        {
+            for (int i = 0; i < lenght; i++)
+            {
+                Console.Write(buffer[i].ToString("X2") + " ");
+                if ((i + 1) % 16 == 0)
+                {
+                    Console.WriteLine();
+                }
+            }
+            Console.WriteLine();
+        }
+
         public static byte[] GetByteSum(byte[] byte1, byte[] byte2)
         {
             var result = new byte[byte1.Length + byte2.Length];

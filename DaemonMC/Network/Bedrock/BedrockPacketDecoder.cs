@@ -68,10 +68,13 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.ResourcePackChunkRequest:
                         new ResourcePackChunkRequest().Decode(decoder);
                         break;
+                    case Info.Bedrock.CommandRequest:
+                        new CommandRequest().Decode(decoder);
+                        break;
 
                     default:
                         Log.error($"[Server] Unknown Bedrock packet: {pkid}");
-                        DataTypes.HexDump(decoder.buffer, decoder.buffer.Length);
+                        ToDataTypes.HexDump(decoder.buffer, decoder.buffer.Length);
                         break;
                 }
 

@@ -41,6 +41,7 @@ namespace DaemonMC
         internal void spawn()
         {
             SendStartGame();
+            SendCommands();
             SendItemData();
             SendCreativeInventory();
             SendBiomeDefinitionList();
@@ -70,6 +71,16 @@ namespace DaemonMC
                 Dimension = 0,
                 Seed = currentLevel.RandomSeed,
                 Generator = 1,
+            };
+            packet.Encode(encoder);
+        }
+
+        internal void SendCommands()
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(this);
+            var packet = new AvailableCommands
+            {
+                Commands = CommandManager.AvailableCommands
             };
             packet.Encode(encoder);
         }
@@ -514,6 +525,11 @@ namespace DaemonMC
             }
 
             Skin = packet.playerSkin;
+        }
+
+        internal void PacketEvent_CommandRequest(CommandRequest packet)
+        {
+            CommandManager.Execute(packet.Command.Substring(1), this);
         }
     }
 }

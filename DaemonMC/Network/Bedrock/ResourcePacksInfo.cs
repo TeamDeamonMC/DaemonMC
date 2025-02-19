@@ -1,6 +1,4 @@
-﻿using DaemonMC.Utils.Text;
-
-namespace DaemonMC.Network.Bedrock
+﻿namespace DaemonMC.Network.Bedrock
 {
     public class ResourcePacksInfo
     {

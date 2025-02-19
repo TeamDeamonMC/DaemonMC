@@ -35,6 +35,8 @@
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
             GameRulesChanged = 72,
+            AvailableCommands = 76,
+            CommandRequest = 77,
             ResourcePackDataInfo = 82,
             ResourcePackChunkData = 83,
             ResourcePackChunkRequest = 84,

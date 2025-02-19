@@ -60,7 +60,7 @@ namespace DaemonMC.Network
                 else
                 {
                     Log.error($"[Server] Unknown RakNet packet: {pkid}");
-                    DataTypes.HexDump(buffer, recv);
+                    ToDataTypes.HexDump(buffer, recv);
                 }
             }
             if (decoder.readOffset < recv)

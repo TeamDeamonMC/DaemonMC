@@ -17,7 +17,10 @@ namespace DaemonMC.Network.Bedrock
         public int InteractionModel = 0;
         public Vector2 InteractRotation = new Vector2();
         public long Tick = 0;
-        public Vector2 PosDelta = new Vector2();
+        public Vector3 PosDelta = new Vector3();
+        public Vector2 AnalogMove = new Vector2();
+        public Vector3 CameraOrientation = new Vector3();
+        public Vector2 RawMove = new Vector2();
 
         public void Decode(PacketDecoder decoder)
         {
@@ -33,7 +36,14 @@ namespace DaemonMC.Network.Bedrock
                 InteractionModel = decoder.ReadVarInt(),
                 InteractRotation = decoder.ReadVec2(),
                 Tick = decoder.ReadVarLong(),
-                PosDelta = decoder.ReadVec2(),
+                PosDelta = decoder.ReadVec3(),
+                //ItemUse =
+                //ItemStack =
+                //BlockActions = 
+                //PredictedVehicle =
+                AnalogMove = decoder.ReadVec2(),
+                CameraOrientation = decoder.ReadVec3(),
+                RawMove = decoder.ReadVec2()
             };
 
             decoder.player.PacketEvent_PlayerAuthInput(packet);

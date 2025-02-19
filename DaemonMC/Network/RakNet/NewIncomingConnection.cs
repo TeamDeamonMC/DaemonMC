@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
     public class NewIncomingConnectionPacket
     {

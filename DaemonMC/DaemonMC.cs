@@ -4,6 +4,7 @@ using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Game;
 using System.Numerics;
+using System.Reflection;
 namespace DaemonMC
 {
     public static class DaemonMC
@@ -12,17 +13,24 @@ namespace DaemonMC
         public static string worldname = "Nice new server";
         public static string maxOnline = "10";
         public static string defaultWorld = "My World";
+        internal static string version = "unknown";
+        internal static string gitHash = "unknown";
         public static void Main()
         {
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnExit);
+
+            var versionInfo = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+
+            version = versionInfo == null ? "unknown" : versionInfo.Split('+')[0];
+            gitHash = versionInfo == null ? "unknown" : versionInfo.Split('+')[1];
 
             Console.WriteLine(" _____                                ______   ______ ");
             Console.WriteLine("(____ \\                              |  ___ \\ / _____)");
             Console.WriteLine(" _   \\ \\ ____  ____ ____   ___  ____ | | _ | | /      ");
             Console.WriteLine("| |   | / _  |/ _  )    \\ / _ \\|  _ \\| || || | |      ");
             Console.WriteLine("| |__/ ( ( | ( (/ /| | | | |_| | | | | || || | \\_____ ");
-            Console.WriteLine("|_____/ \\_||_|\\____)_|_|_|\\___/|_| |_|_||_||_|\\______)");
+            Console.WriteLine($"|_____/ \\_||_|\\____)_|_|_|\\___/|_| |_|_||_||_|\\______) {version}");
             Console.WriteLine("");
             Log.info($"Setting up server for {maxOnline} players with Minecraft {Info.version}");
 

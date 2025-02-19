@@ -34,6 +34,8 @@ namespace DaemonMC
 
             ResourcePackManager.LoadPacks("Resource Packs");
 
+            CommandManager.RegisterBuiltinCommands();
+
             PluginManager.LoadPlugins("Plugins");
 
             Log.info("Server listening on port 19132");
@@ -172,4 +174,11 @@ namespace DaemonMC
             }
         }
     }
+
+    public class IPAddressInfo
+    {
+        public byte[] IPAddress { get; set; }
+        public ushort Port { get; set; }
+    }
+
 }

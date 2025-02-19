@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Reflection.PortableExecutable;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
     public class OpenConnectionRequest2Packet
     {

@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "Release" ]
+    branches: [ "release" ]
 
 jobs:
   build:

@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "release" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
@@ -15,19 +18,45 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        
+    - name: Extract version from .csproj
+      run: |
+        version=$(grep -oPm1 "(?<=<Version>)[^<]+" DaemonMC/DaemonMC.csproj)
+        echo "VERSION=$version" >> $GITHUB_ENV
+        
+    - name: Create Git Tag
+      run: |
+        VERSION=${{ env.VERSION }}
+        git tag $VERSION
+        git push origin $VERSION
+        
+    - name: Read releasenotes
+      run: |
+        description=$(head -n 10 releasenotes.txt)
+        echo "DESCRIPTION=$description" >> $GITHUB_ENV
+        
     - name: Restore dependencies
+      working-directory: DaemonMC
       run: dotnet restore
+      
     - name: Build
+      working-directory: DaemonMC
       run: dotnet build --no-restore
+      
     - name: Publish Application
-      run: dotnet publish -c Release -o out
+      working-directory: DaemonMC
+      run: dotnet publish -c Release -r win-x64 --no-restore -o DaemonMC
+      
     - name: Zip Published Application
-      run: zip -r DaemonMC.zip out/
+      working-directory: DaemonMC
+      run: zip -r DaemonMC.zip DaemonMC/
+      
     - name: Release
-      id: create_release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref_name }}
-        files: DaemonMC.zip
+        tag_name: ${{ env.VERSION }}
+        name: "DaemonMC ${{ env.VERSION }}"
+        body: ${{ env.DESCRIPTION }}
+        files: DaemonMC/DaemonMC.zip
       env:
         GITHUB_TOKEN: ${{ secrets.actionpat }}

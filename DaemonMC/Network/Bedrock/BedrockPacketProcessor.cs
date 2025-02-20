@@ -9,142 +9,140 @@ namespace DaemonMC.Network.Bedrock
 {
     public class BedrockPacketProcessor
     {
-        public static void RequestNetworkSettings(RequestNetworkSettings packet, IPEndPoint clientEp)
+        internal static void HandlePacket(Packet packet, IPEndPoint clientEp)
         {
-            Log.debug($"New player ({RakSessionManager.getSession(clientEp).GUID}) log in with protocol version: {packet.protocolVersion}");
-
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new NetworkSettings
+            if (packet is RequestNetworkSettings requestNetworkSettings)
             {
-                compressionThreshold = 0,
-                compressionAlgorithm = 0,
-                clientThrottleEnabled = false,
-                clientThrottleScalar = 0,
-                clientThrottleThreshold = 0
-            };
-            pk.Encode(encoder);
+                Log.debug($"New player ({RakSessionManager.getSession(clientEp).GUID}) log in with protocol version: {requestNetworkSettings.protocolVersion}");
 
-            RakSessionManager.Compression(clientEp, true);
-            RakSessionManager.getSession(clientEp).protocolVersion = packet.protocolVersion;
-
-            if (!Info.protocolVersion.Contains(packet.protocolVersion))
-            {
-                PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
-                var packet2 = new Disconnect
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new NetworkSettings
                 {
-                    message = $"Unsupported Minecraft version \nSupported protocol versions: {string.Join(", ", Info.protocolVersion)}"
+                    compressionThreshold = 0,
+                    compressionAlgorithm = 0,
+                    clientThrottleEnabled = false,
+                    clientThrottleScalar = 0,
+                    clientThrottleThreshold = 0
                 };
-                packet2.Encode(encoder2);
-                RakSessionManager.deleteSession(clientEp);
-            }
-        }
+                pk.EncodePacket(encoder);
 
-        public static void Login(Login packet, IPEndPoint clientEp)
-        {
-            LoginHandler.execute(packet, clientEp);
-            var session = RakSessionManager.getSession(clientEp);
-            session.protocolVersion = packet.protocolVersion;
+                RakSessionManager.Compression(clientEp, true);
+                RakSessionManager.getSession(clientEp).protocolVersion = requestNetworkSettings.protocolVersion;
 
-            Player player = new Player();
-            player.Username = session.username;
-            player.UUID = session.identity == null ? new Guid() : new Guid(session.identity);
-            player.XUID = session.XUID;
-            player.Skin = session.skin;
-
-            long EntityId = Server.AddPlayer(player, clientEp);
-            session.EntityID = EntityId;
-            player.EntityID = EntityId;
-        }
-
-        public static void PacketViolationWarning(PacketViolationWarning packet)
-        {
-            Log.error($"Client reported that server sent failed packet '{(Info.Bedrock)packet.packetId}'");
-            Log.error(packet.description);
-        }
-
-        public static void ClientCacheStatus(ClientCacheStatus packet, IPEndPoint clientEp)
-        {
-            var player = RakSessionManager.getSession(clientEp);
-            Log.debug($"{player.username} ClientCacheStatus = {packet.status}");
-
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk1 = new ResourcePacksInfo
-            {
-                force = ResourcePackManager.ForcePacks,
-                packs = Server.packs
-            };
-            pk1.Encode(encoder);
-        }
-
-        public static void ResourcePackClientResponse(ResourcePackClientResponse packet, IPEndPoint clientEp)
-        {
-            Log.debug($"ResourcePackClientResponse = {packet.response}");
-            if (packet.response == 2)
-            {
-                foreach (var pack in packet.packs)
+                if (!Info.protocolVersion.Contains(requestNetworkSettings.protocolVersion))
                 {
-                    ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == pack.Substring(0, 36));
-
-                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-                    var pk = new ResourcePackDataInfo
+                    PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
+                    var packet2 = new Disconnect
                     {
-                        PackName = resourcePack.ContentId,
-                        ChunkSize = ResourcePackManager.ChunkSize,
-                        ChunkCount = (int)Math.Ceiling((double)resourcePack.PackContent.Length / ResourcePackManager.ChunkSize),
-                        PackSize = resourcePack.PackContent.Length,
-                        Hash = SHA256.Create().ComputeHash(resourcePack.PackContent),
-                        IsPremium = false,
-                        PackType = 6
+                        message = $"Unsupported Minecraft version \nSupported protocol versions: {string.Join(", ", Info.protocolVersion)}"
                     };
-                    pk.Encode(encoder);
+                    packet2.EncodePacket(encoder2);
+                    RakSessionManager.deleteSession(clientEp);
                 }
             }
-            else if (packet.response == 3)
+
+            if (packet is Login login)
             {
+                LoginHandler.execute(login, clientEp);
+                var session = RakSessionManager.getSession(clientEp);
+                session.protocolVersion = login.protocolVersion;
+
+                Player player = new Player();
+                player.Username = session.username;
+                player.UUID = session.identity == null ? new Guid() : new Guid(session.identity);
+                player.XUID = session.XUID;
+                player.Skin = session.skin;
+
+                long EntityId = Server.AddPlayer(player, clientEp);
+                session.EntityID = EntityId;
+                player.EntityID = EntityId;
+            }
+
+            if (packet is PacketViolationWarning packetViolationWarning)
+            {
+                Log.error($"Client reported that server sent failed packet '{(Info.Bedrock)packetViolationWarning.packetId}'");
+                Log.error(packetViolationWarning.description);
+            }
+
+            if (packet is ClientCacheStatus clientCacheStatus)
+            {
+                var player = RakSessionManager.getSession(clientEp);
+                Log.debug($"{player.username} ClientCacheStatus = {clientCacheStatus.status}");
+
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-                var pk = new ResourcePackStack
+                var pk1 = new ResourcePacksInfo
                 {
+                    force = ResourcePackManager.ForcePacks,
                     packs = Server.packs
                 };
-                pk.Encode(encoder);
+                pk1.EncodePacket(encoder);
             }
-            else if (packet.response == 4) //start game
+
+            if (packet is ResourcePackClientResponse resourcePackClientResponse)
             {
-                var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
-
-                World spawnWorld = Server.levels.FirstOrDefault(w => w.levelName == DaemonMC.defaultWorld);
-                if (spawnWorld != null)
+                Log.debug($"ResourcePackClientResponse = {resourcePackClientResponse.response}");
+                if (resourcePackClientResponse.response == 2)
                 {
-                    player.currentLevel = spawnWorld;
-                }
-                else
-                {
-                    player.currentLevel = Server.levels[0];
-                }
+                    foreach (var pack in resourcePackClientResponse.packs)
+                    {
+                        ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == pack.Substring(0, 36));
 
-                if (!player.currentLevel.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
-                player.spawn();
+                        PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                        var pk = new ResourcePackDataInfo
+                        {
+                            PackName = resourcePack.ContentId,
+                            ChunkSize = ResourcePackManager.ChunkSize,
+                            ChunkCount = (int)Math.Ceiling((double)resourcePack.PackContent.Length / ResourcePackManager.ChunkSize),
+                            PackSize = resourcePack.PackContent.Length,
+                            Hash = SHA256.Create().ComputeHash(resourcePack.PackContent),
+                            IsPremium = false,
+                            PackType = 6
+                        };
+                        pk.EncodePacket(encoder);
+                    }
+                }
+                else if (resourcePackClientResponse.response == 3)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new ResourcePackStack
+                    {
+                        packs = Server.packs
+                    };
+                    pk.EncodePacket(encoder);
+                }
+                else if (resourcePackClientResponse.response == 4) //start game
+                {
+                    var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
+
+                    World spawnWorld = Server.levels.FirstOrDefault(w => w.levelName == DaemonMC.defaultWorld);
+                    if (spawnWorld != null)
+                    {
+                        player.currentLevel = spawnWorld;
+                    }
+                    else
+                    {
+                        player.currentLevel = Server.levels[0];
+                    }
+
+                    if (!player.currentLevel.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
+                    player.spawn();
+                }
             }
-        }
 
-        public static void ResourcePackChunkRequest(ResourcePackChunkRequest packet, IPEndPoint clientEp)
-        {
-            ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == packet.PackName);
-
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new ResourcePackChunkData
+            if (packet is ResourcePackChunkRequest resourcePackChunkRequest)
             {
-                PackName = packet.PackName,
-                Chunk = packet.Chunk,
-                Offset = ResourcePackManager.ChunkSize * packet.Chunk,
-                Data = ResourcePackManager.GetData(packet.PackName, packet.Chunk)
-            };
-            pk.Encode(encoder);
-        }
+                ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == resourcePackChunkRequest.PackName);
 
-        public static void Interact(Interact packet)
-        {
-            //Log.debug($"Action for {packet.actorRuntimeId} / {packet.action}");
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new ResourcePackChunkData
+                {
+                    PackName = resourcePackChunkRequest.PackName,
+                    Chunk = resourcePackChunkRequest.Chunk,
+                    Offset = ResourcePackManager.ChunkSize * resourcePackChunkRequest.Chunk,
+                    Data = ResourcePackManager.GetData(resourcePackChunkRequest.PackName, resourcePackChunkRequest.Chunk)
+                };
+                pk.EncodePacket(encoder);
+            }
         }
     }
 }

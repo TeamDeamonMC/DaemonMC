@@ -1,14 +1,14 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class Example : Packet
+    public class SetLocalPlayerAsInitialized : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.Example;
+        public override Info.Bedrock Id => Info.Bedrock.SetLocalPlayerAsInitialized;
 
-        public int variable = 0;
+        public long EntityID = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            EntityID = decoder.ReadVarLong();
         }
 
         protected override void Encode(PacketEncoder encoder)

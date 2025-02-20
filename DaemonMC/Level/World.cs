@@ -43,7 +43,7 @@ namespace DaemonMC.Level
                     Position = pos,
                     Data = data
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
             }
         }
 
@@ -59,7 +59,7 @@ namespace DaemonMC.Level
                     Position = entity.Position,
                     Metadata = entity.Metadata
                 };
-                pk.Encode(encoder);
+                pk.EncodePacket(encoder);
             }
 
             foreach (Player onlinePlayer in onlinePlayers.Values)
@@ -73,7 +73,7 @@ namespace DaemonMC.Level
                     XUID = player.XUID,
                     Skin = player.Skin
                 };
-                packet3.Encode(encoder3);
+                packet3.EncodePacket(encoder3);
 
                 PacketEncoder encoder4 = PacketEncoderPool.Get(player);
                 var packet4 = new PlayerList
@@ -84,7 +84,7 @@ namespace DaemonMC.Level
                     XUID = onlinePlayer.XUID,
                     Skin = onlinePlayer.Skin
                 };
-                packet4.Encode(encoder4);
+                packet4.EncodePacket(encoder4);
 
                 if (onlinePlayer == player) { continue; }
 
@@ -97,7 +97,7 @@ namespace DaemonMC.Level
                     Position = player.Position,
                     Metadata = player.metadata
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
 
                 PacketEncoder encoder2 = PacketEncoderPool.Get(player);
                 var packet2 = new AddPlayer
@@ -108,7 +108,7 @@ namespace DaemonMC.Level
                     Position = onlinePlayer.Position,
                     Metadata = onlinePlayer.metadata
                 };
-                packet2.Encode(encoder2);
+                packet2.EncodePacket(encoder2);
             }
         }
 
@@ -127,7 +127,7 @@ namespace DaemonMC.Level
                     {
                         EntityId = player.EntityID
                     };
-                    pk.Encode(encoder);
+                    pk.EncodePacket(encoder);
                 }
                 Log.debug($"Despawned {player.Username} from World {player.currentLevel.levelName}");
             }

@@ -42,6 +42,7 @@
             ResourcePackChunkRequest = 84,
             PlayerSkin = 93,
             MoveActorDelta = 111,
+            SetLocalPlayerAsInitialized = 113,
             NetworkChunkPublisherUpdate = 121,
             BiomeDefinitionList = 122,
             ClientCacheStatus = 129,

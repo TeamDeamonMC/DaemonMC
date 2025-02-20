@@ -1,21 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class PlayStatus
+    public class PlayStatus : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.PlayStatus;
+        public override Info.Bedrock Id => Info.Bedrock.PlayStatus;
 
         public int status = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteIntBE(status);
-            encoder.handlePacket();
         }
     }
 }

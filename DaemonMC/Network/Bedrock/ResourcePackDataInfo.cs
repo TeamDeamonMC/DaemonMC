@@ -2,9 +2,9 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePackDataInfo
+    public class ResourcePackDataInfo : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ResourcePackDataInfo;
+        public override Info.Bedrock Id => Info.Bedrock.ResourcePackDataInfo;
 
         public string PackName = "";
         public int ChunkSize = 0;
@@ -14,14 +14,13 @@ namespace DaemonMC.Network.Bedrock
         public bool IsPremium = false;
         public byte PackType = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteString(PackName);
             encoder.WriteInt(ChunkSize);
             encoder.WriteInt(ChunkCount);
@@ -30,7 +29,6 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteBytes(Hash);
             encoder.WriteBool(IsPremium);
             encoder.WriteByte(PackType);
-            encoder.handlePacket();
         }
     }
 }

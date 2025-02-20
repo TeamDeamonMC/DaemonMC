@@ -3,9 +3,9 @@ using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class PlayerList
+    public class PlayerList : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.PlayerList;
+        public override Info.Bedrock Id => Info.Bedrock.PlayerList;
 
         public byte action = 0;
         public Guid UUID = new Guid();
@@ -19,14 +19,13 @@ namespace DaemonMC.Network.Bedrock
         public bool IsHost = false;
         public bool IsSubclient = false;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteByte(action);
             if (action == 0)
             {
@@ -48,7 +47,6 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteVarInt(1);
                 encoder.WriteUUID(UUID);
             }
-            encoder.handlePacket();
         }
     }
 }

@@ -1,29 +1,24 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
 
-    public class PacketViolationWarning
+    public class PacketViolationWarning : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.PacketViolationWarning;
+        public override Info.Bedrock Id => Info.Bedrock.PacketViolationWarning;
 
         public int type = 0;
         public int serverity = 0;
         public int packetId = 0;
         public string description = "";
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new PacketViolationWarning
-            {
-                type = decoder.ReadSignedVarInt(),
-                serverity = decoder.ReadSignedVarInt(),
-                packetId = decoder.ReadSignedVarInt(),
-                description = decoder.ReadString(),
-            };
-
-            BedrockPacketProcessor.PacketViolationWarning(packet);
+            type = decoder.ReadSignedVarInt();
+            serverity = decoder.ReadSignedVarInt();
+            packetId = decoder.ReadSignedVarInt();
+            description = decoder.ReadString();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

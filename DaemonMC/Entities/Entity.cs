@@ -49,7 +49,7 @@ namespace DaemonMC.Entities
                     Position = Position,
                     Metadata = Metadata
                 };
-                pk.Encode(encoder);
+                pk.EncodePacket(encoder);
             }
 
             Log.debug($"Spawned {ActorType} with entityID {EntityId} in {world.levelName}");
@@ -66,7 +66,7 @@ namespace DaemonMC.Entities
                     {
                         EntityId = EntityId,
                     };
-                    pk.Encode(encoder);
+                    pk.EncodePacket(encoder);
                 }
                 Server.availableIds.Enqueue(EntityId);
                 Log.debug($"Despawned {ActorType} with entityID {EntityId} in {currentLevel.levelName}");
@@ -98,7 +98,7 @@ namespace DaemonMC.Entities
                     Header = header,
                     Position = Position
                 };
-                movePk.Encode(encoder);
+                movePk.EncodePacket(encoder);
             }
         }
 
@@ -114,7 +114,7 @@ namespace DaemonMC.Entities
                     EntityId = EntityId,
                     Metadata = Metadata
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
             }
         }
 

@@ -3,9 +3,9 @@ using DaemonMC.Network.Enumerations;
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class PlayerAuthInput
+    public class PlayerAuthInput : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.PlayerAuthInput;
+        public override Info.Bedrock Id => Info.Bedrock.PlayerAuthInput;
 
         public Vector2 Rotation = new Vector2();
         public Vector3 Position = new Vector3();
@@ -22,37 +22,31 @@ namespace DaemonMC.Network.Bedrock
         public Vector3 CameraOrientation = new Vector3();
         public Vector2 RawMove = new Vector2();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new PlayerAuthInput
-            {
-                Rotation = decoder.ReadVec2(),
-                Position = decoder.ReadVec3(),
-                MoveVector = decoder.ReadVec2(),
-                HeadRotation = decoder.ReadFloat(),
-                InputData = decoder.Read<AuthInputData>(),
-                InputMode = decoder.ReadVarInt(),
-                PlayMode = decoder.ReadVarInt(),
-                InteractionModel = decoder.ReadVarInt(),
-                InteractRotation = decoder.ReadVec2(),
-                Tick = decoder.ReadVarLong(),
-                PosDelta = decoder.ReadVec3(),
-                //ItemUse =
-                //ItemStack =
-                //BlockActions = 
-                //PredictedVehicle =
-                AnalogMove = decoder.ReadVec2(),
-                CameraOrientation = decoder.ReadVec3(),
-                RawMove = decoder.ReadVec2()
-            };
-
-            decoder.player.PacketEvent_PlayerAuthInput(packet);
+            Rotation = decoder.ReadVec2();
+            Position = decoder.ReadVec3();
+            MoveVector = decoder.ReadVec2();
+            HeadRotation = decoder.ReadFloat();
+            InputData = decoder.Read<AuthInputData>();
+            InputMode = decoder.ReadVarInt();
+            PlayMode = decoder.ReadVarInt();
+            InteractionModel = decoder.ReadVarInt();
+            InteractRotation = decoder.ReadVec2();
+            Tick = decoder.ReadVarLong();
+            PosDelta = decoder.ReadVec3();
+            //ItemUse =
+            //ItemStack =
+            //BlockActions = 
+            //PredictedVehicle =
+            AnalogMove = decoder.ReadVec2();
+            CameraOrientation = decoder.ReadVec3();
+            RawMove = decoder.ReadVec2();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
-            encoder.handlePacket();
+
         }
     }
 }

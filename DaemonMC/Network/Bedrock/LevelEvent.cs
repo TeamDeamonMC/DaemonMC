@@ -3,26 +3,24 @@ using DaemonMC.Network.Enumerations;
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class LevelEvent
+    public class LevelEvent : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.LevelEvent;
+        public override Info.Bedrock Id => Info.Bedrock.LevelEvent;
 
         public LevelEvents EventID = LevelEvents.Undefined;
         public Vector3 Position = new Vector3();
         public int Data = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteSignedVarInt((int)EventID);
             encoder.WriteVec3(Position);
             encoder.WriteSignedVarInt(Data);
-            encoder.handlePacket();
         }
     }
 }

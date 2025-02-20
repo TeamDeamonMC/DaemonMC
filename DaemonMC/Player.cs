@@ -72,7 +72,7 @@ namespace DaemonMC
                 Seed = currentLevel.RandomSeed,
                 Generator = 1,
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         internal void SendCommands()
@@ -82,7 +82,7 @@ namespace DaemonMC
             {
                 Commands = CommandManager.AvailableCommands
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         internal void SendItemData()
@@ -92,7 +92,7 @@ namespace DaemonMC
             {
 
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         internal void SendCreativeInventory()
@@ -102,7 +102,7 @@ namespace DaemonMC
             {
 
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         internal void SendBiomeDefinitionList()
@@ -119,7 +119,7 @@ namespace DaemonMC
                     }
                 }
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         public void SendPlayStatus(int status)
@@ -129,7 +129,7 @@ namespace DaemonMC
             {
                 status = status,
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         public void SendChunkToPlayer(int chunkX, int chunkZ)
@@ -162,7 +162,7 @@ namespace DaemonMC
                 count = chunkCount,
                 data = chunkData.ToArray()
             };
-            chunk.Encode(encoder);
+            chunk.EncodePacket(encoder);
         }
 
         public void UpdateChunkRadius(int radius)
@@ -173,7 +173,7 @@ namespace DaemonMC
             {
                 radius = drawDistance,
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         public void UpdateAttributes()
@@ -184,7 +184,7 @@ namespace DaemonMC
                 EntityId = EntityID,
                 Attributes = new List<AttributeValue> { attributes.Movement_speed() }
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         public void SendMetadata(bool broadcast = true)
@@ -215,7 +215,7 @@ namespace DaemonMC
                     Metadata = metadata,
                     Tick = Tick
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
             }
         }
 
@@ -226,7 +226,7 @@ namespace DaemonMC
             {
                 GameRules = currentLevel.GameRules
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
 
         private async void ProcessSendQueue()
@@ -254,7 +254,7 @@ namespace DaemonMC
             {
                 message = msg
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
             PacketEncoder encoder2 = PacketEncoderPool.Get(this);
             var packet2 = new RakDisconnect
             {
@@ -272,7 +272,7 @@ namespace DaemonMC
                 messageType = 1,
                 Message = message
             };
-            pk.Encode(encoder);
+            pk.EncodePacket(encoder);
         }
 
         public void Teleport(Vector3 position)
@@ -284,7 +284,7 @@ namespace DaemonMC
                 actorRuntimeId = EntityID,
                 position = position
             };
-            movePk.Encode(encoder);
+            movePk.EncodePacket(encoder);
         }
 
         public void SetFlag(ActorFlags flag, bool enable)
@@ -329,207 +329,174 @@ namespace DaemonMC
                 Position = pos,
                 Data = data
             };
-            packet.Encode(encoder);
+            packet.EncodePacket(encoder);
         }
-
-
-        //
-        //Packet processors for spawned player
-        //
-
 
         private HashSet<(int x, int z)> sentChunks = new();
 
-        internal void PacketEvent_PlayerAuthInput(PlayerAuthInput packet)
+        internal void HandlePacket(Packet packet)
         {
-            Tick = packet.Tick;
-            if (!InputData.SequenceEqual(packet.InputData))
+            if (packet is PlayerAuthInput playerAuthInput)
             {
-                Log.debug($"Data: {string.Join(" | ", packet.InputData)}");
-                UpdateFlags(packet.InputData);
-                InputData = packet.InputData;
-            }
-            if (Position != packet.Position || Rotation != packet.Rotation)
-            {
-                Position = packet.Position;
-                Rotation = packet.Rotation;
-
-                ushort header = 0;
-                header |= 0x01;
-                header |= 0x02;
-                header |= 0x04;
-                header |= 0x08;
-                header |= 0x10;
-                header |= 0x20;
-
-                foreach (Player player in currentLevel.onlinePlayers.Values)
+                Tick = playerAuthInput.Tick;
+                if (!InputData.SequenceEqual(playerAuthInput.InputData))
                 {
-                    if (player == this) { continue; }
-                    PacketEncoder encoder = PacketEncoderPool.Get(player);
-                    var movePk = new MoveActorDelta
-                    {
-                        EntityId = EntityID,
-                        Header = header,
-                        Position = Position,
-                        Rotation = Rotation,
-                        YheadRotation = packet.HeadRotation
-                    };
-                    movePk.Encode(encoder);
+                    Log.debug($"Data: {string.Join(" | ", playerAuthInput.InputData)}");
+                    UpdateFlags(playerAuthInput.InputData);
+                    InputData = playerAuthInput.InputData;
                 }
+                if (Position != playerAuthInput.Position || Rotation != playerAuthInput.Rotation)
+                {
+                    Position = playerAuthInput.Position;
+                    Rotation = playerAuthInput.Rotation;
 
-                int currentChunkX = (int)Math.Floor(Position.X / 16.0);
-                int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
+                    ushort header = 0;
+                    header |= 0x01;
+                    header |= 0x02;
+                    header |= 0x04;
+                    header |= 0x08;
+                    header |= 0x10;
+                    header |= 0x20;
 
-                if (currentChunkX == LastChunkX && currentChunkZ == LastChunkZ)
-                    return; // No movement, no update needed
+                    foreach (Player player in currentLevel.onlinePlayers.Values)
+                    {
+                        if (player == this) { continue; }
+                        PacketEncoder encoder = PacketEncoderPool.Get(player);
+                        var movePk = new MoveActorDelta
+                        {
+                            EntityId = EntityID,
+                            Header = header,
+                            Position = Position,
+                            Rotation = Rotation,
+                            YheadRotation = playerAuthInput.HeadRotation
+                        };
+                        movePk.EncodePacket(encoder);
+                    }
 
-                LastChunkX = currentChunkX;
-                LastChunkZ = currentChunkZ;
+                    int currentChunkX = (int)Math.Floor(Position.X / 16.0);
+                    int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
+
+                    if (currentChunkX == LastChunkX && currentChunkZ == LastChunkZ)
+                        return; // No movement, no update needed
+
+                    LastChunkX = currentChunkX;
+                    LastChunkZ = currentChunkZ;
+
+                    PacketEncoder encoder2 = PacketEncoderPool.Get(this);
+                    var packet2 = new NetworkChunkPublisherUpdate
+                    {
+                        x = (int)Position.X,
+                        y = (int)0,
+                        z = (int)Position.Z,
+                        radius = 20
+                    };
+                    packet2.EncodePacket(encoder2);
+
+                    HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(20, currentChunkX, currentChunkZ));
+
+                    foreach (var chunk in newChunks)
+                    {
+                        if (!sentChunks.Contains(chunk))
+                        {
+                            sentChunks.Add(chunk);
+                            ChunkSendQueue.Enqueue(chunk);
+                        }
+                    }
+
+                    foreach (var chunk in sentChunks.ToList())
+                    {
+                        if (!newChunks.Contains(chunk))
+                        {
+                            sentChunks.Remove(chunk);
+                        }
+                    }
+
+                    ProcessSendQueue();
+                }
+            }
+
+            if (packet is RequestChunkRadius requestChunkRadius)
+            {
+                Log.debug($"{Username} requested chunks with radius {requestChunkRadius.radius}. Max radius = {requestChunkRadius.maxRadius}");
+
+                UpdateChunkRadius(requestChunkRadius.radius);
 
                 PacketEncoder encoder2 = PacketEncoderPool.Get(this);
                 var packet2 = new NetworkChunkPublisherUpdate
                 {
                     x = (int)Position.X,
-                    y = (int)0,
+                    y = (int)Position.Y,
                     z = (int)Position.Z,
-                    radius = 20
+                    radius = drawDistance
                 };
-                packet2.Encode(encoder2);
+                packet2.EncodePacket(encoder2);
 
-                HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(20, currentChunkX, currentChunkZ));
+                int radius = Math.Min(requestChunkRadius.radius, requestChunkRadius.maxRadius) / 2;
 
-                foreach (var chunk in newChunks)
+                int currentChunkX = (int)Math.Floor(Position.X / 16.0);
+                int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
+
+                List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
+
+                foreach (var (x, z) in chunkPositions)
                 {
-                    if (!sentChunks.Contains(chunk))
+                    if (!sentChunks.Contains((x, z)))
                     {
-                        sentChunks.Add(chunk);
-                        ChunkSendQueue.Enqueue(chunk);
-                    }
-                }
-
-                foreach (var chunk in sentChunks.ToList())
-                {
-                    if (!newChunks.Contains(chunk))
-                    {
-                        sentChunks.Remove(chunk);
+                        sentChunks.Add((x, z));
+                        ChunkSendQueue.Enqueue((x, z));
                     }
                 }
 
                 ProcessSendQueue();
             }
-        }
 
-        internal void PacketEvent_MovePlayer(MovePlayer packet)
-        {
-            if (packet.position != Position)
+            if (packet is TextMessage textMessage)
             {
-                Position = packet.position;
-
-                ushort header = 0; //todo
-                header |= 0x01;
-                header |= 0x02;
-                header |= 0x04;
-                /*header |= 0x08;
-                header |= 0x10;
-                header |= 0x20;*/
-
-                foreach (Player player in currentLevel.onlinePlayers.Values)
+                foreach (var dest in currentLevel.onlinePlayers)
                 {
-                    if (player == this) { continue; }
-                    PacketEncoder encoder = PacketEncoderPool.Get(player);
-                    var movePk = new MoveActorDelta
+                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                    var pk = new TextMessage
                     {
-                        EntityId = EntityID,
-                        Header = header,
-                        Position = Position
+                        messageType = 1,
+                        Username = Username,
+                        Message = textMessage.Message
                     };
-                    movePk.Encode(encoder);
-                }
-                Log.debug($"{packet.actorRuntimeId} / {packet.position.X} : {packet.position.Y} : {packet.position.Z} / onground {packet.isOnGround}");
-            }
-        }
-
-        internal void PacketEvent_RequestChunkRadius(RequestChunkRadius packet)
-        {
-            Log.debug($"{Username} requested chunks with radius {packet.radius}. Max radius = {packet.maxRadius}");
-
-            UpdateChunkRadius(packet.radius);
-
-            PacketEncoder encoder2 = PacketEncoderPool.Get(this);
-            var packet2 = new NetworkChunkPublisherUpdate
-            {
-                x = (int) Position.X,
-                y = (int) Position.Y,
-                z = (int) Position.Z,
-                radius = drawDistance
-            };
-            packet2.Encode(encoder2);
-
-            int radius = Math.Min(packet.radius, packet.maxRadius) / 2;
-
-            int currentChunkX = (int)Math.Floor(Position.X / 16.0);
-            int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
-
-            List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
-
-            foreach (var (x, z) in chunkPositions)
-            {
-                if (!sentChunks.Contains((x, z)))
-                {
-                    sentChunks.Add((x, z));
-                    ChunkSendQueue.Enqueue((x, z));
+                    pk.EncodePacket(encoder);
                 }
             }
 
-            ProcessSendQueue();
-        }
-
-        internal void PacketEvent_Text(TextMessage packet)
-        {
-            foreach (var dest in currentLevel.onlinePlayers)
+            if (packet is ServerboundLoadingScreen serverboundLoadingScreen)
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                var pk = new TextMessage
+                if (serverboundLoadingScreen.screenType == 4)
                 {
-                    messageType = 1,
-                    Username = Username,
-                    Message = packet.Message
-                };
-                pk.Encode(encoder);
+                    Spawned = true;
+                }
+                PluginManager.OnPlayerJoin(this);
             }
-        }
 
-        internal void PacketEvent_ServerboundLoadingScreen(ServerboundLoadingScreen packet)
-        {
-            if (packet.screenType == 4)
+            if (packet is PlayerSkin playerSkin)
             {
-                Spawned = true;
-            }
-            PluginManager.OnPlayerJoin(this);
-        }
-
-        internal void PacketEvent_PlayerSkin(PlayerSkin packet)
-        {
-            foreach (var dest in currentLevel.onlinePlayers)
-            {
-                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                var pk = new PlayerSkin
+                foreach (var dest in currentLevel.onlinePlayers)
                 {
-                    UUID = UUID,
-                    playerSkin = packet.playerSkin,
-                    Name = packet.Name,
-                    oldName = Skin.SkinId,
-                    Trusted = packet.Trusted,
-                };
-                pk.Encode(encoder);
+                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                    var pk = new PlayerSkin
+                    {
+                        UUID = UUID,
+                        playerSkin = playerSkin.playerSkin,
+                        Name = playerSkin.Name,
+                        oldName = Skin.SkinId,
+                        Trusted = playerSkin.Trusted,
+                    };
+                    pk.EncodePacket(encoder);
+                }
+
+                Skin = playerSkin.playerSkin;
             }
 
-            Skin = packet.playerSkin;
-        }
-
-        internal void PacketEvent_CommandRequest(CommandRequest packet)
-        {
-            CommandManager.Execute(packet.Command.Substring(1), this);
+            if (packet is CommandRequest commandRequest)
+            {
+                CommandManager.Execute(commandRequest.Command.Substring(1), this);
+            }
         }
     }
 }

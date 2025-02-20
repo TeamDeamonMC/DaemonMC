@@ -1,21 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ItemRegistry
+    public class ItemRegistry : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ItemRegistry;
+        public override Info.Bedrock Id => Info.Bedrock.ItemRegistry;
 
         //public itemData Items;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteVarInt(0); //todo send item data
-            encoder.handlePacket();
         }
     }
 }

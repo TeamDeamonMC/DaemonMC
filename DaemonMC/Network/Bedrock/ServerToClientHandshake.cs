@@ -1,21 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ServerToClientHandshake
+    public class ServerToClientHandshake : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ServerToClientHandshake;
+        public override Info.Bedrock Id => Info.Bedrock.ServerToClientHandshake;
 
         public string JWT = "";
 
-        public void Decode(byte[] buffer)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteString(JWT);
-            encoder.handlePacket();
         }
     }
 }

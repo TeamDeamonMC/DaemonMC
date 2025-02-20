@@ -1,22 +1,17 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ClientCacheStatus
+    public class ClientCacheStatus : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ClientCacheStatus;
+        public override Info.Bedrock Id => Info.Bedrock.ClientCacheStatus;
 
         public bool status = false;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new ClientCacheStatus
-            {
-                status = decoder.ReadBool(),
-            };
-
-            BedrockPacketProcessor.ClientCacheStatus(packet, decoder.endpoint);
+            status = decoder.ReadBool();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

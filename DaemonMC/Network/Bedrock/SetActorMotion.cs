@@ -2,24 +2,22 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class SetActorMotion
+    public class SetActorMotion : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.SetActorMotion;
+        public override Info.Bedrock Id => Info.Bedrock.SetActorMotion;
 
         public long EntityId = 0;
         public Vector3 Motion = new Vector3();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteVarLong((ulong)EntityId);
             encoder.WriteVarLong(0);
-            encoder.handlePacket();
         }
     }
 }

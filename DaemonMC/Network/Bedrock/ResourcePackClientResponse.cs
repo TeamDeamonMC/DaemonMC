@@ -1,23 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePackClientResponse
+    public class ResourcePackClientResponse : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ResourcePackClientResponse;
+        public override Info.Bedrock Id => Info.Bedrock.ResourcePackClientResponse;
 
         public byte response = 0;
         public List<string> packs = new List<string>();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new ResourcePackClientResponse
-            {
-                response = decoder.ReadByte(),
-                packs = decoder.ReadPackNames()
-            };
-            BedrockPacketProcessor.ResourcePackClientResponse(packet, decoder.endpoint);
+            response = decoder.ReadByte();
+            packs = decoder.ReadPackNames();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

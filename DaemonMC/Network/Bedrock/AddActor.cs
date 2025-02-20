@@ -4,9 +4,9 @@ using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class AddActor
+    public class AddActor : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.AddActor;
+        public override Info.Bedrock Id => Info.Bedrock.AddActor;
 
         public long EntityId = 0;
         public string ActorType = "";
@@ -17,14 +17,13 @@ namespace DaemonMC.Network.Bedrock
         public float YbodyRotation = 0;
         public Dictionary<ActorData, Metadata> Metadata = new Dictionary<ActorData, Metadata>();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteSignedVarLong(EntityId);
             encoder.WriteVarLong((ulong)EntityId);
             encoder.WriteString(ActorType);
@@ -38,7 +37,6 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVarInt(0);
             encoder.WriteVarInt(0);
             encoder.WriteVarInt(0);
-            encoder.handlePacket();
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class MovePlayer
+    public class MovePlayer : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.MovePlayer;
+        public override Info.Bedrock Id => Info.Bedrock.MovePlayer;
 
         public long actorRuntimeId = 0;
         public Vector3 position = new Vector3();
@@ -15,26 +15,20 @@ namespace DaemonMC.Network.Bedrock
         public long vehicleRuntimeId = 0;
         public long tick = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new MovePlayer
-            {
-                actorRuntimeId = decoder.ReadVarLong(),
-                position = decoder.ReadVec3(),
-                rotation = decoder.ReadVec2(),
-                YheadRotation = decoder.ReadFloat(),
-                positionMode = decoder.ReadByte(),
-                isOnGround = decoder.ReadBool(),
-                vehicleRuntimeId = decoder.ReadVarLong(),
-                tick = decoder.ReadVarLong()
-            };
-
-            decoder.player.PacketEvent_MovePlayer(packet);
+            actorRuntimeId = decoder.ReadVarLong();
+            position = decoder.ReadVec3();
+            rotation = decoder.ReadVec2();
+            YheadRotation = decoder.ReadFloat();
+            positionMode = decoder.ReadByte();
+            isOnGround = decoder.ReadBool();
+            vehicleRuntimeId = decoder.ReadVarLong();
+            tick = decoder.ReadVarLong();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteVarLong((ulong)actorRuntimeId);
             encoder.WriteVec3(position);
             encoder.WriteVec2(rotation);
@@ -43,7 +37,6 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteBool(isOnGround);
             encoder.WriteVarLong((ulong)vehicleRuntimeId);
             encoder.WriteVarLong((ulong)tick);
-            encoder.handlePacket();
         }
     }
 }

@@ -1,22 +1,21 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class LevelChunk
+    public class LevelChunk : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.LevelChunk;
+        public override Info.Bedrock Id => Info.Bedrock.LevelChunk;
 
         public int chunkX = 0;
         public int chunkZ = 0;
         public int count = 0;
         public byte[] data = new byte[0];
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteSignedVarInt(chunkX);
             encoder.WriteSignedVarInt(chunkZ);
             encoder.WriteSignedVarInt(0);
@@ -28,8 +27,6 @@
             {
                 encoder.WriteByte(raw);
             }
-
-            encoder.handlePacket();
         }
     }
 }

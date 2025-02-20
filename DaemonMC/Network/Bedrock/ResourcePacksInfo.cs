@@ -1,8 +1,8 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePacksInfo
+    public class ResourcePacksInfo : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ResourcePacksInfo;
+        public override Info.Bedrock Id => Info.Bedrock.ResourcePacksInfo;
 
         public bool force = false;
         public bool isAddon = false;
@@ -11,14 +11,13 @@
         public string templateVersion = "";
         public List<ResourcePack> packs = new List<ResourcePack>();
 
-        public void Decode(byte[] buffer)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteBool(force);
             encoder.WriteBool(isAddon);
             encoder.WriteBool(hasScripts);
@@ -41,7 +40,6 @@
                 encoder.WriteBool(pack.RayTracking);
                 encoder.WriteString(pack.CdnUrl);
             }
-            encoder.handlePacket();
         }
     }
 }

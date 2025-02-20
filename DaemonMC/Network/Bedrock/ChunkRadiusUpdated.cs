@@ -1,21 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ChunkRadiusUpdated
+    public class ChunkRadiusUpdated : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ChunkRadiusUpdated;
+        public override Info.Bedrock Id => Info.Bedrock.ChunkRadiusUpdated;
 
         public int radius = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteVarInt(radius);
-            encoder.handlePacket();
         }
     }
 }

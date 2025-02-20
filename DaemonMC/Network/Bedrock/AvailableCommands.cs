@@ -2,23 +2,22 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class AvailableCommands
+    public class AvailableCommands : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.AvailableCommands;
+        public override Info.Bedrock Id => Info.Bedrock.AvailableCommands;
 
         public List<string> EnumValues = new List<string>();
         public List<string> ChainedSubcommandValues = new List<string>();
         public List<string> PostFixes = new List<string>();
         public List<Command> Commands = new List<Command>();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteVarInt(EnumValues.Count);
             foreach (var value in EnumValues)
             {
@@ -55,7 +54,6 @@ namespace DaemonMC.Network.Bedrock
 
             encoder.WriteVarInt(0);//soft enums
             encoder.WriteVarInt(0);//constraints
-            encoder.handlePacket();
         }
     }
 }

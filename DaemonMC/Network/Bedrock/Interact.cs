@@ -1,24 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class Interact
+    public class Interact : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.Interact;
+        public override Info.Bedrock Id => Info.Bedrock.Interact;
 
         public byte action = 0;
         public long actorRuntimeId = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new Interact
-            {
-                action = decoder.ReadByte(),
-                actorRuntimeId = decoder.ReadVarLong()
-            };
-
-            BedrockPacketProcessor.Interact(packet);
+            action = decoder.ReadByte();
+            actorRuntimeId = decoder.ReadVarLong();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

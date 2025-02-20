@@ -30,46 +30,49 @@ namespace DaemonMC.Network.Bedrock
                 switch (pkid)
                 {
                     case Info.Bedrock.RequestNetworkSettings:
-                        new RequestNetworkSettings().Decode(decoder);
+                        new RequestNetworkSettings().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.Login:
-                        new Login().Decode(decoder);
+                        new Login().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.PacketViolationWarning:
-                        new PacketViolationWarning().Decode(decoder);
+                        new PacketViolationWarning().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.ClientCacheStatus:
-                        new ClientCacheStatus().Decode(decoder);
+                        new ClientCacheStatus().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.ResourcePackClientResponse:
-                        new ResourcePackClientResponse().Decode(decoder);
+                        new ResourcePackClientResponse().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.RequestChunkRadius:
-                        new RequestChunkRadius().Decode(decoder);
+                        new RequestChunkRadius().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.MovePlayer:
-                        new MovePlayer().Decode(decoder);
+                        new MovePlayer().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.ServerboundLoadingScreen:
-                        new ServerboundLoadingScreen().Decode(decoder);
+                        new ServerboundLoadingScreen().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.Interact:
-                        new Interact().Decode(decoder);
+                        new Interact().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.TextMessage:
-                        new TextMessage().Decode(decoder);
+                        new TextMessage().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.PlayerAuthInput:
-                        new PlayerAuthInput().Decode(decoder);
+                        new PlayerAuthInput().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.PlayerSkin:
-                        new PlayerSkin().Decode(decoder);
+                        new PlayerSkin().DecodePacket(decoder);
                         break;
                     case Info.Bedrock.ResourcePackChunkRequest:
-                        new ResourcePackChunkRequest().Decode(decoder);
+                        new ResourcePackChunkRequest().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.CommandRequest:
-                        new CommandRequest().Decode(decoder);
+                        new CommandRequest().DecodePacket(decoder);
+                        break;
+                    case Info.Bedrock.SetLocalPlayerAsInitialized:
+                        new SetLocalPlayerAsInitialized().DecodePacket(decoder);
                         break;
 
                     default:

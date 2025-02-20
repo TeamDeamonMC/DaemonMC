@@ -1,21 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class RemoveActor
+    public class RemoveActor : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.RemoveActor;
+        public override Info.Bedrock Id => Info.Bedrock.RemoveActor;
 
         public long EntityId = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteSignedVarLong(EntityId);
-            encoder.handlePacket();
         }
     }
 }

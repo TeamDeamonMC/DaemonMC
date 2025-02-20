@@ -1,25 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class CommandRequest
+    public class CommandRequest : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.CommandRequest;
+        public override Info.Bedrock Id => Info.Bedrock.CommandRequest;
 
         public string Command = "";
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new CommandRequest
-            {
-                Command = decoder.ReadString(),
-            };
-
-            decoder.player.PacketEvent_CommandRequest(packet);
+            Command = decoder.ReadString();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
-            encoder.handlePacket();
+
         }
     }
 }

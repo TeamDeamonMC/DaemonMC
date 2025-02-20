@@ -77,7 +77,7 @@ namespace DaemonMC.Network.RakNet
                 {
                     message = "Server closed"
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
             }
             sessions.Clear();
         }

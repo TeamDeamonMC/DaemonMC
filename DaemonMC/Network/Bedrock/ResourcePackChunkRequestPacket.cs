@@ -2,25 +2,20 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePackChunkRequest
+    public class ResourcePackChunkRequest : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ResourcePackChunkRequest;
+        public override Info.Bedrock Id => Info.Bedrock.ResourcePackChunkRequest;
 
         public string PackName = "";
         public int Chunk = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new ResourcePackChunkRequest
-            {
-                PackName = decoder.ReadString(),
-                Chunk = decoder.ReadInt()
-            };
-
-            BedrockPacketProcessor.ResourcePackChunkRequest(packet, decoder.endpoint);
+            PackName = decoder.ReadString();
+            Chunk = decoder.ReadInt();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

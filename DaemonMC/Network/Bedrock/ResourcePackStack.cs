@@ -1,20 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class ResourcePackStack
+    public class ResourcePackStack : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.ResourcePackStack;
+        public override Info.Bedrock Id => Info.Bedrock.ResourcePackStack;
 
         public bool forceTexturePack = false;
         public List<ResourcePack> packs = new List<ResourcePack>();
 
-        public void Decode(byte[] buffer)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteBool(forceTexturePack);
             encoder.WriteVarInt(0); //add-on list
             encoder.WriteVarInt(packs.Count); //texture pack list
@@ -28,7 +27,6 @@
             encoder.WriteInt(0); //experiments
             encoder.WriteBool(false); //experiments was on
             encoder.WriteBool(false); //editor packs
-            encoder.handlePacket();
         }
     }
 }

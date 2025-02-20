@@ -27,7 +27,7 @@ namespace DaemonMC.Network.Handler
             {
                 status = 0,
             };
-            pk.Encode(encoder);
+            pk.EncodePacket(encoder);
         }
     }
 }

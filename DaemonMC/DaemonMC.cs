@@ -190,7 +190,7 @@ namespace DaemonMC
                     EventID = (LevelEvents)value,
                     Position = pos
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
             }
             Log.info($"Sent level event {(LevelEvents)value} for all players at position {pos.X}; {pos.Y}; {pos.Z}");
         }
@@ -208,7 +208,7 @@ namespace DaemonMC
                     EntityId = entityID,
                     Metadata = new Dictionary<ActorData, Metadata>() { { ActorData.RESERVED_0,  new Metadata(dataValue) } }
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
             }
             Log.info($"Sent actorflags {(ActorFlags)value}:true for entity {entityID}");
         }

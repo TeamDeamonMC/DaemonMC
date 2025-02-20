@@ -114,7 +114,7 @@ namespace DaemonMC.Utils
                 {
                     message = $"Skin decoding failed"
                 };
-                packet.Encode(encoder);
+                packet.EncodePacket(encoder);
                 Log.error($"Skin decoding failed: {ex.Message}");
             }
 

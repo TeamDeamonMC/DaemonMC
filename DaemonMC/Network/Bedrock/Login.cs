@@ -1,25 +1,20 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class Login
+    public class Login : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.Login;
+        public override Info.Bedrock Id => Info.Bedrock.Login;
 
         public int protocolVersion = 0;
         public string request = "";
 
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new Login
-            {
-                protocolVersion = decoder.ReadIntBE(),
-                request = decoder.ReadString(),
-            };
-
-            BedrockPacketProcessor.Login(packet, decoder.endpoint);
+            protocolVersion = decoder.ReadIntBE();
+            request = decoder.ReadString();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

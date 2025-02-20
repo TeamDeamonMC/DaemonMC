@@ -1,22 +1,17 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class RequestNetworkSettings
+    public class RequestNetworkSettings : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.RequestNetworkSettings;
+        public override Info.Bedrock Id => Info.Bedrock.RequestNetworkSettings;
 
         public int protocolVersion = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new RequestNetworkSettings
-            {
-                protocolVersion = decoder.ReadIntBE(),
-            };
-
-            BedrockPacketProcessor.RequestNetworkSettings(packet, decoder.endpoint);
+            protocolVersion = decoder.ReadIntBE();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

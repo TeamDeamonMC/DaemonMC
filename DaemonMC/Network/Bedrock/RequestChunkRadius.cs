@@ -1,23 +1,19 @@
 ﻿namespace DaemonMC.Network.Bedrock
 {
-    public class RequestChunkRadius
+    public class RequestChunkRadius : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.RequestChunkRadius;
+        public override Info.Bedrock Id => Info.Bedrock.RequestChunkRadius;
 
         public int radius = 0;
         public byte maxRadius = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new RequestChunkRadius
-            {
-                radius = decoder.ReadVarInt(),
-                maxRadius = decoder.ReadByte()
-            };
-            decoder.player.PacketEvent_RequestChunkRadius(packet);
+            radius = decoder.ReadVarInt();
+            maxRadius = decoder.ReadByte();
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

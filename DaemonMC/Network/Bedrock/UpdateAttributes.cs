@@ -2,21 +2,20 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class UpdateAttributes
+    public class UpdateAttributes : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.UpdateAttributes;
+        public override Info.Bedrock Id => Info.Bedrock.UpdateAttributes;
 
         public long EntityId = 0;
         public List<AttributeValue> Attributes = new List<AttributeValue>();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteVarInt(Attributes.Count);
             foreach (var attribute in Attributes)
@@ -31,7 +30,6 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteVarInt(0); //todo modifiers
             }
             encoder.WriteVarLong(0); //todo tick
-            encoder.handlePacket();
         }
     }
 }

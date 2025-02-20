@@ -2,9 +2,9 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class StartGame
+    public class StartGame : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.StartGame;
+        public override Info.Bedrock Id => Info.Bedrock.StartGame;
 
         public string LevelName;
         public long EntityId = 0;
@@ -24,14 +24,13 @@ namespace DaemonMC.Network.Bedrock
         public int EditorType = 0;
         public int StopTime = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteSignedVarLong(EntityId);
             encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteVarInt(GameMode);
@@ -124,7 +123,6 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteBool(false);
             encoder.WriteBool(true); //we use hashed block ids
             encoder.WriteBool(true);
-            encoder.handlePacket();
         }
     }
 }

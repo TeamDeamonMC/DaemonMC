@@ -4,9 +4,9 @@ using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class AddPlayer
+    public class AddPlayer : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.AddPlayer;
+        public override Info.Bedrock Id => Info.Bedrock.AddPlayer;
 
         public Guid UUID = Guid.NewGuid();
         public string Username = "";
@@ -21,14 +21,13 @@ namespace DaemonMC.Network.Bedrock
         public string DeviceId = "";
         public int BuildPlatform = 0;
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteUUID(UUID);
             encoder.WriteString(Username);
             encoder.WriteVarLong((ulong)EntityId);
@@ -59,7 +58,6 @@ namespace DaemonMC.Network.Bedrock
 
             encoder.WriteString(DeviceId);
             encoder.WriteInt(BuildPlatform);
-            encoder.handlePacket();
         }
     }
 }

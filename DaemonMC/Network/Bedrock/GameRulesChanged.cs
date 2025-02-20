@@ -2,22 +2,20 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class GameRulesChanged
+    public class GameRulesChanged : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.GameRulesChanged;
+        public override Info.Bedrock Id => Info.Bedrock.GameRulesChanged;
 
         public Dictionary<string, GameRule> GameRules = new Dictionary<string, GameRule>();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteGameRulesData(GameRules);
-            encoder.handlePacket();
         }
     }
 }

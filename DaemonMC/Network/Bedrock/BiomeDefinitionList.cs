@@ -2,22 +2,20 @@
 
 namespace DaemonMC.Network.Bedrock
 {
-    public class BiomeDefinitionList
+    public class BiomeDefinitionList : Packet
     {
-        public Info.Bedrock id = Info.Bedrock.BiomeDefinitionList;
+        public override Info.Bedrock Id => Info.Bedrock.BiomeDefinitionList;
 
         public NbtCompound biomeData = new NbtCompound();
 
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.PacketId(id);
             encoder.WriteCompoundTag(biomeData);
-            encoder.handlePacket();
         }
     }
 }

@@ -8,12 +8,12 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            variable = decoder.ReadInt();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteInt(variable);
         }
     }
 }

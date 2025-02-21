@@ -47,7 +47,7 @@ namespace DaemonMC.Network.RakNet
             var player = getSession(ip);
             if (!sessions.Remove(ip))
             {
-                Log.warn($"Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
+                Log.warn($"[RakNet] Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
                 return false;
             }
             else
@@ -62,7 +62,7 @@ namespace DaemonMC.Network.RakNet
         {
             if (!sessions.TryGetValue(ip, out var session))
             {
-                Log.warn($"Session doesn't exist for {ip.Address.ToString()}.");
+                Log.warn($"[RakNet] Session doesn't exist for {ip.Address.ToString()}.");
                 return;
             }
             sessions[ip].initCompression = enable;

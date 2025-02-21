@@ -17,6 +17,8 @@ namespace DaemonMC
         public static Queue<long> availableIds = new Queue<long>();
         public static int datGrIn = 0;
         public static int datGrOut = 0;
+        public static int nack = 0;
+        public static int rsent = 0;
         public static bool crash = false;
         public static List<World> levels = new List<World>();
         public static List<ResourcePack> packs = new List<ResourcePack>();
@@ -153,23 +155,14 @@ namespace DaemonMC
             return onlinePlayers.Values.ToArray();
         }
 
-        public static void Send(byte[] trimmedBuffer, IPEndPoint client)
-        {
-            if (!RakSessionManager.sessions.TryGetValue(client, out var session))
-            {
-                Log.warn($"Tried to send data to disconnected client {client.Address}");
-                return;
-            }
-            sock.SendTo(trimmedBuffer, client);
-        }
-
         private static void titleUpdate()
         {
             while (true)
             {
-                Console.Title = $"DaeamonMC | Players {onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
+                Console.Title = $"DaeamonMC | Players {onlinePlayers.Count}/{DaemonMC.maxOnline} | DatGr/sec in:{datGrIn} out:{datGrOut} resend:{rsent} | NACK/sec in:{nack} | Pool cache(in-use) in:{PacketDecoderPool.cached}({PacketDecoderPool.inUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
                 datGrIn = 0;
                 datGrOut = 0;
+                nack = 0;
                 Thread.Sleep(1000);
             }
         }

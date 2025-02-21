@@ -1,4 +1,7 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using DaemonMC.Utils.Text;
+using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
     public class FragmentedPacket
     {
@@ -14,6 +17,18 @@
             Count = 0;
             Fragments = new byte[fragmentCount][];
         }
+    }
+
+    public enum ReliabilityType
+    {
+        unreliable,
+        unreliableSequenced,
+        reliable,
+        reliableOrdered,
+        reliableSequenced,
+        unreliableACK,
+        reliableACK,
+        reliableOrderedACK
     }
 
     public class Reliability
@@ -116,7 +131,7 @@
                 {
                     decoder.packetBuffers.Add(body);
                 }
-                //Console.WriteLine($"[Frame Set Packet] seq: {sequence} f: {flags} pL: {pLength} rtype: {reliabilityType} frag: {isFragmented} relIndx: {reliableIndex} seqIndxL: {sequenceIndex} ordIndx: {orderIndex} ordCh: {orderChannel} compSize: {compSize} compIndx: {compIndex} compId: {compId}");
+               //Console.WriteLine($"[Frame Set Packet] seq: {sequence} f: {flags} pL: {pLength} rtype: {reliabilityType} frag: {isFragmented} relIndx: {reliableIndex} seqIndxL: {sequenceIndex} ordIndx: {orderIndex} ordCh: {orderChannel} compSize: {compSize} compIndx: {compIndex} compId: {compId}");
 
                 var ack = new ACKdata { sequenceNumber = sequence };
 
@@ -147,31 +162,27 @@
             }
         }
 
-        public static void ReliabilityHandler(
-        PacketEncoder encoder,
-        byte[] body,
-        byte reliabilityType = 2,
-        bool isFragmented = false,
-        uint sequenceIndex = 0,
-        uint orderIndex = 0,
-        byte orderChannel = 0,
-        int compSize = 0,
-        ushort compId = 0,
-        int compIndex = 0)
+        public static void ReliabilityHandler(PacketEncoder encoder, byte[] body, ReliabilityType reliabilityType = ReliabilityType.reliable)
         {
-            int maxPayloadSize = 1500; //idk
-            isFragmented = body.Length > maxPayloadSize;
+            var session = RakSessionManager.getSession(encoder.clientEp);
+            int maxPayloadSize = session.MTU - 32;
+            bool isFragmented = body.Length > maxPayloadSize;
+            maxPayloadSize -= reliabilityType == ReliabilityType.reliable ? 6 : 3;
+            maxPayloadSize -= isFragmented ? 10 : 0;
             int totalFragments = isFragmented ? (int)Math.Ceiling((double)body.Length / maxPayloadSize) : 1;
 
-            compId = 0;
-            compIndex = 0;
+            int compIndex = 0;
+            uint seqIndex = 0;
+            byte orderChannel = 0;
 
             for (int i = 0; i < totalFragments; i++)
             {
+                session.sentPackets.TryAdd(RakSessionManager.getSession(encoder.clientEp).sequenceNumber, (body, false));
+
                 int start = i * maxPayloadSize;
                 int length = Math.Min(maxPayloadSize, body.Length - start);
 
-                byte flags = (byte)((reliabilityType << 5) & 0b01110000);
+                byte flags = (byte)(((int)reliabilityType << 5) & 0b01110000);
                 if (isFragmented)
                 {
                     flags |= 0b00010000;
@@ -181,58 +192,33 @@
                     flags |= 0x00;
                 }
 
-                encoder.WriteByte(128);
-                encoder.WriteUInt24LE(RakSessionManager.getSession(encoder.clientEp).sequenceNumber);
+                encoder.WriteByte((byte)(isFragmented ? 140 : 128));
+                encoder.WriteUInt24LE(session.sequenceNumber);
                 encoder.WriteByte(flags);
                 encoder.WriteShortBE((ushort)(isFragmented ? length * 8 : body.Count() * 8));
 
-                if (reliabilityType == 0) // Unreliable
+                if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableSequenced)
                 {
-                    // nothing
+                    encoder.WriteUInt24LE(seqIndex);
+                    seqIndex++;
                 }
-                else if (reliabilityType == 1) // Unreliable Sequenced
-                {
-                    encoder.WriteUInt24LE(reliableIndex);
-                    encoder.WriteUInt24LE(sequenceIndex);
-                }
-                else if (reliabilityType == 2) // Reliable
+
+                if (reliabilityType == ReliabilityType.reliable || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableACK || reliabilityType == ReliabilityType.reliableOrderedACK)
                 {
                     encoder.WriteUInt24LE(reliableIndex);
                     reliableIndex++;
                 }
-                else if (reliabilityType == 3) // Ordered
+
+                if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableOrderedACK)
                 {
-                    encoder.WriteUInt24LE(reliableIndex);
-                    encoder.WriteUInt24LE(orderIndex);
-                    encoder.WriteByte(orderChannel);
-                    reliableIndex++;
-                    orderIndex++;
-                }
-                else if (reliabilityType == 4) // Reliable Ordered
-                {
-                    encoder.WriteUInt24LE(reliableIndex);
-                    encoder.WriteUInt24LE(orderIndex);
-                    encoder.WriteByte(orderChannel);
-                }
-                else if (reliabilityType == 5) // Reliable Sequenced
-                {
-                    // nothing
-                }
-                else if (reliabilityType == 6) // Unreliable, ACK
-                {
-                    encoder.WriteUInt24LE(reliableIndex);
-                }
-                else if (reliabilityType == 7) // Reliable, ACK
-                {
-                    encoder.WriteUInt24LE(reliableIndex);
-                    encoder.WriteUInt24LE(orderIndex);
+                    encoder.WriteUInt24LE(session.orderIndex);
                     encoder.WriteByte(orderChannel);
                 }
 
                 if (isFragmented)
                 {
                     encoder.WriteIntBE(totalFragments);
-                    encoder.WriteShortBE(compId);
+                    encoder.WriteShortBE(session.compId);
                     encoder.WriteIntBE(compIndex);
 
                     byte[] fragment = new byte[length];
@@ -245,13 +231,40 @@
                 {
                     encoder.byteStream.Write(body, 0, body.Length);
                 }
-
                 encoder.SendPacket(128, false);
                 encoder.byteStream.SetLength(0);
                 encoder.byteStream.Position = 0;
-                RakSessionManager.getSession(encoder.clientEp).sequenceNumber++;
+            }
+
+            if (isFragmented)
+            {
+                session.compId++;
+            }
+
+            if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableOrderedACK)
+            {
+                session.orderIndex++;
             }
             PacketEncoderPool.Return(encoder);
+        }
+
+        internal static void ResendPacket(uint sequenceNumber, IPEndPoint clientEp)
+        {
+            var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
+            if (sentPackets.TryGetValue(sequenceNumber, out var data))
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                sentPackets.Remove(sequenceNumber);
+                ReliabilityHandler(encoder, data.Item1);
+                Log.debug($"[RakNet] Received NACK {sequenceNumber} from {clientEp.Address}. Resending... OK", ConsoleColor.DarkYellow);
+                Server.rsent++;
+            }
+            else
+            {
+                Log.debug($"[RakNet] Received NACK {sequenceNumber} from {clientEp.Address}. Resending... FAILED. Unexpected sequence number", ConsoleColor.DarkYellow);
+            }
+            // Log.debug($"[RakNet] Currently unacknowledged messages({sentPackets.Count}):[{string.Join(", ", sentPackets.Keys)}]", ConsoleColor.DarkYellow);
+            Server.nack++;
         }
     }
 }

@@ -17,8 +17,6 @@ namespace DaemonMC.Network
         public int protocolVersion = 0;
         public MemoryStream byteStream;
 
-        public static Dictionary<uint, byte[]> sentPackets = new Dictionary<uint, byte[]>();
-
         public PacketEncoder(IPEndPoint ep)
         {
             clientEp = ep;
@@ -74,7 +72,7 @@ namespace DaemonMC.Network
 
             if (trimmedBuffer[0] == 3)
             {
-                Reliability.ReliabilityHandler(this, trimmedBuffer, 0, false);
+                Reliability.ReliabilityHandler(this, trimmedBuffer, ReliabilityType.unreliable);
             }
             else
             {
@@ -85,13 +83,16 @@ namespace DaemonMC.Network
         public void SendPacket(int pkid, bool pooled = true)
         {
             Server.datGrOut++;
-            var clientIp = clientEp.Address.ToString();
-
-            var clientPort = clientEp.Port;
             if (pkid <= 127 || pkid >= 141) { Log.packetOut(clientEp, (Info.RakNet)pkid); };
             byte[] trimmedBuffer = new byte[byteStream.Position];
             Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
-            Server.Send(trimmedBuffer, clientEp);
+            if (!RakSessionManager.sessions.TryGetValue(clientEp, out var session))
+            {
+                Log.warn($"Tried to send data to disconnected client {clientEp.Address}");
+                return;
+            }
+            Server.sock.SendTo(trimmedBuffer, clientEp);
+            if (pkid == 128) { RakSessionManager.getSession(clientEp).sequenceNumber++; };
             if (pooled) { PacketEncoderPool.Return(this); }
         }
 

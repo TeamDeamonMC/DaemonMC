@@ -16,11 +16,11 @@ namespace DaemonMC.Utils.Text
 
         public static bool debugMode = false;
         public static bool pkLog = false;
-        public static void debug(string message)
+        public static void debug(string message, ConsoleColor color = ConsoleColor.Gray)
         {
             if (debugMode)
             {
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.ForegroundColor = color;
                 Console.WriteLine($"[DEBUG] {message}");
                 Console.ResetColor();
             }

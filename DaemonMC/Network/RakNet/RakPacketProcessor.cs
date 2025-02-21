@@ -1,9 +1,11 @@
 ﻿using System.Net;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.RakNet
 {
     public class RakPacketProcessor
     {
+        public static int mtuMax = 1500;
         public static void UnconnectedPing(UnconnectedPingPacket packet, IPEndPoint clientEp)
         {
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
@@ -19,6 +21,7 @@ namespace DaemonMC.Network.RakNet
 
         public static void OpenConnectionRequest1(OpenConnectionRequest1Packet packet, IPEndPoint clientEp)
         {
+            Log.debug($"{clientEp.Address} requested MTU size:{packet.Mtu}. Replying with MTU size:{packet.Mtu} ...");
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new OpenConnectionReply1Packet
             {
@@ -31,6 +34,7 @@ namespace DaemonMC.Network.RakNet
 
         public static void OpenConnectionRequest2(OpenConnectionRequest2Packet packet, IPEndPoint clientEp)
         {
+            Log.debug($"{clientEp.Address} accepted connection with MTU size:{packet.Mtu}");
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new OpenConnectionReply2Packet
             {
@@ -38,6 +42,7 @@ namespace DaemonMC.Network.RakNet
                 GUID = 1234567890123456789,
                 Mtu = packet.Mtu
             };
+            RakSessionManager.getSession(clientEp).MTU = packet.Mtu;
             OpenConnectionReply2.Encode(pk, encoder);
         }
 
@@ -53,19 +58,47 @@ namespace DaemonMC.Network.RakNet
             ConnectionRequestAccepted.Encode(pk, encoder);
         }
 
-        public static void ACK(ACKPacket packet)
+        public static void ACK(ACKPacket packet, IPEndPoint clientEp)
         {
+            var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
+
             foreach (var ack in packet.ACKs)
             {
-                //Console.WriteLine($"ACK: {ack.singleSequence} / {ack.sequenceNumber} / {ack.firstSequenceNumber} / {ack.lastSequenceNumber}");
+                if (ack.singleSequence)
+                {
+                    if (!sentPackets.Remove(ack.sequenceNumber, out var data))
+                    {
+                        Log.debug($"[RakNet] Unable to ACK {ack.sequenceNumber} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
+                    }
+                }
+                else
+                {
+                    for (uint seq = ack.firstSequenceNumber; seq <= ack.lastSequenceNumber; seq++)
+                    {
+                        if (!sentPackets.Remove(seq, out var data))
+                        {
+                            Log.debug($"[RakNet] Unable to ACK {seq} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
+                        }
+                    }
+                }
             }
         }
 
-        public static void NACK(NACKPacket packet)
+        public static void NACK(NACKPacket packet, IPEndPoint clientEp)
         {
             foreach (var nack in packet.NACKs)
             {
-                //Console.WriteLine($"NACK: {nack.singleSequence} / {nack.sequenceNumber} / {nack.firstSequenceNumber} / {nack.lastSequenceNumber}");
+                if (nack.singleSequence)
+                {
+                    Reliability.ResendPacket(nack.sequenceNumber, clientEp);
+                }
+                else
+                {
+                    for (uint seq = nack.firstSequenceNumber; seq <= nack.lastSequenceNumber; seq++)
+                    {
+                        Reliability.ResendPacket(seq, clientEp);
+                    }
+                }
             }
         }
 

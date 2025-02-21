@@ -16,6 +16,7 @@ namespace DaemonMC.Network
                 {
                     case PacketHandler.Player:
                         decoder.player.HandlePacket(this);
+                        break;
                     case PacketHandler.Bedrock:
                         BedrockPacketProcessor.HandlePacket(this, decoder.clientEp);
                         break;

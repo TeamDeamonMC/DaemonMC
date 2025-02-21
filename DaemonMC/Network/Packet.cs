@@ -1,4 +1,5 @@
 ﻿using DaemonMC.Network.Bedrock;
+using DaemonMC.Plugin.Plugin;
 
 namespace DaemonMC.Network
 {
@@ -9,25 +10,30 @@ namespace DaemonMC.Network
         public void DecodePacket(PacketDecoder decoder, PacketHandler handler = PacketHandler.Player)
         {
             Decode(decoder);
-            switch (handler)
+            if (PluginManager.PacketReceived(decoder.clientEp, this))
             {
-                case PacketHandler.Player:
-                    decoder.player.HandlePacket(this);
-                    break;
-                case PacketHandler.Bedrock:
-                    BedrockPacketProcessor.HandlePacket(this, decoder.endpoint);
-                    break;
-                case PacketHandler.Raknet:
-                    //todo
-                    break;
+                switch (handler)
+                {
+                    case PacketHandler.Player:
+                        decoder.player.HandlePacket(this);
+                    case PacketHandler.Bedrock:
+                        BedrockPacketProcessor.HandlePacket(this, decoder.clientEp);
+                        break;
+                    case PacketHandler.Raknet:
+                        //todo
+                        break;
+                }
             }
         }
 
         public void EncodePacket(PacketEncoder encoder)
         {
-            encoder.PacketId(Id);
-            Encode(encoder);
-            encoder.handlePacket();
+            if (PluginManager.PacketSent(encoder.clientEp, this))
+            {
+                encoder.PacketId(Id);
+                Encode(encoder);
+                encoder.handlePacket();
+            }
         }
 
         protected abstract void Decode(PacketDecoder decoder);

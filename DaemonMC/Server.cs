@@ -150,6 +150,11 @@ namespace DaemonMC
             return null;
         }
 
+        public static Player GetPlayer(IPEndPoint ep)
+        {
+            return GetPlayer(RakSessionManager.getSession(ep).EntityID);
+        }
+
         public static Player[] GetOnlinePlayers()
         {
             return onlinePlayers.Values.ToArray();

@@ -21,7 +21,7 @@ namespace DaemonMC.Network.RakNet
                 Security = decoder.ReadByte() //todo
             };
 
-            RakPacketProcessor.ConnectionRequest(packet, decoder.endpoint);
+            RakPacketProcessor.ConnectionRequest(packet, decoder.clientEp);
         }
 
         public static void Encode(ConnectionRequestPacket fields, PacketEncoder encoder)

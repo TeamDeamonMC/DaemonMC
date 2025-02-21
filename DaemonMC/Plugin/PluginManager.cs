@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Net;
+using System.Reflection;
+using DaemonMC.Network;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Plugin.Plugin
@@ -43,12 +45,30 @@ namespace DaemonMC.Plugin.Plugin
             _plugins.Clear();
         }
 
-        public static void OnPlayerJoin(Player player)
+        public static void PlayerJoined(Player player)
         {
             foreach (var plugin in _plugins)
             {
-                plugin.OnPlayerJoin(player);
+                plugin.OnPlayerJoined(player);
             }
+        }
+
+        public static bool PacketReceived(IPEndPoint ep, Packet packet)
+        {
+            foreach (var plugin in _plugins)
+            {
+                return plugin.OnPacketReceived(ep, packet);
+            }
+            return true;
+        }
+
+        public static bool PacketSent(IPEndPoint ep, Packet packet)
+        {
+            foreach (var plugin in _plugins)
+            {
+                return plugin.OnPacketSent(ep, packet);
+            }
+            return true;
         }
     }
 }

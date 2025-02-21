@@ -21,7 +21,7 @@ namespace DaemonMC.Network.RakNet
                 Mtu = decoder.ReadMTU(recv),
             };
 
-            RakPacketProcessor.OpenConnectionRequest1(packet, decoder.endpoint);
+            RakPacketProcessor.OpenConnectionRequest1(packet, decoder.clientEp);
         }
 
         public static void Encode(OpenConnectionRequest1Packet fields)

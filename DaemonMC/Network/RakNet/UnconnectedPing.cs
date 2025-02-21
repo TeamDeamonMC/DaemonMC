@@ -21,7 +21,7 @@ namespace DaemonMC.Network.RakNet
                 ClientId = decoder.ReadLong()
             };
 
-            RakPacketProcessor.UnconnectedPing(packet, decoder.endpoint);
+            RakPacketProcessor.UnconnectedPing(packet, decoder.clientEp);
         }
 
         public static void Encode(UnconnectedPingPacket fields)

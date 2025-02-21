@@ -20,7 +20,7 @@
                 Mtu = decoder.ReadSignedShort(),
                 ClientId = decoder.ReadLong()
             };
-            RakPacketProcessor.OpenConnectionRequest2(packet, decoder.endpoint);
+            RakPacketProcessor.OpenConnectionRequest2(packet, decoder.clientEp);
         }
 
         public static void Encode(OpenConnectionRequest2Packet fields)

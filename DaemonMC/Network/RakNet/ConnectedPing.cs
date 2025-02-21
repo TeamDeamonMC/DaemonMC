@@ -15,7 +15,7 @@
                 Time = decoder.ReadLongLE(),
             };
 
-            RakPacketProcessor.ConnectedPing(packet, decoder.endpoint);
+            RakPacketProcessor.ConnectedPing(packet, decoder.clientEp);
         }
 
         public static void Encode(ConnectedPingPacket fields, PacketEncoder encoder)

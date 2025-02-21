@@ -42,7 +42,7 @@ namespace DaemonMC.Network.RakNet
                 ACKs = ACKs
             };
 
-            RakPacketProcessor.ACK(packet, decoder.endpoint);
+            RakPacketProcessor.ACK(packet, decoder.clientEp);
         }
 
         public static void Encode(ACKPacket fields, PacketEncoder encoder)

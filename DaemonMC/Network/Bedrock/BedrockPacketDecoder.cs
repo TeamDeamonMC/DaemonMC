@@ -7,15 +7,15 @@ namespace DaemonMC.Network.Bedrock
     {
         public static void BedrockDecoder(PacketDecoder decoder)
         {
-            if (RakSessionManager.getSession(decoder.endpoint) != null)
+            if (RakSessionManager.getSession(decoder.clientEp) != null)
             {
-                if (RakSessionManager.getSession(decoder.endpoint).initCompression)
+                if (RakSessionManager.getSession(decoder.clientEp).initCompression)
                 {
                     decoder.ReadByte();
                 }
-                if (Server.onlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.endpoint).EntityID))
+                if (Server.onlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.clientEp).EntityID))
                 {
-                    decoder.player = Server.GetPlayer(RakSessionManager.getSession(decoder.endpoint).EntityID);
+                    decoder.player = Server.GetPlayer(RakSessionManager.getSession(decoder.clientEp).EntityID);
                 }
             }
 
@@ -25,7 +25,7 @@ namespace DaemonMC.Network.Bedrock
                 var size = decoder.ReadVarInt(); //packet size
 
                 var pkid = (Info.Bedrock)decoder.ReadVarInt();
-                Log.packetIn(decoder.endpoint, pkid);
+                Log.packetIn(decoder.clientEp, pkid);
 
                 switch (pkid)
                 {

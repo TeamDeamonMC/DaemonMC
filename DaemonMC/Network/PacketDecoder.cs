@@ -13,14 +13,14 @@ namespace DaemonMC.Network
         public List<byte[]> packetBuffers = new List<byte[]>();
         public byte[] buffer;
         public int readOffset;
-        public IPEndPoint endpoint;
+        public IPEndPoint clientEp;
         public Player player;
 
-        public PacketDecoder(byte[] byteBuffer, IPEndPoint clientEp)
+        public PacketDecoder(byte[] byteBuffer, IPEndPoint ep)
         {
             buffer = byteBuffer;
             readOffset = 0;
-            endpoint = clientEp;
+            clientEp = ep;
         }
 
         public void RakDecoder(PacketDecoder decoder, int recv)
@@ -28,7 +28,7 @@ namespace DaemonMC.Network
             Server.datGrIn++;
 
             var pkid = decoder.ReadByte();
-            if (pkid <= 127 || pkid >= 141) { Log.packetIn(decoder.endpoint, (Info.RakNet)pkid); }
+            if (pkid <= 127 || pkid >= 141) { Log.packetIn(decoder.clientEp, (Info.RakNet)pkid); }
 
 
             if (pkid == UnconnectedPing.id)
@@ -75,9 +75,9 @@ namespace DaemonMC.Network
         {
             foreach (byte[] buffer in packetBuffers)
             {
-                PacketDecoder decoder = PacketDecoderPool.Get(buffer, decoderT.endpoint);
+                PacketDecoder decoder = PacketDecoderPool.Get(buffer, decoderT.clientEp);
                 var pkid = decoder.ReadByte();
-                if (pkid != 254) { Log.packetIn(decoder.endpoint, (Info.RakNet)pkid); }
+                if (pkid != 254) { Log.packetIn(decoder.clientEp, (Info.RakNet)pkid); }
                 if (pkid == ConnectionRequest.id)
                 {
                     ConnectionRequest.Decode(decoder);
@@ -525,7 +525,7 @@ namespace DaemonMC.Network
             {
                 PacketDecoder decoder = pool.Pop();
                 decoder.Reset(buffer);
-                decoder.endpoint = clientEp;
+                decoder.clientEp = clientEp;
                 return decoder;
             }
             else

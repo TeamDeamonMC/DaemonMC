@@ -471,7 +471,7 @@ namespace DaemonMC
                 {
                     Spawned = true;
                 }
-                PluginManager.OnPlayerJoin(this);
+                PluginManager.PlayerJoined(this);
             }
 
             if (packet is PlayerSkin playerSkin)

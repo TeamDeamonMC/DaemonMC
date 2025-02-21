@@ -42,7 +42,7 @@ namespace DaemonMC.Network.RakNet
                 NACKs = NACKs
             };
 
-            RakPacketProcessor.NACK(packet, decoder.endpoint);
+            RakPacketProcessor.NACK(packet, decoder.clientEp);
         }
 
         public static void Encode(ACKPacket fields)

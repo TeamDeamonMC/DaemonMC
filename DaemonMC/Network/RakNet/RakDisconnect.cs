@@ -13,7 +13,7 @@
             var packet = new RakDisconnectPacket
             {
             };
-            RakPacketProcessor.Disconnect(packet, decoder.endpoint);
+            RakPacketProcessor.Disconnect(packet, decoder.clientEp);
         }
 
         public void Encode(PacketEncoder encoder)

@@ -116,7 +116,7 @@ namespace DaemonMC.Level
         {
             if (!onlinePlayers.Remove(player.EntityID))
             {
-                Log.warn($"Couldn't despawn {player.Username} from World {player.currentLevel.levelName}.");
+                Log.warn($"Couldn't despawn {player.Username} from World {player.currentWorld.levelName}.");
             }
             else
             {
@@ -129,7 +129,7 @@ namespace DaemonMC.Level
                     };
                     pk.EncodePacket(encoder);
                 }
-                Log.debug($"Despawned {player.Username} from World {player.currentLevel.levelName}");
+                Log.debug($"Despawned {player.Username} from World {player.currentWorld.levelName}");
             }
         }
 

@@ -11,7 +11,7 @@ namespace DaemonMC.Entities
     public abstract class Entity
     {
         public long EntityId { get; set; } = 0;
-        public World currentLevel { get; protected set; }
+        public World currentWorld { get; protected set; }
         public string ActorType { get; protected set; } = "";
         public Vector3 Position { get; set; } = new Vector3();
         public Vector3 Velocity { get; set; } = new Vector3();
@@ -23,7 +23,7 @@ namespace DaemonMC.Entities
 
         public void Spawn(World world)
         {
-            currentLevel = world;
+            currentWorld = world;
             long id;
 
             if (Server.availableIds.Count > 0)
@@ -39,7 +39,7 @@ namespace DaemonMC.Entities
 
             world.Entities.Add(id, this);
 
-            foreach (var player in currentLevel.onlinePlayers.Values)
+            foreach (var player in currentWorld.onlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
                 var pk = new AddActor
@@ -57,9 +57,9 @@ namespace DaemonMC.Entities
 
         public void Despawn()
         {
-            if (currentLevel.Entities.Remove(EntityId))
+            if (currentWorld.Entities.Remove(EntityId))
             {
-                foreach (var player in currentLevel.onlinePlayers.Values)
+                foreach (var player in currentWorld.onlinePlayers.Values)
                 {
                     PacketEncoder encoder = PacketEncoderPool.Get(player);
                     var pk = new RemoveActor
@@ -69,11 +69,11 @@ namespace DaemonMC.Entities
                     pk.EncodePacket(encoder);
                 }
                 Server.availableIds.Enqueue(EntityId);
-                Log.debug($"Despawned {ActorType} with entityID {EntityId} in {currentLevel.levelName}");
+                Log.debug($"Despawned {ActorType} with entityID {EntityId} in {currentWorld.levelName}");
             }
             else
             {
-                Log.error($"Couldn't find {ActorType} with entityID {EntityId} in {currentLevel.levelName}");
+                Log.error($"Couldn't find {ActorType} with entityID {EntityId} in {currentWorld.levelName}");
             }
         }
 
@@ -81,7 +81,7 @@ namespace DaemonMC.Entities
         {
             Position = position;
 
-            foreach (Player player in currentLevel.onlinePlayers.Values)
+            foreach (Player player in currentWorld.onlinePlayers.Values)
             {
                 ushort header = 0;
                 header |= 0x01;
@@ -106,7 +106,7 @@ namespace DaemonMC.Entities
         {
             Metadata[ActorData.RESERVED_0] = new Metadata(dataValue);
 
-            foreach (var player in currentLevel.onlinePlayers.Values)
+            foreach (var player in currentWorld.onlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
                 var packet = new SetActorData

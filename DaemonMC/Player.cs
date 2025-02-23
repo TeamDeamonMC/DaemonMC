@@ -27,7 +27,7 @@ namespace DaemonMC
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
-        public World currentLevel { get; set; }
+        public World currentWorld { get; set; }
         public AttributesValues attributes { get; set; } = new AttributesValues(0.1f);
         public Dictionary<ActorData, Metadata> metadata { get; set; } = new Dictionary<ActorData, Metadata>();
         public List<AuthInputData> InputData = new List<AuthInputData>();
@@ -49,8 +49,8 @@ namespace DaemonMC
             SendGameRules();
             UpdateAttributes();
             SendMetadata(true);
-            currentLevel.addPlayer(this);
-            Log.info($"{Username} spawned in World:'{currentLevel.levelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
+            currentWorld.addPlayer(this);
+            Log.info($"{Username} spawned in World:'{currentWorld.levelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
         internal void SendStartGame()
@@ -58,7 +58,7 @@ namespace DaemonMC
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new StartGame
             {
-                LevelName = currentLevel.LevelDisplayName,
+                LevelName = currentWorld.LevelDisplayName,
                 EntityId = EntityID,
                 GameType = 0,
                 GameMode = 2,
@@ -69,7 +69,7 @@ namespace DaemonMC
                 SpawnBlockZ = (int)Position.Z,
                 Difficulty = 1,
                 Dimension = 0,
-                Seed = currentLevel.RandomSeed,
+                Seed = currentWorld.RandomSeed,
                 Generator = 1,
             };
             packet.EncodePacket(encoder);
@@ -138,14 +138,14 @@ namespace DaemonMC
             List<byte> chunkData = new List<byte>();
             int chunkCount = 0;
 
-            if (currentLevel.temporary)
+            if (currentWorld.temporary)
             {
                 chunkData = new List<byte>(new SuperFlat().generateChunks());
                 chunkCount = 20;
             }
             else
             {
-                var chunkRaw = currentLevel.GetChunk(chunkX, chunkZ);
+                var chunkRaw = currentWorld.GetChunk(chunkX, chunkZ);
                 chunkData = new List<byte>(chunkRaw.networkSerialize(this));
                 chunkCount = chunkRaw.chunks.Count();
                 if (chunkRaw.chunks.Count == 0)
@@ -203,7 +203,7 @@ namespace DaemonMC
 
             if (broadcast)
             {
-                players = currentLevel.onlinePlayers;
+                players = currentWorld.onlinePlayers;
             }
 
             foreach (var dest in players)
@@ -224,7 +224,7 @@ namespace DaemonMC
             PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new GameRulesChanged
             {
-                GameRules = currentLevel.GameRules
+                GameRules = currentWorld.GameRules
             };
             packet.EncodePacket(encoder);
         }
@@ -358,7 +358,7 @@ namespace DaemonMC
                     header |= 0x10;
                     header |= 0x20;
 
-                    foreach (Player player in currentLevel.onlinePlayers.Values)
+                    foreach (Player player in currentWorld.onlinePlayers.Values)
                     {
                         if (player == this) { continue; }
                         PacketEncoder encoder = PacketEncoderPool.Get(player);
@@ -452,7 +452,7 @@ namespace DaemonMC
 
             if (packet is TextMessage textMessage)
             {
-                foreach (var dest in currentLevel.onlinePlayers)
+                foreach (var dest in currentWorld.onlinePlayers)
                 {
                     PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                     var pk = new TextMessage
@@ -476,7 +476,7 @@ namespace DaemonMC
 
             if (packet is PlayerSkin playerSkin)
             {
-                foreach (var dest in currentLevel.onlinePlayers)
+                foreach (var dest in currentWorld.onlinePlayers)
                 {
                     PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                     var pk = new PlayerSkin

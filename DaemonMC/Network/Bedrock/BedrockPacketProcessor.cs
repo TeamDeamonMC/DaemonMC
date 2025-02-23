@@ -117,14 +117,14 @@ namespace DaemonMC.Network.Bedrock
                     World spawnWorld = Server.levels.FirstOrDefault(w => w.levelName == DaemonMC.defaultWorld);
                     if (spawnWorld != null)
                     {
-                        player.currentLevel = spawnWorld;
+                        player.currentWorld = spawnWorld;
                     }
                     else
                     {
-                        player.currentLevel = Server.levels[0];
+                        player.currentWorld = Server.levels[0];
                     }
 
-                    if (!player.currentLevel.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
+                    if (!player.currentWorld.onlinePlayers.TryAdd(player.EntityID, player)) { return; }
                     player.spawn();
                 }
             }

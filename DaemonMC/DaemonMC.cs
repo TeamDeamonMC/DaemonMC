@@ -100,7 +100,7 @@ namespace DaemonMC
 
             foreach (var player in Server.onlinePlayers.Values)
             {
-                table += string.Format("{0,-15} {1,-15} {2,-10}\n", player.Username, player.EntityID, player.currentLevel.levelName);
+                table += string.Format("{0,-15} {1,-15} {2,-10}\n", player.Username, player.EntityID, player.currentWorld.levelName);
             }
 
             Log.info(table);

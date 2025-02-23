@@ -21,6 +21,39 @@
         public string SkinResourcePatch { get; set; } = "";
         public Cape Cape { get; set; } = new Cape();
         public bool CapeOnClassicSkin { get; set; }
+
+        public static Skin Create(string skinPng, string geometryJson)
+        {
+            return new Skin()
+            {
+                ArmSize = "wide",
+                //AnimatedImageData =
+                //OverrideSkin = payload.OverrideSkin,
+                //PersonaPieces = payload.PersonaPieces,
+                //PersonaSkin = payload.PersonaSkin,
+                //PlayFabId = payload.PlayFabId,
+                PremiumSkin = true,
+                //SkinAnimationData = payload.SkinAnimationData,
+                //SkinColor = payload.SkinColor,
+                //PieceTintColors = payload.PieceTintColors,
+                SkinData = Texture.PngToBytes(skinPng),
+                SkinGeometryData = File.ReadAllText(geometryJson),
+                //SkinGeometryDataEngineVersion = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinGeometryDataEngineVersion)),
+                //SkinId = payload.SkinId,
+                SkinImageHeight = 64,
+                SkinImageWidth = 64,
+                SkinResourcePatch = "{\n   \"geometry\" : {\n      \"default\" : \"geometry.humanoid.custom\"\n   }\n}\n",
+                CapeOnClassicSkin = false,
+                /* Cape = new Cape()
+                 {
+                     CapeData = Convert.FromBase64String(payload.CapeData),
+                     CapeId = payload.CapeId,
+                     CapeImageHeight = payload.CapeImageHeight,
+                     CapeImageWidth = payload.CapeImageWidth,
+                     CapeOnClassicSkin = payload.CapeOnClassicSkin
+                 }*/
+            };
+        }
     }
 
     public class Cape

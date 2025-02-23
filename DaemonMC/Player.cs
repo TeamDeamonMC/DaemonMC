@@ -11,6 +11,7 @@ using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
 using DaemonMC.Level.Generators;
 using DaemonMC.Plugin.Plugin;
+using DaemonMC.Entities;
 
 namespace DaemonMC
 {
@@ -332,6 +333,25 @@ namespace DaemonMC
             packet.EncodePacket(encoder);
         }
 
+        public void PlayAnimation(string animationID)
+        {
+            Animation animation = ResourcePackManager.Animations[animationID];
+            foreach (var player in currentWorld.onlinePlayers.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(player);
+                var packet = new AnimateEntity
+                {
+                    mAnimation = animation.AnimationName,
+                    mController = animation.ControllerName,
+                    mRuntimeId = EntityID
+                };
+                packet.EncodePacket(encoder);
+            }
+        }
+
+
+        ///////////////////////////// Packet handler /////////////////////////////
+
         private HashSet<(int x, int z)> sentChunks = new();
 
         internal void HandlePacket(Packet packet)
@@ -470,8 +490,40 @@ namespace DaemonMC
                 if (serverboundLoadingScreen.screenType == 4)
                 {
                     Spawned = true;
+                    PluginManager.PlayerJoined(this);
+                    foreach (var entity in currentWorld.Entities.Values)
+                    {
+                        _ = Task.Run(async () => {
+                            await Task.Delay(2000);
+                            if (entity is CustomEntity customEntity)
+                            {
+                                PacketEncoder encoder = PacketEncoderPool.Get(this);
+                                var packet = new PlayerList
+                                {
+                                    action = 1,
+                                    UUID = customEntity.UUID,
+                                };
+                                packet.EncodePacket(encoder);
+                            }
+
+                            if (ResourcePackManager.Animations.TryGetValue(entity.SpawnAnimation, out Animation spawnAnimation))
+                            {
+                                PacketEncoder encoder = PacketEncoderPool.Get(this);
+                                var packet1 = new AnimateEntity
+                                {
+                                    mAnimation = spawnAnimation.AnimationName,
+                                    mController = spawnAnimation.ControllerName,
+                                    mRuntimeId = entity.EntityId
+                                };
+                                packet1.EncodePacket(encoder);
+                            }
+                            else
+                            {
+                                Log.warn($"Unable to find spawn animation by key:{entity.SpawnAnimation}. Make sure animation is registered.");
+                            }
+                        });
+                    }
                 }
-                PluginManager.PlayerJoined(this);
             }
 
             if (packet is PlayerSkin playerSkin)

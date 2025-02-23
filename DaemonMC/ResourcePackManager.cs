@@ -1,9 +1,11 @@
-﻿using DaemonMC.Utils.Text;
+﻿using DaemonMC.Utils.Game;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC
 {
     public class ResourcePackManager
     {
+        public static Dictionary<string, Animation> Animations = new Dictionary<string, Animation>();
         public static int ChunkSize = 10000;
         public static bool ForcePacks = false;
         public static void LoadPacks(string packdDirectory)
@@ -32,6 +34,11 @@ namespace DaemonMC
             byte[] chunk = new byte[length];
             Array.Copy(resourcePack.PackContent, start, chunk, 0, length);
             return chunk;
+        }
+
+        public static void RegisterAnimation(string animationID, string controllerName, string animationName, string nextAnimationName = "")
+        {
+            Animations.Add(animationID, new Animation(controllerName, animationName, nextAnimationName));
         }
     }
 

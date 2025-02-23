@@ -11,6 +11,7 @@ namespace DaemonMC.Entities
     public abstract class Entity
     {
         public long EntityId { get; set; } = 0;
+        public string NameTag { get; set; } = "";
         public World currentWorld { get; protected set; }
         public string ActorType { get; protected set; } = "";
         public Vector3 Position { get; set; } = new Vector3();
@@ -18,10 +19,11 @@ namespace DaemonMC.Entities
         public Vector2 Rotation { get; set; } = new Vector2();
         public float YheadRotation { get; set; } = 0;
         public float YbodyRotation { get; set; } = 0;
+        public string SpawnAnimation { get; set; } = "";
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
         private long dataValue = 0;
 
-        public void Spawn(World world)
+        public virtual void Spawn(World world)
         {
             currentWorld = world;
             long id;
@@ -39,6 +41,9 @@ namespace DaemonMC.Entities
 
             world.Entities.Add(id, this);
 
+            Metadata[ActorData.NAMETAG_ALWAYS_SHOW] = new Metadata((byte)1);
+            if (NameTag != "") { Metadata[ActorData.NAME] = new Metadata(NameTag); }
+
             foreach (var player in currentWorld.onlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
@@ -55,7 +60,7 @@ namespace DaemonMC.Entities
             Log.debug($"Spawned {ActorType} with entityID {EntityId} in {world.levelName}");
         }
 
-        public void Despawn()
+        public virtual void Despawn()
         {
             if (currentWorld.Entities.Remove(EntityId))
             {
@@ -104,8 +109,6 @@ namespace DaemonMC.Entities
 
         public void SendMetadata()
         {
-            Metadata[ActorData.RESERVED_0] = new Metadata(dataValue);
-
             foreach (var player in currentWorld.onlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
@@ -128,7 +131,24 @@ namespace DaemonMC.Entities
             {
                 dataValue &= ~(1L << (int)flag);
             }
+            Metadata[ActorData.RESERVED_0] = new Metadata(dataValue);
             SendMetadata();
+        }
+
+        public void PlayAnimation(string animationID)
+        {
+            Animation animation = ResourcePackManager.Animations[animationID];
+            foreach (var player in currentWorld.onlinePlayers.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(player);
+                var packet = new AnimateEntity
+                {
+                    mAnimation = animation.AnimationName,
+                    mController = animation.ControllerName,
+                    mRuntimeId = EntityId
+                };
+                packet.EncodePacket(encoder);
+            }
         }
     }
 }

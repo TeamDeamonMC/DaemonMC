@@ -50,6 +50,7 @@
             PlayerAuthInput = 144,
             CreativeContent = 145,
             PacketViolationWarning = 156,
+            AnimateEntity = 158,
             ItemRegistry = 162,
             RequestNetworkSettings = 193,
             ServerboundLoadingScreen = 312

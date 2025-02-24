@@ -54,9 +54,14 @@ namespace DaemonMC
             Log.info($"{Username} spawned in World:'{CurrentWorld.LevelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
-        internal void SendStartGame()
+        public void Send(Packet packet)
         {
             PacketEncoder encoder = PacketEncoderPool.Get(this);
+            packet.EncodePacket(encoder);
+        }
+
+        internal void SendStartGame()
+        {
             var packet = new StartGame
             {
                 LevelName = CurrentWorld.LevelDisplayName,
@@ -73,42 +78,38 @@ namespace DaemonMC
                 Seed = CurrentWorld.RandomSeed,
                 Generator = 1,
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         internal void SendCommands()
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new AvailableCommands
             {
                 Commands = CommandManager.AvailableCommands
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         internal void SendItemData()
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new ItemRegistry
             {
 
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         internal void SendCreativeInventory()
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new CreativeContent
             {
 
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         internal void SendBiomeDefinitionList()
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new BiomeDefinitionList
             {
                 BiomeData = new fNbt.NbtCompound("")
@@ -120,22 +121,20 @@ namespace DaemonMC
                     }
                 }
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         public void SendPlayStatus(int status)
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new PlayStatus
             {
                 Status = status,
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         public void SendChunkToPlayer(int chunkX, int chunkZ)
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             List<byte> chunkData = new List<byte>();
             int chunkCount = 0;
 
@@ -163,30 +162,28 @@ namespace DaemonMC
                 Count = chunkCount,
                 Data = chunkData.ToArray()
             };
-            chunk.EncodePacket(encoder);
+            Send(chunk);
         }
 
         public void UpdateChunkRadius(int radius)
         {
             drawDistance = radius;
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new ChunkRadiusUpdated
             {
                 Radius = drawDistance,
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         public void UpdateAttributes()
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new UpdateAttributes
             {
                 EntityId = EntityID,
                 Attributes = new List<AttributeValue> { Attributes.Movement_speed() },
                 Tick = Tick
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         public void SendMetadata(bool broadcast = true)
@@ -203,32 +200,30 @@ namespace DaemonMC
 
             Dictionary<long, Player> players = new Dictionary<long, Player>(){ { EntityID, this } };
 
+            var packet = new SetActorData
+            {
+                EntityId = EntityID,
+                Metadata = Metadata,
+                Tick = Tick
+            };
+
             if (broadcast)
             {
-                players = CurrentWorld.OnlinePlayers;
+                CurrentWorld.Send(packet);
             }
-
-            foreach (var dest in players)
+            else
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                var packet = new SetActorData
-                {
-                    EntityId = EntityID,
-                    Metadata = Metadata,
-                    Tick = Tick
-                };
-                packet.EncodePacket(encoder);
+                Send(packet);
             }
         }
 
         public void SendGameRules()
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new GameRulesChanged
             {
                 GameRules = CurrentWorld.GameRules
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
         private async void ProcessSendQueue()
@@ -253,12 +248,13 @@ namespace DaemonMC
         {
             _ = Task.Run(async () => {
                 await Task.Delay(1000);
-                PacketEncoder encoder = PacketEncoderPool.Get(this);
+
                 var packet = new Disconnect
                 {
                     Message = msg
                 };
-                packet.EncodePacket(encoder);
+                Send(packet);
+
                 PacketEncoder encoder2 = PacketEncoderPool.Get(this);
                 var packet2 = new RakDisconnect
                 {
@@ -271,25 +267,23 @@ namespace DaemonMC
 
         public void SendMessage(string message)
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
-            var pk = new TextMessage
+            var packet = new TextMessage
             {
                 MessageType = 1,
                 Message = message
             };
-            pk.EncodePacket(encoder);
+            Send(packet);
         }
 
         public void Teleport(Vector3 position)
         {
             Position = position;
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
-            var movePk = new MovePlayer
+            var packet = new MovePlayer
             {
                 ActorRuntimeId = EntityID,
                 Position = position
             };
-            movePk.EncodePacket(encoder);
+            Send(packet);
         }
 
         public void SetFlag(ActorFlags flag, bool enable)
@@ -327,29 +321,32 @@ namespace DaemonMC
 
         public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
             var packet = new LevelEvent
             {
                 EventID = value,
                 Position = pos,
                 Data = data
             };
-            packet.EncodePacket(encoder);
+            Send(packet);
         }
 
-        public void PlayAnimation(string animationID)
+        public void PlayAnimation(string animationID, bool broadcast = true)
         {
             Animation animation = ResourcePackManager.Animations[animationID];
-            foreach (var player in CurrentWorld.OnlinePlayers.Values)
+            var packet = new AnimateEntity
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(player);
-                var packet = new AnimateEntity
-                {
-                    Animation = animation.AnimationName,
-                    Controller = animation.ControllerName,
-                    RuntimeId = EntityID
-                };
-                packet.EncodePacket(encoder);
+                Animation = animation.AnimationName,
+                Controller = animation.ControllerName,
+                RuntimeId = EntityID
+            };
+
+            if (broadcast)
+            {
+                CurrentWorld.Send(packet);
+            }
+            else
+            {
+                Send(packet);
             }
         }
 
@@ -406,7 +403,6 @@ namespace DaemonMC
                     LastChunkX = currentChunkX;
                     LastChunkZ = currentChunkZ;
 
-                    PacketEncoder encoder2 = PacketEncoderPool.Get(this);
                     var packet2 = new NetworkChunkPublisherUpdate
                     {
                         X = (int)Position.X,
@@ -414,7 +410,7 @@ namespace DaemonMC
                         Z = (int)Position.Z,
                         Radius = 20
                     };
-                    packet2.EncodePacket(encoder2);
+                    Send(packet2);
 
                     HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(20, currentChunkX, currentChunkZ));
 
@@ -447,7 +443,6 @@ namespace DaemonMC
 
                 UpdateChunkRadius(chunkRadius);
 
-                PacketEncoder encoder2 = PacketEncoderPool.Get(this);
                 var packet2 = new NetworkChunkPublisherUpdate
                 {
                     X = (int)Position.X,
@@ -455,7 +450,7 @@ namespace DaemonMC
                     Z = (int)Position.Z,
                     Radius = drawDistance
                 };
-                packet2.EncodePacket(encoder2);
+                Send(packet2);
 
                 int radius = chunkRadius / 2;
 
@@ -478,17 +473,13 @@ namespace DaemonMC
 
             if (packet is TextMessage textMessage)
             {
-                foreach (var dest in CurrentWorld.OnlinePlayers)
+                var msg = new TextMessage
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                    var pk = new TextMessage
-                    {
-                        MessageType = 1,
-                        Username = Username,
-                        Message = textMessage.Message
-                    };
-                    pk.EncodePacket(encoder);
-                }
+                    MessageType = 1,
+                    Username = Username,
+                    Message = textMessage.Message
+                };
+                CurrentWorld.Send(msg);
             }
 
             if (packet is ServerboundLoadingScreen serverboundLoadingScreen)
@@ -503,25 +494,23 @@ namespace DaemonMC
                             await Task.Delay(2000);
                             if (entity is CustomEntity customEntity)
                             {
-                                PacketEncoder encoder = PacketEncoderPool.Get(this);
                                 var packet = new PlayerList
                                 {
                                     Action = 1,
                                     UUID = customEntity.UUID,
                                 };
-                                packet.EncodePacket(encoder);
+                                Send(packet);
                             }
 
                             if (ResourcePackManager.Animations.TryGetValue(entity.SpawnAnimation, out Animation spawnAnimation))
                             {
-                                PacketEncoder encoder = PacketEncoderPool.Get(this);
                                 var packet1 = new AnimateEntity
                                 {
                                     Animation = spawnAnimation.AnimationName,
                                     Controller = spawnAnimation.ControllerName,
                                     RuntimeId = entity.EntityId
                                 };
-                                packet1.EncodePacket(encoder);
+                                Send(packet1);
                             }
                             else
                             {
@@ -534,19 +523,15 @@ namespace DaemonMC
 
             if (packet is PlayerSkin playerSkin)
             {
-                foreach (var dest in CurrentWorld.OnlinePlayers)
+                var pk = new PlayerSkin
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                    var pk = new PlayerSkin
-                    {
-                        UUID = UUID,
-                        Skin = playerSkin.Skin,
-                        Name = playerSkin.Name,
-                        OldName = Skin.SkinId,
-                        Trusted = playerSkin.Trusted,
-                    };
-                    pk.EncodePacket(encoder);
-                }
+                    UUID = UUID,
+                    Skin = playerSkin.Skin,
+                    Name = playerSkin.Name,
+                    OldName = Skin.SkinId,
+                    Trusted = playerSkin.Trusted,
+                };
+                CurrentWorld.Send(pk);
 
                 Skin = playerSkin.Skin;
             }
@@ -559,16 +544,7 @@ namespace DaemonMC
             if (packet is EmoteList emoteList) //todo save these values
             {
                 Log.debug($"Received emote ids from {Username}");
-                foreach (var dest in CurrentWorld.OnlinePlayers)
-                {
-                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                    var pk = new EmoteList
-                    {
-                        ActorRuntimeId = EntityID,
-                        EmoteIds = emoteList.EmoteIds
-                    };
-                    pk.EncodePacket(encoder);
-                }
+                CurrentWorld.Send(emoteList);
             }
 
             if (packet is Interact interact)
@@ -579,20 +555,7 @@ namespace DaemonMC
             if (packet is Emote emote)
             {
                 Log.debug($"{Username} emoted id {emote.EmoteID}");
-                foreach (var dest in CurrentWorld.OnlinePlayers)
-                {
-                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                    var pk = new Emote
-                    {
-                        ActorRuntimeId = EntityID,
-                        EmoteID = emote.EmoteID,
-                        EmoteTicks = emote.EmoteTicks,
-                        XUID = emote.XUID,
-                        PlatformID = emote.PlatformID,
-                        Flags = emote.Flags
-                    };
-                    pk.EncodePacket(encoder);
-                }
+                CurrentWorld.Send(emote);
             }
         }
     }

@@ -44,18 +44,14 @@ namespace DaemonMC.Entities
             Metadata[ActorData.NAMETAG_ALWAYS_SHOW] = new Metadata((byte)1);
             if (NameTag != "") { Metadata[ActorData.NAME] = new Metadata(NameTag); }
 
-            foreach (var player in CurrentWorld.OnlinePlayers.Values)
+            var pk = new AddActor
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(player);
-                var pk = new AddActor
-                {
-                    EntityId = EntityId,
-                    ActorType = ActorType,
-                    Position = Position,
-                    Metadata = Metadata
-                };
-                pk.EncodePacket(encoder);
-            }
+                EntityId = EntityId,
+                ActorType = ActorType,
+                Position = Position,
+                Metadata = Metadata
+            };
+            CurrentWorld.Send(pk);
 
             Log.debug($"Spawned {ActorType} with entityID {EntityId} in {world.LevelName}");
         }
@@ -64,15 +60,12 @@ namespace DaemonMC.Entities
         {
             if (CurrentWorld.Entities.Remove(EntityId))
             {
-                foreach (var player in CurrentWorld.OnlinePlayers.Values)
+                var packet = new RemoveActor
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(player);
-                    var pk = new RemoveActor
-                    {
-                        EntityId = EntityId,
-                    };
-                    pk.EncodePacket(encoder);
-                }
+                    EntityId = EntityId,
+                };
+                CurrentWorld.Send(packet);
+
                 Server.AvailableIds.Enqueue(EntityId);
                 Log.debug($"Despawned {ActorType} with entityID {EntityId} in {CurrentWorld.LevelName}");
             }
@@ -86,39 +79,31 @@ namespace DaemonMC.Entities
         {
             Position = position;
 
-            foreach (Player player in CurrentWorld.OnlinePlayers.Values)
-            {
-                ushort header = 0;
-                header |= 0x01;
-                header |= 0x02;
-                header |= 0x04;
-                header |= 0x08;
-                header |= 0x10;
-                header |= 0x20;
+            ushort header = 0;
+            header |= 0x01;
+            header |= 0x02;
+            header |= 0x04;
+            header |= 0x08;
+            header |= 0x10;
+            header |= 0x20;
 
-                PacketEncoder encoder = PacketEncoderPool.Get(player);
-                var movePk = new MoveActorDelta
-                {
-                    EntityId = EntityId,
-                    Header = header,
-                    Position = Position
-                };
-                movePk.EncodePacket(encoder);
-            }
+            var movePacket = new MoveActorDelta
+            {
+                EntityId = EntityId,
+                Header = header,
+                Position = Position
+            };
+            CurrentWorld.Send(movePacket);
         }
 
         public void SendMetadata()
         {
-            foreach (var player in CurrentWorld.OnlinePlayers.Values)
+            var packet = new SetActorData
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(player);
-                var packet = new SetActorData
-                {
-                    EntityId = EntityId,
-                    Metadata = Metadata
-                };
-                packet.EncodePacket(encoder);
-            }
+                EntityId = EntityId,
+                Metadata = Metadata
+            };
+            CurrentWorld.Send(packet);
         }
 
         public void SetFlag(ActorFlags flag, bool enable)
@@ -138,17 +123,13 @@ namespace DaemonMC.Entities
         public void PlayAnimation(string animationID)
         {
             Animation animation = ResourcePackManager.Animations[animationID];
-            foreach (var player in CurrentWorld.OnlinePlayers.Values)
+            var packet = new AnimateEntity
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(player);
-                var packet = new AnimateEntity
-                {
-                    Animation = animation.AnimationName,
-                    Controller = animation.ControllerName,
-                    RuntimeId = EntityId
-                };
-                packet.EncodePacket(encoder);
-            }
+                Animation = animation.AnimationName,
+                Controller = animation.ControllerName,
+                RuntimeId = EntityId
+            };
+            CurrentWorld.Send(packet);
         }
     }
 }

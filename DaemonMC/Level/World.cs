@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Numerics;
 using DaemonMC.Entities;
 using DaemonMC.Network;
@@ -15,7 +14,7 @@ namespace DaemonMC.Level
 {
     public class World
     {
-        public bool Temporary { get; set; } = true;
+        public bool Temporary { get; set; } = false;
         public string LevelName { get; set; } = "";
         public Dictionary<long, Player> OnlinePlayers { get; set; } = new Dictionary<long, Player>();
         public Dictionary<long, Entity> Entities { get; set; } = new Dictionary<long, Entity>();
@@ -33,19 +32,24 @@ namespace DaemonMC.Level
             Load();
         }
 
-        public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
+        public void Send(Packet packet)
         {
             foreach (var dest in OnlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
-                var packet = new LevelEvent
-                {
-                    EventID = value,
-                    Position = pos,
-                    Data = data
-                };
                 packet.EncodePacket(encoder);
             }
+        }
+
+        public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
+        {
+            var packet = new LevelEvent
+            {
+                EventID = value,
+                Position = pos,
+                Data = data
+            };
+            Send(packet);
         }
 
         public void AddPlayer(Player player)
@@ -54,7 +58,6 @@ namespace DaemonMC.Level
             {
                 if (entity is CustomEntity customEntity)
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(player);
                     var packet = new AddPlayer
                     {
                         UUID = customEntity.UUID,
@@ -63,9 +66,8 @@ namespace DaemonMC.Level
                         Position = customEntity.Position,
                         Metadata = customEntity.Metadata
                     };
-                    packet.EncodePacket(encoder);
+                    player.Send(packet);
 
-                    PacketEncoder encoder2 = PacketEncoderPool.Get(player);
                     var packet2 = new PlayerList
                     {
                         UUID = customEntity.UUID,
@@ -73,11 +75,10 @@ namespace DaemonMC.Level
                         Username = customEntity.NameTag,
                         Skin = customEntity.Skin
                     };
-                    packet2.EncodePacket(encoder2);
+                    player.Send(packet2);
                 }
                 else
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(player);
                     var pk = new AddActor
                     {
                         EntityId = entity.EntityId,
@@ -85,24 +86,22 @@ namespace DaemonMC.Level
                         Position = entity.Position,
                         Metadata = entity.Metadata
                     };
-                    pk.EncodePacket(encoder);
+                    player.Send(pk);
                 }
             }
 
+            var packet3 = new PlayerList
+            {
+                UUID = player.UUID,
+                EntityId = player.EntityID,
+                Username = player.Username,
+                XUID = player.XUID,
+                Skin = player.Skin
+            };
+            Send(packet3);
+
             foreach (Player onlinePlayer in OnlinePlayers.Values)
             {
-                PacketEncoder encoder3 = PacketEncoderPool.Get(onlinePlayer);
-                var packet3 = new PlayerList
-                {
-                    UUID = player.UUID,
-                    EntityId = player.EntityID,
-                    Username = player.Username,
-                    XUID = player.XUID,
-                    Skin = player.Skin
-                };
-                packet3.EncodePacket(encoder3);
-
-                PacketEncoder encoder4 = PacketEncoderPool.Get(player);
                 var packet4 = new PlayerList
                 {
                     UUID = onlinePlayer.UUID,
@@ -111,11 +110,10 @@ namespace DaemonMC.Level
                     XUID = onlinePlayer.XUID,
                     Skin = onlinePlayer.Skin
                 };
-                packet4.EncodePacket(encoder4);
+                Send(packet4);
 
                 if (onlinePlayer == player) { continue; }
 
-                PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
                 var packet = new AddPlayer
                 {
                     UUID = player.UUID,
@@ -124,9 +122,8 @@ namespace DaemonMC.Level
                     Position = player.Position,
                     Metadata = player.Metadata
                 };
-                packet.EncodePacket(encoder);
+                onlinePlayer.Send(packet);
 
-                PacketEncoder encoder2 = PacketEncoderPool.Get(player);
                 var packet2 = new AddPlayer
                 {
                     UUID = onlinePlayer.UUID,
@@ -135,7 +132,7 @@ namespace DaemonMC.Level
                     Position = onlinePlayer.Position,
                     Metadata = onlinePlayer.Metadata
                 };
-                packet2.EncodePacket(encoder2);
+                player.Send(packet2);
             }
         }
 
@@ -147,22 +144,19 @@ namespace DaemonMC.Level
             }
             else
             {
-                foreach (var dest in OnlinePlayers.Values)
+                var packet = new RemoveActor
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(dest);
-                    var pk = new RemoveActor
-                    {
-                        EntityId = player.EntityID
-                    };
-                    pk.EncodePacket(encoder);
-                    PacketEncoder encoder1 = PacketEncoderPool.Get(dest);
-                    var packet1 = new PlayerList
-                    {
-                        Action = 1,
-                        UUID = player.UUID,
-                    };
-                    packet1.EncodePacket(encoder1);
-                }
+                    EntityId = player.EntityID
+                };
+                Send(packet);
+
+                var packet1 = new PlayerList
+                {
+                    Action = 1,
+                    UUID = player.UUID,
+                };
+                Send(packet1);
+
                 Log.debug($"Despawned {player.Username} from World {player.CurrentWorld.LevelName}");
             }
         }

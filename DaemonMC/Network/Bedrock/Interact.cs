@@ -6,17 +6,17 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.Interact;
 
-        public byte action = 0;
-        public long actorRuntimeId = 0;
-        public Vector3 interactPosition = new Vector3();
+        public byte Action { get; set; } = 0;
+        public long ActorRuntimeId { get; set; } = 0;
+        public Vector3 InteractPosition { get; set; } = new Vector3();
 
         protected override void Decode(PacketDecoder decoder)
         {
-            action = decoder.ReadByte();
-            actorRuntimeId = decoder.ReadVarLong();
-            if (action == 3 || action == 4)
+            Action = decoder.ReadByte();
+            ActorRuntimeId = decoder.ReadVarLong();
+            if (Action == 3 || Action == 4)
             {
-                interactPosition = decoder.ReadVec3();
+                InteractPosition = decoder.ReadVec3();
             }
         }
 

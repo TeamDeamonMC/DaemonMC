@@ -8,6 +8,7 @@ using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 using fNbt;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DaemonMC.Network
 {
@@ -82,7 +83,7 @@ namespace DaemonMC.Network
 
         public void SendPacket(int pkid, bool pooled = true)
         {
-            Server.datGrOut++;
+            Server.DatGrOut++;
             if (pkid <= 127 || pkid >= 141) { Log.packetOut(clientEp, (Info.RakNet)pkid); };
             byte[] trimmedBuffer = new byte[byteStream.Position];
             Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
@@ -91,7 +92,7 @@ namespace DaemonMC.Network
                 Log.warn($"Tried to send data to disconnected client {clientEp.Address}");
                 return;
             }
-            Server.sock.SendTo(trimmedBuffer, clientEp);
+            Server.Sock.SendTo(trimmedBuffer, clientEp);
             if (pkid == 128) { RakSessionManager.getSession(clientEp).sequenceNumber++; };
             if (pooled) { PacketEncoderPool.Return(this); }
         }
@@ -110,7 +111,7 @@ namespace DaemonMC.Network
 
         public void PacketId(Info.Bedrock id)
         {
-            WriteVarInt((int) id);
+            WriteVarInt((int)id);
         }
 
         public void WriteBool(bool value)
@@ -170,8 +171,12 @@ namespace DaemonMC.Network
             byteStream.WriteByte(value);
         }
 
-        public void WriteBytes(byte[] data)
+        public void WriteBytes(byte[] data, bool writeLength = true)
         {
+            if (writeLength)
+            {
+                WriteVarInt(data.Count());
+            }
             byteStream.Write(data, 0, data.Length);
         }
 
@@ -238,6 +243,11 @@ namespace DaemonMC.Network
             byteStream.WriteByte((byte)((value >> 16) & 0xFF));
         }
 
+        public void WriteVarLong(long value)
+        {
+            WriteVarLong((ulong)value);
+        }
+
         public void WriteVarLong(ulong value)
         {
             while ((value & ~0x7FUL) != 0)
@@ -285,8 +295,8 @@ namespace DaemonMC.Network
             reordered[6] = mostSignificantBits[5];
             reordered[7] = mostSignificantBits[4];
 
-            WriteBytes(reordered);
-            WriteBytes(leastSignificantBits);
+            WriteBytes(reordered, false);
+            WriteBytes(leastSignificantBits, false);
         }
 
 
@@ -310,7 +320,6 @@ namespace DaemonMC.Network
             WriteString(skin.SkinResourcePatch);
             WriteInt(skin.SkinImageWidth);
             WriteInt(skin.SkinImageHeight);
-            WriteVarInt(skin.SkinData.Count());
             WriteBytes(skin.SkinData);
             WriteInt(skin.AnimatedImageData.Count());
             foreach (var animation in skin.AnimatedImageData)
@@ -318,7 +327,6 @@ namespace DaemonMC.Network
                 WriteInt(animation.ImageWidth);
                 WriteInt(animation.ImageHeight);
                 byte[] imageData = Convert.FromBase64String(animation.Image);
-                WriteVarInt(imageData.Count());
                 WriteBytes(imageData);
                 WriteInt(animation.Type);
                 WriteFloat(animation.Frames);
@@ -326,7 +334,6 @@ namespace DaemonMC.Network
             }
             WriteInt(skin.Cape.CapeImageWidth);
             WriteInt(skin.Cape.CapeImageHeight);
-            WriteVarInt(skin.Cape.CapeData.Count());
             WriteBytes(skin.Cape.CapeData);
             WriteString(skin.SkinGeometryData);
             WriteString(skin.SkinGeometryDataEngineVersion);
@@ -366,7 +373,7 @@ namespace DaemonMC.Network
             WriteVarInt(metadata.Count);
             foreach (var entry in metadata)
             {
-                WriteVarInt((int) entry.Key);
+                WriteVarInt((int)entry.Key);
 
                 switch (entry.Value.Value)
                 {
@@ -376,7 +383,7 @@ namespace DaemonMC.Network
                         break;
                     case short value:
                         WriteVarInt(1);
-                        WriteShort((ushort) value);
+                        WriteShort((ushort)value);
                         break;
                     case int value:
                         WriteVarInt(2);
@@ -433,6 +440,60 @@ namespace DaemonMC.Network
                         WriteFloat(value);
                         break;
                 }
+            }
+        }
+
+        public void WriteEmotes(List<Guid> emoteIds)
+        {
+            WriteVarInt(emoteIds.Count);
+            foreach (var emote in emoteIds)
+            {
+                WriteUUID(emote);
+            }
+        }
+
+        public void WriteResourcePacksInfo(List<ResourcePack> packs)
+        {
+            WriteShort((ushort)packs.Count());
+            foreach (var pack in packs)
+            {
+                WriteUUID(pack.UUID);
+                WriteString(pack.PackIdVersion);
+                WriteLong(pack.PackContent.Length);
+                WriteString(pack.ContentKey);
+                WriteString(pack.SubpackName);
+                WriteString(pack.ContentId);
+                WriteBool(pack.HasScripts);
+                WriteBool(pack.IsAddon);
+                WriteBool(pack.RayTracking);
+                WriteString(pack.CdnUrl);
+            }
+        }
+
+        public void WriteResourcePacksStack(List<ResourcePack> packs)
+        {
+            WriteVarInt(packs.Count);
+            foreach (var pack in packs)
+            {
+                WriteString(pack.UUID.ToString());
+                WriteString(pack.PackIdVersion);
+                WriteString(pack.SubpackName);
+            }
+        }
+
+        public void WriteAttributes(List<AttributeValue> attributes)
+        {
+            WriteVarInt(attributes.Count);
+            foreach (var attribute in attributes)
+            {
+                WriteFloat(attribute.MinValue);
+                WriteFloat(attribute.MaxValue);
+                WriteFloat(attribute.CurrentValue);
+                WriteFloat(attribute.DefaultMinValue);
+                WriteFloat(attribute.DefaultMaxValue);
+                WriteFloat(attribute.DefaultValue);
+                WriteString(attribute.Name);
+                WriteVarInt(0); //todo modifiers
             }
         }
     }

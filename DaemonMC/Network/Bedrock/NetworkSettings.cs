@@ -4,11 +4,11 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.NetworkSettings;
 
-        public ushort compressionThreshold = 0;
-        public ushort compressionAlgorithm = 0;
-        public bool clientThrottleEnabled = false;
-        public byte clientThrottleThreshold = 0;
-        public float clientThrottleScalar = 0;
+        public ushort CompressionThreshold { get; set; } = 0;
+        public ushort CompressionAlgorithm { get; set; } = 0;
+        public bool ClientThrottleEnabled { get; set; } = false;
+        public byte ClientThrottleThreshold { get; set; } = 0;
+        public float ClientThrottleScalar { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -17,11 +17,11 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteShort(compressionThreshold);
-            encoder.WriteShort(compressionAlgorithm);
-            encoder.WriteBool(clientThrottleEnabled);
-            encoder.WriteByte(clientThrottleThreshold);
-            encoder.WriteFloat(clientThrottleScalar);
+            encoder.WriteShort(CompressionThreshold);
+            encoder.WriteShort(CompressionAlgorithm);
+            encoder.WriteBool(ClientThrottleEnabled);
+            encoder.WriteByte(ClientThrottleThreshold);
+            encoder.WriteFloat(ClientThrottleScalar);
         }
     }
 }

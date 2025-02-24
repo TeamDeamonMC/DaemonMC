@@ -9,11 +9,11 @@ namespace DaemonMC.Level
 {
     public class Chunk
     {
-        public List<SubChunk> chunks = new List<SubChunk>();
+        public List<SubChunk> Chunks = new List<SubChunk>();
 
-        public byte[] networkSerialize(Player player = null)
+        public byte[] NetworkSerialize(Player ?player = null)
         {
-            int protocol = Info.protocolVersion.Last();
+            int protocol = Info.ProtocolVersion.Last();
 
             if (player != null)
             {
@@ -22,16 +22,16 @@ namespace DaemonMC.Level
 
             using (var stream = new MemoryStream())
             {
-                for (int i = 0; i < chunks.Count; i++)
+                for (int i = 0; i < Chunks.Count; i++)
                 {
-                    stream.WriteByte((byte)chunks[i].version);
+                    stream.WriteByte((byte)Chunks[i].Version);
 
-                    stream.WriteByte((byte)chunks[i].storageSize);
+                    stream.WriteByte((byte)Chunks[i].StorageSize);
 
-                    for (int a = 0; a < chunks[i].storageSize; a++)
+                    for (int a = 0; a < Chunks[i].StorageSize; a++)
                     {
-                        bool isRuntime = chunks[i].isRuntime;
-                        int bitsPerBlock = chunks[i].bitsPerBlock;
+                        bool isRuntime = Chunks[i].IsRuntime;
+                        int bitsPerBlock = Chunks[i].BitsPerBlock;
                         byte flag = (byte)((bitsPerBlock << 1) | (isRuntime ? 1 : 0));
                         stream.WriteByte(flag);
 
@@ -41,20 +41,20 @@ namespace DaemonMC.Level
                         int position = 0;
                         for (int b = 0; b < wordsPerChunk; b++)
                         {
-                            uint word = chunks[i].words[b];
+                            uint word = Chunks[i].Words[b];
                             for (int block = 0; block < blocksPerWord; block++)
                             {
-                                int state = chunks[i].blocks[position];
+                                int state = Chunks[i].Blocks[position];
                                 word |= (uint)(state & ((1 << bitsPerBlock) - 1)) << ((position % blocksPerWord) * bitsPerBlock);
                                 position++;
                             }
                             ToDataTypes.WriteUInt32(stream, word);
                         }
 
-                        int paletteSize = chunks[i].palette.Count;
+                        int paletteSize = Chunks[i].Palette.Count;
                         VarInt.WriteSInt32(stream, paletteSize);
 
-                        var blockPalette = StateConverter.process(chunks[i].palette, protocol);
+                        var blockPalette = StateConverter.process(Chunks[i].Palette, protocol);
 
                         for (int v = 0; v < paletteSize; v++)
                         {

@@ -4,12 +4,12 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.ResourcePacksInfo;
 
-        public bool force = false;
-        public bool isAddon = false;
-        public bool hasScripts = false;
-        public Guid templateUUID = new Guid();
-        public string templateVersion = "";
-        public List<ResourcePack> packs = new List<ResourcePack>();
+        public bool Force { get; set; } = false;
+        public bool IsAddon { get; set; } = false;
+        public bool HasScripts { get; set; } = false;
+        public Guid TemplateUUID { get; set; } = new Guid();
+        public string TemplateVersion { get; set; } = "";
+        public List<ResourcePack> Packs { get; set; } = new List<ResourcePack>();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -18,28 +18,15 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteBool(force);
-            encoder.WriteBool(isAddon);
-            encoder.WriteBool(hasScripts);
+            encoder.WriteBool(Force);
+            encoder.WriteBool(IsAddon);
+            encoder.WriteBool(HasScripts);
             if (encoder.protocolVersion >= Info.v1_21_50)
             {
-                encoder.WriteUUID(templateUUID);
-                encoder.WriteString(templateVersion);
+                encoder.WriteUUID(TemplateUUID);
+                encoder.WriteString(TemplateVersion);
             }
-            encoder.WriteShort((ushort) packs.Count());
-            foreach (var pack in packs)
-            {
-                encoder.WriteUUID(pack.UUID);
-                encoder.WriteString(pack.PackIdVersion);
-                encoder.WriteLong(pack.PackContent.Length);
-                encoder.WriteString(pack.ContentKey);
-                encoder.WriteString(pack.SubpackName);
-                encoder.WriteString(pack.ContentId);
-                encoder.WriteBool(pack.HasScripts);
-                encoder.WriteBool(pack.IsAddon);
-                encoder.WriteBool(pack.RayTracking);
-                encoder.WriteString(pack.CdnUrl);
-            }
+            encoder.WriteResourcePacksInfo(Packs);
         }
     }
 }

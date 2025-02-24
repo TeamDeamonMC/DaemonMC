@@ -6,8 +6,9 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.UpdateAttributes;
 
-        public long EntityId = 0;
-        public List<AttributeValue> Attributes = new List<AttributeValue>();
+        public long EntityId { get; set; } = 0;
+        public List<AttributeValue> Attributes { get; set; } = new List<AttributeValue>();
+        public long Tick { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -16,20 +17,9 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong) EntityId);
-            encoder.WriteVarInt(Attributes.Count);
-            foreach (var attribute in Attributes)
-            {
-                encoder.WriteFloat(attribute.MinValue);
-                encoder.WriteFloat(attribute.MaxValue);
-                encoder.WriteFloat(attribute.CurrentValue);
-                encoder.WriteFloat(attribute.DefaultMinValue);
-                encoder.WriteFloat(attribute.DefaultMaxValue);
-                encoder.WriteFloat(attribute.DefaultValue);
-                encoder.WriteString(attribute.Name);
-                encoder.WriteVarInt(0); //todo modifiers
-            }
-            encoder.WriteVarLong(0); //todo tick
+            encoder.WriteVarLong(EntityId);
+            encoder.WriteAttributes(Attributes);
+            encoder.WriteVarLong(Tick);
         }
     }
 }

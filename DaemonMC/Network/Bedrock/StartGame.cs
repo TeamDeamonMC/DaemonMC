@@ -6,23 +6,23 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.StartGame;
 
-        public string LevelName;
-        public long EntityId = 0;
-        public int GameMode = 0;
-        public Vector3 Position = new Vector3();
-        public Vector2 Rotation = new Vector2();
-        public long Seed = 0;
-        public ushort BiomeType = 0;
-        public string BiomeName = "plains";
-        public int Dimension = 0;
-        public int Generator = 1;
-        public int GameType = 0;
-        public int Difficulty = 0;
-        public int SpawnBlockX = 0;
-        public int SpawnBlockY = 0;
-        public int SpawnBlockZ = 0;
-        public int EditorType = 0;
-        public int StopTime = 0;
+        public string LevelName = "";
+        public long EntityId { get; set; } = 0;
+        public int GameMode { get; set; } = 0;
+        public Vector3 Position { get; set; } = new Vector3();
+        public Vector2 Rotation { get; set; } = new Vector2();
+        public long Seed { get; set; } = 0;
+        public ushort BiomeType { get; set; } = 0;
+        public string BiomeName { get; set; } = "plains";
+        public int Dimension { get; set; } = 0;
+        public int Generator { get; set; } = 1;
+        public int GameType { get; set; } = 0;
+        public int Difficulty { get; set; } = 0;
+        public int SpawnBlockX { get; set; } = 0;
+        public int SpawnBlockY { get; set; } = 0;
+        public int SpawnBlockZ { get; set; } = 0;
+        public int EditorType { get; set; } = 0;
+        public int StopTime { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -84,7 +84,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
-                encoder.WriteString(Info.version);
+                encoder.WriteString(Info.Version);
                 encoder.WriteInt(0);
                 encoder.WriteInt(0);
                 encoder.WriteBool(false);
@@ -115,7 +115,7 @@ namespace DaemonMC.Network.Bedrock
             }
             encoder.WriteString("");
             encoder.WriteBool(true); //new inventory
-            encoder.WriteString(Info.version);
+            encoder.WriteString(Info.Version);
             encoder.WriteCompoundTag(new fNbt.NbtCompound(""));
             encoder.WriteLong(0); //blockstate checksum
             var uuid = Guid.NewGuid();

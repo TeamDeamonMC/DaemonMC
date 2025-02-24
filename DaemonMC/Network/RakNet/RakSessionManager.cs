@@ -75,7 +75,7 @@ namespace DaemonMC.Network.RakNet
                 PacketEncoder encoder = PacketEncoderPool.Get(player.Key);
                 var packet = new Disconnect
                 {
-                    message = "Server closed"
+                    Message = "Server closed"
                 };
                 packet.EncodePacket(encoder);
             }

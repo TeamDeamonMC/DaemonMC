@@ -7,7 +7,7 @@ namespace DaemonMC.Plugin.Plugin
 {
     public class PluginManager
     {
-        private static readonly List<Plugin> _plugins = new();
+        private static readonly List<Plugin> _plugins = new List<Plugin>();
 
         public static void LoadPlugins(string pluginDirectory)
         {

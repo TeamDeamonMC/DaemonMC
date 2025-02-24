@@ -13,7 +13,7 @@ namespace DaemonMC.Network.Bedrock
                 {
                     decoder.ReadByte();
                 }
-                if (Server.onlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.clientEp).EntityID))
+                if (Server.OnlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.clientEp).EntityID))
                 {
                     decoder.player = Server.GetPlayer(RakSessionManager.getSession(decoder.clientEp).EntityID);
                 }

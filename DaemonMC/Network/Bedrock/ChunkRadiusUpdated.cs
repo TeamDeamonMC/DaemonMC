@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.ChunkRadiusUpdated;
 
-        public int radius = 0;
+        public int Radius { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -13,7 +13,7 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(radius);
+            encoder.WriteVarInt(Radius);
         }
     }
 }

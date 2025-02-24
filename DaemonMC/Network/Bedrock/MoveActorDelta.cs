@@ -6,11 +6,11 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.MoveActorDelta;
 
-        public long EntityId = 0;
-        public ushort Header = 0;
-        public Vector3 Position = new Vector3();
-        public Vector2 Rotation = new Vector2();
-        public float YheadRotation = 0;
+        public long EntityId { get; set; } = 0;
+        public ushort Header { get; set; } = 0;
+        public Vector3 Position { get; set; } = new Vector3();
+        public Vector2 Rotation { get; set; } = new Vector2();
+        public float YheadRotation { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {

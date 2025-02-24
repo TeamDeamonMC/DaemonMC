@@ -12,7 +12,7 @@ namespace DaemonMC.Entities
     {
         public long EntityId { get; set; } = 0;
         public string NameTag { get; set; } = "";
-        public World currentWorld { get; protected set; }
+        public World CurrentWorld { get; protected set; }
         public string ActorType { get; protected set; } = "";
         public Vector3 Position { get; set; } = new Vector3();
         public Vector3 Velocity { get; set; } = new Vector3();
@@ -25,16 +25,16 @@ namespace DaemonMC.Entities
 
         public virtual void Spawn(World world)
         {
-            currentWorld = world;
+            CurrentWorld = world;
             long id;
 
-            if (Server.availableIds.Count > 0)
+            if (Server.AvailableIds.Count > 0)
             {
-                id = Server.availableIds.Dequeue();
+                id = Server.AvailableIds.Dequeue();
             }
             else
             {
-                id = Server.nextId++;
+                id = Server.NextId++;
             }
 
             EntityId = id;
@@ -44,7 +44,7 @@ namespace DaemonMC.Entities
             Metadata[ActorData.NAMETAG_ALWAYS_SHOW] = new Metadata((byte)1);
             if (NameTag != "") { Metadata[ActorData.NAME] = new Metadata(NameTag); }
 
-            foreach (var player in currentWorld.onlinePlayers.Values)
+            foreach (var player in CurrentWorld.OnlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
                 var pk = new AddActor
@@ -57,14 +57,14 @@ namespace DaemonMC.Entities
                 pk.EncodePacket(encoder);
             }
 
-            Log.debug($"Spawned {ActorType} with entityID {EntityId} in {world.levelName}");
+            Log.debug($"Spawned {ActorType} with entityID {EntityId} in {world.LevelName}");
         }
 
         public virtual void Despawn()
         {
-            if (currentWorld.Entities.Remove(EntityId))
+            if (CurrentWorld.Entities.Remove(EntityId))
             {
-                foreach (var player in currentWorld.onlinePlayers.Values)
+                foreach (var player in CurrentWorld.OnlinePlayers.Values)
                 {
                     PacketEncoder encoder = PacketEncoderPool.Get(player);
                     var pk = new RemoveActor
@@ -73,12 +73,12 @@ namespace DaemonMC.Entities
                     };
                     pk.EncodePacket(encoder);
                 }
-                Server.availableIds.Enqueue(EntityId);
-                Log.debug($"Despawned {ActorType} with entityID {EntityId} in {currentWorld.levelName}");
+                Server.AvailableIds.Enqueue(EntityId);
+                Log.debug($"Despawned {ActorType} with entityID {EntityId} in {CurrentWorld.LevelName}");
             }
             else
             {
-                Log.error($"Couldn't find {ActorType} with entityID {EntityId} in {currentWorld.levelName}");
+                Log.error($"Couldn't find {ActorType} with entityID {EntityId} in {CurrentWorld.LevelName}");
             }
         }
 
@@ -86,7 +86,7 @@ namespace DaemonMC.Entities
         {
             Position = position;
 
-            foreach (Player player in currentWorld.onlinePlayers.Values)
+            foreach (Player player in CurrentWorld.OnlinePlayers.Values)
             {
                 ushort header = 0;
                 header |= 0x01;
@@ -109,7 +109,7 @@ namespace DaemonMC.Entities
 
         public void SendMetadata()
         {
-            foreach (var player in currentWorld.onlinePlayers.Values)
+            foreach (var player in CurrentWorld.OnlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
                 var packet = new SetActorData
@@ -138,14 +138,14 @@ namespace DaemonMC.Entities
         public void PlayAnimation(string animationID)
         {
             Animation animation = ResourcePackManager.Animations[animationID];
-            foreach (var player in currentWorld.onlinePlayers.Values)
+            foreach (var player in CurrentWorld.OnlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(player);
                 var packet = new AnimateEntity
                 {
-                    mAnimation = animation.AnimationName,
-                    mController = animation.ControllerName,
-                    mRuntimeId = EntityId
+                    Animation = animation.AnimationName,
+                    Controller = animation.ControllerName,
+                    RuntimeId = EntityId
                 };
                 packet.EncodePacket(encoder);
             }

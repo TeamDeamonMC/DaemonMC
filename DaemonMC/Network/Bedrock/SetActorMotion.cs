@@ -6,8 +6,9 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.SetActorMotion;
 
-        public long EntityId = 0;
-        public Vector3 Motion = new Vector3();
+        public long EntityId { get; set; } = 0;
+        public Vector3 Motion { get; set; } = new Vector3();
+        public long Tick { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -16,8 +17,9 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong)EntityId);
-            encoder.WriteVarLong(0);
+            encoder.WriteVarLong(EntityId);
+            encoder.WriteVec3(Motion);
+            encoder.WriteVarLong(Tick);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace DaemonMC
 {
     public class CommandManager
     {
-        public static List<Command> AvailableCommands = new List<Command>();
+        public static List<Command> AvailableCommands { get; set; } = new List<Command>();
 
         public static void Register(Command command, Action<Player> commandFunction)
         {
@@ -44,7 +44,7 @@ namespace DaemonMC
 
         public static void about(Player player)
         {
-            player.SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.version} \n§r§fProject URL: §agithub.com/laz1444/DaemonMC \n§r§fGit hash: §a{DaemonMC.gitHash} \n§r§fBuild info: §a.NET{Environment.Version} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.protocolVersion)}");
+            player.SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.Version} \n§r§fProject URL: §agithub.com/laz1444/DaemonMC \n§r§fGit hash: §a{DaemonMC.GitHash} \n§r§fBuild info: §a.NET{Environment.Version} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.ProtocolVersion)}");
         }
 
         public static void position(Player player)

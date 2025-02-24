@@ -14,7 +14,7 @@
             {
                 encoder.WriteVarInt(0); //groups
             }
-            encoder.WriteVarInt(0);
+            encoder.WriteVarInt(0); //items
         }
     }
 }

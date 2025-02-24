@@ -25,7 +25,7 @@ namespace DaemonMC.Network
                     PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
                     var packet = new Disconnect
                     {
-                        message = $"Handling {Id}\n {e}"
+                        Message = $"Handling {Id}\n {e}"
                     };
                     packet.EncodePacket(encoder);
                 }

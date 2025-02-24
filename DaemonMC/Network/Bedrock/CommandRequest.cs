@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.CommandRequest;
 
-        public string Command = "";
+        public string Command { get; set; } = "";
 
         protected override void Decode(PacketDecoder decoder)
         {

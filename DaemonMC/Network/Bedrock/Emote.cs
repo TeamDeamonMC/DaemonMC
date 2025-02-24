@@ -4,12 +4,12 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.Emote;
 
-        public long ActorRuntimeId = 0;
-        public string EmoteID = "";
-        public int EmoteTicks = 0;
-        public string XUID = "";
-        public string PlatformID = "";
-        public byte Flags = 0;
+        public long ActorRuntimeId { get; set; } = 0;
+        public string EmoteID { get; set; } = "";
+        public int EmoteTicks { get; set; } = 0;
+        public string XUID { get; set; } = "";
+        public string PlatformID { get; set; } = "";
+        public byte Flags { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -23,7 +23,7 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong)ActorRuntimeId);
+            encoder.WriteVarLong(ActorRuntimeId);
             encoder.WriteString(EmoteID);
             encoder.WriteVarInt(EmoteTicks);
             encoder.WriteString(XUID);

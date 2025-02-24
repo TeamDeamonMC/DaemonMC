@@ -6,17 +6,17 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.AvailableCommands;
 
-        public List<string> EnumValues = new List<string>();
-        public List<string> ChainedSubcommandValues = new List<string>();
-        public List<string> PostFixes = new List<string>();
-        public List<Command> Commands = new List<Command>();
+        public List<string> EnumValues { get; set; } = new List<string>();
+        public List<string> ChainedSubcommandValues { get; set; } = new List<string>();
+        public List<string> PostFixes { get; set; } = new List<string>();
+        public List<Command> Commands { get; set; } = new List<Command>();
 
         protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        protected override void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder) //todo looks terrible
         {
             encoder.WriteVarInt(EnumValues.Count);
             foreach (var value in EnumValues)

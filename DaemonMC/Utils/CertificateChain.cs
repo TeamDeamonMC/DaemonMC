@@ -2,10 +2,10 @@
 {
     public class ExtraData
     {
-        public string identity { get; set; }
-        public string displayName { get; set; }
-        public string XUID { get; set; }
-        public string titleId { get; set; }
-        public string sandboxId { get; set; }
+        public string Identity { get; set; } = "";
+        public string DisplayName { get; set; } = "";
+        public string XUID { get; set; } = "";
+        public string TitleId { get; set; } = "";
+        public string SandboxId { get; set; } = "";
     }
 }

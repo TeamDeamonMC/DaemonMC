@@ -2,8 +2,8 @@
 {
     public class Info
     {
-        public static string version = "1.21.60";
-        public static int[] protocolVersion = [748, 766, 776];
+        public static string Version = "1.21.60";
+        public static int[] ProtocolVersion = [748, 766, 776];
 
         public static int v1_21_40 = 748;
         public static int v1_21_50 = 766;

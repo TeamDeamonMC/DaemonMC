@@ -7,16 +7,18 @@ using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 namespace DaemonMC.Utils
 {
     public class JWTObject
     {
-        public List<string> Chain { get; set; }
+        public List<string> Chain { get; set; } = new List<string>();
     }
 
     public class JWT
     {
         public const string RootKey = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
+        public static bool XboxAuth { get; set; } = true;
 
         public static void processJWTchain(string jsonString, IPEndPoint clientEp)
         {
@@ -27,6 +29,16 @@ namespace DaemonMC.Utils
             if (decodedObject == null)
             {
                 return;
+            }
+
+            if (XboxAuth && decodedObject.Chain.Count != 3) //todo hah add correct auth
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var packet = new Disconnect
+                {
+                    Message = "You need to login to Xbox Live"
+                };
+                packet.EncodePacket(encoder);
             }
 
             foreach (var jwtToken in decodedObject.Chain)
@@ -40,18 +52,17 @@ namespace DaemonMC.Utils
                     {
                         Log.debug("Mojang RootKey: OK");
                     }
-
                     var extraDataClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "extraData");
                     if (extraDataClaim != null)
                     {
                         ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
-                        player.username = extraData.displayName;
-                        player.identity = extraData.identity;
+                        player.username = extraData.DisplayName;
+                        player.identity = extraData.Identity;
                         player.XUID = extraData.XUID;
                     }
                     else
                     {
-                        //Disconnect if online mode false
+
                     }
                 }
                 else
@@ -112,7 +123,7 @@ namespace DaemonMC.Utils
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var packet = new Disconnect
                 {
-                    message = $"Skin decoding failed"
+                    Message = $"Skin decoding failed"
                 };
                 packet.EncodePacket(encoder);
                 Log.error($"Skin decoding failed: {ex.Message}");

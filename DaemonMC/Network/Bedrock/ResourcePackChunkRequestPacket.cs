@@ -6,8 +6,8 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.ResourcePackChunkRequest;
 
-        public string PackName = "";
-        public int Chunk = 0;
+        public string PackName { get; set; } = "";
+        public int Chunk { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {

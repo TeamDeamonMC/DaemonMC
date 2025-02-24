@@ -6,27 +6,27 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.PlayerSkin;
 
-        public Guid UUID = Guid.NewGuid();
-        public Skin playerSkin = new Skin();
-        public string Name = "";
-        public string oldName = "";
-        public bool Trusted = false;
+        public Guid UUID { get; set; } = Guid.NewGuid();
+        public Skin Skin { get; set; } = new Skin();
+        public string Name { get; set; } = "";
+        public string OldName { get; set; } = "";
+        public bool Trusted { get; set; } = false;
 
         protected override void Decode(PacketDecoder decoder)
         {
             UUID = decoder.ReadUUID();
-            playerSkin = decoder.ReadSkin();
+            Skin = decoder.ReadSkin();
             Name = decoder.ReadString();
-            oldName = decoder.ReadString();
+            OldName = decoder.ReadString();
             Trusted = decoder.ReadBool();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteUUID(UUID);
-            encoder.WriteSkin(playerSkin);
+            encoder.WriteSkin(Skin);
             encoder.WriteString(Name);
-            encoder.WriteString(oldName);
+            encoder.WriteString(OldName);
             encoder.WriteBool(Trusted);
         }
     }

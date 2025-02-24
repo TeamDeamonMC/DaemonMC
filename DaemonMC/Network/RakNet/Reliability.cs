@@ -257,14 +257,14 @@ namespace DaemonMC.Network.RakNet
                 sentPackets.Remove(sequenceNumber);
                 ReliabilityHandler(encoder, data.Item1);
                 Log.debug($"[RakNet] Received NACK {sequenceNumber} from {clientEp.Address}. Resending... OK", ConsoleColor.DarkYellow);
-                Server.rsent++;
+                Server.Rsent++;
             }
             else
             {
                 Log.debug($"[RakNet] Received NACK {sequenceNumber} from {clientEp.Address}. Resending... FAILED. Unexpected sequence number", ConsoleColor.DarkYellow);
             }
             // Log.debug($"[RakNet] Currently unacknowledged messages({sentPackets.Count}):[{string.Join(", ", sentPackets.Keys)}]", ConsoleColor.DarkYellow);
-            Server.nack++;
+            Server.Nack++;
         }
     }
 }

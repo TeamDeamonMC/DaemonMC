@@ -4,29 +4,34 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.TextMessage;
 
-        public byte messageType = 0;
-        public bool Localized = false;
-        public string Username = "";
-        public string Message = "";
+        public byte MessageType { get; set; } = 0;
+        public bool Localized { get; set; } = false;
+        public string Username { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string XUID { get; set; } = "";
+        public string PlatformId { get; set; } = "";
+        public string FilteredMessage { get; set; } = "";
 
         protected override void Decode(PacketDecoder decoder)
         {
-            messageType = decoder.ReadByte();
+            MessageType = decoder.ReadByte();
             Localized = decoder.ReadBool();
             Username = decoder.ReadString();
             Message = decoder.ReadString();
+            XUID = decoder.ReadString();
+            PlatformId = decoder.ReadString();
+            FilteredMessage = decoder.ReadString();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(messageType);
+            encoder.WriteByte(MessageType);
             encoder.WriteBool(Localized);
             encoder.WriteString(Username);
             encoder.WriteString(Message);
-
-            encoder.WriteString(""); //xuid
-            encoder.WriteString(""); //platform id
-            encoder.WriteString(""); //filtered msg
+            encoder.WriteString(XUID);
+            encoder.WriteString(PlatformId);
+            encoder.WriteString(FilteredMessage);
         }
     }
 }

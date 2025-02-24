@@ -8,18 +8,18 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.AddPlayer;
 
-        public Guid UUID = Guid.NewGuid();
-        public string Username = "";
-        public long EntityId = 0;
-        public string PlatformChatId = "";
-        public Vector3 Position = new Vector3();
-        public Vector3 Velocity = new Vector3();
-        public Vector2 Rotation = new Vector2();
-        public float YheadRotation = 0;
-        public int GameMode = 0;
-        public Dictionary<ActorData, Metadata> Metadata = new Dictionary<ActorData, Metadata>();
-        public string DeviceId = "";
-        public int BuildPlatform = 0;
+        public Guid UUID { get; set; } = Guid.NewGuid();
+        public string Username { get; set; } = "";
+        public long EntityId { get; set; } = 0;
+        public string PlatformChatId { get; set; } = "";
+        public Vector3 Position { get; set; } = new Vector3();
+        public Vector3 Velocity { get; set; } = new Vector3();
+        public Vector2 Rotation { get; set; } = new Vector2();
+        public float YheadRotation { get; set; } = 0;
+        public int GameMode { get; set; } = 0;
+        public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public string DeviceId { get; set; } = "";
+        public int BuildPlatform { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -30,7 +30,7 @@ namespace DaemonMC.Network.Bedrock
         {
             encoder.WriteUUID(UUID);
             encoder.WriteString(Username);
-            encoder.WriteVarLong((ulong)EntityId);
+            encoder.WriteVarLong(EntityId);
             encoder.WriteString(PlatformChatId);
             encoder.WriteVec3(Position);
             encoder.WriteVec3(Velocity);

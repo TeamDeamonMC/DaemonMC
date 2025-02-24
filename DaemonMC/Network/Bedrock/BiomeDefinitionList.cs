@@ -6,7 +6,7 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.BiomeDefinitionList;
 
-        public NbtCompound biomeData = new NbtCompound();
+        public NbtCompound BiomeData { get; set; } = new NbtCompound();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -15,7 +15,7 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteCompoundTag(biomeData);
+            encoder.WriteCompoundTag(BiomeData);
         }
     }
 }

@@ -4,13 +4,13 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.ResourcePackClientResponse;
 
-        public byte response = 0;
-        public List<string> packs = new List<string>();
+        public byte Response { get; set; } = 0;
+        public List<string> Packs { get; set; } = new List<string>();
 
         protected override void Decode(PacketDecoder decoder)
         {
-            response = decoder.ReadByte();
-            packs = decoder.ReadPackNames();
+            Response = decoder.ReadByte();
+            Packs = decoder.ReadPackNames();
         }
 
         protected override void Encode(PacketEncoder encoder)

@@ -11,8 +11,8 @@ namespace DaemonMC.Tests
         [TestMethod]
         public void InfoLoadTest()
         {
-            string levelName = "My World";
-            using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{levelName}.mcworld"))
+            string LevelName = "My World";
+            using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{LevelName}.mcworld"))
             {
                 foreach (var entry in archive.Entries)
                 {
@@ -47,15 +47,15 @@ namespace DaemonMC.Tests
         [TestMethod]
         public void ChunkLoadTest()
         {
-            string levelName = "My World";
+            string LevelName = "My World";
             int x = 3;
             int z = -3;
             int count = 0;
 
-            using var db = new Database(new DirectoryInfo($"Worlds/{levelName}.mcworld"));
+            using var db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
             db.Open();
 
-            Console.WriteLine($"Reading chunk x:{x} z:{z} from world:Worlds/{levelName}.mcworld");
+            Console.WriteLine($"Reading chunk x:{x} z:{z} from world:Worlds/{LevelName}.mcworld");
             Console.WriteLine();
 
             byte[] index = ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z));

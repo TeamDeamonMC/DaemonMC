@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.Disconnect;
 
-        public string message = "";
+        public string Message { get; set; } = "";
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -15,7 +15,7 @@
         {
             encoder.WriteVarInt(0);
             encoder.WriteBool(false);
-            encoder.WriteString(message);
+            encoder.WriteString(Message);
             encoder.WriteString("");
         }
     }

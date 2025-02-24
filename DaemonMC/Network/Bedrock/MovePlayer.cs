@@ -6,37 +6,37 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.MovePlayer;
 
-        public long actorRuntimeId = 0;
-        public Vector3 position = new Vector3();
-        public Vector2 rotation = new Vector2();
-        public float YheadRotation = 0;
-        public byte positionMode = 0;
-        public bool isOnGround = false;
-        public long vehicleRuntimeId = 0;
-        public long tick = 0;
+        public long ActorRuntimeId { get; set; } = 0;
+        public Vector3 Position { get; set; } = new Vector3();
+        public Vector2 Rotation { get; set; } = new Vector2();
+        public float YheadRotation { get; set; } = 0;
+        public byte PositionMode { get; set; } = 0;
+        public bool IsOnGround { get; set; } = false;
+        public long VehicleRuntimeId { get; set; } = 0;
+        public long Tick { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
-            actorRuntimeId = decoder.ReadVarLong();
-            position = decoder.ReadVec3();
-            rotation = decoder.ReadVec2();
+            ActorRuntimeId = decoder.ReadVarLong();
+            Position = decoder.ReadVec3();
+            Rotation = decoder.ReadVec2();
             YheadRotation = decoder.ReadFloat();
-            positionMode = decoder.ReadByte();
-            isOnGround = decoder.ReadBool();
-            vehicleRuntimeId = decoder.ReadVarLong();
-            tick = decoder.ReadVarLong();
+            PositionMode = decoder.ReadByte();
+            IsOnGround = decoder.ReadBool();
+            VehicleRuntimeId = decoder.ReadVarLong();
+            Tick = decoder.ReadVarLong();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong)actorRuntimeId);
-            encoder.WriteVec3(position);
-            encoder.WriteVec2(rotation);
+            encoder.WriteVarLong((ulong)ActorRuntimeId);
+            encoder.WriteVec3(Position);
+            encoder.WriteVec2(Rotation);
             encoder.WriteFloat(YheadRotation);
             encoder.WriteByte(0);
-            encoder.WriteBool(isOnGround);
-            encoder.WriteVarLong((ulong)vehicleRuntimeId);
-            encoder.WriteVarLong((ulong)tick);
+            encoder.WriteBool(IsOnGround);
+            encoder.WriteVarLong((ulong)VehicleRuntimeId);
+            encoder.WriteVarLong((ulong)Tick);
         }
     }
 }

@@ -7,9 +7,9 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.SetActorData;
 
-        public long EntityId = 0;
-        public Dictionary<ActorData, Metadata> Metadata = new Dictionary<ActorData, Metadata>();
-        public long Tick = 0;
+        public long EntityId { get; set; } = 0;
+        public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public long Tick { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {

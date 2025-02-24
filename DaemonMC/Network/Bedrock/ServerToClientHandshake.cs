@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.ServerToClientHandshake;
 
-        public string JWT = "";
+        public string JWT { get; set; } = "";
 
         protected override void Decode(PacketDecoder decoder)
         {

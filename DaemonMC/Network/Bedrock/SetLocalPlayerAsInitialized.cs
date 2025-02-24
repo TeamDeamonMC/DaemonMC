@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.SetLocalPlayerAsInitialized;
 
-        public long EntityID = 0;
+        public long EntityID { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {

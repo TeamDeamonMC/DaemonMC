@@ -15,27 +15,27 @@ namespace DaemonMC.Level
 {
     public class World
     {
-        public bool temporary;
-        public string levelName;
-        public Dictionary<long, Player> onlinePlayers = new Dictionary<long, Player>();
-        public Dictionary<long, Entity> Entities = new Dictionary<long, Entity>();
-        public Dictionary<string, GameRule> GameRules = new Dictionary<string, GameRule>();
-        public Database db;
+        public bool Temporary { get; set; } = true;
+        public string LevelName { get; set; } = "";
+        public Dictionary<long, Player> OnlinePlayers { get; set; } = new Dictionary<long, Player>();
+        public Dictionary<long, Entity> Entities { get; set; } = new Dictionary<long, Entity>();
+        public Dictionary<string, GameRule> GameRules { get; set; } = new Dictionary<string, GameRule>();
+        public Database Db { get; set; }
         public string LevelDisplayName { get; set; } = "DaemonMC Temp World";
-        public int Version { get; set; } = Info.protocolVersion.Last();
-        public int spawnX { get; set; } = 0;
-        public int spawnZ { get; set; } = 0;
+        public int Version { get; set; } = Info.ProtocolVersion.Last();
+        public int SpawnX { get; set; } = 0;
+        public int SpawnZ { get; set; } = 0;
         public long RandomSeed { get; set; } = 0;
 
-        public World(string LevelName)
+        public World(string levelName)
         {
-            levelName = LevelName;
-            load();
+            LevelName = levelName;
+            Load();
         }
 
         public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
         {
-            foreach (var dest in onlinePlayers)
+            foreach (var dest in OnlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 var packet = new LevelEvent
@@ -48,7 +48,7 @@ namespace DaemonMC.Level
             }
         }
 
-        public void addPlayer(Player player)
+        public void AddPlayer(Player player)
         {
             foreach (var entity in Entities.Values)
             {
@@ -89,7 +89,7 @@ namespace DaemonMC.Level
                 }
             }
 
-            foreach (Player onlinePlayer in onlinePlayers.Values)
+            foreach (Player onlinePlayer in OnlinePlayers.Values)
             {
                 PacketEncoder encoder3 = PacketEncoderPool.Get(onlinePlayer);
                 var packet3 = new PlayerList
@@ -122,7 +122,7 @@ namespace DaemonMC.Level
                     Username = player.Username,
                     EntityId = player.EntityID,
                     Position = player.Position,
-                    Metadata = player.metadata
+                    Metadata = player.Metadata
                 };
                 packet.EncodePacket(encoder);
 
@@ -133,21 +133,21 @@ namespace DaemonMC.Level
                     Username = onlinePlayer.Username,
                     EntityId = onlinePlayer.EntityID,
                     Position = onlinePlayer.Position,
-                    Metadata = onlinePlayer.metadata
+                    Metadata = onlinePlayer.Metadata
                 };
                 packet2.EncodePacket(encoder2);
             }
         }
 
-        public void removePlayer(Player player)
+        public void RemovePlayer(Player player)
         {
-            if (!onlinePlayers.Remove(player.EntityID))
+            if (!OnlinePlayers.Remove(player.EntityID))
             {
-                Log.warn($"Couldn't despawn {player.Username} from World {player.currentWorld.levelName}.");
+                Log.warn($"Couldn't despawn {player.Username} from World {player.CurrentWorld.LevelName}.");
             }
             else
             {
-                foreach (var dest in onlinePlayers.Values)
+                foreach (var dest in OnlinePlayers.Values)
                 {
                     PacketEncoder encoder = PacketEncoderPool.Get(dest);
                     var pk = new RemoveActor
@@ -158,12 +158,12 @@ namespace DaemonMC.Level
                     PacketEncoder encoder1 = PacketEncoderPool.Get(dest);
                     var packet1 = new PlayerList
                     {
-                        action = 1,
+                        Action = 1,
                         UUID = player.UUID,
                     };
                     packet1.EncodePacket(encoder1);
                 }
-                Log.debug($"Despawned {player.Username} from World {player.currentWorld.levelName}");
+                Log.debug($"Despawned {player.Username} from World {player.CurrentWorld.LevelName}");
             }
         }
 
@@ -177,13 +177,13 @@ namespace DaemonMC.Level
             for (int y = 0; y < 24; y++) //since 1.18 320 up, -64 down. 64/16=4 negative subchunks. 320/16=20 positive subchunks. max 24 chunks.
             {
                 dataKey[^1] = (byte)(y - 4);
-                byte[] subChunk = db.Get(dataKey);
+                byte[] subChunk = Db.Get(dataKey);
 
                 if (subChunk != null)
                 {
                     try
                     {
-                        chunk.chunks.Add(ChunkUtils.DecodeSubChunk(subChunk));
+                        chunk.Chunks.Add(ChunkUtils.DecodeSubChunk(subChunk));
                     }
                     catch(Exception ex)
                     {
@@ -200,18 +200,18 @@ namespace DaemonMC.Level
             return chunk;
         }
 
-        public void load()
+        public void Load()
         {
-            var tempData = Path.Combine(Path.GetTempPath(), $"{levelName}.mcworld");
+            var tempData = Path.Combine(Path.GetTempPath(), $"{LevelName}.mcworld");
             if (Directory.Exists(tempData))
             {
                 Directory.Delete(tempData, true);
             }
-            if (File.Exists($"Worlds/{levelName}.mcworld"))
+            if (File.Exists($"Worlds/{LevelName}.mcworld"))
             {
-                Log.info($"Loading world: Worlds\\{levelName}.mcworld");
+                Log.info($"Loading world: Worlds\\{LevelName}.mcworld");
 
-                using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{levelName}.mcworld"))
+                using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{LevelName}.mcworld"))
                 {
                     foreach (var entry in archive.Entries)
                     {
@@ -237,17 +237,17 @@ namespace DaemonMC.Level
                                     RandomSeed = tag["RandomSeed"].LongValue;
                                     LevelDisplayName = tag["LevelName"].StringValue;
                                     Version = tag["NetworkVersion"].IntValue;
-                                    spawnX = tag["SpawnX"].IntValue;
-                                    spawnZ = tag["SpawnZ"].IntValue;
+                                    SpawnX = tag["SpawnX"].IntValue;
+                                    SpawnZ = tag["SpawnZ"].IntValue;
 
                                     if (tag != null && tag["lastOpenedWithVersion"] is NbtList versionList)
                                     {
                                         string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
-                                        if (stringVersion != Info.version)
+                                        if (stringVersion != Info.Version)
                                         {
                                             Log.error($"Unsupported world version {stringVersion}!");
-                                            Log.warn($"This server software doesn't support world format updating, please open Worlds/{levelName}.mcworld with Minecraft client {Info.version} and export mcworld file again to update world.");
-                                            Server.crash = true;
+                                            Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {Info.Version} and export mcworld file again to update world.");
+                                            Server.Crash = true;
                                         }
                                     }
 
@@ -258,26 +258,26 @@ namespace DaemonMC.Level
                     }
                 }
 
-                db = new Database(new DirectoryInfo($"Worlds/{levelName}.mcworld"));
-                db.Open();
+                Db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
+                Db.Open();
             }
             else
             {
-                Log.warn($"World Worlds/{levelName}.mcworld not found. Generating temporary flat world...");
+                Log.warn($"World Worlds/{LevelName}.mcworld not found. Generating temporary flat world...");
                 GameRules.Add("showCoordinates", new GameRule(true));
-                temporary = true;
+                Temporary = true;
             }
         }
 
-        public void unload()
+        public void Unload()
         {
-            if (temporary)
+            if (Temporary)
             {
                 return;
             }
-            Log.info($"Unloading world: {levelName}.mcworld");
-            db.Dispose();
-            db.Close();
+            Log.info($"Unloading world: {LevelName}.mcworld");
+            Db.Dispose();
+            Db.Close();
         }
     }
 }

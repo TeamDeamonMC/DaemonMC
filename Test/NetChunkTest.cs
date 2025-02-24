@@ -13,9 +13,9 @@ namespace DaemonMC
             //var chunkData = testchunk.flat;
             var level = new World("My World");
             var chunk = level.GetChunk(0, 0);
-            var stream = new MemoryStream(chunk.networkSerialize());
+            var stream = new MemoryStream(chunk.NetworkSerialize());
             {
-                for (int i = 0; i < chunk.chunks.Count; i++)
+                for (int i = 0; i < chunk.Chunks.Count; i++)
                 {
                     Console.WriteLine($"reading sunchunk: {i}");
 

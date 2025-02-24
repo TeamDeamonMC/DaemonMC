@@ -7,17 +7,17 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.PlayerList;
 
-        public byte action = 0;
-        public Guid UUID = new Guid();
-        public long EntityId = 0;
-        public string Username = "";
-        public string XUID = "";
-        public string PlatformChatId = "";
-        public int BuildPlatform = 0;
-        public Skin Skin = new Skin();
-        public bool IsTeacher = false;
-        public bool IsHost = false;
-        public bool IsSubclient = false;
+        public byte Action { get; set; } = 0;
+        public Guid UUID { get; set; } = new Guid();
+        public long EntityId { get; set; } = 0;
+        public string Username { get; set; } = "";
+        public string XUID { get; set; } = "";
+        public string PlatformChatId { get; set; } = "";
+        public int BuildPlatform { get; set; } = 0;
+        public Skin Skin { get; set; } = new Skin();
+        public bool IsTeacher { get; set; } = false;
+        public bool IsHost { get; set; } = false;
+        public bool IsSubclient { get; set; } = false;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -26,8 +26,8 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(action);
-            if (action == 0)
+            encoder.WriteByte(Action);
+            if (Action == 0)
             {
                 encoder.WriteVarInt(1);
                 encoder.WriteUUID(UUID);

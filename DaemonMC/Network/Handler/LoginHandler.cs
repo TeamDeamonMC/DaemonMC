@@ -10,10 +10,10 @@ namespace DaemonMC.Network.Handler
     {
         public static void execute(Login packet, IPEndPoint clientEp)
         {
-            byte[] jwtBuffer = Encoding.UTF8.GetBytes(packet.request);
+            byte[] jwtBuffer = Encoding.UTF8.GetBytes(packet.Request);
 
             string pattern = @"{""chain"":\[.*?\]}";
-            var match = Regex.Match(packet.request, pattern);
+            var match = Regex.Match(packet.Request, pattern);
 
             var filteredJWT = match.Value;
             int tokenStartIndex = Encoding.UTF8.GetBytes(filteredJWT).Length + 8;
@@ -25,7 +25,7 @@ namespace DaemonMC.Network.Handler
             PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
             var pk = new PlayStatus
             {
-                status = 0,
+                Status = 0,
             };
             pk.EncodePacket(encoder);
         }

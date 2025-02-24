@@ -5,17 +5,17 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.PacketViolationWarning;
 
-        public int type = 0;
-        public int serverity = 0;
-        public int packetId = 0;
-        public string description = "";
+        public int Type { get; set; } = 0;
+        public int Serverity { get; set; } = 0;
+        public int PacketId { get; set; } = 0;
+        public string Description { get; set; } = "";
 
         protected override void Decode(PacketDecoder decoder)
         {
-            type = decoder.ReadSignedVarInt();
-            serverity = decoder.ReadSignedVarInt();
-            packetId = decoder.ReadSignedVarInt();
-            description = decoder.ReadString();
+            Type = decoder.ReadSignedVarInt();
+            Serverity = decoder.ReadSignedVarInt();
+            PacketId = decoder.ReadSignedVarInt();
+            Description = decoder.ReadString();
         }
 
         protected override void Encode(PacketEncoder encoder)

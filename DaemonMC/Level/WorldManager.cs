@@ -14,22 +14,22 @@ namespace DaemonMC.Level
 
             foreach (string file in Directory.GetFiles(worldDirectory))
             {
-                Server.levels.Add(new World(Path.GetFileNameWithoutExtension(file)));
+                Server.Levels.Add(new World(Path.GetFileNameWithoutExtension(file)));
             }
 
-            if(Server.levels.Count == 0)
+            if(Server.Levels.Count == 0)
             {
-                Server.levels.Add(new World("Temp"));
+                Server.Levels.Add(new World("Temp"));
             }
 
-            var matchingLevels = Server.levels
+            var matchingLevels = Server.Levels
                 .Select((world, index) => new { World = world, Index = index })
-                .Where(w => w.World.levelName == DaemonMC.defaultWorld)
+                .Where(w => w.World.LevelName == DaemonMC.DefaultWorld)
                 .ToList();
 
             if (matchingLevels.Count == 0)
             {
-                Log.warn($"World name {DaemonMC.defaultWorld} specified in DaemonMC.yaml not found in Worlds directory.");
+                Log.warn($"World name {DaemonMC.DefaultWorld} specified in DaemonMC.yaml not found in Worlds directory.");
                 Log.warn($"Check if DaemonMC.yaml 'spawnWorld' contains correct world name without extension.");
                 Log.warn($"Players will be spawned in next found available world.");
             }

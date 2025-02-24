@@ -13,26 +13,26 @@ namespace DaemonMC.Utils
 
             reader.ReadByte();//Todo support new format
 
-            subChunk.storageSize = reader.ReadByte();
+            subChunk.StorageSize = reader.ReadByte();
 
             reader.ReadByte(); // sub_chunk_index since 1.17.30 TODO
 
-            for (int i = 0; i < subChunk.storageSize; i++) //read real blocks
+            for (int i = 0; i < subChunk.StorageSize; i++) //read real blocks
             {
-                subChunk.bitsPerBlock = reader.ReadByte() >> 1;
-                int blocksPerWord = (int)Math.Floor(32d / subChunk.bitsPerBlock);
+                subChunk.BitsPerBlock = reader.ReadByte() >> 1;
+                int blocksPerWord = (int)Math.Floor(32d / subChunk.BitsPerBlock);
                 int wordCount = (int)Math.Ceiling(4096d / blocksPerWord);
 
                 int position = 0;
                 for (int wordIdx = 0; wordIdx < wordCount; wordIdx++)
                 {
                     uint word = reader.ReadUInt32();
-                    subChunk.words[wordIdx] = word;
+                    subChunk.Words[wordIdx] = word;
                     for (int block = 0; block < blocksPerWord; block++)
                     {
                         if (position >= 4096) continue;
 
-                        subChunk.blocks[position] = (byte)((word >> ((position % blocksPerWord) * subChunk.bitsPerBlock)) & ((1 << subChunk.bitsPerBlock) - 1));
+                        subChunk.Blocks[position] = (byte)((word >> ((position % blocksPerWord) * subChunk.BitsPerBlock)) & ((1 << subChunk.BitsPerBlock) - 1));
 
                         position++;
                     }
@@ -77,7 +77,7 @@ namespace DaemonMC.Utils
                             compound.Add(statesCompound);
                         }
 
-                        subChunk.palette.Add(compound);
+                        subChunk.Palette.Add(compound);
                     }
                 }
                 return subChunk; //todo fix and remove here. this usually works but will not always. multiple storages thorw error

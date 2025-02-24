@@ -7,20 +7,20 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.PlayerAuthInput;
 
-        public Vector2 Rotation = new Vector2();
-        public Vector3 Position = new Vector3();
-        public Vector2 MoveVector = new Vector2();
-        public float HeadRotation = 0;
-        public List<AuthInputData> InputData = new List<AuthInputData>();
-        public int InputMode = 0;
-        public int PlayMode = 0;
-        public int InteractionModel = 0;
-        public Vector2 InteractRotation = new Vector2();
-        public long Tick = 0;
-        public Vector3 PosDelta = new Vector3();
-        public Vector2 AnalogMove = new Vector2();
-        public Vector3 CameraOrientation = new Vector3();
-        public Vector2 RawMove = new Vector2();
+        public Vector2 Rotation { get; set; } = new Vector2();
+        public Vector3 Position { get; set; } = new Vector3();
+        public Vector2 MoveVector { get; set; } = new Vector2();
+        public float HeadRotation { get; set; } = 0;
+        public List<AuthInputData> InputData { get; set; } = new List<AuthInputData>();
+        public int InputMode { get; set; } = 0;
+        public int PlayMode { get; set; } = 0;
+        public int InteractionModel { get; set; } = 0;
+        public Vector2 InteractRotation { get; set; } = new Vector2();
+        public long Tick { get; set; } = 0;
+        public Vector3 PosDelta { get; set; } = new Vector3();
+        public Vector2 AnalogMove { get; set; } = new Vector2();
+        public Vector3 CameraOrientation { get; set; } = new Vector3();
+        public Vector2 RawMove { get; set; } = new Vector2();
 
         protected override void Decode(PacketDecoder decoder)
         {

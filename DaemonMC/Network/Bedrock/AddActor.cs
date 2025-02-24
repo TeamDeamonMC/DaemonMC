@@ -8,14 +8,14 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.AddActor;
 
-        public long EntityId = 0;
-        public string ActorType = "";
-        public Vector3 Position = new Vector3();
-        public Vector3 Velocity = new Vector3();
-        public Vector2 Rotation = new Vector2();
-        public float YheadRotation = 0;
-        public float YbodyRotation = 0;
-        public Dictionary<ActorData, Metadata> Metadata = new Dictionary<ActorData, Metadata>();
+        public long EntityId { get; set; } = 0;
+        public string ActorType { get; set; } = "";
+        public Vector3 Position { get; set; } = new Vector3();
+        public Vector3 Velocity { get; set; } = new Vector3();
+        public Vector2 Rotation { get; set; } = new Vector2();
+        public float YheadRotation { get; set; } = 0;
+        public float YbodyRotation { get; set; } = 0;
+        public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -32,11 +32,11 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVec2(Rotation);
             encoder.WriteFloat(YheadRotation);
             encoder.WriteFloat(YbodyRotation);
-            encoder.WriteVarInt(0);
+            encoder.WriteVarInt(0);//attributes todo
             encoder.WriteMetadata(Metadata);
-            encoder.WriteVarInt(0);
-            encoder.WriteVarInt(0);
-            encoder.WriteVarInt(0);
+            encoder.WriteVarInt(0);//synched properties todo
+            encoder.WriteVarInt(0);//synched properties todo
+            encoder.WriteVarInt(0);//actor links todo
         }
     }
 }

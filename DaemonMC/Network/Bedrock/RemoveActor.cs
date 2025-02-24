@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.RemoveActor;
 
-        public long EntityId = 0;
+        public long EntityId { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {

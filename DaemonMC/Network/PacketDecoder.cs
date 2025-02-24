@@ -14,6 +14,7 @@ namespace DaemonMC.Network
         public byte[] buffer;
         public int readOffset;
         public IPEndPoint clientEp;
+        public int protocolVersion = 0;
         public Player player;
 
         public PacketDecoder(byte[] byteBuffer, IPEndPoint ep)
@@ -21,11 +22,12 @@ namespace DaemonMC.Network
             buffer = byteBuffer;
             readOffset = 0;
             clientEp = ep;
+            protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
         }
 
         public void RakDecoder(PacketDecoder decoder, int recv)
         {
-            Server.datGrIn++;
+            Server.DatGrIn++;
 
             var pkid = decoder.ReadByte();
             if (pkid <= 127 || pkid >= 141) { Log.packetIn(decoder.clientEp, (Info.RakNet)pkid); }
@@ -494,6 +496,17 @@ namespace DaemonMC.Network
             return skin;
         }
 
+        public List<Guid> ReadEmotes()
+        {
+            var EmoteIds = new List<Guid>();
+            var size = ReadVarInt();
+            for (int v = 0; v < size; v++)
+            {
+                EmoteIds.Add(ReadUUID());
+            }
+            return EmoteIds;
+        }
+
         public T? ReadOptional<T>(Func<T> readFunction) where T : struct
         {
             return ReadBool() ? readFunction() : (T?)null;
@@ -518,31 +531,31 @@ namespace DaemonMC.Network
 
     public static class PacketDecoderPool
     {
-        public static Stack<PacketDecoder> pool = new Stack<PacketDecoder>();
-        public static int cached = 0;
-        public static int inUse = 0;
+        public static Stack<PacketDecoder> Pool = new Stack<PacketDecoder>();
+        public static int Cached = 0;
+        public static int InUse = 0;
 
         public static PacketDecoder Get(byte[] buffer, IPEndPoint clientEp)
         {
-            inUse++;
-            if (pool.Count > 0)
+            InUse++;
+            if (Pool.Count > 0)
             {
-                PacketDecoder decoder = pool.Pop();
+                PacketDecoder decoder = Pool.Pop();
                 decoder.Reset(buffer);
                 decoder.clientEp = clientEp;
                 return decoder;
             }
             else
             {
-                cached++;
+                Cached++;
                 return new PacketDecoder(buffer, clientEp);
             }
         }
 
         public static void Return(PacketDecoder decoder)
         {
-            inUse--;
-            pool.Push(decoder);
+            InUse--;
+            Pool.Push(decoder);
         }
     }
 }

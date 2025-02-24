@@ -4,14 +4,14 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.Login;
 
-        public int protocolVersion = 0;
-        public string request = "";
+        public int ProtocolVersion { get; set; } = 0;
+        public string Request { get; set; } = "";
 
 
         protected override void Decode(PacketDecoder decoder)
         {
-            protocolVersion = decoder.ReadIntBE();
-            request = decoder.ReadString();
+            ProtocolVersion = decoder.ReadIntBE();
+            Request = decoder.ReadString();
         }
 
         protected override void Encode(PacketEncoder encoder)

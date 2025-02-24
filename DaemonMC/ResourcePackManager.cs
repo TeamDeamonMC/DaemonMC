@@ -20,14 +20,14 @@ namespace DaemonMC
             {
                 if (Path.GetExtension(file) == ".mcpack")
                 {
-                    Server.packs.Add(new ResourcePack(file));
+                    Server.Packs.Add(new ResourcePack(file));
                 }
             }
         }
 
         public static byte[] GetData(string contentId, int chunkIndex)
         {
-            ResourcePack resourcePack = Server.packs.FirstOrDefault(p => p.ContentId == contentId);
+            ResourcePack resourcePack = Server.Packs.FirstOrDefault(p => p.ContentId == contentId);
 
             int start = chunkIndex * ChunkSize;
             int length = Math.Min(ChunkSize, resourcePack.PackContent.Length - start);

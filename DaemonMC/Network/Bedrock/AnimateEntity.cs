@@ -4,13 +4,13 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.AnimateEntity;
 
-        public string mAnimation = "";
-        public string mNextState = "";
-        public string mStopExpression = "";
-        public int StopExpressionMolang = 0;
-        public string mController = "";
-        public float mBlendOutTime = 0;
-        public long mRuntimeId = 0;
+        public string Animation { get; set; } = "";
+        public string NextState { get; set; } = "";
+        public string StopExpression { get; set; } = "";
+        public int StopExpressionMolang { get; set; } = 0;
+        public string Controller { get; set; } = "";
+        public float BlendOutTime { get; set; } = 0;
+        public long RuntimeId { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -19,14 +19,14 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteString(mAnimation);
-            encoder.WriteString(mNextState);
-            encoder.WriteString(mStopExpression);
+            encoder.WriteString(Animation);
+            encoder.WriteString(NextState);
+            encoder.WriteString(StopExpression);
             encoder.WriteInt(StopExpressionMolang);
-            encoder.WriteString(mController);
-            encoder.WriteFloat(mBlendOutTime);
+            encoder.WriteString(Controller);
+            encoder.WriteFloat(BlendOutTime);
             encoder.WriteVarInt(1);
-            encoder.WriteVarLong((ulong)mRuntimeId);
+            encoder.WriteVarLong(RuntimeId);
         }
     }
 }

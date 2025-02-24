@@ -4,7 +4,7 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.PlayStatus;
 
-        public int status = 0;
+        public int Status { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -13,7 +13,7 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteIntBE(status);
+            encoder.WriteIntBE(Status);
         }
     }
 }

@@ -15,16 +15,16 @@ namespace DaemonMC.Entities
 
         public override void Spawn(World world)
         {
-            currentWorld = world;
+            CurrentWorld = world;
             long id;
 
-            if (Server.availableIds.Count > 0)
+            if (Server.AvailableIds.Count > 0)
             {
-                id = Server.availableIds.Dequeue();
+                id = Server.AvailableIds.Dequeue();
             }
             else
             {
-                id = Server.nextId++;
+                id = Server.NextId++;
             }
 
             EntityId = id;
@@ -34,7 +34,7 @@ namespace DaemonMC.Entities
             Metadata[ActorData.NAMETAG_ALWAYS_SHOW] = new Metadata((byte)1);
             if (NameTag != "") { Metadata[ActorData.NAME] = new Metadata(NameTag); }
 
-            foreach (Player onlinePlayer in currentWorld.onlinePlayers.Values)
+            foreach (Player onlinePlayer in CurrentWorld.OnlinePlayers.Values)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
                 var packet = new AddPlayer
@@ -60,12 +60,12 @@ namespace DaemonMC.Entities
 
             _ = Task.Run(async () => {
                 await Task.Delay(2000);
-                foreach (Player onlinePlayer in currentWorld.onlinePlayers.Values)
+                foreach (Player onlinePlayer in CurrentWorld.OnlinePlayers.Values)
                 {
                     PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
                     var packet = new PlayerList
                     {
-                        action = 1,
+                        Action = 1,
                         UUID = UUID,
                     };
                     packet.EncodePacket(encoder);
@@ -73,14 +73,14 @@ namespace DaemonMC.Entities
 
                 if (ResourcePackManager.Animations.TryGetValue(SpawnAnimation, out Animation spawnAnimation))
                 {
-                    foreach (Player onlinePlayer in currentWorld.onlinePlayers.Values)
+                    foreach (Player onlinePlayer in CurrentWorld.OnlinePlayers.Values)
                     {
                         PacketEncoder encoder = PacketEncoderPool.Get(onlinePlayer);
                         var packet1 = new AnimateEntity
                         {
-                            mAnimation = spawnAnimation.AnimationName,
-                            mController = spawnAnimation.ControllerName,
-                            mRuntimeId = EntityId
+                            Animation = spawnAnimation.AnimationName,
+                            Controller = spawnAnimation.ControllerName,
+                            RuntimeId = EntityId
                         };
                         packet1.EncodePacket(encoder);
                     }

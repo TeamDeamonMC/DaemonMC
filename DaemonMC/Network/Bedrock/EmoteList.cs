@@ -4,27 +4,19 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.EmoteList;
 
-        public long ActorRuntimeId = 0;
-        public List<Guid> EmoteIds = new List<Guid>();
+        public long ActorRuntimeId { get; set; } = 0;
+        public List<Guid> EmoteIds { get; set; } = new List<Guid>();
 
         protected override void Decode(PacketDecoder decoder)
         {
             ActorRuntimeId = decoder.ReadVarLong();
-            var size = decoder.ReadVarInt();
-            for (int v = 0; v < size; v++)
-            {
-                EmoteIds.Add(decoder.ReadUUID());
-            }
+            EmoteIds = decoder.ReadEmotes();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong)ActorRuntimeId);
-            encoder.WriteVarInt(EmoteIds.Count());
-            foreach (var emote in EmoteIds)
-            {
-                encoder.WriteUUID(emote);
-            }
+            encoder.WriteVarLong(ActorRuntimeId);
+            encoder.WriteEmotes(EmoteIds);
         }
     }
 }

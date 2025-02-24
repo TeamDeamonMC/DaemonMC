@@ -9,13 +9,13 @@ namespace DaemonMC
 {
     public static class DaemonMC
     {
-        public static string servername = "DaemonMC";
-        public static string worldname = "Nice new server";
-        public static string maxOnline = "10";
-        public static string defaultWorld = "My World";
-        public static int drawDistance = 10;
-        internal static string version = "unknown";
-        internal static string gitHash = "unknown";
+        public static string Servername = "DaemonMC";
+        public static string Worldname = "Nice new server";
+        public static string MaxOnline = "10";
+        public static string DefaultWorld = "My World";
+        public static int DrawDistance = 10;
+        internal static string Version = "unknown";
+        internal static string GitHash = "unknown";
         public static void Main()
         {
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
@@ -23,17 +23,17 @@ namespace DaemonMC
 
             var versionInfo = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
-            version = versionInfo == null ? "unknown" : versionInfo.Split('+')[0];
-            gitHash = versionInfo == null ? "unknown" : versionInfo.Split('+')[1];
+            Version = versionInfo == null ? "unknown" : versionInfo.Split('+')[0];
+            GitHash = versionInfo == null ? "unknown" : versionInfo.Split('+')[1];
 
             Console.WriteLine(" _____                                ______   ______ ");
             Console.WriteLine("(____ \\                              |  ___ \\ / _____)");
             Console.WriteLine(" _   \\ \\ ____  ____ ____   ___  ____ | | _ | | /      ");
             Console.WriteLine("| |   | / _  |/ _  )    \\ / _ \\|  _ \\| || || | |      ");
             Console.WriteLine("| |__/ ( ( | ( (/ /| | | | |_| | | | | || || | \\_____ ");
-            Console.WriteLine($"|_____/ \\_||_|\\____)_|_|_|\\___/|_| |_|_||_||_|\\______) {version}");
+            Console.WriteLine($"|_____/ \\_||_|\\____)_|_|_|\\___/|_| |_|_||_||_|\\______) {Version}");
             Console.WriteLine("");
-            Log.info($"Setting up server for {maxOnline} players with Minecraft {Info.version}");
+            Log.info($"Setting up server for {MaxOnline} players with Minecraft {Info.Version}");
 
             Config.Set();
 
@@ -94,14 +94,14 @@ namespace DaemonMC
 
         static void Playerlist()
         {
-            string table = $"Currently {Server.onlinePlayers.Count} players on the server\n\n";
+            string table = $"Currently {Server.OnlinePlayers.Count} players on the server\n\n";
 
             table += string.Format("{0,-15} {1,-15} {2,-10}\n", "Player", "EntityID", "World");
             table += new string('-', 45) + "\n";
 
-            foreach (var player in Server.onlinePlayers.Values)
+            foreach (var player in Server.OnlinePlayers.Values)
             {
-                table += string.Format("{0,-15} {1,-15} {2,-10}\n", player.Username, player.EntityID, player.currentWorld.levelName);
+                table += string.Format("{0,-15} {1,-15} {2,-10}\n", player.Username, player.EntityID, player.CurrentWorld.LevelName);
             }
 
             Log.info(table);
@@ -114,15 +114,15 @@ namespace DaemonMC
             table += string.Format("{0,-35} {1,-15} {2,-10}\n", "Entity", "EntityID", "World");
             table += new string('-', 65) + "\n";
 
-            foreach (var world in Server.levels)
+            foreach (var world in Server.Levels)
             {
                 foreach (var entity in world.Entities.Values)
                 {
-                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", entity.ActorType, entity.EntityId, world.levelName);
+                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", entity.ActorType, entity.EntityId, world.LevelName);
                 }
-                foreach (var entity in world.onlinePlayers.Values)
+                foreach (var entity in world.OnlinePlayers.Values)
                 {
-                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", $"minecraft:player ({entity.Username})", entity.EntityID, world.levelName);
+                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", $"minecraft:player ({entity.Username})", entity.EntityID, world.LevelName);
                 }
             }
 
@@ -183,7 +183,7 @@ namespace DaemonMC
 
         public static void SendLevelEvent(int value, Vector3 pos)
         {
-            foreach (var dest in Server.onlinePlayers)
+            foreach (var dest in Server.OnlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 var packet = new LevelEvent
@@ -201,7 +201,7 @@ namespace DaemonMC
             long dataValue = 0;
             dataValue |= (1L << value);
 
-            foreach (var dest in Server.onlinePlayers)
+            foreach (var dest in Server.OnlinePlayers)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 var packet = new SetActorData

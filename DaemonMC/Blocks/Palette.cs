@@ -4,7 +4,7 @@ namespace DaemonMC.Blocks
 {
     public class Palette
     {
-        public static Dictionary<int, Block> blockHashes = new Dictionary<int, Block>();
+        public static Dictionary<int, Block> blockHashes { get; protected set; } = new Dictionary<int, Block>();
 
         public static void buildPalette()
         {

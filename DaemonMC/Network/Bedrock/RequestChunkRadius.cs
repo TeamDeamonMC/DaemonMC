@@ -4,13 +4,13 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.RequestChunkRadius;
 
-        public int radius = 0;
-        public byte maxRadius = 0;
+        public int Radius { get; set; } = 0;
+        public byte MaxRadius { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
-            radius = decoder.ReadVarInt();
-            maxRadius = decoder.ReadByte();
+            Radius = decoder.ReadVarInt();
+            MaxRadius = decoder.ReadByte();
         }
 
         protected override void Encode(PacketEncoder encoder)

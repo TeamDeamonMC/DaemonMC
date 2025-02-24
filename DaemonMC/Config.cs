@@ -1,18 +1,20 @@
 ﻿using DaemonMC.Utils.Text;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
+using DaemonMC.Utils;
 
 namespace DaemonMC
 {
     public class Config
     {
-        public string serverName { get; set; } = "DaemonMC";
-        public string worldName { get; set; } = "Nice new server";
-        public string spawnWorld { get; set; } = "My World";
-        public string maxOnline { get; set; } = "10";
-        public int drawDistance { get; set; } = 10;
-        public bool forcePacks { get; set; } = false;
-        public bool debug { get; set; } = false;
+        public string ServerName { get; set; } = "DaemonMC";
+        public string WorldName { get; set; } = "Nice new server";
+        public string SpawnWorld { get; set; } = "My World";
+        public string MaxOnline { get; set; } = "10";
+        public int DrawDistance { get; set; } = 10;
+        public bool ForcePacks { get; set; } = false;
+        public bool XboxAuth { get; set; } = true;
+        public bool Debug { get; set; } = false;
 
         public static void Set()
         {
@@ -44,13 +46,14 @@ namespace DaemonMC
 
             }
 
-            Log.debugMode = config.debug;
-            DaemonMC.servername = config.serverName;
-            DaemonMC.worldname = config.worldName;
-            DaemonMC.maxOnline = config.maxOnline;
-            DaemonMC.defaultWorld = config.spawnWorld;
-            DaemonMC.drawDistance = config.drawDistance;
-            ResourcePackManager.ForcePacks = config.forcePacks;
+            Log.debugMode = config.Debug;
+            DaemonMC.Servername = config.ServerName;
+            DaemonMC.Worldname = config.WorldName;
+            DaemonMC.MaxOnline = config.MaxOnline;
+            DaemonMC.DefaultWorld = config.SpawnWorld;
+            DaemonMC.DrawDistance = config.DrawDistance;
+            JWT.XboxAuth = config.XboxAuth;
+            ResourcePackManager.ForcePacks = config.ForcePacks;
         }
     }
 }

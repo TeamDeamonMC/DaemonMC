@@ -7,9 +7,9 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.LevelEvent;
 
-        public LevelEvents EventID = LevelEvents.Undefined;
-        public Vector3 Position = new Vector3();
-        public int Data = 0;
+        public LevelEvents EventID { get; set; } = LevelEvents.Undefined;
+        public Vector3 Position { get; set; } = new Vector3();
+        public int Data { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {

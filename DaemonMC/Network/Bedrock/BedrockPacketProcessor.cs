@@ -43,7 +43,22 @@ namespace DaemonMC.Network.Bedrock
 
             if (packet is Login login)
             {
-                LoginHandler.execute(login, clientEp);
+                try
+                {
+                    LoginHandler.execute(login, clientEp);
+                }
+                catch (Exception e)
+                {
+                    Log.error($"Login error: {e}");
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var packet1 = new Disconnect
+                    {
+                        message = $"Login error: {e}"
+                    };
+                    packet1.EncodePacket(encoder);
+                    return;
+                }
+
                 var session = RakSessionManager.getSession(clientEp);
                 session.protocolVersion = login.protocolVersion;
 

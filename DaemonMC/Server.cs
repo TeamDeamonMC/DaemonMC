@@ -168,6 +168,7 @@ namespace DaemonMC
                 datGrIn = 0;
                 datGrOut = 0;
                 nack = 0;
+                rsent = 0;
                 Thread.Sleep(1000);
             }
         }

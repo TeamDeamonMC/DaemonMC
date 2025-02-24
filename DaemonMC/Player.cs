@@ -250,19 +250,22 @@ namespace DaemonMC
 
         public void Kick(string msg)
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(this);
-            var packet = new Disconnect
-            {
-                message = msg
-            };
-            packet.EncodePacket(encoder);
-            PacketEncoder encoder2 = PacketEncoderPool.Get(this);
-            var packet2 = new RakDisconnect
-            {
-            };
-            packet2.Encode(encoder2);
-            Server.RemovePlayer((long)EntityID);
-            RakSessionManager.deleteSession(ep);
+            _ = Task.Run(async () => {
+                await Task.Delay(1000);
+                PacketEncoder encoder = PacketEncoderPool.Get(this);
+                var packet = new Disconnect
+                {
+                    message = msg
+                };
+                packet.EncodePacket(encoder);
+                PacketEncoder encoder2 = PacketEncoderPool.Get(this);
+                var packet2 = new RakDisconnect
+                {
+                };
+                packet2.Encode(encoder2);
+                Server.RemovePlayer((long)EntityID);
+                RakSessionManager.deleteSession(ep);
+            });
         }
 
         public void SendMessage(string message)
@@ -437,9 +440,11 @@ namespace DaemonMC
 
             if (packet is RequestChunkRadius requestChunkRadius)
             {
-                Log.debug($"{Username} requested chunks with radius {requestChunkRadius.radius}. Max radius = {requestChunkRadius.maxRadius}");
+                var chunkRadius = Math.Min(DaemonMC.drawDistance, requestChunkRadius.radius);
 
-                UpdateChunkRadius(requestChunkRadius.radius);
+                Log.debug($"{Username} requested chunks with radius {requestChunkRadius.radius} (sent {chunkRadius}). Max radius = {requestChunkRadius.maxRadius}");
+
+                UpdateChunkRadius(chunkRadius);
 
                 PacketEncoder encoder2 = PacketEncoderPool.Get(this);
                 var packet2 = new NetworkChunkPublisherUpdate
@@ -451,7 +456,7 @@ namespace DaemonMC
                 };
                 packet2.EncodePacket(encoder2);
 
-                int radius = Math.Min(requestChunkRadius.radius, requestChunkRadius.maxRadius) / 2;
+                int radius = chunkRadius / 2;
 
                 int currentChunkX = (int)Math.Floor(Position.X / 16.0);
                 int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
@@ -548,6 +553,45 @@ namespace DaemonMC
             if (packet is CommandRequest commandRequest)
             {
                 CommandManager.Execute(commandRequest.Command.Substring(1), this);
+            }
+
+            if (packet is EmoteList emoteList) //todo save these values
+            {
+                Log.debug($"Received emote ids from {Username}");
+                foreach (var dest in currentWorld.onlinePlayers)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                    var pk = new EmoteList
+                    {
+                        ActorRuntimeId = EntityID,
+                        EmoteIds = emoteList.EmoteIds
+                    };
+                    pk.EncodePacket(encoder);
+                }
+            }
+
+            if (packet is Interact interact)
+            {
+                Log.debug($"{Username} interacted id {interact.action} at {interact.interactPosition}");
+            }
+
+            if (packet is Emote emote)
+            {
+                Log.debug($"{Username} emoted id {emote.EmoteID}");
+                foreach (var dest in currentWorld.onlinePlayers)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
+                    var pk = new Emote
+                    {
+                        ActorRuntimeId = EntityID,
+                        EmoteID = emote.EmoteID,
+                        EmoteTicks = emote.EmoteTicks,
+                        XUID = emote.XUID,
+                        PlatformID = emote.PlatformID,
+                        Flags = emote.Flags
+                    };
+                    pk.EncodePacket(encoder);
+                }
             }
         }
     }

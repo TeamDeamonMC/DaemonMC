@@ -8,10 +8,11 @@ namespace DaemonMC
     {
         public string serverName { get; set; } = "DaemonMC";
         public string worldName { get; set; } = "Nice new server";
-        public string maxOnline { get; set; } = "10";
-        public bool debug { get; set; } = false;
         public string spawnWorld { get; set; } = "My World";
+        public string maxOnline { get; set; } = "10";
+        public int drawDistance { get; set; } = 10;
         public bool forcePacks { get; set; } = false;
+        public bool debug { get; set; } = false;
 
         public static void Set()
         {
@@ -48,6 +49,7 @@ namespace DaemonMC
             DaemonMC.worldname = config.worldName;
             DaemonMC.maxOnline = config.maxOnline;
             DaemonMC.defaultWorld = config.spawnWorld;
+            DaemonMC.drawDistance = config.drawDistance;
             ResourcePackManager.ForcePacks = config.forcePacks;
         }
     }

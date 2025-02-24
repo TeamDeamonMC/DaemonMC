@@ -13,6 +13,7 @@ namespace DaemonMC
         public static string worldname = "Nice new server";
         public static string maxOnline = "10";
         public static string defaultWorld = "My World";
+        public static int drawDistance = 10;
         internal static string version = "unknown";
         internal static string gitHash = "unknown";
         public static void Main()

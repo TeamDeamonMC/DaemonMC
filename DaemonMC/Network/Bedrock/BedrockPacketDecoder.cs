@@ -74,6 +74,12 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.SetLocalPlayerAsInitialized:
                         new SetLocalPlayerAsInitialized().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.EmoteList:
+                        new EmoteList().DecodePacket(decoder);
+                        break;
+                    case Info.Bedrock.Emote:
+                        new Emote().DecodePacket(decoder);
+                        break;
 
                     default:
                         Log.error($"[Server] Unknown Bedrock packet: {pkid}");

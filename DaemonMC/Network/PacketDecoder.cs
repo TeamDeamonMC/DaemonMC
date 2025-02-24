@@ -260,6 +260,10 @@ namespace DaemonMC.Network
         public string ReadString()
         {
             int length = ReadVarInt();
+            if (length < 0 || readOffset + length > buffer.Length)
+            {
+                throw new Exception($"Invalid string lenght {length}");
+            }
             string str = Encoding.UTF8.GetString(buffer, readOffset, length);
             readOffset += length;
 

@@ -1,5 +1,6 @@
 ﻿using DaemonMC.Network.Bedrock;
 using DaemonMC.Plugin.Plugin;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network
 {
@@ -9,7 +10,28 @@ namespace DaemonMC.Network
 
         public void DecodePacket(PacketDecoder decoder, PacketHandler handler = PacketHandler.Player)
         {
-            Decode(decoder);
+            try
+            {
+                Decode(decoder);
+            }
+            catch (Exception e)
+            {
+                if (decoder.player != null)
+                {
+                    decoder.player.Kick($"Handling {Id}\n {e}");
+                }
+                else
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
+                    var packet = new Disconnect
+                    {
+                        message = $"Handling {Id}\n {e}"
+                    };
+                    packet.EncodePacket(encoder);
+                }
+                Log.warn($"Packet decoding error for {decoder.clientEp.Address}. \n Handling {Id}\n {e}");
+                return;
+            }
             if (PluginManager.PacketReceived(decoder.clientEp, this))
             {
                 switch (handler)

@@ -591,7 +591,17 @@ namespace DaemonMC
 
             if (packet is InventoryTransaction inventoryTransaction)
             {
-
+                if (inventoryTransaction.Transaction.Type is TransactionType.ItemUseOnEntityTransaction)
+                {
+                    if (CurrentWorld.Entities.TryGetValue(inventoryTransaction.Transaction.EntityId, out Entity entity))
+                    {
+                        PluginManager.EntityAttack(this, entity);
+                    }
+                    if (CurrentWorld.OnlinePlayers.TryGetValue(inventoryTransaction.Transaction.EntityId, out Player player))
+                    {
+                        PluginManager.PlayerAttack(this, player);
+                    }
+                }
             }
         }
     }

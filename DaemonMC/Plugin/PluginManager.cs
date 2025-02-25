@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Reflection;
+using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Utils.Text;
 
@@ -69,6 +70,22 @@ namespace DaemonMC.Plugin.Plugin
                 return plugin.OnPacketSent(ep, packet);
             }
             return true;
+        }
+
+        public static void EntityAttack(Player player, Entity entity)
+        {
+            foreach (var plugin in _plugins)
+            {
+                plugin.OnEntityAttack(player, entity);
+            }
+        }
+
+        public static void PlayerAttack(Player player, Player victim)
+        {
+            foreach (var plugin in _plugins)
+            {
+                plugin.OnPlayerAttack(player, victim);
+            }
         }
     }
 }

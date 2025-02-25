@@ -120,7 +120,7 @@ namespace DaemonMC.Entities
             SendMetadata();
         }
 
-        public void PlayAnimation(string animationID)
+        public void PlayAnimation(string animationID, long sendTo = -1)
         {
             Animation animation = ResourcePackManager.Animations[animationID];
             var packet = new AnimateEntity
@@ -129,7 +129,14 @@ namespace DaemonMC.Entities
                 Controller = animation.ControllerName,
                 RuntimeId = EntityId
             };
-            CurrentWorld.Send(packet);
+            if (sendTo == -1)
+            {
+                CurrentWorld.Send(packet);
+            }
+            else
+            {
+                Server.GetPlayer(sendTo).Send(packet);
+            }
         }
 
         public void SetNameTag(string nameTag)

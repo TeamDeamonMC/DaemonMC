@@ -11,6 +11,7 @@ namespace DaemonMC
         public string WorldName { get; set; } = "Nice new server";
         public string SpawnWorld { get; set; } = "My World";
         public string MaxOnline { get; set; } = "10";
+        public string DefaultGamemode { get; set; } = "Survival";
         public int DrawDistance { get; set; } = 10;
         public bool ForcePacks { get; set; } = false;
         public bool XboxAuth { get; set; } = true;
@@ -51,9 +52,26 @@ namespace DaemonMC
             DaemonMC.Worldname = config.WorldName;
             DaemonMC.MaxOnline = config.MaxOnline;
             DaemonMC.DefaultWorld = config.SpawnWorld;
+            DaemonMC.GameMode = ToGameMode(config.DefaultGamemode);
             DaemonMC.DrawDistance = config.DrawDistance;
             JWT.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;
+        }
+
+        public static int ToGameMode(string gameMode)
+        {
+            switch (gameMode.ToLower())
+            {
+                case "survival":
+                    return 0;
+                case "adventure":
+                    return 1;
+                case "creative":
+                    return 2;
+                default:
+                    Log.warn($"Unknown GameMode {gameMode}. Check DaemonMC.yaml.");
+                    return 2;
+            }
         }
     }
 }

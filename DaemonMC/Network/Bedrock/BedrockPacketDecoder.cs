@@ -80,6 +80,13 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.Emote:
                         new Emote().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.Animate:
+                        new Animate().DecodePacket(decoder);
+                        break;
+                    case Info.Bedrock.InventoryTransaction:
+                        new InventoryTransaction().DecodePacket(decoder);
+                        break;
+
 
                     default:
                         Log.error($"[Server] Unknown Bedrock packet: {pkid}");

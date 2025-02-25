@@ -21,6 +21,7 @@ namespace DaemonMC
         public Skin Skin { get; set; } = new Skin();
         public Guid UUID { get; set; } = new Guid();
         public string XUID { get; set; }
+        public int GameMode { get; set; } = 0;
         public long EntityID { get; set; }
         private long dataValue { get; set; }
         public long Tick { get; set; }
@@ -31,7 +32,8 @@ namespace DaemonMC
         public World CurrentWorld { get; set; }
         public AttributesValues Attributes { get; set; } = new AttributesValues(0.1f);
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
-        public List<AuthInputData> InputData = new List<AuthInputData>();
+        public List<AuthInputData> InputData { get; set; } = new List<AuthInputData>();
+        public List<AbilitiesData> Abilities { get; set; } = new List<AbilitiesData>() { new AbilitiesData(1, 262143, 0, 0.05f, 0.1f, 0.1f) };
 
         private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
         private bool SendQueueBusy = false;
@@ -50,6 +52,7 @@ namespace DaemonMC
             SendGameRules();
             UpdateAttributes();
             SendMetadata(true);
+            SendAbilities();
             CurrentWorld.AddPlayer(this);
             Log.info($"{Username} spawned in World:'{CurrentWorld.LevelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
@@ -66,8 +69,8 @@ namespace DaemonMC
             {
                 LevelName = CurrentWorld.LevelDisplayName,
                 EntityId = EntityID,
-                GameType = 0,
-                GameMode = 2,
+                GameType = GameMode,
+                GameMode = GameMode,
                 Position = new Vector3(Position.X, Position.Y, Position.Z),
                 Rotation = new Vector2(0, 0),
                 SpawnBlockX = (int)Position.X,
@@ -350,6 +353,28 @@ namespace DaemonMC
             }
         }
 
+        public void SetGameMode(int gameMode)
+        {
+            GameMode = gameMode;
+
+            SetPlayerGameType packet = new SetPlayerGameType()
+            {
+                GameMode = gameMode
+            };
+            Send(packet);
+        }
+
+        public void SendAbilities()
+        {
+            UpdateAbilities packet = new UpdateAbilities()
+            {
+                EntityId = EntityID,
+                PlayerPermissions = 0,
+                CommandPermissions = 0,
+                Layers = Abilities,
+            };
+            Send(packet);
+        }
 
         ///////////////////////////// Packet handler /////////////////////////////
 
@@ -549,13 +574,24 @@ namespace DaemonMC
 
             if (packet is Interact interact)
             {
-                Log.debug($"{Username} interacted id {interact.Action} at {interact.InteractPosition}");
+                Log.debug($"{Username} interacted id:{interact.Action} at {interact.InteractPosition}");
             }
 
             if (packet is Emote emote)
             {
-                Log.debug($"{Username} emoted id {emote.EmoteID}");
+                Log.debug($"{Username} emoted id:{emote.EmoteID}");
                 CurrentWorld.Send(emote);
+            }
+
+            if (packet is Animate animate)
+            {
+                CurrentWorld.Send(animate);
+                Log.debug($"{Username} animation action:{animate.Action}");
+            }
+
+            if (packet is InventoryTransaction inventoryTransaction)
+            {
+
             }
         }
     }

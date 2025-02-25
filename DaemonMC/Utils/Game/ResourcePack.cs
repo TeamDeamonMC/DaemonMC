@@ -20,7 +20,7 @@ namespace DaemonMC
         {
             var pack = ZipFile.OpenRead(PackPath);
 
-            string keyFile = $"Resource Packs\\{Path.GetFileNameWithoutExtension(PackPath)}.key";
+            string keyFile = Path.Combine("Resource Packs", $"{Path.GetFileNameWithoutExtension(PackPath)}.key");
 
             string manifest = "";
 

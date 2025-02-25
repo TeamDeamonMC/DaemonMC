@@ -457,7 +457,14 @@ namespace DaemonMC.Network
             WriteShort((ushort)packs.Count());
             foreach (var pack in packs)
             {
-                WriteUUID(pack.UUID);
+                if (protocolVersion >= Info.v1_21_50)
+                {
+                    WriteUUID(pack.UUID);
+                }
+                if (protocolVersion <= Info.v1_21_40)
+                {
+                    WriteString(pack.UUID.ToString());
+                }
                 WriteString(pack.PackIdVersion);
                 WriteLong(pack.PackContent.Length);
                 WriteString(pack.ContentKey);
@@ -496,6 +503,23 @@ namespace DaemonMC.Network
                 WriteVarInt(0); //todo modifiers
             }
         }
+
+        public void WriteAbilitiesData(List<AbilitiesData> abilitiesDatas)
+        {
+            WriteVarInt(abilitiesDatas.Count);
+            foreach (var data in abilitiesDatas)
+            {
+                WriteShort((ushort)data.Layer);
+                WriteInt(data.AbilitiesSet);
+                WriteInt(data.AbilityValues);
+                WriteFloat(data.FlySpeed);
+                if (protocolVersion >= Info.v1_21_60)
+                {
+                    WriteFloat(data.VerticalFlySpeed);
+                }
+                WriteFloat(data.WalkSpeed);
+            }
+        }
     }
 
     public class PacketEncoderPool
@@ -509,18 +533,18 @@ namespace DaemonMC.Network
          return Get(player.ep);
      }
 
-        public static PacketEncoder Get(IPEndPoint ep)
+        public static PacketEncoder Get(IPEndPoint clientEp)
         {
             Interlocked.Increment(ref inUse);
             if (pool.TryPop(out var encoder))
             {
-                encoder.clientEp = ep;
-                encoder.protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
+                encoder.clientEp = clientEp;
+                encoder.protocolVersion = RakSessionManager.getSession(clientEp).protocolVersion;
                 return encoder;
             }
 
             Interlocked.Increment(ref cached);
-            return new PacketEncoder(ep);
+            return new PacketEncoder(clientEp);
         }
 
         public static void Return(PacketEncoder encoder)

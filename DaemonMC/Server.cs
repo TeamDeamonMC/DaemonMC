@@ -77,6 +77,11 @@ namespace DaemonMC
 
         public static void ServerClose()
         {
+            foreach (Player player in OnlinePlayers.Values)
+            {
+                player.Kick("Server closed");
+            }
+            Thread.Sleep(1000);
             Log.line();
             Log.info("Shutting down...");
             PluginManager.UnloadPlugins();

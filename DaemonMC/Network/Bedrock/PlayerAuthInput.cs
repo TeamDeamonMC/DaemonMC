@@ -41,7 +41,10 @@ namespace DaemonMC.Network.Bedrock
             //PredictedVehicle =
             AnalogMove = decoder.ReadVec2();
             CameraOrientation = decoder.ReadVec3();
-            RawMove = decoder.ReadVec2();
+            if (decoder.protocolVersion >= Info.v1_21_50)
+            {
+                RawMove = decoder.ReadVec2();
+            }
         }
 
         protected override void Encode(PacketEncoder encoder)

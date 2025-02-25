@@ -13,6 +13,7 @@ namespace DaemonMC
         public static string Worldname = "Nice new server";
         public static string MaxOnline = "10";
         public static string DefaultWorld = "My World";
+        public static int GameMode = 0;
         public static int DrawDistance = 10;
         internal static string Version = "unknown";
         internal static string GitHash = "unknown";
@@ -23,8 +24,11 @@ namespace DaemonMC
 
             var versionInfo = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
-            Version = versionInfo == null ? "unknown" : versionInfo.Split('+')[0];
-            GitHash = versionInfo == null ? "unknown" : versionInfo.Split('+')[1];
+            if (versionInfo != null)
+            {
+                Version = versionInfo.Split('+')[0] == null ? "unknown" : versionInfo.Split('+')[0];
+                GitHash = versionInfo.Split('+')[1] == null ? "unknown" : versionInfo.Split('+')[1];
+            }
 
             Console.WriteLine(" _____                                ______   ______ ");
             Console.WriteLine("(____ \\                              |  ___ \\ / _____)");

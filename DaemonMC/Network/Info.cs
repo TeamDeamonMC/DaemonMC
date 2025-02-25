@@ -27,10 +27,13 @@
             MovePlayer = 19,
             LevelEvent = 25,
             UpdateAttributes = 29,
+            InventoryTransaction = 30,
             Interact = 33,
             SetActorData = 39,
             SetActorMotion = 40,
+            Animate = 44,
             LevelChunk = 58,
+            SetPlayerGameType = 62,
             PlayerList = 63,
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
@@ -54,6 +57,8 @@
             PacketViolationWarning = 156,
             AnimateEntity = 158,
             ItemRegistry = 162,
+            UpdateAbilities = 187,
+            UpdateAdventureSettings = 188,
             RequestNetworkSettings = 193,
             ServerboundLoadingScreen = 312
         }

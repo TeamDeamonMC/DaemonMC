@@ -64,7 +64,7 @@ namespace DaemonMC.Level
                         Username = customEntity.NameTag,
                         EntityId = customEntity.EntityId,
                         Position = customEntity.Position,
-                        Metadata = customEntity.Metadata
+                        Metadata = customEntity.Metadata,
                     };
                     player.Send(packet);
 
@@ -120,7 +120,8 @@ namespace DaemonMC.Level
                     Username = player.Username,
                     EntityId = player.EntityID,
                     Position = player.Position,
-                    Metadata = player.Metadata
+                    Metadata = player.Metadata,
+                    Layers = player.Abilities
                 };
                 onlinePlayer.Send(packet);
 
@@ -130,7 +131,8 @@ namespace DaemonMC.Level
                     Username = onlinePlayer.Username,
                     EntityId = onlinePlayer.EntityID,
                     Position = onlinePlayer.Position,
-                    Metadata = onlinePlayer.Metadata
+                    Metadata = onlinePlayer.Metadata,
+                    Layers = onlinePlayer.Abilities
                 };
                 player.Send(packet2);
             }

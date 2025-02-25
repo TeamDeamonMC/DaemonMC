@@ -18,6 +18,9 @@ namespace DaemonMC.Network.Bedrock
         public float YheadRotation { get; set; } = 0;
         public int GameMode { get; set; } = 0;
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public byte PlayerPermissions { get; set; } = 0;
+        public byte CommandPermissions { get; set; } = 0;
+        public List<AbilitiesData> Layers { get; set; } = new List<AbilitiesData>();
         public string DeviceId { get; set; } = "";
         public int BuildPlatform { get; set; } = 0;
 
@@ -47,11 +50,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVarInt(0);
             encoder.WriteVarInt(0);
 
-            //todo serialized abilities data
             encoder.WriteLong(EntityId);
-            encoder.WriteByte(0);
-            encoder.WriteByte(0);
-            encoder.WriteByte(0);
+            encoder.WriteByte(PlayerPermissions);
+            encoder.WriteByte(CommandPermissions);
+            encoder.WriteAbilitiesData(Layers);
 
             //todo actor links
             encoder.WriteVarInt(0);

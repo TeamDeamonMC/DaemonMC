@@ -543,6 +543,7 @@ namespace DaemonMC.Network
                 PacketDecoder decoder = Pool.Pop();
                 decoder.Reset(buffer);
                 decoder.clientEp = clientEp;
+                decoder.protocolVersion = RakSessionManager.getSession(clientEp).protocolVersion;
                 return decoder;
             }
             else

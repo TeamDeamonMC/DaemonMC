@@ -71,6 +71,7 @@ namespace DaemonMC.Network.Bedrock
                 long EntityId = Server.AddPlayer(player, clientEp);
                 session.EntityID = EntityId;
                 player.EntityID = EntityId;
+                player.GameMode = DaemonMC.GameMode; 
             }
 
             if (packet is PacketViolationWarning packetViolationWarning)

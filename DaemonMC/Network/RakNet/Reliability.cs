@@ -165,6 +165,13 @@ namespace DaemonMC.Network.RakNet
         public static void ReliabilityHandler(PacketEncoder encoder, byte[] body, ReliabilityType reliabilityType = ReliabilityType.reliable)
         {
             var session = RakSessionManager.getSession(encoder.clientEp);
+
+            if (session == null)
+            {
+                PacketEncoderPool.Return(encoder);
+                return;
+            }
+
             int maxPayloadSize = session.MTU - 32;
             bool isFragmented = body.Length > maxPayloadSize;
             maxPayloadSize -= reliabilityType == ReliabilityType.reliable ? 6 : 3;

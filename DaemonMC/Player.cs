@@ -55,7 +55,6 @@ namespace DaemonMC
             SendMetadata(true);
             SendAbilities();
             CurrentWorld.AddPlayer(this);
-            Log.info($"{Username} spawned in World:'{CurrentWorld.LevelName}' X:{Position.X} Y:{Position.Y} Z:{Position.Z}");
         }
 
         public void Send(Packet packet)
@@ -377,6 +376,111 @@ namespace DaemonMC
             Send(packet);
         }
 
+        private void SendEntities()
+        {
+            foreach (var entity in CurrentWorld.Entities.Values)
+            {
+                _ = Task.Run(async () => {
+                    await Task.Delay(2000);
+                    if (entity is CustomEntity customEntity)
+                    {
+                        var packet = new PlayerList
+                        {
+                            Action = 1,
+                            UUID = customEntity.UUID,
+                        };
+                        Send(packet);
+                    }
+
+                    if (ResourcePackManager.Animations.TryGetValue(entity.SpawnAnimation, out Animation spawnAnimation))
+                    {
+                        var packet1 = new AnimateEntity
+                        {
+                            Animation = spawnAnimation.AnimationName,
+                            Controller = spawnAnimation.ControllerName,
+                            RuntimeId = entity.EntityId
+                        };
+                        Send(packet1);
+                    }
+                    else
+                    {
+                        Log.warn($"Unable to find spawn animation by key:{entity.SpawnAnimation}. Make sure animation is registered.");
+                    }
+                });
+            }
+        }
+
+        public async void ChangeWorld(World world, Vector3 position)
+        {
+            CurrentWorld.RemovePlayer(this);
+            foreach (var player in CurrentWorld.OnlinePlayers.Values)
+            {
+                var packet = new PlayerList
+                {
+                    Action = 1,
+                    UUID = player.UUID,
+                };
+                Send(packet);
+                var packet3 = new RemoveActor
+                {
+                    EntityId = player.EntityID
+                };
+                Send(packet3);
+            }
+            foreach (var entity in CurrentWorld.Entities.Values)
+            {
+                if (entity is CustomEntity customEntity)
+                {
+                    var packet = new PlayerList
+                    {
+                        Action = 1,
+                        UUID = customEntity.UUID,
+                    };
+                    Send(packet);
+                }
+                var packet3 = new RemoveActor
+                {
+                    EntityId = entity.EntityId
+                };
+                Send(packet3);
+            }
+            CurrentWorld = world;
+            world.AddPlayer(this);
+            ChunkSendQueue.Clear();
+            sentChunks.Clear();
+            SendQueueBusy = false;
+            SendEntities();
+            await Task.Delay(500); //need a little bit time to clear chunk cache and send packets
+            var packet2 = new NetworkChunkPublisherUpdate
+            {
+                X = (int)Position.X,
+                Y = (int)Position.Y,
+                Z = (int)Position.Z,
+                Radius = drawDistance
+            };
+            Send(packet2);
+
+            int radius = drawDistance / 2;
+
+            int currentChunkX = (int)Math.Floor(Position.X / 16.0);
+            int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
+
+            List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
+
+            foreach (var (x, z) in chunkPositions)
+            {
+                if (!sentChunks.Contains((x, z)))
+                {
+                    sentChunks.Add((x, z));
+                    ChunkSendQueue.Enqueue((x, z));
+                }
+            }
+
+            ProcessSendQueue();
+            await Task.Delay(500);
+            Teleport(position);
+        }
+
         ///////////////////////////// Packet handler /////////////////////////////
 
         private HashSet<(int x, int z)> sentChunks = new();
@@ -518,36 +622,7 @@ namespace DaemonMC
                 {
                     Spawned = true;
                     PluginManager.PlayerJoined(this);
-                    foreach (var entity in CurrentWorld.Entities.Values)
-                    {
-                        _ = Task.Run(async () => {
-                            await Task.Delay(2000);
-                            if (entity is CustomEntity customEntity)
-                            {
-                                var packet = new PlayerList
-                                {
-                                    Action = 1,
-                                    UUID = customEntity.UUID,
-                                };
-                                Send(packet);
-                            }
-
-                            if (ResourcePackManager.Animations.TryGetValue(entity.SpawnAnimation, out Animation spawnAnimation))
-                            {
-                                var packet1 = new AnimateEntity
-                                {
-                                    Animation = spawnAnimation.AnimationName,
-                                    Controller = spawnAnimation.ControllerName,
-                                    RuntimeId = entity.EntityId
-                                };
-                                Send(packet1);
-                            }
-                            else
-                            {
-                                Log.warn($"Unable to find spawn animation by key:{entity.SpawnAnimation}. Make sure animation is registered.");
-                            }
-                        });
-                    }
+                    SendEntities();
                 }
             }
 

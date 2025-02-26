@@ -54,6 +54,7 @@ namespace DaemonMC.Level
 
         public void AddPlayer(Player player)
         {
+            OnlinePlayers.TryAdd(player.EntityID, player);
             foreach (var entity in Entities.Values)
             {
                 if (entity is CustomEntity customEntity)
@@ -136,6 +137,7 @@ namespace DaemonMC.Level
                 };
                 player.Send(packet2);
             }
+            Log.info($"{player.Username} spawned in World:'{LevelName}' X:{player.Position.X} Y:{player.Position.Y} Z:{player.Position.Z}");
         }
 
         public void RemovePlayer(Player player)

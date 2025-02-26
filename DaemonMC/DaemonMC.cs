@@ -5,6 +5,7 @@ using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Game;
 using System.Numerics;
 using System.Reflection;
+
 namespace DaemonMC
 {
     public static class DaemonMC
@@ -41,7 +42,21 @@ namespace DaemonMC
 
             Config.Set();
 
-            Thread serverThread = new Thread(new ThreadStart(Server.ServerF));
+            Thread serverThread = new Thread(() =>
+            {
+                try
+                {
+                    Server.ServerF();
+                }
+                catch (Exception ex)
+                {
+                    string filename = $"CrashDump_{DateTime.Now.ToString("yyyy_MM_dd-HH_mm_ss")}.txt";
+                    File.AppendAllText(filename, ex.ToString());
+                    Log.error($"Server experienced fatal crash. Check {filename} for details.");
+                    Thread.Sleep(3000);
+                    Environment.Exit(1);
+                }
+            });
             serverThread.Start();
 
             Command();

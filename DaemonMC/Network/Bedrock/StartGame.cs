@@ -102,7 +102,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                encoder.WriteSignedVarInt(2); //0 server auth off, need fix
+                encoder.WriteSignedVarInt(2);
                 encoder.WriteSignedVarInt(40);
                 encoder.WriteBool(true);
                 //end of synced movement settings

@@ -27,6 +27,7 @@ namespace DaemonMC
         public long Tick { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
+        public bool onGround { get; set; }
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
         public World CurrentWorld { get; set; }
@@ -403,6 +404,10 @@ namespace DaemonMC
                     header |= 0x08;
                     header |= 0x10;
                     header |= 0x20;
+                    if (playerAuthInput.InputData.Contains(AuthInputData.VerticalCollision))
+                    {
+                        header |= 0x40;
+                    }
 
                     foreach (Player player in CurrentWorld.OnlinePlayers.Values)
                     {

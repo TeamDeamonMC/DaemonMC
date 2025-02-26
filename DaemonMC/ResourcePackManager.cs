@@ -10,6 +10,7 @@ namespace DaemonMC
         public static bool ForcePacks = false;
         public static void LoadPacks(string packdDirectory)
         {
+            Server.Packs.Add(new ResourcePack() { UUID = new Guid("0fba4063-dba1-4281-9b89-ff9390653530"), PackIdVersion = "1.0.0" });
             if (!Directory.Exists(packdDirectory))
             {
                 Log.warn($"{packdDirectory}/ not found. Creating new folder...");

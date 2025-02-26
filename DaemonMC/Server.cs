@@ -11,6 +11,7 @@ namespace DaemonMC
 {
     public class Server
     {
+        public static int Port { get; set; } = 19132;
         public static Socket Sock { get; set; } = null!;
         public static Dictionary<long, Player> OnlinePlayers = new Dictionary<long, Player>();
         public static long NextId = 10;
@@ -26,8 +27,21 @@ namespace DaemonMC
         public static void ServerF()
         {
             Sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPEndPoint iep = new IPEndPoint(IPAddress.Any, 19132);
-            Sock.Bind(iep);
+            IPEndPoint iep = new IPEndPoint(IPAddress.Any, Port);
+
+            try
+            {
+                Sock.Bind(iep);
+            }
+            catch (SocketException e)
+            {
+                if(e.ErrorCode == 10048)
+                {
+                    Log.error($"Server can't start. Port {Port} is already in use.");
+                    Crash = true;
+                }
+            }
+
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
 
             Palette.buildPalette();
@@ -40,7 +54,7 @@ namespace DaemonMC
 
             PluginManager.LoadPlugins("Plugins");
 
-            Log.info("Server listening on port 19132");
+            Log.info($"Server listening on port {Port}");
             Log.line();
             Log.info("Type /help to see available commands");
 

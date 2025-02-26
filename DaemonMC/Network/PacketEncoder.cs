@@ -225,13 +225,12 @@ namespace DaemonMC.Network
         {
             string[] ipParts = ip.Split('.');
             byte[] ipAddress = new byte[] { byte.Parse(ipParts[0]), byte.Parse(ipParts[1]), byte.Parse(ipParts[2]), byte.Parse(ipParts[3]) };
-            ushort port = 19132;
 
             byteStream.WriteByte(4);
 
             byteStream.Write(ipAddress, 0, ipAddress.Length);
 
-            byte[] portBytes = BitConverter.GetBytes(port);
+            byte[] portBytes = BitConverter.GetBytes((ushort)Server.Port);
             Array.Reverse(portBytes);
             byteStream.Write(portBytes, 0, portBytes.Length);
         }

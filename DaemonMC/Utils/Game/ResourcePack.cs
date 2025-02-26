@@ -16,7 +16,12 @@ namespace DaemonMC
         public bool IsAddon { get; set; } = false;
         public bool RayTracking { get; set; } = false;
         public string CdnUrl { get; set; } = "";
-        public ResourcePack(string PackPath)
+        public ResourcePack()
+        {
+
+        }
+
+        public ResourcePack(string PackPath) : this()
         {
             var pack = ZipFile.OpenRead(PackPath);
 

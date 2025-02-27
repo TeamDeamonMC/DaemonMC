@@ -142,7 +142,7 @@ namespace DaemonMC.Entities
         public void SetNameTag(string nameTag)
         {
             NameTag = nameTag;
-            if (nameTag != "") { Metadata[ActorData.NAME] = new Metadata(nameTag); }
+            Metadata[ActorData.NAME] = new Metadata(nameTag);
             SendMetadata();
         }
     }

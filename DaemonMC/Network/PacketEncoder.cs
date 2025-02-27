@@ -510,7 +510,7 @@ namespace DaemonMC.Network
             {
                 WriteShort((ushort)data.Layer);
                 WriteInt(data.AbilitiesSet);
-                WriteInt(data.AbilityValues);
+                WriteAbilityValues(data.AbilityValues);
                 WriteFloat(data.FlySpeed);
                 if (protocolVersion >= Info.v1_21_60)
                 {
@@ -518,6 +518,44 @@ namespace DaemonMC.Network
                 }
                 WriteFloat(data.WalkSpeed);
             }
+        }
+
+        public void WriteAbilityValues(PermissionSet permissions)
+        {
+            int value = 0;
+            if (permissions.Build)
+            {
+                value |= (1 << (int)AbilitiesIndex.Build);
+            }
+            if (permissions.Mine)
+            {
+                value |= (1 << (int)AbilitiesIndex.Mine);
+            }
+            if (permissions.DoorsAndSwitches)
+            {
+                value |= (1 << (int)AbilitiesIndex.DoorsAndSwitches);
+            }
+            if (permissions.OpenContainers)
+            {
+                value |= (1 << (int)AbilitiesIndex.OpenContainers);
+            }
+            if (permissions.AttackPlayers)
+            {
+                value |= (1 << (int)AbilitiesIndex.AttackPlayers);
+            }
+            if (permissions.AttackMobs)
+            {
+                value |= (1 << (int)AbilitiesIndex.AttackMobs);
+            }
+            if (permissions.OperatorCommands)
+            {
+                value |= (1 << (int)AbilitiesIndex.OperatorCommands);
+            }
+            if (permissions.Teleport)
+            {
+                value |= (1 << (int)AbilitiesIndex.Teleport);
+            }
+            WriteInt(value);
         }
     }
 

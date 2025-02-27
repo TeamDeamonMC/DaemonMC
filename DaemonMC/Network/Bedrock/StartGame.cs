@@ -72,7 +72,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false);
                 encoder.WriteBool(false); //bonus chest
                 encoder.WriteBool(false); //map
-                encoder.WriteByte(2); //permission level
+                encoder.WriteByte(3); //permission level
                 encoder.WriteInt(0); //chunk tick range
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);

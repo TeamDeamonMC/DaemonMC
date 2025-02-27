@@ -2,14 +2,12 @@
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network;
 using DaemonMC.Utils.Text;
-using fNbt;
 using System.Numerics;
 using DaemonMC.Level;
 using DaemonMC.Utils;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
-using DaemonMC.Level.Generators;
 using DaemonMC.Plugin.Plugin;
 using DaemonMC.Entities;
 
@@ -17,7 +15,9 @@ namespace DaemonMC
 {
     public class Player
     {
-        public string Username { get; set; }
+        private PlayerUtils _player;
+        public string Username { get; set; } = "";
+        public string NameTag { get; set; } = "";
         public Skin Skin { get; set; } = new Skin();
         public Guid UUID { get; set; } = new Guid();
         public string XUID { get; set; }
@@ -34,21 +34,20 @@ namespace DaemonMC
         public AttributesValues Attributes { get; set; } = new AttributesValues(0.1f);
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
         public List<AuthInputData> InputData { get; set; } = new List<AuthInputData>();
-        public List<AbilitiesData> Abilities { get; set; } = new List<AbilitiesData>() { new AbilitiesData(1, 262143, 0, 0.05f, 0.1f, 0.1f) };
+        public List<AbilitiesData> Abilities { get; set; } = new List<AbilitiesData>() { new AbilitiesData(1, 262143, new PermissionSet(), 0.05f, 0.1f, 0.1f) };
 
-        private Queue<(int x, int z)> ChunkSendQueue = new Queue<(int x, int z)>();
-        private bool SendQueueBusy = false;
-        public bool Spawned = false;
+    public bool Spawned { get; set; } = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
 
+        public Player()
+        {
+            _player = new PlayerUtils(this);
+        }
+
         internal void spawn()
         {
-            SendStartGame();
-            SendCommands();
-            SendItemData();
-            SendCreativeInventory();
-            SendBiomeDefinitionList();
+            _player.SendStartGame();
             SendPlayStatus(3);
             SendGameRules();
             UpdateAttributes();
@@ -63,70 +62,6 @@ namespace DaemonMC
             packet.EncodePacket(encoder);
         }
 
-        internal void SendStartGame()
-        {
-            var packet = new StartGame
-            {
-                LevelName = CurrentWorld.LevelDisplayName,
-                EntityId = EntityID,
-                GameType = GameMode,
-                GameMode = GameMode,
-                Position = new Vector3(Position.X, Position.Y, Position.Z),
-                Rotation = new Vector2(0, 0),
-                SpawnBlockX = (int)Position.X,
-                SpawnBlockY = (int)Position.Y,
-                SpawnBlockZ = (int)Position.Z,
-                Difficulty = 1,
-                Dimension = 0,
-                Seed = CurrentWorld.RandomSeed,
-                Generator = 1,
-            };
-            Send(packet);
-        }
-
-        internal void SendCommands()
-        {
-            var packet = new AvailableCommands
-            {
-                Commands = CommandManager.AvailableCommands
-            };
-            Send(packet);
-        }
-
-        internal void SendItemData()
-        {
-            var packet = new ItemRegistry
-            {
-
-            };
-            Send(packet);
-        }
-
-        internal void SendCreativeInventory()
-        {
-            var packet = new CreativeContent
-            {
-
-            };
-            Send(packet);
-        }
-
-        internal void SendBiomeDefinitionList()
-        {
-            var packet = new BiomeDefinitionList
-            {
-                BiomeData = new fNbt.NbtCompound("")
-                {
-                new NbtCompound("plains")
-                    {
-                        new NbtFloat("downfall", 0.4f),
-                        new NbtFloat("temperature", 0.8f),
-                    }
-                }
-            };
-            Send(packet);
-        }
-
         public void SendPlayStatus(int status)
         {
             var packet = new PlayStatus
@@ -134,38 +69,6 @@ namespace DaemonMC
                 Status = status,
             };
             Send(packet);
-        }
-
-        public void SendChunkToPlayer(int chunkX, int chunkZ)
-        {
-            List<byte> chunkData = new List<byte>();
-            int chunkCount = 0;
-
-            if (CurrentWorld.Temporary)
-            {
-                chunkData = new List<byte>(new SuperFlat().generateChunks());
-                chunkCount = 20;
-            }
-            else
-            {
-                var chunkRaw = CurrentWorld.GetChunk(chunkX, chunkZ);
-                chunkData = new List<byte>(chunkRaw.NetworkSerialize(this));
-                chunkCount = chunkRaw.Chunks.Count();
-                if (chunkRaw.Chunks.Count == 0)
-                {
-                    chunkData = new List<byte>(new SuperFlat().generateChunks());
-                    chunkCount = 20;
-                }
-            }
-
-            var chunk = new LevelChunk
-            {
-                ChunkX = chunkX,
-                ChunkZ = chunkZ,
-                Count = chunkCount,
-                Data = chunkData.ToArray()
-            };
-            Send(chunk);
         }
 
         public void UpdateChunkRadius(int radius)
@@ -193,6 +96,8 @@ namespace DaemonMC
         {
             if (dataValue == 0)
             {
+                NameTag = Username;
+                Metadata[ActorData.NAME] = new Metadata(Username);
                 SetFlag(ActorFlags.ALWAYS_SHOW_NAME, true);
                 SetFlag(ActorFlags.HAS_COLLISION, true);
                 SetFlag(ActorFlags.HAS_GRAVITY, true);
@@ -200,8 +105,6 @@ namespace DaemonMC
             }
 
             Metadata[ActorData.RESERVED_0] = new Metadata(dataValue);
-
-            Dictionary<long, Player> players = new Dictionary<long, Player>(){ { EntityID, this } };
 
             var packet = new SetActorData
             {
@@ -229,24 +132,6 @@ namespace DaemonMC
             Send(packet);
         }
 
-        private async void ProcessSendQueue()
-        {
-            if (SendQueueBusy) { return; }
-            SendQueueBusy = true;
-            while (ChunkSendQueue.Count > 0)
-            {
-                if (!Server.OnlinePlayers.ContainsValue(this)) {
-                    ChunkSendQueue.Clear();
-                    break;
-                }
-                var (chunkX, chunkZ) = ChunkSendQueue.Dequeue();
-                SendChunkToPlayer(chunkX, chunkZ);
-
-                await Task.Delay(10);
-            }
-            SendQueueBusy = false;
-        }
-
         public void Kick(string msg)
         {
             _ = Task.Run(async () => {
@@ -263,7 +148,7 @@ namespace DaemonMC
                 {
                 };
                 packet2.Encode(encoder2);
-                Server.RemovePlayer((long)EntityID);
+                Server.RemovePlayer(EntityID);
                 RakSessionManager.deleteSession(ep);
             });
         }
@@ -284,7 +169,21 @@ namespace DaemonMC
             var packet = new MovePlayer
             {
                 ActorRuntimeId = EntityID,
-                Position = position
+                Position = position,
+                Teleport = true,
+                Tick = Tick
+            };
+            Send(packet);
+        }
+
+        public void MoveTo(Vector3 position)
+        {
+            Position = position;
+            var packet = new MovePlayer
+            {
+                ActorRuntimeId = EntityID,
+                Position = position,
+                Tick = Tick
             };
             Send(packet);
         }
@@ -299,27 +198,6 @@ namespace DaemonMC
             {
                 dataValue &= ~(1L << (int)flag);
             }
-        }
-
-        public void UpdateFlags(List<AuthInputData> flags)
-        {
-            if (flags.Contains(AuthInputData.Sneaking))
-            {
-                SetFlag(ActorFlags.SNEAKING, true);
-            }
-            if (flags.Contains(AuthInputData.StopSneaking))
-            {
-                SetFlag(ActorFlags.SNEAKING, false);
-            }
-            if (flags.Contains(AuthInputData.StartSprinting))
-            {
-                SetFlag(ActorFlags.SPRINTING, true);
-            }
-            if (flags.Contains(AuthInputData.StopSprinting))
-            {
-                SetFlag(ActorFlags.SPRINTING, false);
-            }
-            SendMetadata(true);
         }
 
         public void SendLevelEvent(Vector3 pos, LevelEvents value, int data = 0)
@@ -356,7 +234,6 @@ namespace DaemonMC
         public void SetGameMode(int gameMode)
         {
             GameMode = gameMode;
-
             SetPlayerGameType packet = new SetPlayerGameType()
             {
                 GameMode = gameMode
@@ -364,16 +241,22 @@ namespace DaemonMC
             Send(packet);
         }
 
-        public void SendAbilities()
+        public void SendAbilities(byte playerPermissions = 3, byte commandPermissions = 0)
         {
             UpdateAbilities packet = new UpdateAbilities()
             {
                 EntityId = EntityID,
-                PlayerPermissions = 0,
-                CommandPermissions = 0,
+                PlayerPermissions = playerPermissions,
+                CommandPermissions = commandPermissions,
                 Layers = Abilities,
             };
             Send(packet);
+        }
+
+        public void SetPermissions(PermissionSet permissions)
+        {
+            Abilities[0].AbilityValues = permissions;
+            SendAbilities();
         }
 
         private void SendEntities()
@@ -446,44 +329,22 @@ namespace DaemonMC
             }
             CurrentWorld = world;
             world.AddPlayer(this);
-            ChunkSendQueue.Clear();
-            sentChunks.Clear();
-            SendQueueBusy = false;
+            _player.ClearChunkCache();
             SendEntities();
-            await Task.Delay(500); //need a little bit time to clear chunk cache and send packets
-            var packet2 = new NetworkChunkPublisherUpdate
-            {
-                X = (int)Position.X,
-                Y = (int)Position.Y,
-                Z = (int)Position.Z,
-                Radius = drawDistance
-            };
-            Send(packet2);
-
-            int radius = drawDistance / 2;
-
-            int currentChunkX = (int)Math.Floor(Position.X / 16.0);
-            int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
-
-            List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
-
-            foreach (var (x, z) in chunkPositions)
-            {
-                if (!sentChunks.Contains((x, z)))
-                {
-                    sentChunks.Add((x, z));
-                    ChunkSendQueue.Enqueue((x, z));
-                }
-            }
-
-            ProcessSendQueue();
+            await Task.Delay(500); //need a little bit time to clear chunk cache and process packets
+            _player.SendChunks();
             await Task.Delay(500);
             Teleport(position);
         }
 
-        ///////////////////////////// Packet handler /////////////////////////////
+        public void SetNameTag(string nameTag)
+        {
+            NameTag = nameTag;
+            Metadata[ActorData.NAME] = new Metadata(nameTag);
+            SendMetadata();
+        }
 
-        private HashSet<(int x, int z)> sentChunks = new();
+        ///////////////////////////// Packet handler /////////////////////////////
 
         internal void HandlePacket(Packet packet)
         {
@@ -493,10 +354,10 @@ namespace DaemonMC
                 if (!InputData.SequenceEqual(playerAuthInput.InputData))
                 {
                     Log.debug($"Data: {string.Join(" | ", playerAuthInput.InputData)}");
-                    UpdateFlags(playerAuthInput.InputData);
+                    _player.UpdateFlags(playerAuthInput.InputData);
                     InputData = playerAuthInput.InputData;
                 }
-                if (Position != playerAuthInput.Position || Rotation != playerAuthInput.Rotation)
+                if (Vector3.Distance(Position, playerAuthInput.Position) > 0.01f || Vector2.Distance(Rotation, playerAuthInput.Rotation) > 0.01f)
                 {
                     Position = playerAuthInput.Position;
                     Rotation = playerAuthInput.Rotation;
@@ -550,22 +411,22 @@ namespace DaemonMC
 
                     foreach (var chunk in newChunks)
                     {
-                        if (!sentChunks.Contains(chunk))
+                        if (!_player.sentChunks.Contains(chunk))
                         {
-                            sentChunks.Add(chunk);
-                            ChunkSendQueue.Enqueue(chunk);
+                            _player.sentChunks.Add(chunk);
+                            _player.ChunkSendQueue.Enqueue(chunk);
                         }
                     }
 
-                    foreach (var chunk in sentChunks.ToList())
+                    foreach (var chunk in _player.sentChunks.ToList())
                     {
                         if (!newChunks.Contains(chunk))
                         {
-                            sentChunks.Remove(chunk);
+                            _player.sentChunks.Remove(chunk);
                         }
                     }
 
-                    ProcessSendQueue();
+                    _player.ProcessSendQueue();
                 }
             }
 
@@ -577,32 +438,7 @@ namespace DaemonMC
 
                 UpdateChunkRadius(chunkRadius);
 
-                var packet2 = new NetworkChunkPublisherUpdate
-                {
-                    X = (int)Position.X,
-                    Y = (int)Position.Y,
-                    Z = (int)Position.Z,
-                    Radius = drawDistance
-                };
-                Send(packet2);
-
-                int radius = chunkRadius / 2;
-
-                int currentChunkX = (int)Math.Floor(Position.X / 16.0);
-                int currentChunkZ = (int)Math.Floor(Position.Z / 16.0);
-
-                List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
-
-                foreach (var (x, z) in chunkPositions)
-                {
-                    if (!sentChunks.Contains((x, z)))
-                    {
-                        sentChunks.Add((x, z));
-                        ChunkSendQueue.Enqueue((x, z));
-                    }
-                }
-
-                ProcessSendQueue();
+                _player.SendChunks();
             }
 
             if (packet is TextMessage textMessage)
@@ -620,7 +456,6 @@ namespace DaemonMC
             {
                 if (serverboundLoadingScreen.ScreenType == 4)
                 {
-                    Spawned = true;
                     PluginManager.PlayerJoined(this);
                     SendEntities();
                 }

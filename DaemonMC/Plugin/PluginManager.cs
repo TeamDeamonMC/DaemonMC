@@ -21,11 +21,11 @@ namespace DaemonMC.Plugin.Plugin
 
             foreach (var file in Directory.GetFiles(pluginDirectory, "*.dll"))
             {
+                Log.info($"Loading plugin: {file}");
                 Assembly assembly = Assembly.LoadFrom(file);
 
                 foreach (var type in assembly.GetTypes())
                 {
-                    Log.info($"Loading plugin: {file}");
                     if (typeof(Plugin).IsAssignableFrom(type) && !type.IsInterface)
                     {
                         Plugin plugin = (Plugin)Activator.CreateInstance(type)!;

@@ -44,7 +44,7 @@ namespace DaemonMC
 
         public static void about(Player player)
         {
-            player.SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.Version} \n§r§fProject URL: §agithub.com/laz1444/DaemonMC \n§r§fGit hash: §a{DaemonMC.GitHash} \n§r§fBuild info: §a.NET{Environment.Version} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.ProtocolVersion)}");
+            player.SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.Version} \n§r§fProject URL: §agithub.com/laz1444/DaemonMC \n§r§fGit hash: §a{DaemonMC.GitHash} \n§r§fEnvironment: §a.NET{Environment.Version}, {Environment.OSVersion} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.ProtocolVersion)}");
         }
 
         public static void position(Player player)

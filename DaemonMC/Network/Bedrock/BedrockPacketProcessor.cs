@@ -4,6 +4,7 @@ using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 using System.Security.Cryptography;
+using fNbt;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -130,6 +131,11 @@ namespace DaemonMC.Network.Bedrock
                 {
                     var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
 
+                    if (player.Spawned) //something weird happens under load
+                    {
+                        return;
+                    }
+
                     World spawnWorld = Server.Levels.FirstOrDefault(w => w.LevelName == DaemonMC.DefaultWorld);
                     if (spawnWorld != null)
                     {
@@ -142,6 +148,38 @@ namespace DaemonMC.Network.Bedrock
 
                     if (!player.CurrentWorld.OnlinePlayers.TryAdd(player.EntityID, player)) { return; }
                     player.spawn();
+
+                    var commands = new AvailableCommands
+                    {
+                        Commands = CommandManager.AvailableCommands
+                    };
+                    player.Send(commands);
+
+                    var items = new ItemRegistry
+                    {
+
+                    };
+                    player.Send(items);
+
+                    var creativeInventory = new CreativeContent
+                    {
+
+                    };
+                    player.Send(creativeInventory);
+
+                    var biomes = new BiomeDefinitionList
+                    {
+                        BiomeData = new fNbt.NbtCompound("")
+                        {
+                            new NbtCompound("plains")
+                            {
+                                new NbtFloat("downfall", 0.4f),
+                                new NbtFloat("temperature", 0.8f),
+                            }  
+                        }
+                    };
+                    player.Send(biomes);
+                    player.Spawned = true;
                 }
             }
 

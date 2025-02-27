@@ -25,6 +25,7 @@
             AddActor = 13,
             RemoveActor = 14,
             MovePlayer = 19,
+            UpdateBlock = 21,
             LevelEvent = 25,
             UpdateAttributes = 29,
             InventoryTransaction = 30,

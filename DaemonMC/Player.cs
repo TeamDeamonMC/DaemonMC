@@ -10,6 +10,7 @@ using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
 using DaemonMC.Plugin.Plugin;
 using DaemonMC.Entities;
+using DaemonMC.Blocks;
 
 namespace DaemonMC
 {
@@ -98,6 +99,7 @@ namespace DaemonMC
             {
                 NameTag = Username;
                 Metadata[ActorData.NAME] = new Metadata(Username);
+                SetFlag(ActorFlags.CAN_SHOW_NAME, true);
                 SetFlag(ActorFlags.ALWAYS_SHOW_NAME, true);
                 SetFlag(ActorFlags.HAS_COLLISION, true);
                 SetFlag(ActorFlags.HAS_GRAVITY, true);
@@ -344,6 +346,21 @@ namespace DaemonMC
             SendMetadata();
         }
 
+        public void SendBlock(Block block, int x, int y, int z)
+        {
+            var packet = new UpdateBlock()
+            {
+                Block = block,
+                Position = new Vector3(x, y, z)
+            };
+            Send(packet);
+        }
+
+        public void SendBlock(Block block, Vector3 playerPos)
+        {
+            SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
+        }
+
         ///////////////////////////// Packet handler /////////////////////////////
 
         internal void HandlePacket(Packet packet)
@@ -359,6 +376,8 @@ namespace DaemonMC
                 }
                 if (Vector3.Distance(Position, playerAuthInput.Position) > 0.01f || Vector2.Distance(Rotation, playerAuthInput.Rotation) > 0.01f)
                 {
+                    PluginManager.PlayerMove(this);
+
                     Position = playerAuthInput.Position;
                     Rotation = playerAuthInput.Rotation;
 

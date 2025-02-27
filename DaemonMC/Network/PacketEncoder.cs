@@ -138,6 +138,17 @@ namespace DaemonMC.Network
             byteStream.Write(bytes, 0, bytes.Length);
         }
 
+        public void WriteVarInt_Signed(int rawValue)
+        {
+            uint value = unchecked((uint)rawValue);
+            while ((value & 0xFFFFFF80) != 0)
+            {
+                byteStream.WriteByte((byte)((value & 127) | 128));
+                value >>= 7;
+            }
+            byteStream.WriteByte((byte)value);
+        }
+
         public void WriteVarInt(int value)
         {
             while ((value & -128) != 0)
@@ -556,6 +567,13 @@ namespace DaemonMC.Network
                 value |= (1 << (int)AbilitiesIndex.Teleport);
             }
             WriteInt(value);
+        }
+
+        public void WriteBlockNetPos(Vector3 position)
+        {
+            WriteSignedVarInt((int)position.X);
+            WriteVarInt_Signed((int)position.Y); //what kind of data type even is this?
+            WriteSignedVarInt((int)position.Z);
         }
     }
 

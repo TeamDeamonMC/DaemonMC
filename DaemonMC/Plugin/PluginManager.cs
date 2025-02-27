@@ -54,6 +54,14 @@ namespace DaemonMC.Plugin.Plugin
             }
         }
 
+        public static void PlayerMove(Player player)
+        {
+            foreach (var plugin in _plugins)
+            {
+                plugin.OnPlayerMove(player);
+            }
+        }
+
         public static bool PacketReceived(IPEndPoint ep, Packet packet)
         {
             foreach (var plugin in _plugins)

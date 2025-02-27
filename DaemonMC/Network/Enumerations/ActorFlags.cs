@@ -41,6 +41,7 @@
         CHESTED,
         STACKABLE,
         SHOW_BOTTOM,
+        STANDING,
         SHAKING,
         IDLING,
         CASTING,
@@ -120,6 +121,7 @@
         TIMER_FLAG_2,
         TIMER_FLAG_3,
         BODY_ROTATION_BLOCKED,
+        RENDERS_WHEN_INVISIBLE,
         Count
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
+using DaemonMC.Blocks;
 using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
@@ -50,6 +51,21 @@ namespace DaemonMC.Level
                 Data = data
             };
             Send(packet);
+        }
+
+        public void SendBlock(Block block, int x, int y, int z)
+        {
+            var packet = new UpdateBlock()
+            {
+                Block = block,
+                Position = new Vector3(x, y, z)
+            };
+            Send(packet);
+        }
+
+        public void SendBlock(Block block, Vector3 playerPos)
+        {
+            SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
         }
 
         public void AddPlayer(Player player)

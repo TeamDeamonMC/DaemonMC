@@ -34,7 +34,7 @@ namespace DaemonMC.Network.RakNet
     public class Reliability
     {
         public static uint reliableIndex = 0;
-        public static Dictionary<short, FragmentedPacket> fragmentedPackets = new Dictionary<short, FragmentedPacket>();
+        public static Dictionary<IPAddress, FragmentedPacket> fragmentedPackets = new Dictionary<IPAddress, FragmentedPacket>();
 
         public static void ReliabilityHandler(PacketDecoder decoder, int recv)
         {
@@ -110,12 +110,12 @@ namespace DaemonMC.Network.RakNet
 
                 if (isFragmented)
                 {
-                    if (!fragmentedPackets.ContainsKey(compId))
+                    if (!fragmentedPackets.ContainsKey(decoder.clientEp.Address))
                     {
-                        fragmentedPackets[compId] = new FragmentedPacket(compSize, lengthInBytes);
+                        fragmentedPackets[decoder.clientEp.Address] = new FragmentedPacket(compSize, lengthInBytes);
                     }
 
-                    var fragment = fragmentedPackets[compId];
+                    var fragment = fragmentedPackets[decoder.clientEp.Address];
                     fragment.Fragments[compIndex] = body;
                     fragment.ReceivedSize += body.Length;
                     fragment.Count++;
@@ -124,7 +124,7 @@ namespace DaemonMC.Network.RakNet
                     {
                         byte[] fullPacket = ReassemblePacket(fragment);
                         decoder.packetBuffers.Add(fullPacket);
-                        fragmentedPackets.Remove(compId);
+                        fragmentedPackets.Remove(decoder.clientEp.Address);
                     }
                 }
                 else

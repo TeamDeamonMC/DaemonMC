@@ -12,7 +12,27 @@
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);NU1605</NoWarn>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DaemonMC</Title>
+    <Description>Simple and lightning fast Minecraft Bedrock Edition server software</Description>
+    <Copyright>laz1444</Copyright>
+    <PackageProjectUrl>https://github.com/laz1444/DaemonMC/wiki</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/laz1444/DaemonMC</RepositoryUrl>
+    <PackageTags>mcpe; bedrock-server; bedrock-dedicated-server; minecraft</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MiNET.fnbt" Version="1.0.22" />

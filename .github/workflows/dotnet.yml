@@ -51,6 +51,16 @@ jobs:
       working-directory: DaemonMC
       run: zip -r DaemonMC.zip DaemonMC/
       
+    - name: Create NuGet Package
+      run: dotnet pack --configuration Release --output out
+      
+    - name: Publish NuGet Package
+      run: |
+        dotnet nuget push out/*.nupkg \
+        --api-key ${{ secrets.nugetkey }} \
+        --source https://api.nuget.org/v3/index.json \
+        --skip-duplicate
+      
     - name: Release
       uses: softprops/action-gh-release@v2
       with:

@@ -54,7 +54,7 @@ jobs:
     - name: Publish NuGet Package
       working-directory: DaemonMC
       run: |
-        dotnet nuget push out/*.nupkg \
+        dotnet nuget push bin/Release//*.nupkg \
         --api-key ${{ secrets.nugetkey }} \
         --source https://api.nuget.org/v3/index.json \
         --skip-duplicate

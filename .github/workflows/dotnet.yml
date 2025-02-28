@@ -51,10 +51,6 @@ jobs:
       working-directory: DaemonMC
       run: zip -r DaemonMC.zip DaemonMC/
       
-    - name: Create NuGet Package
-      working-directory: DaemonMC
-      run: dotnet pack --configuration Release --output out
-      
     - name: Publish NuGet Package
       working-directory: DaemonMC
       run: |

@@ -75,7 +75,7 @@ namespace DaemonMC.Entities
             }
         }
 
-        public void SetPosition(Vector3 position)
+        public void MoveTo(Vector3 position)
         {
             Position = position;
 

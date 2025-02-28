@@ -10,11 +10,7 @@ namespace DaemonMC.Network.RakNet
 
         public static void createSession(IPEndPoint ip)
         {
-            if (sessions.TryGetValue(ip, out var session))
-            {
-                return;
-            }
-            sessions.Add(ip, new RakSession());
+            sessions.TryAdd(ip, new RakSession());
         }
 
         public static void addSession(IPEndPoint ip, long guid)

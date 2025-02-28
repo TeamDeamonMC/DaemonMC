@@ -130,6 +130,8 @@ namespace DaemonMC
             if (OnlinePlayers.ContainsKey(id))
             {
                 var player = GetPlayer(id);
+                PluginManager.PlayerLeaved(player);
+
                 if (player.CurrentWorld != null)
                 {
                     player.CurrentWorld.RemovePlayer(player);

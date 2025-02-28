@@ -10,6 +10,7 @@ namespace DaemonMC.Plugin.Plugin
         void OnUnload();
 
         void OnPlayerJoined(Player player);
+        void OnPlayerLeaved(Player player);
         void OnPlayerMove(Player player);
         bool OnPacketReceived(IPEndPoint ep, Packet packet);
         bool OnPacketSent(IPEndPoint ep, Packet packet);
@@ -22,6 +23,7 @@ namespace DaemonMC.Plugin.Plugin
         public virtual void OnLoad() { }
         public virtual void OnUnload() { }
         public virtual void OnPlayerJoined(Player player) { }
+        public virtual void OnPlayerLeaved(Player player) { }
         public virtual void OnPlayerMove(Player player) { }
         public virtual bool OnPacketReceived(IPEndPoint ep, Packet packet) { return true; }
         public virtual bool OnPacketSent(IPEndPoint ep, Packet packet) { return true; }

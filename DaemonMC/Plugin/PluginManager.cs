@@ -54,6 +54,14 @@ namespace DaemonMC.Plugin.Plugin
             }
         }
 
+        public static void PlayerLeaved(Player player)
+        {
+            foreach (var plugin in _plugins)
+            {
+                plugin.OnPlayerLeaved(player);
+            }
+        }
+
         public static void PlayerMove(Player player)
         {
             foreach (var plugin in _plugins)

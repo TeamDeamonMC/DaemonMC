@@ -358,7 +358,7 @@ namespace DaemonMC
 
         public void SendBlock(Block block, Vector3 playerPos)
         {
-            SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
+            SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
         }
 
         ///////////////////////////// Packet handler /////////////////////////////

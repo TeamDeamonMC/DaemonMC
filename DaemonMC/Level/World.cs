@@ -68,6 +68,16 @@ namespace DaemonMC.Level
             SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
         }
 
+        public void SendMessage(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 1,
+                Message = message
+            };
+            Send(packet);
+        }
+
         public void AddPlayer(Player player)
         {
             OnlinePlayers.TryAdd(player.EntityID, player);

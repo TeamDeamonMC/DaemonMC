@@ -184,7 +184,7 @@ namespace DaemonMC.Network.RakNet
 
             for (int i = 0; i < totalFragments; i++)
             {
-                session.sentPackets.TryAdd(RakSessionManager.getSession(encoder.clientEp).sequenceNumber, (body, false));
+                //session.sentPackets.TryAdd(RakSessionManager.getSession(encoder.clientEp).sequenceNumber, (body, false)); todo fix crash. Works good without but probably important for clients with bad connection
 
                 int start = i * maxPayloadSize;
                 int length = Math.Min(maxPayloadSize, body.Length - start);

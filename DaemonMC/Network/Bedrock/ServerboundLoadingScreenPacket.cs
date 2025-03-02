@@ -10,7 +10,7 @@
         protected override void Decode(PacketDecoder decoder)
         {
             ScreenType = decoder.ReadVarInt();
-            ScreenId = decoder.ReadOptional(() => decoder.ReadInt());
+            ScreenId = decoder.ReadOptional(decoder.ReadInt);
         }
 
         protected override void Encode(PacketEncoder encoder)

@@ -507,9 +507,9 @@ namespace DaemonMC.Network
             return EmoteIds;
         }
 
-        public T? ReadOptional<T>(Func<T> readFunction) where T : struct
+        public T? ReadOptional<T>(Func<T> readFunction)
         {
-            return ReadBool() ? readFunction() : (T?)null;
+            return ReadBool() ? readFunction() : default;
         }
 
         public List<TEnum> Read<TEnum>() where TEnum : Enum

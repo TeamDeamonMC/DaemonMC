@@ -27,8 +27,20 @@
         {
             encoder.WriteByte(MessageType);
             encoder.WriteBool(Localized);
-            encoder.WriteString(Username);
-            encoder.WriteString(Message);
+            if (MessageType == 0 || MessageType == 5 || MessageType == 6 || MessageType == 9 || MessageType == 10 || MessageType == 11)
+            {
+                encoder.WriteString(Message);
+            }
+            if (MessageType == 1 || MessageType == 7 || MessageType == 8)
+            {
+                encoder.WriteString(Username);
+                encoder.WriteString(Message);
+            }
+            if (MessageType == 2 || MessageType == 3 || MessageType == 4)
+            {
+                encoder.WriteString(Message);
+                encoder.WriteVarInt(0);
+            }
             encoder.WriteString(XUID);
             encoder.WriteString(PlatformId);
             encoder.WriteString(FilteredMessage);

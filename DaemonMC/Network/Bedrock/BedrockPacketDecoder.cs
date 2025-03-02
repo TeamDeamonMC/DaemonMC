@@ -86,6 +86,9 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.InventoryTransaction:
                         new InventoryTransaction().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.ModalFormResponse:
+                        new ModalFormResponse().DecodePacket(decoder);
+                        break;
 
 
                     default:

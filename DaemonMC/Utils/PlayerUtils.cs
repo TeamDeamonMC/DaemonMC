@@ -128,6 +128,7 @@ namespace DaemonMC.Utils
 
         internal void UpdateFlags(List<AuthInputData> flags)
         {
+            long data = p.dataValue;
             if (flags.Contains(AuthInputData.Sneaking))
             {
                 p.SetFlag(ActorFlags.SNEAKING, true);
@@ -144,7 +145,10 @@ namespace DaemonMC.Utils
             {
                 p.SetFlag(ActorFlags.SPRINTING, false);
             }
-            p.SendMetadata(true);
+            if (data != p.dataValue)
+            {
+                p.SendMetadata(true);
+            }
         }
     }
 }

@@ -11,6 +11,8 @@ using DaemonMC.Utils.Game;
 using DaemonMC.Plugin.Plugin;
 using DaemonMC.Entities;
 using DaemonMC.Blocks;
+using DaemonMC.Forms;
+using Newtonsoft.Json;
 
 namespace DaemonMC
 {
@@ -24,7 +26,7 @@ namespace DaemonMC
         public string XUID { get; set; }
         public int GameMode { get; set; } = 0;
         public long EntityID { get; set; }
-        private long dataValue { get; set; }
+        internal long dataValue { get; set; }
         public long Tick { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
@@ -159,8 +161,101 @@ namespace DaemonMC
         {
             var packet = new TextMessage
             {
-                MessageType = 1,
+                MessageType = 0,
                 Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendChatMessage(string message, string from)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 1,
+                Message = message,
+                Username = from
+            };
+            Send(packet);
+        }
+
+        public void SendPopup(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 3,
+                Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendJukeboxPopup(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 4,
+                Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendTip(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 5,
+                Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendTitle(string title, string subtitle = "", int fadeInTime = 1, int stayTime = 1, int fadeOutTime = 1)
+        {
+            var packet = new SetTitle
+            {
+                Type = 2,
+                Text = title,
+                FadeIn = fadeInTime * 20,
+                Stay = stayTime * 20,
+                FadeOut = fadeOutTime * 20,
+                XUID = XUID
+            };
+            Send(packet);
+
+            if (subtitle != "")
+            {
+                var packet2 = new SetTitle
+                {
+                    Type = 3,
+                    Text = subtitle,
+                    FadeIn = fadeInTime * 20,
+                    Stay = stayTime * 20,
+                    FadeOut = fadeOutTime * 20,
+                    XUID = XUID
+                };
+                Send(packet2);
+            }
+        }
+
+        public void SendActionBarTitle(string title, int fadeInTime = 1, int stayTime = 1, int fadeOutTime = 1)
+        {
+            var packet = new SetTitle
+            {
+                Type = 4,
+                Text = title,
+                FadeIn = fadeInTime * 20,
+                Stay = stayTime * 20,
+                FadeOut = fadeOutTime * 20,
+                XUID = XUID
+            };
+            Send(packet);
+        }
+
+        public void ClearTitle()
+        {
+            var packet = new SetTitle
+            {
+                Type = 0,
+                XUID = XUID
             };
             Send(packet);
         }
@@ -361,6 +456,17 @@ namespace DaemonMC
             SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
         }
 
+        public void SendForm(Form form, Action<Player, string> callback)
+        {
+            var packet = new ModalFormRequest()
+            {
+                ID = form.Id,
+                Data = JsonConvert.SerializeObject(form, new JsonSerializerSettings() { ContractResolver = FormManager.contractResolver })
+            };
+            FormManager.PendingForms[form.Id] = (form, callback);
+            Send(packet);
+        }
+
         ///////////////////////////// Packet handler /////////////////////////////
 
         internal void HandlePacket(Packet packet)
@@ -535,6 +641,36 @@ namespace DaemonMC
                     {
                         PluginManager.PlayerAttack(this, player);
                     }
+                }
+            }
+
+            if (packet is ModalFormResponse formResponse)
+            {
+                if (FormManager.PendingForms.TryGetValue(formResponse.ID, out var entry))
+                {
+                    var (form, callback) = entry;
+                    FormManager.PendingForms.Remove(formResponse.ID);
+
+                    if (form is ModalForm modalForm && formResponse.Data != null)
+                    {
+                        if (formResponse.Data.Contains("true"))
+                        {
+                            callback(this, modalForm.Button1);
+                        }
+                        else if (formResponse.Data.Contains("false"))
+                        {
+                            callback(this, modalForm.Button2);
+                        }
+                    }
+
+                    if (form is SimpleForm simpleForm && formResponse.Data != null && int.TryParse(formResponse.Data, out int x))
+                    {
+                        callback(this, simpleForm.Buttons[x].Text);
+                    }
+                }
+                else
+                {
+                    Log.warn($"Received response for unknown form ID: {formResponse.ID}");
                 }
             }
         }

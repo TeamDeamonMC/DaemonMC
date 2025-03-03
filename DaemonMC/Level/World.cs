@@ -72,10 +72,114 @@ namespace DaemonMC.Level
         {
             var packet = new TextMessage
             {
-                MessageType = 1,
+                MessageType = 0,
                 Message = message
             };
             Send(packet);
+        }
+
+        public void SendChatMessage(string message, string from)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 1,
+                Message = message,
+                Username = from
+            };
+            Send(packet);
+        }
+
+        public void SendPopup(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 3,
+                Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendJukeboxPopup(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 4,
+                Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendTip(string message)
+        {
+            var packet = new TextMessage
+            {
+                MessageType = 5,
+                Message = message
+            };
+            Send(packet);
+        }
+
+        public void SendTitle(string title, string subtitle = "", int fadeInTime = 1, int stayTime = 1, int fadeOutTime = 1)
+        {
+            foreach (var dest in OnlinePlayers.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest);
+                var packet = new SetTitle
+                {
+                    Type = 2,
+                    Text = title,
+                    FadeIn = fadeInTime * 20,
+                    Stay = stayTime * 20,
+                    FadeOut = fadeOutTime * 20,
+                    XUID = dest.XUID
+                };
+                packet.EncodePacket(encoder);
+
+                if (subtitle != "")
+                {
+                    var packet2 = new SetTitle
+                    {
+                        Type = 3,
+                        Text = subtitle,
+                        FadeIn = fadeInTime * 20,
+                        Stay = stayTime * 20,
+                        FadeOut = fadeOutTime * 20,
+                        XUID = dest.XUID
+                    };
+                }
+            }
+        }
+
+        public void SendActionBarTitle(string title, int fadeInTime = 1, int stayTime = 1, int fadeOutTime = 1)
+        {
+            foreach (var dest in OnlinePlayers.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest);
+                var packet = new SetTitle
+                {
+                    Type = 4,
+                    Text = title,
+                    FadeIn = fadeInTime * 20,
+                    Stay = stayTime * 20,
+                    FadeOut = fadeOutTime * 20,
+                    XUID = dest.XUID
+                };
+                packet.EncodePacket(encoder);
+            }
+        }
+
+        public void ClearTitle()
+        {
+            foreach (var dest in OnlinePlayers.Values)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(dest);
+                var packet = new SetTitle
+                {
+                    Type = 0,
+                    XUID = dest.XUID
+                };
+                packet.EncodePacket(encoder);
+            }
         }
 
         public void AddPlayer(Player player)

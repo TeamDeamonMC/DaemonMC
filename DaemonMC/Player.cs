@@ -467,6 +467,16 @@ namespace DaemonMC
             Send(packet);
         }
 
+        public void Transfer(string address, ushort port)
+        {
+            var packet = new TransferPlayer()
+            {
+                IpAddress = address,
+                Port = port
+            };
+            Send(packet);
+        }
+
         ///////////////////////////// Packet handler /////////////////////////////
 
         internal void HandlePacket(Packet packet)

@@ -44,6 +44,7 @@
             ResourcePackDataInfo = 82,
             ResourcePackChunkData = 83,
             ResourcePackChunkRequest = 84,
+            TransferPlayer = 85,
             SetTitle = 88,
             PlayerSkin = 93,
             ModalFormRequest = 100,

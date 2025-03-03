@@ -648,25 +648,7 @@ namespace DaemonMC
             {
                 if (FormManager.PendingForms.TryGetValue(formResponse.ID, out var entry))
                 {
-                    var (form, callback) = entry;
-                    FormManager.PendingForms.Remove(formResponse.ID);
-
-                    if (form is ModalForm modalForm && formResponse.Data != null)
-                    {
-                        if (formResponse.Data.Contains("true"))
-                        {
-                            callback(this, modalForm.Button1);
-                        }
-                        else if (formResponse.Data.Contains("false"))
-                        {
-                            callback(this, modalForm.Button2);
-                        }
-                    }
-
-                    if (form is SimpleForm simpleForm && formResponse.Data != null && int.TryParse(formResponse.Data, out int x))
-                    {
-                        callback(this, simpleForm.Buttons[x].Text);
-                    }
+                    FormManager.Process(this, formResponse, entry);
                 }
                 else
                 {

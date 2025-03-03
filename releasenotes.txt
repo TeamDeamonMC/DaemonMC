@@ -2,7 +2,7 @@ Bugfix and feature release.
 
 Features:
 - Added new text related features like titles and popups and their API methods: SendChatMessage, SendPopup, SendJukeboxPopup, SendTip, SetTitle, SendActionBarTitle, ClearTitle. 
-- Added ModalForm and SimpleForm forms and API method for sending forms: player.SendForm.
+- Added ModalForm, SimpleForm and CustomForm forms, form components and API method for sending forms: player.SendForm.
 
 Fixes:
 - Fixed unnecessary SetActorData sending.

@@ -1,12 +1,12 @@
 Bugfix and feature release.
 
-Features:
-- Added new text related features like titles and popups and their API methods: SendChatMessage, SendPopup, SendJukeboxPopup, SendTip, SetTitle, SendActionBarTitle, ClearTitle. 
-- Added ModalForm, SimpleForm and CustomForm forms, form components and API method for sending forms: player.SendForm.
+Features
+- Added new text related features like titles and popups and their API methods SendChatMessage, SendPopup, SendJukeboxPopup, SendTip, SetTitle, SendActionBarTitle, ClearTitle. 
+- Added ModalForm, SimpleForm and CustomForm forms, form components and API method for sending forms player.SendForm.
 - Added Transfer API method.
 
-Check [Plugin API (Methods)](https://github.com/laz1444/DaemonMC/wiki/Plugin-API-(Methods)) world and player selection for new methods.
+Check Wiki for Plugin API (Methods) world and player selection for new methods.
 
-Fixes:
+Fixes
 - Fixed unnecessary SetActorData sending.
 - Fixed crash that occur randomly during gameplay.

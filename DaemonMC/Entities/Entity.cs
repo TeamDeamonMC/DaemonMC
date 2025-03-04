@@ -39,10 +39,10 @@ namespace DaemonMC.Entities
 
             EntityId = id;
 
-            world.Entities.Add(id, this);
-
             Metadata[ActorData.NAMETAG_ALWAYS_SHOW] = new Metadata((byte)1);
             if (NameTag != "") { Metadata[ActorData.NAME] = new Metadata(NameTag); }
+
+            world.Entities.Add(id, this);
 
             var pk = new AddActor
             {

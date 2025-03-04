@@ -62,26 +62,26 @@ namespace DaemonMC.Network.RakNet
         {
             var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
 
-            foreach (var ack in packet.ACKs)
-            {
-                if (ack.singleSequence)
-                {
-                    if (!sentPackets.Remove(ack.sequenceNumber, out var data))
-                    {
-                        Log.debug($"[RakNet] Unable to ACK {ack.sequenceNumber} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
-                    }
-                }
-                else
-                {
-                    for (uint seq = ack.firstSequenceNumber; seq <= ack.lastSequenceNumber; seq++)
-                    {
-                        if (!sentPackets.Remove(seq, out var data))
-                        {
-                            Log.debug($"[RakNet] Unable to ACK {seq} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
-                        }
-                    }
-                }
-            }
+            /*  foreach (var ack in packet.ACKs) todo enable after fixing Reliability line 187
+              {
+                  if (ack.singleSequence)
+                  {
+                      if (!sentPackets.Remove(ack.sequenceNumber, out var data))
+                      {
+                          Log.debug($"[RakNet] Unable to ACK {ack.sequenceNumber} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
+                      }
+                  }
+                  else
+                  {
+                      for (uint seq = ack.firstSequenceNumber; seq <= ack.lastSequenceNumber; seq++)
+                      {
+                          if (!sentPackets.Remove(seq, out var data))
+                          {
+                              Log.debug($"[RakNet] Unable to ACK {seq} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
+                          }
+                      }
+                  }
+              }*/
         }
 
         public static void NACK(NACKPacket packet, IPEndPoint clientEp)

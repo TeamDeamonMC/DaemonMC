@@ -45,7 +45,7 @@ jobs:
       
     - name: Publish Application
       working-directory: DaemonMC
-      run: dotnet publish -c Release -r win-x64 --no-restore -o DaemonMC
+      run: dotnet publish -c Release --no-restore -o DaemonMC
       
     - name: Zip Published Application
       working-directory: DaemonMC

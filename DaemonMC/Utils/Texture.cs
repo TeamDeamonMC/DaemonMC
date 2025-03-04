@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp;
 
 namespace DaemonMC.Utils
 {
@@ -6,10 +7,9 @@ namespace DaemonMC.Utils
     {
         public static byte[] PngToBytes(string filename)
         {
-            using (Bitmap bitmap = new Bitmap(filename))
+            using (Image<Rgba32> bitmap = Image.Load<Rgba32>(filename))
             {
-                int size = bitmap.Height * bitmap.Width * 4;
-
+                int size = bitmap.Width * bitmap.Height * 4;
                 byte[] bytes = new byte[size];
 
                 int i = 0;
@@ -17,7 +17,7 @@ namespace DaemonMC.Utils
                 {
                     for (int x = 0; x < bitmap.Width; x++)
                     {
-                        Color color = bitmap.GetPixel(x, y);
+                        Rgba32 color = bitmap[x, y];
                         bytes[i++] = color.R;
                         bytes[i++] = color.G;
                         bytes[i++] = color.B;

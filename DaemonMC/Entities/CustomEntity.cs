@@ -15,6 +15,8 @@ namespace DaemonMC.Entities
 
         public override void Spawn(World world)
         {
+            UUID = Guid.NewGuid();
+
             CurrentWorld = world;
             long id;
 

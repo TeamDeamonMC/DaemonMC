@@ -1,4 +1,4 @@
-﻿using SkiaSharp;
+﻿using System.Drawing;
 
 namespace DaemonMC.Utils
 {
@@ -6,20 +6,22 @@ namespace DaemonMC.Utils
     {
         public static byte[] PngToBytes(string filename)
         {
-            using (SKBitmap bitmap = SKBitmap.Decode(filename))
+            using (Bitmap bitmap = new Bitmap(filename))
             {
-                byte[] bytes = new byte[bitmap.Width * bitmap.Height * 4];
+                int size = bitmap.Height * bitmap.Width * 4;
+
+                byte[] bytes = new byte[size];
 
                 int i = 0;
                 for (int y = 0; y < bitmap.Height; y++)
                 {
                     for (int x = 0; x < bitmap.Width; x++)
                     {
-                        SKColor color = bitmap.GetPixel(x, y);
-                        bytes[i++] = color.Red;
-                        bytes[i++] = color.Green;
-                        bytes[i++] = color.Blue;
-                        bytes[i++] = color.Alpha;
+                        Color color = bitmap.GetPixel(x, y);
+                        bytes[i++] = color.R;
+                        bytes[i++] = color.G;
+                        bytes[i++] = color.B;
+                        bytes[i++] = color.A;
                     }
                 }
 

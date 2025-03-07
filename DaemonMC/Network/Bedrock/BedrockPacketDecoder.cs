@@ -7,15 +7,30 @@ namespace DaemonMC.Network.Bedrock
     {
         public static void BedrockDecoder(PacketDecoder decoder)
         {
-            if (RakSessionManager.getSession(decoder.clientEp) != null)
+            var session = RakSessionManager.getSession(decoder.clientEp);
+
+            if (session.encryptor != null)
             {
-                if (RakSessionManager.getSession(decoder.clientEp).initCompression)
+                if (!session.encryptor.validated)
+                {
+                    session.encryptor.Validate(decoder);
+                }
+
+                Log.debug($"Encrypted Packet Data: {BitConverter.ToString(decoder.buffer)}");
+                decoder.buffer = session.encryptor.Decrypt(decoder.buffer.Skip(1).ToArray().Take(decoder.buffer.Length - 9).ToArray());
+                decoder.readOffset++;
+                Log.debug($"Decrypted Packet Data: {BitConverter.ToString(decoder.buffer)}");
+            }
+
+            if (session != null)
+            {
+                if (session.initCompression)
                 {
                     decoder.ReadByte();
                 }
-                if (Server.OnlinePlayers.ContainsKey(RakSessionManager.getSession(decoder.clientEp).EntityID))
+                if (Server.OnlinePlayers.ContainsKey(session.EntityID))
                 {
-                    decoder.player = Server.GetPlayer(RakSessionManager.getSession(decoder.clientEp).EntityID);
+                    decoder.player = Server.GetPlayer(session.EntityID);
                 }
             }
 

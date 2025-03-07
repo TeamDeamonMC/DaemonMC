@@ -7,6 +7,7 @@ using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 
 namespace DaemonMC.Utils
 {
@@ -31,7 +32,35 @@ namespace DaemonMC.Utils
                 return;
             }
 
-            if (XboxAuth && decodedObject.Chain.Count != 3) //todo hah add correct auth
+            if (decodedObject.Chain.Count == 3)
+            {
+                var jsonToken = handler.ReadToken(decodedObject.Chain[1]) as JwtSecurityToken;  //mojang chain
+                var x5u = jsonToken.Header["x5u"].ToString();
+                if (x5u == RootKey)
+                {
+                    Log.debug("Mojang RootKey: OK");
+                }
+
+                var clientToken = handler.ReadToken(decodedObject.Chain[2]) as JwtSecurityToken;  //client chain
+                var extraDataClaim = clientToken.Claims.FirstOrDefault(claim => claim.Type == "extraData");
+
+                ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
+                player.username = extraData.DisplayName;
+                player.identity = extraData.Identity;
+                player.identityPublicKey = clientToken.Claims.FirstOrDefault(claim => claim.Type == "identityPublicKey").Value;
+                player.XUID = extraData.XUID;
+            }
+            else if (!XboxAuth)
+            {
+                var jsonToken2 = handler.ReadToken(decodedObject.Chain[0]) as JwtSecurityToken;  //client chain
+                var extraDataClaim = jsonToken2.Claims.FirstOrDefault(claim => claim.Type == "extraData");
+
+                ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
+                player.username = extraData.DisplayName;
+                player.identity = extraData.Identity;
+                player.XUID = extraData.XUID;
+            }
+            else
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var packet = new Disconnect
@@ -39,36 +68,6 @@ namespace DaemonMC.Utils
                     Message = "You need to login to Xbox Live"
                 };
                 packet.EncodePacket(encoder);
-            }
-
-            foreach (var jwtToken in decodedObject.Chain)
-            {
-                var jsonToken = handler.ReadToken(jwtToken) as JwtSecurityToken;
-                var x5u = jsonToken.Header["x5u"].ToString();
-
-                if (jsonToken != null)
-                {
-                    if (x5u == RootKey)
-                    {
-                        Log.debug("Mojang RootKey: OK");
-                    }
-                    var extraDataClaim = jsonToken.Claims.FirstOrDefault(claim => claim.Type == "extraData");
-                    if (extraDataClaim != null)
-                    {
-                        ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
-                        player.username = extraData.DisplayName;
-                        player.identity = extraData.Identity;
-                        player.XUID = extraData.XUID;
-                    }
-                    else
-                    {
-
-                    }
-                }
-                else
-                {
-                    Log.error("Failed to decode JWT.");
-                }
             }
         }
 
@@ -83,8 +82,6 @@ namespace DaemonMC.Utils
 
             JObject header = JObject.Parse(headerJson);
             JwtPayload payload = JsonConvert.DeserializeObject<JwtPayload>(payloadJson);
-
-            string publicKey = header["x5u"].ToString();
 
             try
             {
@@ -129,8 +126,25 @@ namespace DaemonMC.Utils
                 Log.error($"Skin decoding failed: {ex.Message}");
             }
 
-            Log.debug($"Public Key (x5u): {publicKey}");
             Log.info($"{player.username} with client version {payload.GameVersion} doing login...");
+        }
+
+        public static string CreateHandshakeJwt(byte[] secret, ECDsa ecdsa)
+        {
+            ECParameters signParams = ecdsa.ExportParameters(true);
+
+            var headerJson = $"{{\"alg\":\"ES384\",\"x5u\":\"{Convert.ToBase64String(ecdsa.ExportSubjectPublicKeyInfo())}\"}}";
+            string headerBase64 = Base64UrlEncode(Encoding.UTF8.GetBytes(headerJson));
+
+            var payloadJson = $"{{\"salt\":\"{Convert.ToBase64String(secret)}\"}}";
+            string payloadBase64 = Base64UrlEncode(Encoding.UTF8.GetBytes(payloadJson));
+
+            string message = $"{headerBase64}.{payloadBase64}";
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+            byte[] derSignature = ecdsa.SignData(messageBytes, HashAlgorithmName.SHA384);
+            Log.debug($"Raw Signature (Hex): {BitConverter.ToString(derSignature)}");
+            string signatureBase64 = Base64UrlEncode(derSignature);
+            return $"{message}.{signatureBase64}";
         }
 
         private static string DecodeBase64Url(string base64Url)
@@ -144,6 +158,14 @@ namespace DaemonMC.Utils
 
             byte[] data = Convert.FromBase64String(base64);
             return Encoding.UTF8.GetString(data);
+        }
+
+        private static string Base64UrlEncode(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes)
+                .TrimEnd('=')
+                .Replace('+', '-')
+                .Replace('/', '_');
         }
     }
 }

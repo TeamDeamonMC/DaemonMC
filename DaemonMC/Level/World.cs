@@ -182,6 +182,15 @@ namespace DaemonMC.Level
             }
         }
 
+        public void SendTime(int time)
+        {
+            var packet = new SetTime()
+            {
+                Time = time,
+            };
+            Send(packet);
+        }
+
         public void AddPlayer(Player player)
         {
             OnlinePlayers.TryAdd(player.EntityID, player);

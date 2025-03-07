@@ -477,6 +477,15 @@ namespace DaemonMC
             Send(packet);
         }
 
+        public void SendTime(int time)
+        {
+            var packet = new SetTime()
+            {
+                Time = time,
+            };
+            Send(packet);
+        }
+
         ///////////////////////////// Packet handler /////////////////////////////
 
         internal void HandlePacket(Packet packet)

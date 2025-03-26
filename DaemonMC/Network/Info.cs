@@ -35,6 +35,7 @@
             SetActorData = 39,
             SetActorMotion = 40,
             Animate = 44,
+            InventorySlot = 50,
             LevelChunk = 58,
             SetPlayerGameType = 62,
             PlayerList = 63,

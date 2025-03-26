@@ -44,7 +44,9 @@ namespace DaemonMC
 
             if (Log.debugMode) { Log.warn("Decreased performance expected due to enabled debug mode (DaemonMC.yaml: debug)"); }
 
-            Palette.buildPalette();
+            BlockPalette.buildPalette();
+
+            ItemPalette.buildPalette();
 
             WorldManager.LoadWorlds("Worlds");
 

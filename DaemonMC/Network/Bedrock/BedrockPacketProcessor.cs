@@ -5,6 +5,7 @@ using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 using System.Security.Cryptography;
 using fNbt;
+using DaemonMC.Blocks;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -157,7 +158,7 @@ namespace DaemonMC.Network.Bedrock
 
                     var items = new ItemRegistry
                     {
-
+                        Items = ItemPalette.items
                     };
                     player.Send(items);
 

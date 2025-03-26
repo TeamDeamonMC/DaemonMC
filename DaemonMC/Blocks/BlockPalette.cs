@@ -2,7 +2,7 @@
 
 namespace DaemonMC.Blocks
 {
-    public class Palette
+    public class BlockPalette
     {
         public static Dictionary<int, Block> blockHashes { get; protected set; } = new Dictionary<int, Block>();
 

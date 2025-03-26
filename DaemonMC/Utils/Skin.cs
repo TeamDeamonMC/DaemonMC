@@ -14,7 +14,7 @@
         public string SkinColor { get; set; } = "";
         public byte[] SkinData { get; set; } = new byte[0];
         public string SkinGeometryData { get; set; } = "";
-        public string SkinGeometryDataEngineVersion { get; set; } = "0.0.0";
+        public string SkinGeometryDataEngineVersion { get; set; } = "";
         public string SkinId { get; set; } = "";
         public int SkinImageHeight { get; set; }
         public int SkinImageWidth { get; set; }

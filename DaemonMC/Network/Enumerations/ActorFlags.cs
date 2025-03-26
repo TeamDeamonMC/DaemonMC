@@ -122,6 +122,9 @@
         TIMER_FLAG_3,
         BODY_ROTATION_BLOCKED,
         RENDERS_WHEN_INVISIBLE,
+        BODY_ROTATION_AXIS_ALIGNED,
+        COLLIDABLE,
+        WASD_AIR_CONTROLLED,
         Count
     }
 }

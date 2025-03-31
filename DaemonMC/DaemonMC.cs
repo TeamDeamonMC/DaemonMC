@@ -27,8 +27,9 @@ namespace DaemonMC
 
             if (versionInfo != null)
             {
-                Version = versionInfo.Split('+')[0] == null ? "unknown" : versionInfo.Split('+')[0];
-                GitHash = versionInfo.Split('+')[1] == null ? "unknown" : versionInfo.Split('+')[1];
+                var parts = versionInfo.Split('+');
+                Version = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : "unknown";
+                GitHash = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : "unknown";
             }
 
             Console.WriteLine(" _____                                ______   ______ ");

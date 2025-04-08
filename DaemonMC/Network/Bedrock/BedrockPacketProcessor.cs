@@ -6,6 +6,7 @@ using DaemonMC.Utils.Text;
 using System.Security.Cryptography;
 using fNbt;
 using DaemonMC.Blocks;
+using DaemonMC.Entities;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -180,6 +181,16 @@ namespace DaemonMC.Network.Bedrock
                         }
                     };
                     player.Send(biomes);
+
+                    foreach (var actorData in ActorProperties.PropertyData)
+                    {
+                        var actorProperties = new SyncActorProperty
+                        {
+                            Data = actorData,
+                        };
+                        player.Send(actorProperties);
+                    }
+
                     player.Spawned = true;
                 }
             }

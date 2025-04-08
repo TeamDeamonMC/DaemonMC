@@ -15,7 +15,9 @@ namespace DaemonMC.Network.Bedrock
         public Vector2 Rotation { get; set; } = new Vector2();
         public float YheadRotation { get; set; } = 0;
         public float YbodyRotation { get; set; } = 0;
+        public List<AttributeValue> Attributes { get; set; } = new List<AttributeValue>();
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public SynchedProperties Properties { get; set; } = new SynchedProperties();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -32,10 +34,9 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVec2(Rotation);
             encoder.WriteFloat(YheadRotation);
             encoder.WriteFloat(YbodyRotation);
-            encoder.WriteVarInt(0);//attributes todo
+            encoder.WriteActorAttributes(Attributes);
             encoder.WriteMetadata(Metadata);
-            encoder.WriteVarInt(0);//synched properties todo
-            encoder.WriteVarInt(0);//synched properties todo
+            encoder.WriteProperties(Properties);
             encoder.WriteVarInt(0);//actor links todo
         }
     }

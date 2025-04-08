@@ -18,7 +18,7 @@ namespace DaemonMC.Network.Bedrock
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteVarLong(EntityId);
-            encoder.WriteAttributes(Attributes);
+            encoder.WritePlayerAttributes(Attributes);
             encoder.WriteVarLong(Tick);
         }
     }

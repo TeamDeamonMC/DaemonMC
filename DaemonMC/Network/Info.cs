@@ -66,6 +66,7 @@
             PacketViolationWarning = 156,
             AnimateEntity = 158,
             ItemRegistry = 162,
+            SyncActorProperty = 165,
             UpdateAbilities = 187,
             UpdateAdventureSettings = 188,
             RequestNetworkSettings = 193,

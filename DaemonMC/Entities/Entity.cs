@@ -20,7 +20,9 @@ namespace DaemonMC.Entities
         public float YheadRotation { get; set; } = 0;
         public float YbodyRotation { get; set; } = 0;
         public string SpawnAnimation { get; set; } = "";
+        public List<AttributeValue> Attributes { get; set; } = new List<AttributeValue>();
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public SynchedProperties Properties { get; set; } = new SynchedProperties();
         private long dataValue = 0;
 
         public virtual void Spawn(World world)
@@ -49,7 +51,9 @@ namespace DaemonMC.Entities
                 EntityId = EntityId,
                 ActorType = ActorType,
                 Position = Position,
-                Metadata = Metadata
+                Attributes = Attributes,
+                Metadata = Metadata,
+                Properties = Properties
             };
             CurrentWorld.Send(pk);
 

@@ -498,7 +498,7 @@ namespace DaemonMC.Network
             }
         }
 
-        public void WriteAttributes(List<AttributeValue> attributes)
+        public void WritePlayerAttributes(List<AttributeValue> attributes)
         {
             WriteVarInt(attributes.Count);
             foreach (var attribute in attributes)
@@ -511,6 +511,18 @@ namespace DaemonMC.Network
                 WriteFloat(attribute.DefaultValue);
                 WriteString(attribute.Name);
                 WriteVarInt(0); //todo modifiers
+            }
+        }
+
+        public void WriteActorAttributes(List<AttributeValue> attributes)
+        {
+            WriteVarInt(attributes.Count);
+            foreach (var attribute in attributes)
+            {
+                WriteString(attribute.Name);
+                WriteFloat(attribute.MinValue);
+                WriteFloat(attribute.CurrentValue);
+                WriteFloat(attribute.MaxValue);
             }
         }
 
@@ -574,6 +586,23 @@ namespace DaemonMC.Network
             WriteSignedVarInt((int)position.X);
             WriteVarInt_Signed((int)position.Y); //what kind of data type even is this?
             WriteSignedVarInt((int)position.Z);
+        }
+
+        public void WriteProperties(SynchedProperties properties)
+        {
+            WriteVarInt(properties.intEntries.Count);
+            foreach (var entry in properties.intEntries)
+            {
+                WriteVarInt(entry.Key);
+                WriteSignedVarInt(entry.Value);
+            }
+
+            WriteVarInt(properties.floatEntries.Count);
+            foreach (var entry in properties.floatEntries)
+            {
+                WriteVarInt(entry.Key);
+                WriteFloat(entry.Value);
+            }
         }
     }
 

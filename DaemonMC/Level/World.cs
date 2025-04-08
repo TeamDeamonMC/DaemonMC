@@ -224,7 +224,9 @@ namespace DaemonMC.Level
                         EntityId = entity.EntityId,
                         ActorType = entity.ActorType,
                         Position = entity.Position,
-                        Metadata = entity.Metadata
+                        Attributes = entity.Attributes,
+                        Metadata = entity.Metadata,
+                        Properties = entity.Properties
                     };
                     player.Send(pk);
                 }

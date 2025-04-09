@@ -3,12 +3,13 @@
     public class Info
     {
         public static string Version = "1.21.70";
-        public static int[] ProtocolVersion = [748, 766, 776, 786];
+        public static int[] ProtocolVersion = [748, 766, 776, 786, /*800*/];
 
         public static int v1_21_40 = 748;
         public static int v1_21_50 = 766;
         public static int v1_21_60 = 776;
         public static int v1_21_70 = 786;
+        public static int v1_21_80 = 800;
 
         public enum Bedrock
         {

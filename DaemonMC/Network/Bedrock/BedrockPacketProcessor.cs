@@ -131,7 +131,8 @@ namespace DaemonMC.Network.Bedrock
                 }
                 else if (resourcePackClientResponse.Response == 4) //start game
                 {
-                    var player = Server.GetPlayer(RakSessionManager.getSession(clientEp).EntityID);
+                    var session = RakSessionManager.getSession(clientEp);
+                    var player = Server.GetPlayer(session.EntityID);
 
                     if (player.Spawned) //something weird happens under load
                     {
@@ -157,11 +158,14 @@ namespace DaemonMC.Network.Bedrock
                     };
                     player.Send(commands);
 
-                    var items = new ItemRegistry
+                    if (session.protocolVersion >= Info.v1_21_60)
                     {
-                        Items = ItemPalette.items
-                    };
-                    player.Send(items);
+                        var items = new ItemRegistry
+                        {
+                            Items = ItemPalette.items
+                        };
+                        player.Send(items);
+                    }
 
                     var creativeInventory = new CreativeContent
                     {

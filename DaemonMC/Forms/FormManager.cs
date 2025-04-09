@@ -41,6 +41,13 @@ namespace DaemonMC.Forms
                 {
                     if (customForm.Content[i] is Label label)
                     {
+                        if (rawData[i] != null)
+                        {
+                            object[] newData = new object[rawData.Length + 1];
+                            newData[0] = null;
+                            Array.Copy(rawData, 0, newData, 1, rawData.Length);
+                            rawData = newData;
+                        }
                         components[i] = label.Text;
                     }
 

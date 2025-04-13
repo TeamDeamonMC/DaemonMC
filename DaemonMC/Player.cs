@@ -28,7 +28,7 @@ namespace DaemonMC
         public long EntityID { get; set; }
         internal long dataValue { get; set; }
         public long Tick { get; set; }
-        public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
+        public Vector3 Position { get; set; } = new Vector3(0, 100, 0);
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
         public bool onGround { get; set; }
         public int drawDistance { get; set; }
@@ -38,8 +38,7 @@ namespace DaemonMC
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
         public List<AuthInputData> InputData { get; set; } = new List<AuthInputData>();
         public List<AbilitiesData> Abilities { get; set; } = new List<AbilitiesData>() { new AbilitiesData(1, 262143, new PermissionSet(), 0.05f, 0.1f, 0.1f) };
-
-    public bool Spawned { get; set; } = false;
+        public bool Spawned { get; set; } = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
 
@@ -545,13 +544,13 @@ namespace DaemonMC
                     var packet2 = new NetworkChunkPublisherUpdate
                     {
                         X = (int)Position.X,
-                        Y = (int)0,
+                        Y = (int)Position.Y,
                         Z = (int)Position.Z,
-                        Radius = 20
+                        Radius = drawDistance
                     };
                     Send(packet2);
 
-                    HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(20, currentChunkX, currentChunkZ));
+                    HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(drawDistance/2, currentChunkX, currentChunkZ));
 
                     foreach (var chunk in newChunks)
                     {

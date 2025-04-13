@@ -41,9 +41,10 @@ namespace DaemonMC.Level
                         int position = 0;
                         for (int b = 0; b < wordsPerChunk; b++)
                         {
-                            uint word = Chunks[i].Words[b];
+                            uint word = 0;
                             for (int block = 0; block < blocksPerWord; block++)
                             {
+                                if (position >= 4096) continue;
                                 int state = Chunks[i].Blocks[position];
                                 word |= (uint)(state & ((1 << bitsPerBlock) - 1)) << ((position % blocksPerWord) * bitsPerBlock);
                                 position++;

@@ -16,6 +16,7 @@ namespace DaemonMC
         public static string DefaultWorld = "My World";
         public static int GameMode = 0;
         public static int DrawDistance = 10;
+        public static bool UnloadChunks = true;
         internal static string Version = "unknown";
         internal static string GitHash = "unknown";
         public static void Main()

@@ -13,6 +13,7 @@ namespace DaemonMC
         public string MaxOnline { get; set; } = "10";
         public string DefaultGamemode { get; set; } = "Survival";
         public int DrawDistance { get; set; } = 10;
+        public bool UnloadChunks { get; set; } = true;
         public int Port { get; set; } = 19132;
         public bool ForcePacks { get; set; } = false;
         public bool XboxAuth { get; set; } = true;
@@ -55,6 +56,7 @@ namespace DaemonMC
             DaemonMC.DefaultWorld = config.SpawnWorld;
             DaemonMC.GameMode = ToGameMode(config.DefaultGamemode);
             DaemonMC.DrawDistance = config.DrawDistance;
+            DaemonMC.UnloadChunks = config.UnloadChunks;
             Server.Port = config.Port;
             JWT.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;

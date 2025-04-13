@@ -15,6 +15,7 @@ namespace DaemonMC.Level
 {
     public class World
     {
+        public Dictionary<(int x, int z), Chunk> Cache { get; set; } = new Dictionary<(int x, int z), Chunk>();
         public bool Temporary { get; set; } = false;
         public string LevelName { get; set; } = "";
         public Dictionary<long, Player> OnlinePlayers { get; set; } = new Dictionary<long, Player>();
@@ -31,6 +32,7 @@ namespace DaemonMC.Level
         {
             LevelName = levelName;
             Load();
+            UnloadChunks();
         }
 
         public void Send(Packet packet)
@@ -308,6 +310,11 @@ namespace DaemonMC.Level
 
         public Chunk GetChunk(int x, int z)
         {
+            if (Cache.TryGetValue((x, z), out var cachedChunk))
+            {
+                return cachedChunk;
+            }
+
             byte[] index = ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z));
             byte[] dataKey = ToDataTypes.GetByteSum(index, new byte[] { 0x2f, 0 });
 
@@ -333,9 +340,12 @@ namespace DaemonMC.Level
                 }
                 else
                 {
+                    Cache.Add((x, z), chunk);
                     return chunk;
                 }
             }
+
+            Cache.Add((x, z), chunk);
             return chunk;
         }
 
@@ -405,6 +415,102 @@ namespace DaemonMC.Level
                 Log.warn($"World Worlds/{LevelName}.mcworld not found. Generating temporary flat world...");
                 GameRules.Add("showCoordinates", new GameRule(true));
                 Temporary = true;
+            }
+        }
+
+        public void UnloadChunks()
+        {
+            if (!DaemonMC.UnloadChunks)
+            {
+                return;
+            }
+            _ = Task.Run(async () =>
+            {
+                if (Cache.Count > 0)
+                {
+                    var activeChunks = new HashSet<(int x, int z)>();
+
+                    foreach (var player in OnlinePlayers.Values)
+                    {
+                        int playerChunkX = (int)Math.Floor(player.Position.X / 16.0);
+                        int playerChunkZ = (int)Math.Floor(player.Position.Z / 16.0);
+                        int distance = player.drawDistance / 2;
+
+                        for (int dx = -distance; dx <= distance; dx++)
+                        {
+                            for (int dz = -distance; dz <= distance; dz++)
+                            {
+                                activeChunks.Add((playerChunkX + dx, playerChunkZ + dz));
+                            }
+                        }
+                    }
+
+                    var chunksToRemove = Cache.Keys
+                        .Where(chunkCoord => !activeChunks.Contains(chunkCoord))
+                        .ToList();
+
+                    int loadedChunks = Cache.Count();
+
+                    foreach (var chunkCoord in chunksToRemove)
+                    {
+                        Cache.Remove(chunkCoord);
+                    }
+                    Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from World {LevelName}. {Cache.Count()} still loaded.");
+                }
+                await Task.Delay(20000);
+                UnloadChunks();
+            });
+        }
+
+        public Block GetBlock(Vector3 position)
+        {
+            int posX = (int)(position.X < 0 ? position.X - 1 : position.X);
+            int posZ = (int)(position.Z < 0 ? position.Z - 1 : position.Z);
+
+            int chunkX = (int)Math.Floor(posX / 16f);
+            int chunkZ = (int)Math.Floor(posZ / 16f);
+
+            if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
+            {
+                int subChunkY = (int)Math.Floor((position.Y + 64) / 16f);
+
+                int localX = ((int)posX % 16 + 16) % 16;
+                int localY = ((int)position.Y % 16 + 16) % 16;
+                int localZ = ((int)posZ % 16 + 16) % 16;
+
+                if (subChunkY >= chunk.Chunks.Count) { return new Air(); }
+
+                var subChunk = chunk.Chunks[subChunkY];
+
+                if (subChunk == null) { return new Air(); }
+
+                int blockIndex = (localY) | (localZ << 4) | (localX << 8);
+                int blockStateIndex = subChunk.Blocks[blockIndex];
+
+                var nbt = new NbtFile
+                {
+                    BigEndian = false,
+                    UseVarInt = false,
+                    RootTag = subChunk.Palette[blockStateIndex],
+                };
+
+                byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
+                var blockHash = Fnv1aHash.Hash32(saveToBuffer);
+
+                if (BlockPalette.blockHashes.TryGetValue(blockHash, out Block value))
+                {
+                    return value;
+                }
+                else
+                {
+                    Log.warn($"Blockstate hash {blockHash} not found in BlockPalette. Requested state: {subChunk.Palette[blockStateIndex]}");
+                    return new Air();
+                }
+            }
+            else
+            {
+                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. From world position x:{posX}; y:{position.Y}, z:{posZ}");
+                return new Air();
             }
         }
 

@@ -27,7 +27,6 @@ namespace DaemonMC.Utils
                 for (int wordIdx = 0; wordIdx < wordCount; wordIdx++)
                 {
                     uint word = reader.ReadUInt32();
-                    subChunk.Words[wordIdx] = word;
                     for (int block = 0; block < blocksPerWord; block++)
                     {
                         if (position >= 4096) continue;
@@ -85,44 +84,22 @@ namespace DaemonMC.Utils
             return subChunk; //keep this
         }
 
-        public static List<(int x, int z)> GetSequence(int radius, int x, int z)
+        public static List<(int x, int z)> GetSequence(int radius, int centerX, int centerZ)
         {
             var positions = new List<(int x, int z)>();
-            var visited = new HashSet<(int x, int z)>();
 
-            positions.Add((0, 0));
-            visited.Add((0, 0));
-
-            var queue = new Queue<(int x, int z)>();
-            queue.Enqueue((0, 0));
-
-            while (queue.Count > 0)
+            for (int dx = -radius; dx <= radius; dx++)
             {
-                (x, z) = queue.Dequeue();
-
-                foreach (var (nx, nz) in GetNear(x, z))
+                for (int dz = -radius; dz <= radius; dz++)
                 {
-                    if (!visited.Contains((nx, nz)) && Math.Sqrt(nx * nx + nz * nz) <= radius)
+                    if (Math.Sqrt(dx * dx + dz * dz) <= radius)
                     {
-                        visited.Add((nx, nz));
-                        positions.Add((nx, nz));
-                        queue.Enqueue((nx, nz));
+                        positions.Add((centerX + dx, centerZ + dz));
                     }
                 }
             }
 
             return positions;
-        }
-
-        private static List<(int x, int z)> GetNear(int x, int z)
-        {
-            return new List<(int, int)>
-            {
-                (x + 1, z),
-                (x - 1, z),
-                (x, z + 1),
-                (x, z - 1)
-            };
         }
     }
 }

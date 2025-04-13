@@ -4,12 +4,11 @@ namespace DaemonMC.Level
 {
     public class SubChunk
     {
-        public int Version = 8;
-        public int StorageSize = 0;
-        public bool IsRuntime = true;
-        public int BitsPerBlock = 0;
-        public List<NbtCompound> Palette = new List<NbtCompound>();
-        public byte[] Blocks = new byte[40960]; //really bad design
-        public uint[] Words = new uint[2000]; //todo bad design
+        public int Version { get; set; } = 8;
+        public int StorageSize { get; set; } = 0;
+        public bool IsRuntime { get; set; } = true;
+        public int BitsPerBlock { get; set; } = 0;
+        public List<NbtCompound> Palette { get; set; } = new List<NbtCompound>(); //ordered states
+        public byte[] Blocks { get; set; } = new byte[4096]; //blocks (index from ordered states)
     }
 }

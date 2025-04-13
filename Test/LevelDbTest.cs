@@ -1,4 +1,6 @@
 ﻿using System.IO.Compression;
+using DaemonMC.Blocks;
+using DaemonMC.Utils;
 using fNbt;
 using MiNET.LevelDB;
 using MiNET.LevelDB.Utils;
@@ -48,9 +50,15 @@ namespace DaemonMC.Tests
         public void ChunkLoadTest()
         {
             string LevelName = "My World";
-            int x = 3;
-            int z = -3;
+            int x = 4;
+            int z = 4;
             int count = 0;
+
+            var tempData = Path.Combine(Path.GetTempPath(), $"{LevelName}.mcworld");
+            if (Directory.Exists(tempData))
+            {
+                Directory.Delete(tempData, true);
+            }
 
             using var db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
             db.Open();
@@ -79,10 +87,13 @@ namespace DaemonMC.Tests
             }
 
             db.Close();
+            db.Dispose();
         }
 
         private void DecodeChunk(ReadOnlySpan<byte> data)
         {
+            BlockPalette.buildPalette();
+
             var reader = new SpanReader(data);
 
             var version = reader.ReadByte();
@@ -118,7 +129,7 @@ namespace DaemonMC.Tests
                 }
 
                 int paletteSize = reader.ReadInt32();
-                Console.WriteLine($"bitsPerBlock: {bitsPerBlock} | paletteSize: {paletteSize}");
+                Console.WriteLine($"bitsPerBlock: {bitsPerBlock} | paletteSize: {paletteSize} | wordCount: {wordCount}");
                 var palette = new List<NbtCompound>();
 
                 for (int j = 0; j < paletteSize; j++)
@@ -158,15 +169,15 @@ namespace DaemonMC.Tests
                     }
                 }
 
+                var blockPos = 0;
                 foreach (var block in blocks)
                 {
-                    int x = (position >> 8) & 0xF;
-                    int y = position & 0xF;
-                    int z = (position >> 4) & 0xF;
+                    int x = (blockPos >> 8) & 0xF;
+                    int y = blockPos & 0xF;
+                    int z = (blockPos >> 4) & 0xF;
 
                     if (block < palette.Count)
                     {
-                       // Console.WriteLine($"block x:{x}, y:{y}, z:{z}");
                         var nbt = new NbtFile
                         {
                             BigEndian = false,
@@ -176,12 +187,22 @@ namespace DaemonMC.Tests
 
                         byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
 
-                        //Console.WriteLine(Fnv1aHash.Hash32(saveToBuffer));
+                        var blockHash = Fnv1aHash.Hash32(saveToBuffer);
+
+                        if (BlockPalette.blockHashes.TryGetValue(blockHash, out Block value))
+                        {
+                            Console.WriteLine($"block {blockPos} x:{x}, y:{y}, z:{z} block:{value.Name}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"block {blockPos} x:{x}, y:{y}, z:{z} block:{blockHash}");
+                        }
                     }
                     else
                     {
                         Console.WriteLine($"unknown block x:{x}, y:{y}, z:{z} state:{block}");
                     }
+                    blockPos++;
                 }
                 return;
             }

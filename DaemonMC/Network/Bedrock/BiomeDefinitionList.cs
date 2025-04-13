@@ -1,4 +1,4 @@
-﻿using fNbt;
+﻿using DaemonMC.Biomes;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -6,7 +6,7 @@ namespace DaemonMC.Network.Bedrock
     {
         public override Info.Bedrock Id => Info.Bedrock.BiomeDefinitionList;
 
-        public NbtCompound BiomeData { get; set; } = new NbtCompound();
+        public List<Biome> BiomeData { get; set; } = new List<Biome>();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -15,7 +15,14 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteCompoundTag(BiomeData);
+            if (encoder.protocolVersion >= Info.v1_21_80)
+            {
+                encoder.WriteBiomes(BiomeData);
+            }
+            else
+            {
+                encoder.WriteBiomesOld(BiomeData);
+            }
         }
     }
 }

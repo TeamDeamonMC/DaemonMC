@@ -15,6 +15,7 @@ namespace DaemonMC.Level
 {
     public class World
     {
+        private string LevelDbVersion { get; set; } = "1.21.70";
         public Dictionary<(int x, int z), Chunk> Cache { get; set; } = new Dictionary<(int x, int z), Chunk>();
         public bool Temporary { get; set; } = false;
         public string LevelName { get; set; } = "";
@@ -392,7 +393,7 @@ namespace DaemonMC.Level
                                     if (tag != null && tag["lastOpenedWithVersion"] is NbtList versionList)
                                     {
                                         string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
-                                        if (stringVersion != Info.Version)
+                                        if (stringVersion != LevelDbVersion)
                                         {
                                             Log.error($"Unsupported world version {stringVersion}!");
                                             Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {Info.Version} and export mcworld file again to update world.");

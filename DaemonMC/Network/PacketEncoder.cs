@@ -2,6 +2,7 @@
 using System.Net;
 using System.Numerics;
 using System.Text;
+using DaemonMC.Biomes;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
@@ -602,6 +603,63 @@ namespace DaemonMC.Network
             {
                 WriteVarInt(entry.Key);
                 WriteFloat(entry.Value);
+            }
+        }
+
+        public void WriteBiomesOld(List<Biome> biomes)
+        {
+            var BiomeData = new NbtCompound("");
+            foreach (var biome in biomes)
+            {
+                BiomeData.Add(new NbtCompound(biome.BiomeName)
+                {
+                    new NbtFloat("ash", biome.BiomeData.AshDensity),
+                    new NbtFloat("blue_spores", biome.BiomeData.BlueSporeDensity),
+                    new NbtFloat("downfall", biome.BiomeData.Downfall),
+                    new NbtFloat("red_spores", biome.BiomeData.RedSporeDensity),
+                    new NbtFloat("temperature", biome.BiomeData.Temperature),
+                    new NbtFloat("white_ash", biome.BiomeData.WhiteAshDensity),
+                });
+            }
+            WriteCompoundTag(BiomeData);
+        }
+
+        public void WriteBiomes(List<Biome> biomes)
+        {
+            ushort BiomeIndex = 0;
+            WriteVarInt(biomes.Count);
+            foreach (var biome in biomes)
+            {
+                WriteShort(BiomeIndex);
+                WriteOptional();
+                WriteFloat(biome.BiomeData.Temperature);
+                WriteFloat(biome.BiomeData.Downfall);
+                WriteFloat(biome.BiomeData.RedSporeDensity);
+                WriteFloat(biome.BiomeData.BlueSporeDensity);
+                WriteFloat(biome.BiomeData.AshDensity);
+                WriteFloat(biome.BiomeData.WhiteAshDensity);
+                WriteFloat(biome.BiomeData.Depth);
+                WriteFloat(biome.BiomeData.Scale);
+                WriteFloat(biome.BiomeData.WaterColor);
+                WriteBool(biome.BiomeData.Rain);
+                WriteOptional(); //biome tags. todo?
+                WriteOptional(); //not needed, client side chunk gen not supported
+                BiomeIndex++;
+            }
+
+            WriteVarInt(biomes.Count);
+            foreach (var biome in biomes)
+            {
+                WriteString(biome.BiomeName);
+            }
+        }
+
+        public void WriteOptional(Action writeFunction = null)
+        {
+            WriteBool(writeFunction != null);
+            if (writeFunction != null)
+            {
+                writeFunction();
             }
         }
     }

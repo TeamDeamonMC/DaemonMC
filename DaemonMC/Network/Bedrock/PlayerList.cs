@@ -18,6 +18,7 @@ namespace DaemonMC.Network.Bedrock
         public bool IsTeacher { get; set; } = false;
         public bool IsHost { get; set; } = false;
         public bool IsSubclient { get; set; } = false;
+        public int Color { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -40,6 +41,10 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(IsTeacher);
                 encoder.WriteBool(IsHost);
                 encoder.WriteBool(IsSubclient);
+                if (encoder.protocolVersion >= Info.v1_21_80)
+                {
+                    encoder.WriteInt(Color);
+                }
                 encoder.WriteBool(true);
             }
             else

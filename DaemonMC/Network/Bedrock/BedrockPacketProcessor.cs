@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using fNbt;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
+using DaemonMC.Biomes;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -175,14 +176,7 @@ namespace DaemonMC.Network.Bedrock
 
                     var biomes = new BiomeDefinitionList
                     {
-                        BiomeData = new fNbt.NbtCompound("")
-                        {
-                            new NbtCompound("plains")
-                            {
-                                new NbtFloat("downfall", 0.4f),
-                                new NbtFloat("temperature", 0.8f),
-                            }  
-                        }
+                        BiomeData = BiomeManager.Biomes
                     };
                     player.Send(biomes);
 

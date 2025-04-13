@@ -125,6 +125,7 @@
         BODY_ROTATION_AXIS_ALIGNED,
         COLLIDABLE,
         WASD_AIR_CONTROLLED,
+        DOES_SERVER_AUTH_ONLY_DISMOUNT,
         Count
     }
 }

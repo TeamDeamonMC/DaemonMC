@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
+using DaemonMC.Biomes;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
 using DaemonMC.Network;
@@ -336,14 +337,15 @@ namespace DaemonMC.Level
                     {
                         Log.error($"Chunk x:{x}; z:{z} decoding failed. Fix this. Sent empty chunk");
                         Log.error(ex.ToString());
-                        return chunk;
+                        break;
                     }
                 }
-                else
-                {
-                    Cache.Add((x, z), chunk);
-                    return chunk;
-                }
+            }
+
+            for (int i = 0; i < chunk.Chunks.Count; i++) //todo temp code to apply plains biome. Need to read these from DB
+            {
+                chunk.Chunks[i].BiomePalette.Add(BiomeManager.GetBiomeId("plains"));
+                //chunk.Chunks[i].Biomes = Enumerable.Repeat((byte)0x01, 4096).ToArray();
             }
 
             Cache.Add((x, z), chunk);

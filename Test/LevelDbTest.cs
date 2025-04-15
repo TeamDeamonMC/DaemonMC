@@ -47,6 +47,54 @@ namespace DaemonMC.Tests
         }
 
         [TestMethod]
+        public void Data3DLoadTest()
+        {
+            string LevelName = "My World";
+            int x = 4;
+            int z = 4;
+            int count = 0;
+
+            var tempData = Path.Combine(Path.GetTempPath(), $"{LevelName}.mcworld");
+            if (Directory.Exists(tempData))
+            {
+                Directory.Delete(tempData, true);
+            }
+
+            using var db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
+            db.Open();
+
+            Console.WriteLine($"Reading chunk x:{x} z:{z} from world:Worlds/{LevelName}.mcworld");
+            Console.WriteLine();
+
+            byte[] index = ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z));
+            byte[] dataKey = ToDataTypes.GetByteSum(index, new byte[] { 0x2b });
+            byte[] data = db.Get(dataKey);
+
+            Console.WriteLine($"size:{data.Count()}");
+            var reader = new SpanReader(data);
+
+            int[] heightMap = new int[256];
+            for (int v = 0; v < heightMap.Length; v++)
+            {
+                heightMap[v] = reader.ReadByte() | (reader.ReadByte() << 8);
+            }
+
+            /*foreach (var h in heightMap)
+            {
+                Console.WriteLine(h);
+            }*/
+
+            if (reader.Length > 512)
+            {
+                Console.WriteLine("3D Biomes Found");
+                DecodeBiomes(reader); ;
+            }
+
+            db.Close();
+            db.Dispose();
+        }
+
+        [TestMethod]
         public void ChunkLoadTest()
         {
             string LevelName = "My World";
@@ -88,6 +136,26 @@ namespace DaemonMC.Tests
 
             db.Close();
             db.Dispose();
+        }
+
+        private void DecodeBiomes(SpanReader reader)
+        {
+            var size = reader.ReadByte();
+            Console.WriteLine(size);
+
+            int[] blocks = new int[4096];
+            int position = 0;
+            for (int block = 0; block < 2; block++)
+            {
+                int state = reader.ReadByte()
+                            | (reader.ReadByte() << 8)
+                            | (reader.ReadByte() << 16)
+                            | (reader.ReadByte() << 24);
+
+                Console.WriteLine(state);
+                blocks[position] = state;
+                position++;
+            }
         }
 
         private void DecodeChunk(ReadOnlySpan<byte> data)

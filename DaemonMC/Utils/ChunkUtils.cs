@@ -52,8 +52,10 @@ namespace DaemonMC.Utils
                     var rootTag = file.RootTag;
                     if (rootTag != null)
                     {
-                        var compound = new NbtCompound("");
-                        compound.Add(new NbtString("name", rootTag["name"].StringValue));
+                        var compound = new NbtCompound("")
+                        {
+                            new NbtString("name", rootTag["name"].StringValue)
+                        };
 
                         if (rootTag["states"] is NbtCompound statesTag)
                         {

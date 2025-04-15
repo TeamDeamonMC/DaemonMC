@@ -10,5 +10,7 @@ namespace DaemonMC.Level
         public int BitsPerBlock { get; set; } = 0;
         public List<NbtCompound> Palette { get; set; } = new List<NbtCompound>(); //ordered states
         public byte[] Blocks { get; set; } = new byte[4096]; //blocks (index from ordered states)
+        public List<int> BiomePalette { get; set; } = new List<int>(); //ordered biomes
+        public byte[] Biomes { get; set; } = new byte[4096]; //3D biomes (index from ordered biomes)
     }
 }

@@ -74,7 +74,43 @@ namespace DaemonMC.Level
                     }
                 }
 
-                stream.Write(new byte[256], 0, 256); //not sure about this
+                for (int i = 0; i < Chunks.Count; i++)
+                {
+                    for (int a = 0; a < Chunks[i].StorageSize; a++)
+                    {
+                        bool isRuntime = Chunks[i].IsRuntime;
+                        int bitsPerBlock = Chunks[i].BitsPerBlock;
+                        byte flag = (byte)((bitsPerBlock << 1) | (isRuntime ? 1 : 0));
+                        stream.WriteByte(flag);
+
+                        int blocksPerWord = (int)Math.Floor(32f / bitsPerBlock);
+                        uint wordsPerChunk = (uint)Math.Ceiling(4096f / blocksPerWord);
+
+                        int position = 0;
+                        for (int b = 0; b < wordsPerChunk; b++)
+                        {
+                            uint word = 0;
+                            for (int block = 0; block < blocksPerWord; block++)
+                            {
+                                if (position >= 4096) continue;
+                                int state = Chunks[i].Biomes[position];
+                                word |= (uint)(state & ((1 << bitsPerBlock) - 1)) << ((position % blocksPerWord) * bitsPerBlock);
+                                position++;
+                            }
+                            ToDataTypes.WriteUInt32(stream, word);
+                        }
+
+                        int paletteSize = Chunks[i].BiomePalette.Count;
+                        VarInt.WriteSInt32(stream, paletteSize);
+
+                        for (int v = 0; v < paletteSize; v++)
+                        {
+                            VarInt.WriteSInt32(stream, Chunks[i].BiomePalette[v]);
+                        }
+                    }
+                }
+
+                stream.WriteByte(0); //border blocks
                 VarInt.WriteSInt32(stream, 0);
 
                 return stream.ToArray();

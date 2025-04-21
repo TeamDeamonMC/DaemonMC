@@ -102,8 +102,9 @@ namespace DaemonMC.Network.RakNet
             }
         }
 
-        public static void NewIncomingConnection(NewIncomingConnectionPacket packet)
+        public static void NewIncomingConnection(NewIncomingConnectionPacket packet, IPEndPoint clientEp)
         {
+            Log.debug($"[RakNet] New Connection: {clientEp.Address} incommingTime: {packet.incommingTime} serverTime: {packet.incommingTime}", ConsoleColor.DarkYellow);
             //Log.warn($"NewIncomingConnectionPacket: {packet.serverAddress.IPAddress[0]}.{packet.serverAddress.IPAddress[1]}.{packet.serverAddress.IPAddress[2]}.{packet.serverAddress.IPAddress[3]}:{packet.serverAddress.Port} / {packet.incommingTime} / {packet.serverTime} / {packet.internalAddress.Count()}");
         }
 

@@ -18,7 +18,7 @@ namespace DaemonMC.Network.RakNet
             {
                 GUID = decoder.ReadLong(),
                 Time = decoder.ReadLongLE(),
-                Security = decoder.ReadByte() //todo
+                Security = decoder.ReadByte()
             };
 
             RakPacketProcessor.ConnectionRequest(packet, decoder.clientEp);

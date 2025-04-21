@@ -17,12 +17,12 @@
             var packet = new NewIncomingConnectionPacket
             {
                 serverAddress = decoder.ReadAddress(),
-                internalAddress = decoder.ReadInternalAddress(20),
+                internalAddress = decoder.ReadInternalAddress(22),
                 incommingTime = decoder.ReadLong(),
                 serverTime = decoder.ReadLong()
             };
 
-            RakPacketProcessor.NewIncomingConnection(packet);
+            RakPacketProcessor.NewIncomingConnection(packet, decoder.clientEp);
         }
 
         public static void Encode(NewIncomingConnectionPacket fields)

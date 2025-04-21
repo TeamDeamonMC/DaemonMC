@@ -22,6 +22,12 @@ namespace DaemonMC.Utils.Game
         public int Slot { get; set; }
     }
 
+    public class FullContainerName
+    {
+        public byte ContainerName { get; set; } = 0;
+        public int DynamicId { get; set; } = 0;
+    }
+
     public enum TransactionType
     {
         NormalTransaction,

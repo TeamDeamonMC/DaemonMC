@@ -22,9 +22,9 @@
             encoder.WriteByte(id);
             encoder.WriteMagic(fields.Magic);
             encoder.WriteLongLE(fields.GUID);
-            encoder.WriteAddress(); //todo
+            encoder.WriteAddress();
             encoder.WriteShortBE((ushort)fields.Mtu);
-            encoder.WriteByte(0); //todo
+            encoder.WriteByte(0);
             encoder.SendPacket(id);
         }
     }

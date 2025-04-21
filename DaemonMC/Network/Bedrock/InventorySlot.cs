@@ -1,4 +1,6 @@
 ﻿using DaemonMC.Items;
+using DaemonMC.Items.VanillaItems;
+using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -8,7 +10,9 @@ namespace DaemonMC.Network.Bedrock
 
         public int ContainerID { get; set; } = 0;
         public int Slot { get; set; } = 0;
-        public Item Item { get; set; }
+        public FullContainerName ContainerName { get; set; } = new FullContainerName();
+        public Item StorageItem { get; set; } = new Air();
+        public Item Item { get; set; } = new Air();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -19,22 +23,9 @@ namespace DaemonMC.Network.Bedrock
         {
             encoder.WriteVarInt(ContainerID);
             encoder.WriteVarInt(Slot);
-
-            encoder.WriteByte(0);
-            encoder.WriteBool(false);
-
-            encoder.WriteSignedVarInt(0);
-
-
-
-            encoder.WriteSignedVarInt(Item.Id);
-            encoder.WriteShort(1);
-            encoder.WriteVarInt(0);
-
-            encoder.WriteBool(false);
-
-            encoder.WriteSignedVarInt(0);
-            encoder.WriteVarInt(0);
+            encoder.WriteContainerName(ContainerName);
+            encoder.WriteItem(StorageItem);
+            encoder.WriteItem(Item);
         }
     }
 }

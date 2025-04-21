@@ -48,7 +48,7 @@ namespace DaemonMC.Network.RakNet
             }
             else
             {
-                Log.debug($"RakNet session closed for {player.username} with IP {ip.Address}");
+                Log.debug($"[RakNet] session closed for {player.username} with IP {ip.Address}", ConsoleColor.DarkYellow);
                 Log.info($"{player.username} Requested disconnect and got disconnected successfully.");
                 return true;
             }

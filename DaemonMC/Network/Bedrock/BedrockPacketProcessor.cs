@@ -17,8 +17,6 @@ namespace DaemonMC.Network.Bedrock
         {
             if (packet is RequestNetworkSettings requestNetworkSettings)
             {
-                Log.debug($"New player ({RakSessionManager.getSession(clientEp).GUID}) log in with protocol version: {requestNetworkSettings.ProtocolVersion}");
-
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new NetworkSettings
                 {

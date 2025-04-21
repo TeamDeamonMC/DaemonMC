@@ -22,7 +22,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteString(item.Value.Name);
                 encoder.WriteShort((ushort)item.Value.Id);
                 encoder.WriteBool(false); //components
-                encoder.WriteVarInt(2);
+                encoder.WriteVarInt(0);
                 encoder.WriteCompoundTag(new NbtCompound(""));
             }
         }

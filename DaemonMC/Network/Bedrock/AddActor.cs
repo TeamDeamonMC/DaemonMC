@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using DaemonMC.Entities;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Utils.Game;
 
@@ -18,6 +19,7 @@ namespace DaemonMC.Network.Bedrock
         public List<AttributeValue> Attributes { get; set; } = new List<AttributeValue>();
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
         public SynchedProperties Properties { get; set; } = new SynchedProperties();
+        public List<EntityLink> LinkedActors { get; set; } = new List<EntityLink>();
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -37,7 +39,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteActorAttributes(Attributes);
             encoder.WriteMetadata(Metadata);
             encoder.WriteProperties(Properties);
-            encoder.WriteVarInt(0);//actor links todo
+            encoder.WriteActorLinks(LinkedActors);
         }
     }
 }

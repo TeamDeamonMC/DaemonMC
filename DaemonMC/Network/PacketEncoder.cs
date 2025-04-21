@@ -3,13 +3,14 @@ using System.Net;
 using System.Numerics;
 using System.Text;
 using DaemonMC.Biomes;
+using DaemonMC.Entities;
+using DaemonMC.Items;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 using fNbt;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DaemonMC.Network
 {
@@ -651,6 +652,43 @@ namespace DaemonMC.Network
             foreach (var biome in biomes)
             {
                 WriteString(biome.BiomeName);
+            }
+        }
+
+        public void WriteActorLinks(List<EntityLink> links)
+        {
+            WriteVarInt(links.Count);
+            foreach (var link in links)
+            {
+                WriteSignedVarLong(0);//old entity id? like when you switch from one to another? todo find out
+                WriteSignedVarLong(link.EntityId);
+                WriteByte(link.Type);
+                WriteBool(true);
+                WriteBool(true);
+                WriteFloat(link.AngularVelocity);
+            }
+        }
+
+        public void WriteContainerName(FullContainerName ContainerName)
+        {
+            WriteByte(ContainerName.ContainerName);
+            WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt(ContainerName.DynamicId));
+        }
+
+        public void WriteItem(Item item)
+        {
+            if (item is Items.VanillaItems.Air)
+            {
+                WriteSignedVarInt(0);
+            }
+            else
+            {
+                WriteSignedVarInt(item.Id);
+                WriteShort(item.Count);
+                WriteVarInt(item.Aux);
+                WriteBool(false);
+                WriteSignedVarInt(0); //block runtime id.
+                WriteVarInt(0); //todo nbt
             }
         }
 

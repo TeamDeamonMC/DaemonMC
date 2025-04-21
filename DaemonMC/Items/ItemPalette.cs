@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using DaemonMC.Items;
-using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Blocks
 {

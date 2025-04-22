@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Numerics;
 using System.Text;
+using DaemonMC.Blocks;
+using DaemonMC.Items;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
@@ -308,18 +310,18 @@ namespace DaemonMC.Network
             return ipAddressInfo;
         }
 
-        public IPAddressInfo[] ReadInternalAddress(int count)
+        public IPAddressInfo[] ReadInternalAddress()
         {
-            IPAddressInfo[] ipAddress = new IPAddressInfo[count];
-            for (int i = 0; i < count; ++i)
-            {
-                byte ipVersion = buffer[readOffset];
-                readOffset++;
+            List<IPAddressInfo> internalAddresses = new List<IPAddressInfo>();
 
+            while (buffer.Length - readOffset > 16)
+            {
+                byte ipVersion = buffer[readOffset++];
                 IPAddressInfo ipAddressInfo = new IPAddressInfo();
 
                 if (ipVersion == 4)
                 {
+                    if (buffer.Length - readOffset < 6) break;
                     ipAddressInfo.IPAddress = new byte[4];
                     Array.Copy(buffer, readOffset, ipAddressInfo.IPAddress, 0, 4);
                     ipAddressInfo.Port = BitConverter.ToUInt16(buffer, readOffset + 4);
@@ -327,14 +329,21 @@ namespace DaemonMC.Network
                 }
                 else if (ipVersion == 6)
                 {
+                    if (buffer.Length - readOffset < 31) break;
                     ipAddressInfo.IPAddress = new byte[16];
-                    Array.Copy(buffer, readOffset + 4, ipAddressInfo.IPAddress, 0, 16);
                     ipAddressInfo.Port = BitConverter.ToUInt16(buffer, readOffset + 2);
+                    Array.Copy(buffer, readOffset + 4, ipAddressInfo.IPAddress, 0, 16);
                     readOffset += 32;
                 }
-                ipAddress[i] = ipAddressInfo;
+                else
+                {
+                    break;
+                }
+
+                internalAddresses.Add(ipAddressInfo);
             }
-            return ipAddress;
+
+            return internalAddresses.ToArray();
         }
 
         public uint ReadUInt24LE()
@@ -505,6 +514,25 @@ namespace DaemonMC.Network
                 EmoteIds.Add(ReadUUID());
             }
             return EmoteIds;
+        }
+
+        public Item ReadItem()
+        {
+            var id = ReadSignedVarInt();
+            if (id != 0)
+            {
+                if (ItemPalette.items.TryGetValue((short)id, out Item value))
+                {
+                    Item item = value.Clone();
+                    item.Count = ReadShort();
+                    item.Aux = ReadVarInt();
+                    ReadBool();//??? todo
+                    ReadSignedVarInt();//block runtime id
+                    ReadString();//nbt data
+                    return value;
+                }
+            }
+            return new Items.VanillaItems.Air();
         }
 
         public T? ReadOptional<T>(Func<T> readFunction)

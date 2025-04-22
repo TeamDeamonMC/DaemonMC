@@ -38,6 +38,7 @@ namespace DaemonMC
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
         public List<AuthInputData> InputData { get; set; } = new List<AuthInputData>();
         public List<AbilitiesData> Abilities { get; set; } = new List<AbilitiesData>() { new AbilitiesData(1, 262143, new PermissionSet(), 0.05f, 0.1f, 0.1f) };
+        public PlayerInventory Inventory { get; set; }
         public bool Spawned { get; set; } = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
@@ -45,6 +46,7 @@ namespace DaemonMC
         public Player()
         {
             _player = new PlayerUtils(this);
+            Inventory = new PlayerInventory(this);
         }
 
         internal void spawn()
@@ -593,6 +595,11 @@ namespace DaemonMC
                     Message = textMessage.Message
                 };
                 CurrentWorld.Send(msg);
+                Inventory.OnHead(new Items.VanillaItems.NetheriteHelmet());
+                Inventory.OnChest(new Items.VanillaItems.DiamondChestplate());
+                Inventory.OnLegs(new Items.VanillaItems.DiamondLeggings());
+                Inventory.OnFeets(new Items.VanillaItems.NetheriteBoots());
+                Inventory.Set(0, 1, new Items.VanillaItems.DiamondSword());
             }
 
             if (packet is ServerboundLoadingScreen serverboundLoadingScreen)
@@ -633,6 +640,26 @@ namespace DaemonMC
             if (packet is Interact interact)
             {
                 Log.debug($"{Username} interacted id:{interact.Action} at {interact.InteractPosition}");
+                if (interact.Action == 6)
+                {
+                    var pk = new ContainerOpen
+                    {
+                        ContainerId = 0,
+                        ContainerType = 255,
+                        EntityId = EntityID
+                    };
+                    Send(pk);
+                }
+            }
+
+            if (packet is ContainerClose containerClose)
+            {
+                var pk = new ContainerClose
+                {
+                    ContainerId = 0,
+                    ContainerType = 255,
+                };
+                Send(pk);
             }
 
             if (packet is Emote emote)
@@ -659,6 +686,31 @@ namespace DaemonMC
                     {
                         PluginManager.PlayerAttack(this, player);
                     }
+                }
+            }
+
+            if (packet is MobEquipment mobEquipment)
+            {
+                if (Inventory.Inventory.TryGetValue(mobEquipment.Slot, out var expectedItem))
+                {
+                    if (expectedItem.Name != mobEquipment.Item.Name)
+                    {
+                        Log.warn($"{mobEquipment.EntityId} Inventory mismatch. Expected {Inventory.Inventory[mobEquipment.Slot].Name}, player have {mobEquipment.Item.Name}. Resending item from server side inventory...");
+                        Inventory.Send(0, mobEquipment.Slot, expectedItem);
+                    }
+                    Log.debug($"{mobEquipment.EntityId} holding {mobEquipment.Item.Name} in slot {mobEquipment.Slot}");
+                    Inventory.HandSlot = mobEquipment.Slot;
+                    var pk1 = new MobEquipment
+                    {
+                        EntityId = mobEquipment.EntityId,
+                        Item = expectedItem,
+                        Slot = 0,
+                    };
+                    CurrentWorld.Send(pk1, EntityID);
+                }
+                else
+                {
+                    Kick("Inventory error");
                 }
             }
 

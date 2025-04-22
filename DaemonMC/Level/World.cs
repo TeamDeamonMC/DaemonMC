@@ -37,10 +37,14 @@ namespace DaemonMC.Level
             UnloadChunks();
         }
 
-        public void Send(Packet packet)
+        public void Send(Packet packet, long selfId = -1)
         {
             foreach (var dest in OnlinePlayers)
             {
+                if (dest.Value.EntityID == selfId)
+                {
+                    continue;
+                }
                 PacketEncoder encoder = PacketEncoderPool.Get(dest.Value);
                 packet.EncodePacket(encoder);
             }
@@ -267,9 +271,20 @@ namespace DaemonMC.Level
                     EntityId = player.EntityID,
                     Position = player.Position,
                     Metadata = player.Metadata,
-                    Layers = player.Abilities
+                    Layers = player.Abilities,
+                    Item = player.Inventory.GetHand()
                 };
                 onlinePlayer.Send(packet);
+
+                var armor = new MobArmorEquipment
+                {
+                    EntityId = player.EntityID,
+                    Head = player.Inventory.Head,
+                    Chest = player.Inventory.Chest,
+                    Legs = player.Inventory.Legs,
+                    Feet = player.Inventory.Feets
+                };
+                onlinePlayer.Send(armor);
 
                 var packet2 = new AddPlayer
                 {
@@ -278,9 +293,20 @@ namespace DaemonMC.Level
                     EntityId = onlinePlayer.EntityID,
                     Position = onlinePlayer.Position,
                     Metadata = onlinePlayer.Metadata,
-                    Layers = onlinePlayer.Abilities
+                    Layers = onlinePlayer.Abilities,
+                    Item = onlinePlayer.Inventory.GetHand()
                 };
                 player.Send(packet2);
+
+                var armor2 = new MobArmorEquipment
+                {
+                    EntityId = onlinePlayer.EntityID,
+                    Head = onlinePlayer.Inventory.Head,
+                    Chest = onlinePlayer.Inventory.Chest,
+                    Legs = onlinePlayer.Inventory.Legs,
+                    Feet = onlinePlayer.Inventory.Feets
+                };
+                player.Send(armor2);
             }
             Log.info($"{player.Username} spawned in World:'{LevelName}' X:{player.Position.X} Y:{player.Position.Y} Z:{player.Position.Z}");
         }

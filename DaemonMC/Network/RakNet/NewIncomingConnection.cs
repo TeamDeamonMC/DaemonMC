@@ -17,7 +17,7 @@
             var packet = new NewIncomingConnectionPacket
             {
                 serverAddress = decoder.ReadAddress(),
-                internalAddress = decoder.ReadInternalAddress(22),
+                internalAddress = decoder.ReadInternalAddress(),//todo
                 incommingTime = decoder.ReadLong(),
                 serverTime = decoder.ReadLong()
             };

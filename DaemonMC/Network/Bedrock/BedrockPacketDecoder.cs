@@ -104,6 +104,12 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.ModalFormResponse:
                         new ModalFormResponse().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.ContainerClose:
+                        new ContainerClose().DecodePacket(decoder);
+                        break;
+                    case Info.Bedrock.MobEquipment:
+                        new MobEquipment().DecodePacket(decoder);
+                        break;
 
 
                     default:

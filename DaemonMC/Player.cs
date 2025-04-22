@@ -595,11 +595,6 @@ namespace DaemonMC
                     Message = textMessage.Message
                 };
                 CurrentWorld.Send(msg);
-                Inventory.OnHead(new Items.VanillaItems.NetheriteHelmet());
-                Inventory.OnChest(new Items.VanillaItems.DiamondChestplate());
-                Inventory.OnLegs(new Items.VanillaItems.DiamondLeggings());
-                Inventory.OnFeets(new Items.VanillaItems.NetheriteBoots());
-                Inventory.Set(0, 1, new Items.VanillaItems.DiamondSword());
             }
 
             if (packet is ServerboundLoadingScreen serverboundLoadingScreen)

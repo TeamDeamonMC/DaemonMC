@@ -102,6 +102,7 @@ namespace DaemonMC
                     Log.info("/actorflags <EntityID (long)> <ActorFlags (int)> - Send specific actorflags value to entity or player");
                     Log.info("/levelevent <Position (X Y Z)> <LevelEvents (int)> - Send specific level event to players");
                     Log.info("/list - Spawned entities list");
+                    Log.info("/packet <PacketClassName> <Field1=Value1> <Field2=Value2> ... - Build and broadcast packet with custom values");
                     Log.info("/pklog <enable (bool)> - Enable packet logger");
                     Command2();
                     break;
@@ -163,6 +164,65 @@ namespace DaemonMC
                     break;
                 case "/list":
                     Entitylist();
+                    break;
+                case "/packet":
+                    if (parts.Length >= 2)
+                    {
+                        string packetName = parts[1];
+                        var packetType = typeof(Packet).Assembly
+                            .GetTypes()
+                            .FirstOrDefault(t => t.Name.Equals(packetName, StringComparison.OrdinalIgnoreCase));
+
+                        if (packetType == null)
+                        {
+                            Log.error($"Unknown packet: {packetName}");
+                            break;
+                        }
+
+                        var packet = Activator.CreateInstance(packetType);
+
+                        for (int i = 2; i < parts.Length; i++)
+                        {
+                            var arg = parts[i];
+                            var split = arg.Split('=');
+                            if (split.Length != 2)
+                            {
+                                Log.warn($"Invalid arg format: {arg}. Use Field=Value.");
+                                continue;
+                            }
+
+                            var fieldName = split[0];
+                            var valueStr = split[1];
+
+                            var prop = packetType.GetProperty(fieldName);
+                            if (prop == null)
+                            {
+                                Log.warn($"Field {fieldName} not found in {packetName}");
+                                continue;
+                            }
+
+                            try
+                            {
+                                object value = Convert.ChangeType(valueStr, prop.PropertyType);
+                                prop.SetValue(packet, value);
+                            }
+                            catch
+                            {
+                                Log.warn($"Failed to convert {valueStr} to {prop.PropertyType.Name} for {fieldName}");
+                            }
+                        }
+
+                        foreach (var dest in Server.OnlinePlayers)
+                        {
+                            dest.Value.Send((Packet)packet);
+                        }
+
+                        Log.info($"Sent {packetName} to {Server.OnlinePlayers.Count} players");
+                    }
+                    else
+                    {
+                        Log.info("Usage: /packet <PacketName> <Field1=Value1> <Field2=Value2> ...");
+                    }
                     break;
                 case "/pklog":
                     if (parts.Length == 2 && bool.TryParse(parts[1], out bool boolValue))

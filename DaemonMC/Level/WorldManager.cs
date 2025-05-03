@@ -14,7 +14,10 @@ namespace DaemonMC.Level
 
             foreach (string file in Directory.GetFiles(worldDirectory))
             {
-                Server.Levels.Add(new World(Path.GetFileNameWithoutExtension(file)));
+                if (Path.GetExtension(file) == ".mcworld")
+                {
+                    Server.Levels.Add(new World(Path.GetFileNameWithoutExtension(file)));
+                }
             }
 
             if(Server.Levels.Count == 0)

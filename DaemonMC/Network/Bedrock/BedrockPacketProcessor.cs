@@ -8,6 +8,7 @@ using fNbt;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
 using DaemonMC.Biomes;
+using System.Numerics;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -142,6 +143,7 @@ namespace DaemonMC.Network.Bedrock
                     if (spawnWorld != null)
                     {
                         player.CurrentWorld = spawnWorld;
+                        player.Position = new Vector3(spawnWorld.SpawnX, spawnWorld.SpawnY, spawnWorld.SpawnZ);
                     }
                     else
                     {

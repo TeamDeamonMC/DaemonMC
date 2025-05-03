@@ -27,6 +27,7 @@ namespace DaemonMC.Level
         public string LevelDisplayName { get; set; } = "DaemonMC Temp World";
         public int Version { get; set; } = Info.ProtocolVersion.Last();
         public int SpawnX { get; set; } = 0;
+        public int SpawnY { get; set; } = 384;
         public int SpawnZ { get; set; } = 0;
         public long RandomSeed { get; set; } = 0;
 
@@ -366,6 +367,10 @@ namespace DaemonMC.Level
                         break;
                     }
                 }
+                else
+                {
+                    break;
+                }
             }
 
             for (int i = 0; i < chunk.Chunks.Count; i++) //todo temp code to apply plains biome. Need to read these from DB
@@ -418,13 +423,13 @@ namespace DaemonMC.Level
                                     SpawnX = tag["SpawnX"].IntValue;
                                     SpawnZ = tag["SpawnZ"].IntValue;
 
-                                    if (tag != null && tag["lastOpenedWithVersion"] is NbtList versionList)
+                                    if (tag != null && tag["MinimumCompatibleClientVersion"] is NbtList versionList)
                                     {
                                         string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
                                         if (stringVersion != LevelDbVersion)
                                         {
                                             Log.error($"Unsupported world version {stringVersion}!");
-                                            Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {Info.Version} and export mcworld file again to update world.");
+                                            Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {LevelDbVersion} and export mcworld file again to update world.");
                                             Server.Crash = true;
                                         }
                                     }
@@ -438,6 +443,17 @@ namespace DaemonMC.Level
 
                 Db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
                 Db.Open();
+
+                var SpawnChunk = GetChunk(SpawnX / 16, SpawnZ / 16);
+                if (SpawnChunk.Chunks.Count == 0)
+                {
+                    Log.warn($"Unable to calulate spawn point Y value for {LevelName}. Spawn chunk not found in DB. Y value set to 384");
+                }
+                else
+                {
+                    SpawnY = (SpawnChunk.Chunks.Count * 16) - 64;
+                }
+                Log.debug($"Calculated {LevelName} spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
             }
             else
             {
@@ -475,16 +491,19 @@ namespace DaemonMC.Level
                     }
 
                     var chunksToRemove = Cache.Keys
-                        .Where(chunkCoord => !activeChunks.Contains(chunkCoord))
+                        .Where(chunkCoord => !activeChunks.Contains(chunkCoord) && chunkCoord != (SpawnX / 16, SpawnZ / 16))
                         .ToList();
 
                     int loadedChunks = Cache.Count();
 
-                    foreach (var chunkCoord in chunksToRemove)
+                    if (chunksToRemove.Count != 0)
                     {
-                        Cache.Remove(chunkCoord);
+                        foreach (var chunkCoord in chunksToRemove)
+                        {
+                            Cache.Remove(chunkCoord);
+                        }
+                        Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from World {LevelName}. {Cache.Count()} still loaded.");
                     }
-                    Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from World {LevelName}. {Cache.Count()} still loaded.");
                 }
                 await Task.Delay(20000);
                 UnloadChunks();

@@ -391,7 +391,17 @@ namespace DaemonMC
             }
         }
 
-        public async void ChangeWorld(World world)
+        public void ChangeWorld(World world)
+        {
+            doChangeWorld(world, new Vector3(CurrentWorld.SpawnX, CurrentWorld.SpawnY, CurrentWorld.SpawnZ));
+        }
+
+        public void ChangeWorld(World world, Vector3 position)
+        {
+            doChangeWorld(world, position);
+        }
+
+        public async void doChangeWorld(World world, Vector3 position)
         {
             CurrentWorld.RemovePlayer(this);
             foreach (var player in CurrentWorld.OnlinePlayers.Values)
@@ -432,7 +442,7 @@ namespace DaemonMC
             await Task.Delay(500); //need a little bit time to clear chunk cache and process packets
             _player.SendChunks();
             await Task.Delay(500);
-            Teleport(new Vector3(CurrentWorld.SpawnX, CurrentWorld.SpawnY, CurrentWorld.SpawnZ));
+            Teleport(position);
         }
 
         public void SetNameTag(string nameTag)

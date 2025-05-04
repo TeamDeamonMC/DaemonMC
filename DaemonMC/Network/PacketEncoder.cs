@@ -580,6 +580,10 @@ namespace DaemonMC.Network
             {
                 value |= (1 << (int)AbilitiesIndex.Teleport);
             }
+            if (permissions.MayFly)
+            {
+                value |= (1 << (int)AbilitiesIndex.MayFly);
+            }
             WriteInt(value);
         }
 

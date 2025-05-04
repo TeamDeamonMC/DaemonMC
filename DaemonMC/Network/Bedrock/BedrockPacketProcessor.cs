@@ -74,7 +74,12 @@ namespace DaemonMC.Network.Bedrock
                 long EntityId = Server.AddPlayer(player, clientEp);
                 session.EntityID = EntityId;
                 player.EntityID = EntityId;
-                player.GameMode = DaemonMC.GameMode; 
+                player.GameMode = DaemonMC.GameMode;
+
+                if (player.GameMode == 2)
+                {
+                    player.Abilities[0].AbilityValues.MayFly = true;
+                }
             }
 
             if (packet is PacketViolationWarning packetViolationWarning)

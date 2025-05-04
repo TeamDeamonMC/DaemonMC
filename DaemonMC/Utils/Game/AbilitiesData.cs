@@ -30,5 +30,6 @@
         public bool AttackMobs { get; set; }
         public bool OperatorCommands { get; set; }
         public bool Teleport { get; set; }
+        public bool MayFly { get; set; }
     }
 }

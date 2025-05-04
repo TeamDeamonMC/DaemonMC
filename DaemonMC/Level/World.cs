@@ -349,10 +349,24 @@ namespace DaemonMC.Level
 
             var chunk = new Chunk();
 
+            List<byte[]> subChunks = new List<byte[]>(24);
+            int lastSubChunkY = -1;
+
             for (int y = 0; y < 24; y++) //since 1.18 320 up, -64 down. 64/16=4 negative subchunks. 320/16=20 positive subchunks. max 24 chunks.
             {
                 dataKey[^1] = (byte)(y - 4);
                 byte[] subChunk = Db.Get(dataKey);
+
+                subChunks.Add(subChunk);
+                if (subChunk != null)
+                {
+                    lastSubChunkY = y;
+                }
+            }
+
+            for (int y = 0; y <= lastSubChunkY; y++)
+            {
+                byte[] subChunk = subChunks[y];
 
                 if (subChunk != null)
                 {
@@ -360,16 +374,16 @@ namespace DaemonMC.Level
                     {
                         chunk.Chunks.Add(ChunkUtils.DecodeSubChunk(subChunk));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        Log.error($"Chunk x:{x}; z:{z} decoding failed. Fix this. Sent empty chunk");
+                        Log.error($"SubChunk x:{x}; y:{y} z:{z} decoding failed. This shouldn't happen. Sent empty chunk");
                         Log.error(ex.ToString());
-                        break;
+                        chunk.Chunks.Add(new SubChunk());
                     }
                 }
                 else
                 {
-                    break;
+                    chunk.Chunks.Add(new SubChunk());
                 }
             }
 
@@ -453,7 +467,7 @@ namespace DaemonMC.Level
                 {
                     SpawnY = (SpawnChunk.Chunks.Count * 16) - 64;
                 }
-                Log.debug($"Calculated {LevelName} spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
+                Log.debug($"Calculated '{LevelName}' spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
             }
             else
             {
@@ -502,7 +516,7 @@ namespace DaemonMC.Level
                         {
                             Cache.Remove(chunkCoord);
                         }
-                        Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from World {LevelName}. {Cache.Count()} still loaded.");
+                        Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from '{LevelName}'. {Cache.Count()} still loaded.");
                     }
                 }
                 await Task.Delay(20000);
@@ -557,7 +571,7 @@ namespace DaemonMC.Level
             }
             else
             {
-                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. From world position x:{posX}; y:{position.Y}, z:{posZ}");
+                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{posX}; y:{position.Y}, z:{posZ}");
                 return new Air();
             }
         }

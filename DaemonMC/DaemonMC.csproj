@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.9-alpha</Version>
+    <Version>1.0.10-alpha</Version>
     <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="MiNET.fnbt" Version="1.0.22" />
-    <PackageReference Include="MiNET.LevelDB" Version="1.0.49" />
+    <PackageReference Include="MiNET.LevelDB-CobwebSMP" Version="0.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />

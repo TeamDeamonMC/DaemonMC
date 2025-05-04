@@ -102,7 +102,7 @@ namespace DaemonMC.Utils
             if (p.CurrentWorld.Temporary)
             {
                 chunkData = new List<byte>(new SuperFlat().generateChunks());
-                chunkCount = 20;
+                chunkCount = 1;
             }
             else
             {
@@ -112,7 +112,7 @@ namespace DaemonMC.Utils
                 if (chunkRaw.Chunks.Count == 0)
                 {
                     chunkData = new List<byte>(new SuperFlat().generateChunks());
-                    chunkCount = 20;
+                    chunkCount = 1;
                 }
             }
 

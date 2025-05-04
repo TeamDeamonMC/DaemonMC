@@ -69,11 +69,6 @@ namespace DaemonMC.Level.Generators
                         }
                     }
                 }
-                for (int i = 0; i < 19; i++)//empty chunks again
-                {
-                    stream.WriteByte(8);//version
-                    stream.WriteByte(0);//storage size
-                }
 
                 stream.Write(new byte[256], 0, 256); //not sure about this
                 VarInt.WriteSInt32(stream, 0);

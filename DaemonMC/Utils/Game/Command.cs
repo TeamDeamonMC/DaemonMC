@@ -21,16 +21,4 @@
             Parameters = overloads ?? new List<Parameter>();
         }
     }
-
-    public class Parameter
-    {
-        public string Name { get; set; } = "";
-        public Type Type { get; set; }
-
-        public Parameter(string name, Type type)
-        {
-            Name = name;
-            Type = type;
-        }
-    }
 }

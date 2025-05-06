@@ -102,8 +102,8 @@ namespace DaemonMC
             {
                 NameTag = Username;
                 Metadata[ActorData.NAME] = new Metadata(Username);
+                Metadata[ActorData.NAMETAG_ALWAYS_SHOW] = new Metadata((byte) 1);
                 SetFlag(ActorFlags.CAN_SHOW_NAME, true);
-                SetFlag(ActorFlags.ALWAYS_SHOW_NAME, true);
                 SetFlag(ActorFlags.HAS_COLLISION, true);
                 SetFlag(ActorFlags.HAS_GRAVITY, true);
                 SetFlag(ActorFlags.FIRE_IMMUNE, true);

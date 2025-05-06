@@ -1,5 +1,4 @@
-﻿using DaemonMC.Network.Enumerations;
-using DaemonMC.Utils.Game;
+﻿using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -8,6 +7,7 @@ namespace DaemonMC.Network.Bedrock
         public override Info.Bedrock Id => Info.Bedrock.AvailableCommands;
 
         public List<string> EnumValues { get; set; } = new List<string>();
+        public List<CommandEnum> Enums { get; set; } = new List<CommandEnum>();
         public List<string> ChainedSubcommandValues { get; set; } = new List<string>();
         public List<string> PostFixes { get; set; } = new List<string>();
         public List<Command> Commands { get; set; } = new List<Command>();
@@ -34,7 +34,17 @@ namespace DaemonMC.Network.Bedrock
             {
                 encoder.WriteString(value);
             }
-            encoder.WriteVarInt(0);//enum data
+            encoder.WriteVarInt(Enums.Count);
+            foreach (var enumEntry in Enums)
+            {
+                encoder.WriteString(enumEntry.Name);
+                encoder.WriteVarInt(enumEntry.Values.Count());
+                foreach (var val in enumEntry.Values)
+                {
+                    encoder.WriteByte((byte)CommandManager.EnumValues.IndexOf(val));
+                }
+            }
+
             encoder.WriteVarInt(0);//ChainedSubcommand data
 
             encoder.WriteVarInt(Commands.Count);
@@ -44,7 +54,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteString(command.Description);
                 encoder.WriteShort((ushort)command.Flags);
                 encoder.WriteByte(command.Permission);
-                encoder.WriteInt(command.AliasEnum);
+                encoder.WriteInt(-1);
                 encoder.WriteVarInt(command.ChainedSubcommandIndex.Count());
                 foreach (var index in command.ChainedSubcommandIndex)
                 {
@@ -58,7 +68,7 @@ namespace DaemonMC.Network.Bedrock
                     foreach (var parameter in overload)
                     {
                         encoder.WriteString(parameter.Name);
-                        encoder.WriteInt((int)ParameterTypes.Epsilon | (int)CommandManager.GetType(parameter.Type));
+                        encoder.WriteInt(CommandManager.GetSymbol(parameter.Type, Enums.FindIndex(p => p.Name == parameter.Name)));
                         encoder.WriteBool(false);
                         encoder.WriteByte(0);
                     }

@@ -9,6 +9,9 @@ namespace DaemonMC
     public class CommandManager
     {
         public static List<Command> AvailableCommands { get; set; } = new List<Command>();
+        public static List<string> EnumValues { get; set; } = new List<string>();
+        public static List<CommandEnum> RealEnums { get; set; } = new List<CommandEnum>();
+
         private static readonly Dictionary<Type, ParameterTypes> typeMap = new()
         {
             { typeof(int), ParameterTypes.Int },
@@ -16,6 +19,7 @@ namespace DaemonMC
             { typeof(string), ParameterTypes.Id },
             { typeof(Player), ParameterTypes.Selection },
             { typeof(Vector3), ParameterTypes.PositionFloat },
+            { typeof(EnumP), ParameterTypes.Enum },
         };
         private static readonly Dictionary<Type, string> typeStringMap = new()
         {
@@ -50,6 +54,18 @@ namespace DaemonMC
                 command.CommandFunction.Add(commandFunction);
                 AvailableCommands.Add(command);
             }
+
+            foreach (var param in command.Parameters)
+            {
+                if (param is EnumP enumParam)
+                {
+                    if(RealEnums.FirstOrDefault(p => p.Name == enumParam.Name) == null)
+                    {
+                        RealEnums.Add(new CommandEnum(enumParam.Name, enumParam.Values.ToList()));
+                        EnumValues.AddRange(enumParam.Values.Except(EnumValues));
+                    }
+                }
+            }
         }
 
         public static void Unregister(string commandName)
@@ -63,13 +79,19 @@ namespace DaemonMC
             AvailableCommands.Remove(cmd);
         }
 
-        public static ParameterTypes GetType(Type type)
+        public static int GetSymbol(Type type, int enumIndex = -1)
         {
             if (typeMap.TryGetValue(type, out var paramType))
-                return paramType;
+            {
+                if (type == typeof(Enum))
+                {
+                    return (int)ParameterTypes.Enum | enumIndex;
+                }
+                return (int)ParameterTypes.Epsilon | (int)paramType;
+            }
 
             Log.error($"Unknown command parameter type: {type}");
-            return ParameterTypes.RawText;
+            return (int)ParameterTypes.Epsilon | (int)ParameterTypes.RawText;
         }
 
         public static void Execute(string command, Player player)
@@ -105,7 +127,7 @@ namespace DaemonMC
                     }
 
                     Type expectedType = param.Type;
-                    
+
                     if (expectedType == typeof(Vector3) && Vector3.TryParse(argParts, argIndex, out Vector3 vec))
                     {
                         parsedArgs.Add(vec);
@@ -122,6 +144,11 @@ namespace DaemonMC
                         argIndex++;
                     }
                     else if (expectedType == typeof(string) || expectedType == typeof(Player))
+                    {
+                        parsedArgs.Add(argParts[argIndex]);
+                        argIndex++;
+                    }
+                    else if (expectedType == typeof(EnumP) && param.Values.Contains(argParts[argIndex], StringComparer.OrdinalIgnoreCase))
                     {
                         parsedArgs.Add(argParts[argIndex]);
                         argIndex++;
@@ -144,8 +171,8 @@ namespace DaemonMC
             player.SendMessage("§cIncorrect usage. Available parameters:");
             foreach (var overload in regCommand.Overloads)
             {
-                var parameters = string.Join(" ", overload.Select(p => $"<{p.Name}: {typeStringMap[p.Type]}>"));
-                player.SendMessage($"§a/{regCommand.Name} {parameters}");
+                var parameters = string.Join(" ", overload.Select(p => $"<{p.Name}: {(p.Type == typeof(EnumP) ? string.Join(" | ", p.Values) : typeStringMap[p.Type])}>"));
+                player.SendMessage($"§f/{regCommand.Name} §a{parameters}");
             }
         }
 
@@ -175,6 +202,18 @@ namespace DaemonMC
         {
             Player = player;
             Data = data;
+        }
+    }
+
+    public class CommandEnum
+    {
+        public string Name { get; set; } = "";
+        public List<string> Values { get; set; } = new List<string>();
+
+        public CommandEnum(string name, List<string> values)
+        {
+            Name = name;
+            Values = values;
         }
     }
 }

@@ -160,6 +160,8 @@ namespace DaemonMC.Network.Bedrock
 
                     var commands = new AvailableCommands
                     {
+                        EnumValues = CommandManager.EnumValues,
+                        Enums = CommandManager.RealEnums,
                         Commands = CommandManager.AvailableCommands
                     };
                     player.Send(commands);

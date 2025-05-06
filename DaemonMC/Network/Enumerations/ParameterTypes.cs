@@ -94,5 +94,6 @@
         CodeBuilderArgs = 0x100059,
         CodeBuilderSelectParam = 0x10005a,
         CodeBuilderSelector = 0x10005b,
+        Enum = 0x200000,
     }
 }

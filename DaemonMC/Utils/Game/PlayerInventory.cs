@@ -7,7 +7,7 @@ namespace DaemonMC.Utils.Game
     public class PlayerInventory
     {
         internal readonly Player _player;
-        public Dictionary<byte, Item> Inventory { get; protected set; } = new Dictionary<byte, Item>(); //0 - 8 hotbar, 8 - 35 inventory
+        public Dictionary<byte, Item> Inventory { get; protected set; } = new Dictionary<byte, Item>(); //0 - 9 hotbar, 10 - 35 inventory
         public Item Head { get; protected set; } = new Air();
         public Item Chest { get; protected set; } = new Air();
         public Item Legs { get; protected set; } = new Air();

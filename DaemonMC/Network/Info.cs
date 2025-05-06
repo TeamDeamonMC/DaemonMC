@@ -75,7 +75,9 @@
             UpdateAbilities = 187,
             UpdateAdventureSettings = 188,
             RequestNetworkSettings = 193,
-            ServerboundLoadingScreen = 312
+            SetHud = 308,
+            ServerboundLoadingScreen = 312,
+            ClientMovementPredictionSync = 322
         }
 
         public enum RakNet

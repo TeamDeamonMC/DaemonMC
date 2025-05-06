@@ -39,6 +39,7 @@ namespace DaemonMC
         public List<AuthInputData> InputData { get; set; } = new List<AuthInputData>();
         public List<AbilitiesData> Abilities { get; set; } = new List<AbilitiesData>() { new AbilitiesData(1, 262143, new PermissionSet(), 0.05f, 0.1f, 0.1f) };
         public PlayerInventory Inventory { get; set; }
+        public Dictionary<Effects, bool> AllEffects { get; set; } = new Dictionary<Effects, bool>();
         public bool Spawned { get; set; } = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
@@ -58,6 +59,7 @@ namespace DaemonMC
             SendMetadata(true);
             SendAbilities();
             CurrentWorld.AddPlayer(this);
+            SendHud(HudElements.AirBubbles, false); //tempfix for bubbles. todo fix
         }
 
         public void Send(Packet packet)
@@ -497,6 +499,96 @@ namespace DaemonMC
             Send(packet);
         }
 
+        public void SendHud(HudElements element, bool visible)
+        {
+            SendHud(new Dictionary<HudElements, bool>() { { element, visible } });
+        }
+
+        public void SendHud(Dictionary<HudElements, bool> elements)
+        {
+            var packet = new SetHud
+            {
+                HudElements = elements,
+            };
+            Send(packet);
+        }
+
+        public void UpdateVisibleEffects()
+        {
+            long effectsData = 0;
+
+            foreach (var effect in AllEffects)
+            {
+                if (effect.Value)
+                {
+                    effectsData = (effectsData << 7) | (((int)effect.Key & 0x3F) << 1) | 0;
+                }
+            }
+
+            Metadata[ActorData.VISIBLE_MOB_EFFECTS] = new Metadata(effectsData);
+
+            SendMetadata();
+        }
+
+        public void AddEffect(Effects effect, int duration = -1, bool showParticles = true)
+        {
+            if (AllEffects.ContainsKey(effect))
+            {
+                Log.warn($"Effect '{effect}' already applied to {Username}");
+                return;
+            }
+
+            AllEffects.Add(effect, showParticles);
+
+            if (showParticles)
+            {
+                UpdateVisibleEffects();
+            }
+
+            var packet = new MobEffect
+            {
+                EntityId = EntityID,
+                EventId = 1,
+                EffectId = (int)effect,
+                ShowParticles = showParticles,
+                Duration = duration,
+                Tick = Tick
+            };
+            Send(packet);
+
+            if (duration > 0)
+            {
+                _ = Task.Run(async () => {
+                    await Task.Delay(duration * 50);
+                    Log.debug($"Effect '{effect}' removed from {Username}");
+                    AllEffects.Remove(effect);
+                    UpdateVisibleEffects();
+                });
+            }
+        }
+
+        public void RemoveEffect(Effects effect)
+        {
+            if (!AllEffects.Remove(effect))
+            {
+                Log.warn($"Couldn't remove effect '{effect}' from {Username}. Effect is not applied.");
+                return;
+            }
+
+            var packet = new MobEffect
+            {
+                EntityId = EntityID,
+                EventId = 3,
+                EffectId = (int)effect,
+                Tick = Tick
+            };
+            Send(packet);
+
+            Log.debug($"Effect '{effect}' removed from {Username}");
+            AllEffects.Remove(effect);
+            UpdateVisibleEffects();
+        }
+
         ///////////////////////////// Packet handler /////////////////////////////
 
         internal void HandlePacket(Packet packet)
@@ -729,6 +821,11 @@ namespace DaemonMC
                 {
                     Log.warn($"Received response for unknown form ID: {formResponse.ID}");
                 }
+            }
+
+            if (packet is ClientMovementPredictionSync clientMovementPredictionSync)
+            {
+                Log.debug($"ClientMovementPredictionSync: {string.Join(" | ", clientMovementPredictionSync.ActorData)}");
             }
         }
     }

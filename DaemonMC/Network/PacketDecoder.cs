@@ -6,6 +6,7 @@ using DaemonMC.Items;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
+using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network
@@ -533,6 +534,18 @@ namespace DaemonMC.Network
                 }
             }
             return new Items.VanillaItems.Air();
+        }
+
+        public AttributesValues ReadAttributes()
+        {
+            var values = new AttributesValues();
+            values.MovementSpeed = ReadFloat();
+            values.UnderwaterMovementSpeed = ReadFloat();
+            values.LavaMovementSpeed = ReadFloat();
+            values.JumpStrength = ReadFloat();
+            values.Health = ReadFloat();
+            values.Hunger = ReadFloat();
+            return values;
         }
 
         public T? ReadOptional<T>(Func<T> readFunction)

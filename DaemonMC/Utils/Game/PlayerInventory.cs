@@ -39,7 +39,7 @@ namespace DaemonMC.Utils.Game
             Set(120, 2, item);
         }
 
-        public void OnFeets(Item item)
+        public void OnFeet(Item item)
         {
             Set(120, 3, item);
         }

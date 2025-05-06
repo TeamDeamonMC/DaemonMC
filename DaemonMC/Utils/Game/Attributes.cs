@@ -24,11 +24,26 @@
 
     public class AttributesValues
     {
-        public float MovementSpeed { get; set; }
+        public float MovementSpeed { get; set; } = 0;
+        public float UnderwaterMovementSpeed { get; set; } = 0;
+        public float LavaMovementSpeed { get; set; } = 0;
+        public float JumpStrength { get; set; } = 0;
+        public float Health { get; set; } = 0;
+        public float Hunger { get; set; } = 0;
 
-        public AttributesValues(float movementSpeed)
+        public AttributesValues()
+        {
+
+        }
+
+        public AttributesValues(float movementSpeed = 0, float underwaterMovementSpeed = 0, float lavaMovementSpeed = 0, float jumpStrength = 0, float health = 0, float hunger = 0)
         {
             MovementSpeed = movementSpeed;
+            UnderwaterMovementSpeed = underwaterMovementSpeed;
+            LavaMovementSpeed = lavaMovementSpeed;
+            JumpStrength = jumpStrength;
+            Health = health;
+            Hunger = hunger;
         }
 
         public AttributeValue Movement_speed()

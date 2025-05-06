@@ -1,0 +1,37 @@
+﻿namespace DaemonMC.Network.Enumerations
+{
+    public enum Effects
+    {
+        Unknown,
+        Speed,
+        Slowness,
+        Haste,
+        MiningFatingue,
+        Strenght,
+        InstantHealth,
+        InstantDamage,
+        JumpBoost,
+        Nausea,
+        Regeneration,
+        Resistance,
+        FireResistance,
+        WaterBreathing,
+        Invisibility,
+        Blindness,
+        NightVision,
+        Hunger,
+        Weakness,
+        Poison,
+        Wither,
+        HealthBoost,
+        Absorbation,
+        Saturation,
+        Levitation,
+        FatalPoison,
+        ConduitPower,
+        SlowFalling,
+        BadOmen,
+        HeroOfTheVillage,
+        Darkness
+    }
+}

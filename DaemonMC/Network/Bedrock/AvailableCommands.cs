@@ -1,4 +1,5 @@
-﻿using DaemonMC.Utils.Game;
+﻿using DaemonMC.Network.Enumerations;
+using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -49,7 +50,19 @@ namespace DaemonMC.Network.Bedrock
                 {
                     encoder.WriteShort((ushort)index);
                 }
-                encoder.WriteVarInt(0);
+                encoder.WriteVarInt(command.Overloads.Count());
+                foreach (var overload in command.Overloads)
+                {
+                    encoder.WriteBool(false);
+                    encoder.WriteVarInt(overload.Count());
+                    foreach (var parameter in overload)
+                    {
+                        encoder.WriteString(parameter.Name);
+                        encoder.WriteInt((int)ParameterTypes.Epsilon | (int)CommandManager.GetType(parameter.Type));
+                        encoder.WriteBool(false);
+                        encoder.WriteByte(0);
+                    }
+                }
             }
 
             encoder.WriteVarInt(0);//soft enums

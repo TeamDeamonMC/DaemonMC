@@ -1,7 +1,8 @@
-﻿using DaemonMC.Network;
+﻿using System.Numerics;
+using DaemonMC.Network;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
-using DaemonMC.Utils.Maths;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC
@@ -59,7 +60,7 @@ namespace DaemonMC
             {
                 if (param is EnumP enumParam)
                 {
-                    if(RealEnums.FirstOrDefault(p => p.Name == enumParam.Name) == null)
+                    if (RealEnums.FirstOrDefault(p => p.Name == enumParam.Name) == null)
                     {
                         RealEnums.Add(new CommandEnum(enumParam.Name, enumParam.Values.ToList()));
                         EnumValues.AddRange(enumParam.Values.Except(EnumValues));
@@ -128,7 +129,7 @@ namespace DaemonMC
 
                     Type expectedType = param.Type;
 
-                    if (expectedType == typeof(Vector3) && Vector3.TryParse(argParts, argIndex, out Vector3 vec))
+                    if (expectedType == typeof(Vector3) && Parser.Vector3(argParts, argIndex, out Vector3 vec))
                     {
                         parsedArgs.Add(vec);
                         argIndex += 3;

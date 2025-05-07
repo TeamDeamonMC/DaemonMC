@@ -1,4 +1,4 @@
-﻿using DaemonMC.Utils.Maths;
+﻿using System.Numerics;
 
 namespace DaemonMC.Utils.Game
 {

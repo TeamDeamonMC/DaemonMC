@@ -1,23 +1,14 @@
-﻿namespace DaemonMC.Utils.Maths
+﻿using System.Numerics;
+
+namespace DaemonMC.Utils
 {
-    public struct Vector3
+    internal class Parser
     {
-        public float X;
-        public float Y;
-        public float Z;
-
-        public Vector3(float x, float y, float z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public static bool TryParse(string[] args, out Vector3 result)
+        public static bool Vector3(string[] args, out Vector3 result)
         {
             result = new Vector3();
 
-            if (TryParse(args, 0, out Vector3 data))
+            if (Vector3(args, 0, out Vector3 data))
             {
                 result = data;
                 return true;
@@ -25,7 +16,7 @@
             return false;
         }
 
-        public static bool TryParse(string[] args, int index, out Vector3 result)
+        public static bool Vector3(string[] args, int index, out Vector3 result)
         {
             result = new Vector3();
 

@@ -4,8 +4,8 @@ using DaemonMC.Utils.Text;
 using DaemonMC.Network;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Level;
-using DaemonMC.Plugin.Plugin;
 using DaemonMC.Blocks;
+using DaemonMC.Plugin;
 
 namespace DaemonMC
 {

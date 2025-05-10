@@ -1,6 +1,9 @@
 ﻿using System.Numerics;
+using DaemonMC;
 using DaemonMC.Network;
+using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Plugin;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
@@ -9,7 +12,7 @@ namespace DaemonMC
 {
     public class CommandManager
     {
-        public static List<Command> AvailableCommands { get; set; } = new List<Command>();
+        public static Dictionary<string, (Plugin.Plugin Plugin, Command Command)> AvailableCommands { get; set; } = new();
         public static List<string> EnumValues { get; set; } = new List<string>();
         public static List<CommandEnum> RealEnums { get; set; } = new List<CommandEnum>();
 
@@ -30,30 +33,57 @@ namespace DaemonMC
             { typeof(Player), "target" },
             { typeof(Vector3), "x y z" },
         };
+        
+        public static List<Command> GetAvailableCommands() {
+            return AvailableCommands.Values.Select(x => x.Command).ToList();
+        }
+        
+        public static List<Command> GetCommandsByPlugin(Plugin.Plugin plugin) {
+            return AvailableCommands.Where(kvp => kvp.Value.Plugin == plugin).Select(kvp => kvp.Value.Command).ToList();
+        }
 
-        public static void Register(Command command, Action<CommandAction> commandFunction)
-        {
-            var regCommand = AvailableCommands.FirstOrDefault(p => p.Name == command.Name);
+        public static void Register(Plugin.Plugin plugin, Command command, Action<CommandAction> commandFunction) {
+            
+            if (plugin == null!) {
+                Log.warn($"Cannot register command '{command.Name}' without a plugin reference.");
+                return;
+            }
+            
+            var existingEntry = AvailableCommands.FirstOrDefault(p => p.Value.Plugin == plugin && p.Value.Command.Name == command.Name);
 
-            if (regCommand != null)
+            if (existingEntry.Key != null)
             {
-                bool overloadExists = regCommand.Overloads.Any(existingOverload => existingOverload.Count == command.Parameters.Count && !existingOverload.Where((param, index) => param.Name != command.Parameters[index].Name || param.Type != command.Parameters[index].Type).Any());
+                var existingCommand = existingEntry.Value.Command;
+                bool overloadExists = existingCommand.Overloads.Any(existingOverload => 
+                    existingOverload.Count == command.Parameters.Count && 
+                    !existingOverload.Where((param, index) => 
+                        param.Name != command.Parameters[index].Name || 
+                        param.Type != command.Parameters[index].Type).Any());
+
                 if (overloadExists)
                 {
-                    Log.warn($"Couldn't register {command.Name}. Command already registered.");
+                    Log.warn($"Couldn't register {command.Name}. Command already registered by plugin {plugin.GetName()}.");
                     return;
                 }
                 else
                 {
-                    regCommand.Overloads.Add(command.Parameters);
-                    regCommand.CommandFunction.Add(commandFunction);
+                    existingCommand.Overloads.Add(command.Parameters);
+                    existingCommand.CommandFunction.Add(commandFunction);
                 }
             }
             else
             {
+                // Cerca se il comando esiste per altri plugin
+                var conflict = AvailableCommands.FirstOrDefault(p => p.Value.Command.Name == command.Name);
+                if (conflict.Key != null)
+                {
+                    Log.warn($"Command name '{command.Name}' is already registered by plugin {conflict.Value.Plugin.GetName()}. Use a different name.");
+                    return;
+                }
+
                 command.Overloads.Add(command.Parameters);
                 command.CommandFunction.Add(commandFunction);
-                AvailableCommands.Add(command);
+                AvailableCommands.Add(command.Name, (plugin, command));
             }
 
             foreach (var param in command.Parameters)
@@ -71,13 +101,31 @@ namespace DaemonMC
 
         public static void Unregister(string commandName)
         {
-            var cmd = AvailableCommands.FirstOrDefault(p => p.Name == commandName);
-            if (cmd == null)
+            if (AvailableCommands.Remove(commandName))
+            {
+                Log.debug($"Command '{commandName}' unregistered successfully.");
+            }
+            else
             {
                 Log.warn($"Couldn't unregister {commandName}. Command not found.");
-                return;
             }
-            AvailableCommands.Remove(cmd);
+        }
+
+        public static void UnregisterAll(Plugin.Plugin plugin)
+        {
+            if (plugin == null) return;
+
+            var commandsToRemove = AvailableCommands
+                .Where(kvp => kvp.Value.Plugin == plugin)
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            foreach (var commandName in commandsToRemove)
+            {
+                AvailableCommands.Remove(commandName);
+            }
+
+            Log.debug($"Unregistered {commandsToRemove.Count} commands for plugin {plugin.GetName()}");
         }
 
         public static int GetSymbol(Type type, int enumIndex = -1)
@@ -97,6 +145,7 @@ namespace DaemonMC
 
         public static void Execute(string command, Player player)
         {
+
             if (string.IsNullOrWhiteSpace(command)) return;
 
             string[] commandParts = command.Split(' ');
@@ -105,12 +154,13 @@ namespace DaemonMC
             string commandName = commandParts[0];
             string[] argParts = commandParts.Skip(1).ToArray();
 
-            var regCommand = AvailableCommands.FirstOrDefault(c => c.Name == commandName);
-            if (regCommand == null)
+            if (!AvailableCommands.TryGetValue(commandName, out var commandEntry))
             {
                 player.SendMessage($"§cUnknown command: {commandName}");
                 return;
             }
+
+            var regCommand = commandEntry.Command;
 
             for (int i = 0; i < regCommand.Overloads.Count; i++)
             {
@@ -169,22 +219,26 @@ namespace DaemonMC
             }
 
             Log.debug($"Failed command request: {command}");
-            player.SendMessage("§cIncorrect usage. Available parameters:");
+            player.SendMessage($"{TextFormat.Red}Incorrect usage. Available parameters:");
             foreach (var overload in regCommand.Overloads)
             {
                 var parameters = string.Join(" ", overload.Select(p => $"<{p.Name}: {(p.Type == typeof(EnumP) ? string.Join(" | ", p.Values) : typeStringMap[p.Type])}>"));
-                player.SendMessage($"§f/{regCommand.Name} §a{parameters}");
+                player.SendMessage($"{TextFormat.White}/{regCommand.Name} {TextFormat.Green}{parameters}");
             }
         }
 
-        public static void RegisterBuiltinCommands()
-        {
-            Register(new Command("about", "Information about the server"), about);
-            Register(new Command("pos", "Your current position"), position);
+        public static void RegisterBuiltinCommands() {
+            RegisterInternal(new Command("about", "Information about the server"), about);
+            RegisterInternal(new Command("pos", "Your current position"), position);
+        }
+        
+        private static void RegisterInternal(Command command, Action<CommandAction> commandFunction) {
+            command.Overloads.Add(command.Parameters);
+            command.CommandFunction.Add(commandFunction);
+            AvailableCommands.Add(command.Name, (null!, command));
         }
 
-        public static void about(CommandAction action)
-        {
+        public static void about(CommandAction action) {
             action.Player.SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.Version} \n§r§fProject URL: §agithub.com/laz1444/DaemonMC \n§r§fGit hash: §a{DaemonMC.GitHash} \n§r§fEnvironment: §a.NET{Environment.Version}, {Environment.OSVersion} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.ProtocolVersion)}");
         }
 

@@ -18,6 +18,7 @@ namespace DaemonMC
         public bool ForcePacks { get; set; } = false;
         public bool XboxAuth { get; set; } = true;
         public bool Debug { get; set; } = false;
+        public bool HotReloading { get; set; } = true;
 
         public static void Set()
         {
@@ -57,6 +58,7 @@ namespace DaemonMC
             DaemonMC.GameMode = ToGameMode(config.DefaultGamemode);
             DaemonMC.DrawDistance = config.DrawDistance;
             DaemonMC.UnloadChunks = config.UnloadChunks;
+            DaemonMC.HotReloading = config.HotReloading;
             Server.Port = config.Port;
             JWT.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;

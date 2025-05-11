@@ -8,10 +8,10 @@ using DaemonMC.Utils;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
-using DaemonMC.Plugin.Plugin;
 using DaemonMC.Entities;
 using DaemonMC.Blocks;
 using DaemonMC.Forms;
+using DaemonMC.Plugin;
 using Newtonsoft.Json;
 
 namespace DaemonMC
@@ -139,25 +139,23 @@ namespace DaemonMC
             Send(packet);
         }
 
-        public void Kick(string msg)
-        {
-            _ = Task.Run(async () => {
-                await Task.Delay(1000);
-
-                var packet = new Disconnect
-                {
-                    Message = msg
-                };
-                Send(packet);
-
-                PacketEncoder encoder2 = PacketEncoderPool.Get(this);
-                var packet2 = new RakDisconnect
-                {
-                };
-                packet2.Encode(encoder2);
-                Server.RemovePlayer(EntityID);
-                RakSessionManager.deleteSession(ep);
-            });
+        public void Kick(string msg) {
+            
+            var packet = new Disconnect {
+                Message = msg
+            };
+            
+            Send(packet);
+            
+            var encoder2 = PacketEncoderPool.Get(this);
+            var packet2 = new RakDisconnect {
+                id = 0
+            };
+            
+            packet2.Encode(encoder2);
+            
+            Server.RemovePlayer(EntityID);
+            RakSessionManager.deleteSession(ep);
         }
 
         public void SendMessage(string message)
@@ -604,7 +602,9 @@ namespace DaemonMC
                 }
                 if (Vector3.Distance(Position, playerAuthInput.Position) > 0.01f || Vector2.Distance(Rotation, playerAuthInput.Rotation) > 0.01f)
                 {
-                    PluginManager.PlayerMove(this);
+                    if (!PluginManager.PlayerMove(this)) {
+                        return;
+                    }
 
                     Position = playerAuthInput.Position;
                     Rotation = playerAuthInput.Rotation;
@@ -688,10 +688,13 @@ namespace DaemonMC
                 _player.SendChunks();
             }
 
-            if (packet is TextMessage textMessage)
-            {
-                var msg = new TextMessage
-                {
+            if (packet is TextMessage textMessage) {
+
+                if (!PluginManager.PlayerSentMessage(this, textMessage)) {
+                    return;
+                }
+                
+                var msg = new TextMessage {
                     MessageType = 1,
                     Username = Username,
                     Message = textMessage.Message
@@ -699,28 +702,24 @@ namespace DaemonMC
                 CurrentWorld.Send(msg);
             }
 
-            if (packet is ServerboundLoadingScreen serverboundLoadingScreen)
-            {
-                if (serverboundLoadingScreen.ScreenType == 4)
-                {
-                    PluginManager.PlayerJoined(this);
+            if (packet is ServerboundLoadingScreen { ScreenType: 4 }) {
+
+                if (PluginManager.PlayerJoined(this)) {
                     SendEntities();
                 }
+
+                return;
             }
 
-            if (packet is PlayerSkin playerSkin)
-            {
-                var pk = new PlayerSkin
-                {
-                    UUID = UUID,
-                    Skin = playerSkin.Skin,
-                    Name = playerSkin.Name,
-                    OldName = Skin.SkinId,
-                    Trusted = playerSkin.Trusted,
-                };
+            if (packet is PlayerSkin playerSkin) {
+                
+                var pk = new PlayerSkin { UUID = UUID, Skin = Skin, Name = Skin.SkinId, OldName = Skin.SkinId, Trusted = true };
+                if (PluginManager.PlayerSkinChanged(this, playerSkin)) {
+                    pk = new PlayerSkin { UUID = UUID, Skin = playerSkin.Skin, Name = playerSkin.Name, OldName = Skin.SkinId, Trusted = playerSkin.Trusted };
+                    Skin = playerSkin.Skin;
+                }
+                
                 CurrentWorld.Send(pk);
-
-                Skin = playerSkin.Skin;
             }
 
             if (packet is CommandRequest commandRequest)
@@ -771,18 +770,24 @@ namespace DaemonMC
                 Log.debug($"{Username} animation action:{animate.Action}");
             }
 
-            if (packet is InventoryTransaction inventoryTransaction)
-            {
-                if (inventoryTransaction.Transaction.Type is TransactionType.ItemUseOnEntityTransaction)
-                {
-                    if (CurrentWorld.Entities.TryGetValue(inventoryTransaction.Transaction.EntityId, out Entity entity))
-                    {
-                        PluginManager.EntityAttack(this, entity);
+            if (packet is InventoryTransaction { Transaction.Type: TransactionType.ItemUseOnEntityTransaction } inventoryTransaction) {
+                
+                if (CurrentWorld.Entities.TryGetValue(inventoryTransaction.Transaction.EntityId, out Entity entity)) {
+                    
+                    if (!PluginManager.PlayerAttackedEntity(this, entity)) {
+                        return;
                     }
-                    if (CurrentWorld.OnlinePlayers.TryGetValue(inventoryTransaction.Transaction.EntityId, out Player player))
-                    {
-                        PluginManager.PlayerAttack(this, player);
+                    
+                    // TODO PvP mechanics, and health manager...
+                }
+                
+                if (CurrentWorld.OnlinePlayers.TryGetValue(inventoryTransaction.Transaction.EntityId, out Player player)) {
+                    
+                    if (!PluginManager.PlayerAttackedPlayer(this, player)) {
+                        return;
                     }
+                    
+                    // TODO PvP mechanics, and health manager...
                 }
             }
 

@@ -5,6 +5,7 @@ using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Game;
 using System.Numerics;
 using System.Reflection;
+using DaemonMC.Plugin;
 
 namespace DaemonMC
 {
@@ -17,6 +18,7 @@ namespace DaemonMC
         public static int GameMode = 0;
         public static int DrawDistance = 10;
         public static bool UnloadChunks = true;
+        public static bool HotReloading = true;
         internal static string Version = "unknown";
         internal static string GitHash = "unknown";
         public static void Main()
@@ -69,17 +71,17 @@ namespace DaemonMC
             Server.ServerClose();
         }
 
-        static void Command()
-        {
-            string cmd = Console.ReadLine();
-            switch (cmd)
-            {
+        private static void Command() {
+            
+            var cmd = Console.ReadLine();
+            switch (cmd) {
                 case "/help":
                     Log.line();
                     Log.info("/shutdown - Close server");
                     Log.info("/dev - Debugging mode");
                     Log.info("/list - Player list");
                     Log.info("/liste - Entity list");
+                    Log.info("/plugins - Plugins list");
                     Log.line();
                     break;
                 case "/list":
@@ -90,6 +92,10 @@ namespace DaemonMC
                     break;
                 case "/shutdown":
                     Server.ServerClose();
+                    break;
+                case "/plugins":
+                    var plugins = PluginManager.GetLoadedPlugins();
+                    Log.info($"Plugins list ({plugins.Count}): " + string.Join(", ", plugins.Select(x => $"{x.PluginInstance.GetName()} v{x.PluginInstance.GetVersion()}")));
                     break;
                 case "/dev":
                     Log.line();

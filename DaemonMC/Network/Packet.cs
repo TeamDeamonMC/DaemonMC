@@ -1,5 +1,5 @@
 ﻿using DaemonMC.Network.Bedrock;
-using DaemonMC.Plugin.Plugin;
+using DaemonMC.Plugin;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network

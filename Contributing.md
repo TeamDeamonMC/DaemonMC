@@ -4,7 +4,7 @@ DaemonMC is not supposed to be feature rich complete server software but core fo
 
 Before making pull request make sure it:
 
- - Contains only one fix (like "added camera api". Not like "added various events and methods")
+ - Contains only one change (like "added camera api". Not like "added various events and methods")
  - It follows same code style
  - It's tested and works on Windows and Linux operating systems
  - It contains only your code (not copy paste from someone else)

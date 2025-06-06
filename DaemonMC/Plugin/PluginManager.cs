@@ -1,11 +1,15 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Loader;
 using DaemonMC.Entities;
 using DaemonMC.Network;
+using DaemonMC.Network.Bedrock;
+using DaemonMC.Plugin.Events;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 
-namespace DaemonMC.Plugin.Plugin
+namespace DaemonMC.Plugin
 {
     public class PluginManager
     {
@@ -162,7 +166,7 @@ namespace DaemonMC.Plugin.Plugin
         {
             foreach (var plugin in _plugins)
             {
-                plugin.PluginInstance.OnPlayerJoined(player);
+                plugin.PluginInstance.OnPlayerJoined(new PlayerJoinedEvent(player));
             }
         }
 
@@ -170,49 +174,129 @@ namespace DaemonMC.Plugin.Plugin
         {
             foreach (var plugin in _plugins)
             {
-                plugin.PluginInstance.OnPlayerLeaved(player);
+                plugin.PluginInstance.OnPlayerLeaved(new PlayerLeavedEvent(player));
             }
         }
 
         public static void PlayerMove(Player player)
         {
+            var oldPosition = player.Position;
+            var ev = new PlayerMoveEvent(player);
+
             foreach (var plugin in _plugins)
             {
-                plugin.PluginInstance.OnPlayerMove(player);
+                plugin.PluginInstance.OnPlayerMove(ev);
+                if (!ev.IsCancelled)
+                {
+                    continue;
+                }
+                player.MoveTo(oldPosition);
             }
         }
 
         public static bool PacketReceived(IPEndPoint ep, Packet packet)
         {
+            var ev = new PacketEvent(ep, packet);
+
             foreach (var plugin in _plugins)
             {
-                return plugin.PluginInstance.OnPacketReceived(ep, packet);
+                plugin.PluginInstance.OnPacketReceived(ev);
+
+                if (ev.IsCancelled)
+                {
+                    return false;
+                }
             }
             return true;
         }
 
         public static bool PacketSent(IPEndPoint ep, Packet packet)
         {
+            var ev = new PacketEvent(ep, packet);
+
             foreach (var plugin in _plugins)
             {
-                return plugin.PluginInstance.OnPacketSent(ep, packet);
+                plugin.PluginInstance.OnPacketSent(ev);
+
+                if (ev.IsCancelled)
+                {
+                    return false;
+                }
             }
             return true;
         }
 
-        public static void EntityAttack(Player player, Entity entity)
+        public static void PlayerAttackedEntity(Player player, Entity entity)
         {
             foreach (var plugin in _plugins)
             {
-                plugin.PluginInstance.OnEntityAttack(player, entity);
+                plugin.PluginInstance.OnPlayerAttackedEntity(new PlayerAttackedEntityEvent(player, entity));
             }
         }
 
-        public static void PlayerAttack(Player player, Player victim)
+        public static void PlayerAttackedPlayer(Player player, Player victim)
         {
             foreach (var plugin in _plugins)
             {
-                plugin.PluginInstance.OnPlayerAttack(player, victim);
+                plugin.PluginInstance.OnPlayerAttackedPlayer(new PlayerAttackedPlayerEvent(player, victim));
+            }
+        }
+
+        public static void PlayerSentMessage(Player player, TextMessage textMessage)
+        {
+            var ev = new PlayerSentMessageEvent(player, textMessage);
+
+            foreach (var plugin in _plugins)
+            {
+                plugin.PluginInstance.OnPlayerSentMessage(ev);
+                if (ev.IsCancelled)
+                {
+                    continue;
+                }
+                var msg = new TextMessage
+                {
+                    MessageType = 1,
+                    Username = player.Username,
+                    Message = textMessage.Message
+                };
+                player.CurrentWorld.Send(msg);
+            }
+        }
+
+        public static void PlayerSkinChanged(Player player, PlayerSkin playerSkin)
+        {
+            var ev = new PlayerSkinChangedEvent(player, playerSkin);
+
+            foreach (var plugin in _plugins)
+            {
+                plugin.PluginInstance.OnPlayerSkinChanged(ev);
+
+                if (ev.IsCancelled)
+                {
+                    var pk = new PlayerSkin
+                    {
+                        UUID = player.UUID,
+                        Skin = player.Skin,
+                        Name = player.Skin.SkinId,
+                        OldName = player.Skin.SkinId,
+                        Trusted = player.Skin.PremiumSkin,
+                    };
+                    player.Send(pk);
+                    Log.error("cancel");
+                    continue;
+                }
+
+                var pk2 = new PlayerSkin
+                {
+                    UUID = player.UUID,
+                    Skin = playerSkin.Skin,
+                    Name = playerSkin.Name,
+                    OldName = player.Skin.SkinId,
+                    Trusted = playerSkin.Trusted,
+                };
+                player.CurrentWorld.Send(pk2);
+
+                player.Skin = playerSkin.Skin;
             }
         }
     }

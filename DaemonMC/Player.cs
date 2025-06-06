@@ -8,11 +8,12 @@ using DaemonMC.Utils;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Game;
-using DaemonMC.Plugin.Plugin;
+using DaemonMC.Plugin;
 using DaemonMC.Entities;
 using DaemonMC.Blocks;
 using DaemonMC.Forms;
 using Newtonsoft.Json;
+using DaemonMC.Plugin.Events;
 
 namespace DaemonMC
 {
@@ -690,13 +691,7 @@ namespace DaemonMC
 
             if (packet is TextMessage textMessage)
             {
-                var msg = new TextMessage
-                {
-                    MessageType = 1,
-                    Username = Username,
-                    Message = textMessage.Message
-                };
-                CurrentWorld.Send(msg);
+                PluginManager.PlayerSentMessage(this, textMessage);
             }
 
             if (packet is ServerboundLoadingScreen serverboundLoadingScreen)
@@ -710,17 +705,7 @@ namespace DaemonMC
 
             if (packet is PlayerSkin playerSkin)
             {
-                var pk = new PlayerSkin
-                {
-                    UUID = UUID,
-                    Skin = playerSkin.Skin,
-                    Name = playerSkin.Name,
-                    OldName = Skin.SkinId,
-                    Trusted = playerSkin.Trusted,
-                };
-                CurrentWorld.Send(pk);
-
-                Skin = playerSkin.Skin;
+                PluginManager.PlayerSkinChanged(this, playerSkin);
             }
 
             if (packet is CommandRequest commandRequest)
@@ -777,11 +762,11 @@ namespace DaemonMC
                 {
                     if (CurrentWorld.Entities.TryGetValue(inventoryTransaction.Transaction.EntityId, out Entity entity))
                     {
-                        PluginManager.EntityAttack(this, entity);
+                        PluginManager.PlayerAttackedEntity(this, entity);
                     }
                     if (CurrentWorld.OnlinePlayers.TryGetValue(inventoryTransaction.Transaction.EntityId, out Player player))
                     {
-                        PluginManager.PlayerAttack(this, player);
+                        PluginManager.PlayerAttackedPlayer(this, player);
                     }
                 }
             }

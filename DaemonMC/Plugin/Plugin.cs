@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using DaemonMC.Network;
 using DaemonMC.Plugin.Events;
+using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Plugin;
 
@@ -55,5 +56,15 @@ public abstract class Plugin : IPlugin {
     
     public string GetVersion() {
         return Version;
+    }
+
+    public void RegisterCommand(Command command, Action<CommandAction> action)
+    {
+        CommandManager.Register(this, command, action);
+    }
+
+    public void RegisterAnimation(string animationID, string controllerName, string animationName, string nextAnimationName = "")
+    {
+       ResourcePackManager.Animations.Add(animationID, new Animation(controllerName, animationName, nextAnimationName));
     }
 }

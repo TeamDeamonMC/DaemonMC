@@ -36,11 +36,6 @@ namespace DaemonMC
             Array.Copy(resourcePack.PackContent, start, chunk, 0, length);
             return chunk;
         }
-
-        public static void RegisterAnimation(string animationID, string controllerName, string animationName, string nextAnimationName = "")
-        {
-            Animations.Add(animationID, new Animation(controllerName, animationName, nextAnimationName));
-        }
     }
 
     public class resourceManifest

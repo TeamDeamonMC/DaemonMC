@@ -33,4 +33,4 @@ Plugin tutoral, API and other useful things can be found in [Wiki](https://githu
 
 Click here to learn how to create first plugin [Plugin tutorial](https://github.com/laz1444/DaemonMC/wiki/Plugin-tutorial)
 
-Want to contribute? That's really cool. Here's some useful information: [Contributing.md](https://github.com/laz1444/Contributing.md)
+Want to contribute? That's really cool. Here's some useful information: [Contributing.md](https://github.com/laz1444/DaemonMC/blob/main/Contributing.md)

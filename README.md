@@ -32,3 +32,5 @@ Just remember that because of the latest world format, players using older game 
 Plugin tutoral, API and other useful things can be found in [Wiki](https://github.com/laz1444/DaemonMC/wiki).
 
 Click here to learn how to create first plugin [Plugin tutorial](https://github.com/laz1444/DaemonMC/wiki/Plugin-tutorial)
+
+Want to contribute? That's really cool. Here's some useful information: [Contributing.md](https://github.com/laz1444/Contributing.md)

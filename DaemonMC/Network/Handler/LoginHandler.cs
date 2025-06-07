@@ -2,9 +2,11 @@
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
+using Newtonsoft.Json;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace DaemonMC.Network.Handler
@@ -14,10 +16,26 @@ namespace DaemonMC.Network.Handler
         public static void execute(Login packet, IPEndPoint clientEp)
         {
             byte[] jwtBuffer = Encoding.UTF8.GetBytes(packet.Request);
+            string filteredJWT;
 
-            string pattern = @"{""chain"":\[.*?\]}";
-            var match = Regex.Match(packet.Request, pattern);
-            var filteredJWT = match.Value;
+            if (packet.ProtocolVersion >= Info.v1_21_90)
+            {
+                var request = packet.Request.Substring(1).TrimStart().Split('\n')[0];
+
+                var json = JsonConvert.DeserializeObject<LoginJson>(request);
+                var certificateJsonString = json.Certificate;
+                var certificateJson = JsonDocument.Parse(certificateJsonString);
+                var chainArray = certificateJson.RootElement.GetProperty("chain");
+
+                filteredJWT = $"{{\"chain\":{chainArray.GetRawText()}}}";
+            }
+            else
+            {
+                string pattern = @"{""chain"":\[.*?\]}";
+                var match = Regex.Match(packet.Request, pattern);
+                filteredJWT = match.Value;
+            }
+
             int tokenStartIndex = Encoding.UTF8.GetBytes(filteredJWT).Length + 8;
             var Token = Encoding.UTF8.GetString(jwtBuffer, tokenStartIndex, jwtBuffer.Length - tokenStartIndex);
 
@@ -79,5 +97,11 @@ namespace DaemonMC.Network.Handler
                 pk.EncodePacket(encoder);
             }
         }
+    }
+
+    public class LoginJson
+    {
+        public int AuthenticationType { get; set; } = 0;
+        public string Certificate { get; set; } = "";
     }
 }

@@ -100,9 +100,16 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteString(LevelName); //level name?
             encoder.WriteString("");
+            if (encoder.protocolVersion >= Info.v1_21_90)
+            {
+                encoder.WriteString(""); //owner id idk
+            }
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                encoder.WriteSignedVarInt(2);
+                if (encoder.protocolVersion <= Info.v1_21_80)
+                {
+                    encoder.WriteSignedVarInt(2);
+                }
                 encoder.WriteSignedVarInt(40);
                 encoder.WriteBool(true);
                 //end of synced movement settings

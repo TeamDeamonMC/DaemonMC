@@ -692,8 +692,32 @@ namespace DaemonMC.Network
                 WriteVarInt(item.Aux);
                 WriteBool(false);
                 WriteSignedVarInt(0); //block runtime id.
-                WriteVarInt(0); //todo nbt
+                WriteItemData(item.Data);
             }
+        }
+
+        public void WriteItemData(NbtCompound nbt)
+        {
+            if (nbt == null)
+            {
+                WriteByte(0);
+                return;
+            }
+
+            nbt.Name = "";
+
+            var file = new NbtFile(nbt)
+            {
+                BigEndian = false,
+                UseVarInt = false
+            };
+
+            var itemData = new List<byte>();
+            itemData.AddRange(new List<byte> { 0xFF, 0xFF, 0x01 });
+            itemData.AddRange(file.SaveToBuffer(NbtCompression.None));
+            itemData.AddRange(new List<byte> { 0x00, 0x00 });
+
+            WriteBytes(itemData.ToArray(), true);
         }
 
         public void WriteOptional(Action writeFunction = null)

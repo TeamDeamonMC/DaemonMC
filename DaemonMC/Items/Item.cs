@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Items
+﻿using fNbt;
+
+namespace DaemonMC.Items
 {
     public abstract class Item
     {
@@ -8,6 +10,7 @@
         public bool ComponentBased { get; protected set; } = false;
         public ushort Count { get; set; } = 1;
         public int Aux { get; set; } = 0;
+        public NbtCompound Data { get; set; } = null;
 
         public Item Clone()
         {

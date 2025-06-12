@@ -1,12 +1,10 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Reflection;
 using System.Runtime.Loader;
 using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Plugin.Events;
-using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Plugin
@@ -20,10 +18,18 @@ namespace DaemonMC.Plugin
 
         public static void LoadPlugins(string pluginDirectory)
         {
+            var lib = Path.Combine(pluginDirectory, "SharedLibraries");
+
             if (!Directory.Exists(pluginDirectory))
             {
                 Log.warn($"{pluginDirectory}/ not found. Creating new folder...");
                 Directory.CreateDirectory(pluginDirectory);
+                Directory.CreateDirectory(lib);
+            }
+
+            foreach (var file in Directory.GetFiles(lib, "*.dll"))
+            {
+                LoadLibrary(file);
             }
 
             foreach (var file in Directory.GetFiles(pluginDirectory, "*.dll"))
@@ -44,10 +50,23 @@ namespace DaemonMC.Plugin
             _watcher.Renamed += (s, e) => HandlePluginRenamed(e.OldFullPath, e.FullPath);
         }
 
-        public static void LoadPlugin(string filePath)
+        public static void LoadLibrary(string filePath)
         {
-            Log.info($"Loading plugin: {filePath}");
+            var fullPath = Path.GetFullPath(filePath);
 
+            var loadContext = new PluginLoadContext(fullPath);
+
+            using var fs = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var ms = new MemoryStream();
+            fs.CopyTo(ms);
+            ms.Position = 0;
+            var assembly = loadContext.LoadFromStream(ms);
+
+            Log.info($"Loading library: {filePath}");
+        }
+
+        public static void LoadPlugin(string filePath, bool reloaded = false)
+        {
             var fullPath = Path.GetFullPath(filePath);
             var loadContext = new PluginLoadContext(fullPath);
 
@@ -62,7 +81,28 @@ namespace DaemonMC.Plugin
             {
                 if (typeof(Plugin).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                 {
+                    var attr = type.GetCustomAttribute<PluginInfo>();
+                    if (attr != null)
+                    {
+                        Log.info($"Loading plugin: {filePath} - {attr.Name} v{attr.Version}");
+                    }
+                    else
+                    {
+                        Log.error($"Plugin {filePath} can't be loaded. Missing metadata. Please check DaemonMC/wiki/Plugin-tutorial.");
+                        return;
+                    }
+
                     var pluginInstance = (Plugin)Activator.CreateInstance(type)!;
+
+                    if (reloaded)
+                    {
+                        if (pluginInstance is not HotReload)
+                        {
+                            Log.error($"Plugin {filePath} can't be loaded. This plugin doesn't support HotReload feature. Please restart server to enable this plugin.");
+                            return;
+                        }
+                        pluginInstance.OnReload();
+                    }
                     pluginInstance.OnLoad();
 
                     _plugins.Add(new LoadedPlugin
@@ -78,7 +118,7 @@ namespace DaemonMC.Plugin
         public static void ReloadPlugin(string file)
         {
             UnloadPlugin(file);
-            LoadPlugin(file);
+            LoadPlugin(file, true);
         }
 
         public static void UnloadPlugins()
@@ -110,6 +150,7 @@ namespace DaemonMC.Plugin
         {
             var plugin = _plugins.FirstOrDefault(p => p.Path == Path.GetFullPath(file));
             if (plugin == null) return;
+            if (plugin.PluginInstance is not HotReload) return;
 
             plugin.PluginInstance.OnUnload();
             plugin.LoadContext.Unload();
@@ -153,7 +194,7 @@ namespace DaemonMC.Plugin
 
             if (Path.GetExtension(newPath).Equals(".dll", StringComparison.OrdinalIgnoreCase))
             {
-                Task.Delay(500).ContinueWith(_ => LoadPlugin(newPath));
+                Task.Delay(500).ContinueWith(_ => LoadPlugin(newPath, true));
             }
         }
 

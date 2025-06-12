@@ -204,6 +204,16 @@ namespace DaemonMC
             Player = player;
             Data = data;
         }
+
+        public Player GetPlayer()
+        {
+            return Player;
+        }
+
+        public object[] GetData()
+        {
+            return Data;
+        }
     }
 
     public class CommandEnum

@@ -143,14 +143,13 @@ namespace DaemonMC
         public void Kick(string msg)
         {
             _ = Task.Run(async () => {
-                await Task.Delay(1000);
-
+                await Task.Delay(500);
                 var packet = new Disconnect
                 {
                     Message = msg
                 };
                 Send(packet);
-
+                await Task.Delay(500);
                 PacketEncoder encoder2 = PacketEncoderPool.Get(this);
                 var packet2 = new RakDisconnect
                 {

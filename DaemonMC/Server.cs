@@ -173,6 +173,20 @@ namespace DaemonMC
             return null;
         }
 
+        public static Player GetPlayer(string username)
+        {
+            var player = OnlinePlayers
+                .Values
+                .FirstOrDefault(p => p.Username == username);
+
+            if (player != null)
+            {
+                return player;
+            }
+
+            return null;
+        }
+
         public static Player GetPlayer(IPEndPoint ep)
         {
             return GetPlayer(RakSessionManager.getSession(ep).EntityID);

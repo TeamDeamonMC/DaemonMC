@@ -54,15 +54,16 @@ namespace DaemonMC.Plugin
         {
             var fullPath = Path.GetFullPath(filePath);
 
-            var loadContext = new PluginLoadContext(fullPath);
+            try
+            {
+                Assembly.LoadFrom(fullPath);
 
-            using var fs = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var ms = new MemoryStream();
-            fs.CopyTo(ms);
-            ms.Position = 0;
-            var assembly = loadContext.LoadFromStream(ms);
-
-            Log.info($"Loading library: {filePath}");
+                Log.info($"Loading library: {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Log.error($"Couldn't load library {filePath}: {ex.Message}");
+            }
         }
 
         public static void LoadPlugin(string filePath, bool reloaded = false)

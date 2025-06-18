@@ -20,7 +20,7 @@ namespace DaemonMC.Network.Handler
 
             if (packet.ProtocolVersion >= Info.v1_21_90)
             {
-                var request = packet.Request.Substring(1).TrimStart().Split('\n')[0];
+                var request = packet.Request.Substring(packet.Request.IndexOf('{')).TrimStart().Split('\n')[0];
 
                 var json = JsonConvert.DeserializeObject<LoginJson>(request);
                 var certificateJsonString = json.Certificate;

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Fence()
         {
             Name = "minecraft:fence";
-            Id = 754;
+            Id = 771;
             Version = 2;
             ComponentBased = false;
         }

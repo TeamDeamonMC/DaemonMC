@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Boat()
         {
             Name = "minecraft:boat";
-            Id = 793;
+            Id = 811;
             Version = 2;
             ComponentBased = false;
         }

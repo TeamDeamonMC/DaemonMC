@@ -1,11 +1,11 @@
 namespace DaemonMC.Items.VanillaItems
 {
-    public class Wool : Item
+    public class RedHarness : Item
     {
-        public Wool()
+        public RedHarness()
         {
-            Name = "minecraft:wool";
-            Id = 768;
+            Name = "minecraft:red_harness";
+            Id = 765;
             Version = 2;
             ComponentBased = false;
         }

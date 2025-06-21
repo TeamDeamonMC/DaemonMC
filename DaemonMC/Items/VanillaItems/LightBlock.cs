@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LightBlock()
         {
             Name = "minecraft:light_block";
-            Id = 792;
+            Id = 810;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StoneBlockSlab4()
         {
             Name = "minecraft:stone_block_slab4";
-            Id = 760;
+            Id = 777;
             Version = 2;
             ComponentBased = false;
         }

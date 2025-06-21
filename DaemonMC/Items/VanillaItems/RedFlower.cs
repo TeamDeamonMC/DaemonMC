@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RedFlower()
         {
             Name = "minecraft:red_flower";
-            Id = 771;
+            Id = 788;
             Version = 2;
             ComponentBased = false;
         }

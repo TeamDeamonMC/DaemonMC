@@ -1,11 +1,11 @@
 namespace DaemonMC.Items.VanillaItems
 {
-    public class Wool : Item
+    public class DriedGhast : Item
     {
-        public Wool()
+        public DriedGhast()
         {
-            Name = "minecraft:wool";
-            Id = 768;
+            Name = "minecraft:dried_ghast";
+            Id = -1027;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DoubleStoneBlockSlab3()
         {
             Name = "minecraft:double_stone_block_slab3";
-            Id = 763;
+            Id = 780;
             Version = 2;
             ComponentBased = false;
         }

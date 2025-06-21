@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Log2()
         {
             Name = "minecraft:log2";
-            Id = 776;
+            Id = 793;
             Version = 2;
             ComponentBased = false;
         }

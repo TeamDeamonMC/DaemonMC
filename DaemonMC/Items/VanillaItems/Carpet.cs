@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Carpet()
         {
             Name = "minecraft:carpet";
-            Id = 752;
+            Id = 769;
             Version = 2;
             ComponentBased = false;
         }

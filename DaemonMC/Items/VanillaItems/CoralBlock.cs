@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CoralBlock()
         {
             Name = "minecraft:coral_block";
-            Id = 756;
+            Id = 773;
             Version = 2;
             ComponentBased = false;
         }

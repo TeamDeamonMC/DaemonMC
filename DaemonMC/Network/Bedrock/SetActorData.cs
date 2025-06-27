@@ -9,6 +9,7 @@ namespace DaemonMC.Network.Bedrock
 
         public long EntityId { get; set; } = 0;
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();
+        public SynchedProperties Properties { get; set; } = new SynchedProperties();
         public long Tick { get; set; } = 0;
 
         protected override void Decode(PacketDecoder decoder)
@@ -20,8 +21,7 @@ namespace DaemonMC.Network.Bedrock
         {
             encoder.WriteVarLong((ulong) EntityId);
             encoder.WriteMetadata(Metadata);
-            encoder.WriteVarInt(0);
-            encoder.WriteVarInt(0); //todo here
+            encoder.WriteProperties(Properties);
             encoder.WriteVarLong((ulong) Tick);
         }
     }

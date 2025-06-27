@@ -4,7 +4,10 @@
     {
         public override Info.Bedrock Id => Info.Bedrock.Disconnect;
 
+        public int Reason { get; set; } = 0;
+        public bool SkipMessage { get; set; } = false;
         public string Message { get; set; } = "";
+        public string FilteredMessage { get; set; } = "";
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -13,10 +16,10 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(0);
-            encoder.WriteBool(false);
+            encoder.WriteVarInt(Reason);
+            encoder.WriteBool(SkipMessage);
             encoder.WriteString(Message);
-            encoder.WriteString("");
+            encoder.WriteString(FilteredMessage);
         }
     }
 }

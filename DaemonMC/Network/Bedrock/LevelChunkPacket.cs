@@ -6,6 +6,7 @@
 
         public int ChunkX { get; set; } = 0;
         public int ChunkZ { get; set; } = 0;
+        public int Dimension { get; set; } = 0;
         public int Count { get; set; } = 0;
         public byte[] Data { get; set; } = [];
 
@@ -18,7 +19,7 @@
         {
             encoder.WriteSignedVarInt(ChunkX);
             encoder.WriteSignedVarInt(ChunkZ);
-            encoder.WriteSignedVarInt(0);
+            encoder.WriteSignedVarInt(Dimension);
             encoder.WriteVarInt(Count);
             encoder.WriteBool(false);
             encoder.WriteBytes(Data);

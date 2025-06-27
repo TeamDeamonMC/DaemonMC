@@ -19,7 +19,7 @@ namespace DaemonMC.Network.Bedrock
         {
             encoder.WriteBlockNetPos(Position);
             encoder.WriteVarInt(Block.GetHash());
-            encoder.WriteVarInt(720912);
+            encoder.WriteVarInt(11);
             encoder.WriteVarInt(0);
         }
     }

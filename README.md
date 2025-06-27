@@ -1,8 +1,8 @@
 # DaemonMC
 **This software is still in development**
 
-Fast and lightweight server software for Minecraft: Bedrock Edition optimised for mini games.
-Instead of vanilla features and mechanics, this software will focus on performance, simplicity.
+Fast and lightweight server software for Minecraft: Bedrock Edition designed for mini games.
+Instead of vanilla features and mechanics, here game is completely driven by plugins. All DaemonMC provide is server core with simple API so you can add only what you need. No unnecessary server resources and network usage by various core features like block tick or mobs.
 Discord: [https://discord.gg/A6BBcXSCj4](https://discord.gg/A6BBcXSCj4)
 
 ## Getting started
@@ -28,8 +28,7 @@ Just remember that because of the latest world format, players using older game 
 
 **Multiworld:** You can have as many worlds as you want. Just specify spawn world name in ```DaemonMC.yaml``` and use API ([ChangeWorld(World, Vector3)](https://github.com/TeamDeamonMC/DaemonMC/wiki/Plugin-API-(Methods)#changeworldworld-vector3).) to transfer players to other worlds.
 
-**Simple plugin API:**  Instead of vanilla based mechanics, with this software game is completely driven by plugins.
-Plugin tutoral, API and other useful things can be found in [Wiki](https://github.com/TeamDeamonMC/DaemonMC/wiki).
+**Simple plugin API:** Plugin tutoral, API and other useful things can be found in [Wiki](https://github.com/TeamDeamonMC/DaemonMC/wiki).
 
 Click here to learn how to create first plugin [Plugin tutorial](https://github.com/TeamDeamonMC/DaemonMC/wiki/Plugin-tutorial)
 

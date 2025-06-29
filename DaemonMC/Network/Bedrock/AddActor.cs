@@ -29,7 +29,7 @@ namespace DaemonMC.Network.Bedrock
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteSignedVarLong(EntityId);
-            encoder.WriteVarLong((ulong)EntityId);
+            encoder.WriteVarLong(EntityId);
             encoder.WriteString(ActorType);
             encoder.WriteVec3(Position);
             encoder.WriteVec3(Velocity);

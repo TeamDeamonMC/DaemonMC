@@ -48,5 +48,12 @@ namespace DaemonMC.Blocks
             byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
             return Fnv1aHash.Hash32(saveToBuffer);
         }
+
+        public Block Clone()
+        {
+            var cloned = (Block)MemberwiseClone();
+            cloned.States = new Dictionary<string, object>(States);
+            return cloned;
+        }
     }
 }

@@ -113,7 +113,7 @@ namespace DaemonMC.Network
 
         public void PacketId(Info.Bedrock id)
         {
-            WriteVarInt((int)id);
+            WriteVarInt((uint)id);
         }
 
         public void WriteBool(bool value)
@@ -153,6 +153,16 @@ namespace DaemonMC.Network
 
         public void WriteVarInt(int value)
         {
+            WriteVarInt((uint)value);
+        }
+
+        public void WriteVarInt(uint value)
+        {
+            if (value < 0)
+            {
+                throw new InvalidOperationException($"WriteVarInt was called with a negative value ({value})");
+            }
+
             while ((value & -128) != 0)
             {
                 byteStream.WriteByte((byte)((value & 127) | 128));
@@ -164,7 +174,7 @@ namespace DaemonMC.Network
         public void WriteSignedVarInt(int value)
         {
             uint zigzagEncoded = (uint)((value << 1) ^ (value >> 31));
-            WriteVarInt((int)zigzagEncoded);
+            WriteVarInt(zigzagEncoded);
         }
 
         public void WriteShort(ushort value)
@@ -262,6 +272,11 @@ namespace DaemonMC.Network
 
         public void WriteVarLong(ulong value)
         {
+            if (value < 0)
+            {
+                throw new InvalidOperationException($"WriteVarLong was called with a negative value ({value})");
+            }
+
             while ((value & ~0x7FUL) != 0)
             {
                 byteStream.WriteByte((byte)((value & 0x7FUL) | 0x80UL));
@@ -385,7 +400,7 @@ namespace DaemonMC.Network
             WriteVarInt(metadata.Count);
             foreach (var entry in metadata)
             {
-                WriteVarInt((int)entry.Key);
+                WriteVarInt((uint)entry.Key);
 
                 switch (entry.Value.Value)
                 {

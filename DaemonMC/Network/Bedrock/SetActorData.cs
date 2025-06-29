@@ -19,10 +19,10 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong) EntityId);
+            encoder.WriteVarLong(EntityId);
             encoder.WriteMetadata(Metadata);
             encoder.WriteProperties(Properties);
-            encoder.WriteVarLong((ulong) Tick);
+            encoder.WriteVarLong(Tick);
         }
     }
 }

@@ -23,19 +23,19 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarLong((ulong)ActorRuntimeId);
+            encoder.WriteVarLong(ActorRuntimeId);
             encoder.WriteVec3(Position);
             encoder.WriteVec2(Rotation);
             encoder.WriteFloat(YheadRotation);
             encoder.WriteByte((byte)(Teleport ? 2 : 0));
             encoder.WriteBool(IsOnGround);
-            encoder.WriteVarLong((ulong)VehicleRuntimeId);
+            encoder.WriteVarLong(VehicleRuntimeId);
             if (Teleport)
             {
                 encoder.WriteInt(0); //tp cause
                 encoder.WriteInt(0); //???source actor type
             }
-            encoder.WriteVarLong((ulong)Tick);
+            encoder.WriteVarLong(Tick);
         }
     }
 }

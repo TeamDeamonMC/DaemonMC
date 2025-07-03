@@ -17,6 +17,7 @@ namespace DaemonMC
         public int Port { get; set; } = 19132;
         public bool ForcePacks { get; set; } = false;
         public bool XboxAuth { get; set; } = true;
+        public string Compression { get; set; } = "none";
         public bool Debug { get; set; } = false;
 
         public static void Set()
@@ -57,6 +58,7 @@ namespace DaemonMC
             DaemonMC.GameMode = ToGameMode(config.DefaultGamemode);
             DaemonMC.DrawDistance = config.DrawDistance;
             DaemonMC.UnloadChunks = config.UnloadChunks;
+            DaemonMC.Compression = ToCompressionType(config.Compression);
             Server.Port = config.Port;
             JWT.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;
@@ -75,6 +77,22 @@ namespace DaemonMC
                 default:
                     Log.warn($"Unknown GameMode {gameMode}. Check DaemonMC.yaml.");
                     return 2;
+            }
+        }
+
+        public static CompressionTypes ToCompressionType(string type)
+        {
+            switch (type.ToLower())
+            {
+                case "none":
+                    return CompressionTypes.None;
+                case "zlib":
+                    return CompressionTypes.ZLib;
+                case "snappy":
+                    return CompressionTypes.Snappy;
+                default:
+                    Log.warn($"Unknown Compression Types {type}. Check DaemonMC.yaml.");
+                    return CompressionTypes.None;
             }
         }
     }

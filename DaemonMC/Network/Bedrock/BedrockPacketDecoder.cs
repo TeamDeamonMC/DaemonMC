@@ -1,4 +1,5 @@
 ﻿using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
@@ -26,7 +27,21 @@ namespace DaemonMC.Network.Bedrock
             {
                 if (session.initCompression)
                 {
-                    decoder.ReadByte();
+                    CompressionTypes compression = (CompressionTypes)decoder.ReadByte();
+                    if (compression != CompressionTypes.None)
+                    {
+                        var compressedData = decoder.buffer.Skip(decoder.readOffset).ToArray();
+                        switch (compression)
+                        {
+                            case CompressionTypes.ZLib:
+                                decoder.buffer = Compression.DecompressZLib(compressedData);
+                                break;
+                            case CompressionTypes.Snappy:
+                                decoder.buffer = Compression.DecompressSnappy(compressedData);
+                                break;
+                        }
+                        decoder.readOffset = 0;
+                    }
                 }
                 if (Server.OnlinePlayers.ContainsKey(session.EntityID))
                 {

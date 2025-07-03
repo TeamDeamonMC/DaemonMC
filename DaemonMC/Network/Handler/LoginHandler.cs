@@ -17,30 +17,38 @@ namespace DaemonMC.Network.Handler
         {
             byte[] jwtBuffer = Encoding.UTF8.GetBytes(packet.Request);
             string filteredJWT;
+            string tokenJWT;
 
             if (packet.ProtocolVersion >= Info.v1_21_90)
             {
-                var request = packet.Request.Substring(packet.Request.IndexOf('{')).TrimStart().Split('\n')[0];
+                int jsonStart = packet.Request.IndexOf('{');
+                int jsonEnd = packet.Request.LastIndexOf("}");
 
-                var json = JsonConvert.DeserializeObject<LoginJson>(request);
-                var certificateJsonString = json.Certificate;
-                var certificateJson = JsonDocument.Parse(certificateJsonString);
-                var chainArray = certificateJson.RootElement.GetProperty("chain");
+                string jsonPart = packet.Request.Substring(jsonStart, jsonEnd - jsonStart + 1);
+
+                var loginJson = JsonConvert.DeserializeObject<LoginJson>(jsonPart);
+                var certJson = JsonDocument.Parse(loginJson.Certificate);
+                var chainArray = certJson.RootElement.GetProperty("chain");
 
                 filteredJWT = $"{{\"chain\":{chainArray.GetRawText()}}}";
+
+                byte[] jwtBytes = Encoding.UTF8.GetBytes(packet.Request);
+                int tokenStart = Encoding.UTF8.GetBytes(jsonPart).Length + 8;
+
+                tokenJWT = Encoding.UTF8.GetString(jwtBytes, tokenStart, jwtBytes.Length - tokenStart);
             }
             else
             {
                 string pattern = @"{""chain"":\[.*?\]}";
                 var match = Regex.Match(packet.Request, pattern);
                 filteredJWT = match.Value;
+
+                int tokenStart = Encoding.UTF8.GetBytes(filteredJWT).Length + 8;
+                tokenJWT = Encoding.UTF8.GetString(jwtBuffer, tokenStart, jwtBuffer.Length - tokenStart);
             }
 
-            int tokenStartIndex = Encoding.UTF8.GetBytes(filteredJWT).Length + 8;
-            var Token = Encoding.UTF8.GetString(jwtBuffer, tokenStartIndex, jwtBuffer.Length - tokenStartIndex);
-
             JWT.processJWTchain(filteredJWT, clientEp);
-            JWT.processJWTtoken(Token, clientEp);
+            JWT.processJWTtoken(tokenJWT, clientEp);
 
             var player = RakSessionManager.getSession(clientEp);
 

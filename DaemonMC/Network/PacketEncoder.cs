@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Net;
 using System.Numerics;
 using System.Text;
@@ -29,49 +30,47 @@ namespace DaemonMC.Network
 
         public void handlePacket(string type = "bedrock")
         {
-            byte[] trimmedBuffer = new byte[byteStream.Position];
-            Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
+            byte[] trimmedBuffer = byteStream.ToArray()[..(int)byteStream.Position];
+
             if (type == "bedrock")
             {
-                if (RakSessionManager.getSession(clientEp) == null)
-                {
-                    return;
-                }
+                var session = RakSessionManager.getSession(clientEp);
+                if (session == null) return;
 
-                var packetID = ToDataTypes.ReadVarInt(trimmedBuffer);
-
+                int packetID = ToDataTypes.ReadVarInt(trimmedBuffer);
                 Log.packetOut(clientEp, (Info.Bedrock)packetID);
-                byte[] bedrockId = new byte[] { 254 };
 
-                if (RakSessionManager.getSession(clientEp) != null)
+                bool useCompression = session.initCompression;
+                byte[] bedrockId = useCompression ? new byte[] { 254, (byte)DaemonMC.Compression } : new byte[] { 254 };
+
+                byte[] lengthVarInt = ToDataTypes.WriteVarint(trimmedBuffer.Length);
+
+                byte[] toCompress = lengthVarInt.Concat(trimmedBuffer).ToArray();
+
+                if (useCompression)
                 {
-                    if (RakSessionManager.getSession(clientEp).initCompression)
+                    switch (DaemonMC.Compression)
                     {
-                        bedrockId = new byte[] { 254, 255 };
+                        case CompressionTypes.ZLib:
+                            toCompress = Compression.CompressZLib(toCompress);
+                            break;
+                        case CompressionTypes.Snappy:
+                            toCompress = Compression.CompressSnappy(toCompress);
+                            break;
                     }
                 }
 
-                byte[] lengthVarInt = ToDataTypes.WriteVarint((int)byteStream.Position);
+                byte[] finalPacket = bedrockId.Concat(toCompress).ToArray();
 
-                byte[] header = new byte[bedrockId.Length + lengthVarInt.Length];
-                Array.Copy(bedrockId, 0, header, 0, bedrockId.Length);
-                Array.Copy(lengthVarInt, 0, header, bedrockId.Length, lengthVarInt.Length);
-
-                byte[] newtrimmedBuffer = new byte[trimmedBuffer.Length + header.Length];
-                Array.Copy(header, 0, newtrimmedBuffer, 0, header.Length);
-                Array.Copy(trimmedBuffer, 0, newtrimmedBuffer, header.Length, trimmedBuffer.Length);
-
-                byteStream.SetLength(0);
-                byteStream.Position = 0;
-
-                Reliability.ReliabilityHandler(this, newtrimmedBuffer);
+                ResetStream();
+                Reliability.ReliabilityHandler(this, finalPacket);
                 return;
             }
 
+
             Log.packetOut(clientEp, (Info.RakNet)trimmedBuffer[0]);
 
-            byteStream.SetLength(0);
-            byteStream.Position = 0;
+            ResetStream();
 
             if (trimmedBuffer[0] == 3)
             {
@@ -81,6 +80,12 @@ namespace DaemonMC.Network
             {
                 Reliability.ReliabilityHandler(this, trimmedBuffer);
             }
+        }
+
+        private void ResetStream()
+        {
+            byteStream.SetLength(0);
+            byteStream.Position = 0;
         }
 
         public void SendPacket(int pkid, bool pooled = true)

@@ -5,6 +5,7 @@ using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Game;
 using System.Numerics;
 using System.Reflection;
+using DaemonMC.Utils;
 
 namespace DaemonMC
 {
@@ -17,6 +18,7 @@ namespace DaemonMC
         public static int GameMode = 0;
         public static int DrawDistance = 10;
         public static bool UnloadChunks = true;
+        public static CompressionTypes Compression = CompressionTypes.None;
         internal static string Version = "unknown";
         internal static string GitHash = "unknown";
         public static void Main()

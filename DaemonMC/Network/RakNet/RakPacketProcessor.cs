@@ -62,7 +62,7 @@ namespace DaemonMC.Network.RakNet
         {
             var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
 
-            /*  foreach (var ack in packet.ACKs) todo enable after fixing Reliability line 187
+              foreach (var ack in packet.ACKs)// check Reliability line 187
               {
                   if (ack.singleSequence)
                   {
@@ -81,7 +81,7 @@ namespace DaemonMC.Network.RakNet
                           }
                       }
                   }
-              }*/
+              }
         }
 
         public static void NACK(NACKPacket packet, IPEndPoint clientEp)

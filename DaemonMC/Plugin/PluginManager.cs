@@ -104,7 +104,10 @@ namespace DaemonMC.Plugin
                         }
                         pluginInstance.OnReload();
                     }
-                    pluginInstance.OnLoad();
+                    else
+                    {
+                        pluginInstance.OnLoad();
+                    }
 
                     _plugins.Add(new LoadedPlugin
                     {

@@ -21,8 +21,8 @@ namespace DaemonMC.Network.Bedrock
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new NetworkSettings
                 {
-                    CompressionThreshold = 0,
-                    CompressionAlgorithm = 0,
+                    CompressionThreshold = 1,
+                    CompressionAlgorithm = (ushort)DaemonMC.Compression,
                     ClientThrottleEnabled = false,
                     ClientThrottleScalar = 0,
                     ClientThrottleThreshold = 0

@@ -5,6 +5,10 @@ Fast and lightweight server software for Minecraft: Bedrock Edition designed for
 Instead of vanilla features and mechanics, here game is completely driven by plugins. All DaemonMC provide is server core with simple API so you can add only what you need. No unnecessary server resources and network usage by various core features like block tick or mobs.
 Discord: [https://discord.gg/A6BBcXSCj4](https://discord.gg/A6BBcXSCj4)
 
+
+**Servers / Test servers running DaemonMC**
+csmpmg.minecraft.pe 19132
+
 ## Getting started
 
 Download latest .zip from [Releases](https://github.com/TeamDeamonMC/DaemonMC/releases). Unzip and run DaemonMC.exe.

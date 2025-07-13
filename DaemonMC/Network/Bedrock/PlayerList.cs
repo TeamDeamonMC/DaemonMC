@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class PlayerList : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.PlayerList;
+        public override int Id => (int) Info.Bedrock.PlayerList;
 
         public byte Action { get; set; } = 0;
         public Guid UUID { get; set; } = new Guid();

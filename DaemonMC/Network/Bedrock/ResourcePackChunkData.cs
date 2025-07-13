@@ -2,7 +2,7 @@
 {
     public class ResourcePackChunkData : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ResourcePackChunkData;
+        public override int Id => (int) Info.Bedrock.ResourcePackChunkData;
 
         public string PackName { get; set; } = "";
         public int Chunk { get; set; } = 0;

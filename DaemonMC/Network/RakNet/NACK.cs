@@ -1,30 +1,18 @@
-﻿using System.Net;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
-    public class NACKPacket
+    public class NACK : Packet
     {
-        public List<NACKdata> NACKs { get; set; }
-    }
+        public override int Id => (int) Info.RakNet.NACK;
 
-    public class NACKdata
-    {
-        public bool singleSequence { get; set; }
-        public uint sequenceNumber { get; set; }
-        public uint firstSequenceNumber { get; set; }
-        public uint lastSequenceNumber { get; set; }
-    }
+        public List<ACKdata> NACKs { get; set; } = new List<ACKdata>();
 
-    public class NACK
-    {
-        public static byte id = 160;
-        public static void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var NACKs = new List<NACKdata>();
+            var NACKlist = new List<ACKdata>();
             var count = decoder.ReadSignedShort();
             for (int i = 0; i < count; ++i)
             {
-                var NACK = new NACKdata();
+                var NACK = new ACKdata();
                 NACK.singleSequence = decoder.ReadBool();
                 if (NACK.singleSequence == true)
                 {
@@ -35,17 +23,12 @@ namespace DaemonMC.Network.RakNet
                     NACK.firstSequenceNumber = decoder.ReadUInt24LE();
                     NACK.lastSequenceNumber = decoder.ReadUInt24LE();
                 }
-                NACKs.Add(NACK);
+                NACKlist.Add(NACK);
+                NACKs = NACKlist;
             }
-            var packet = new NACKPacket
-            {
-                NACKs = NACKs
-            };
-
-            RakPacketProcessor.NACK(packet, decoder.clientEp);
         }
 
-        public static void Encode(ACKPacket fields)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

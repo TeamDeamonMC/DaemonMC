@@ -2,7 +2,7 @@
 {
     public class ResourcePackStack : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ResourcePackStack;
+        public override int Id => (int) Info.Bedrock.ResourcePackStack;
 
         public bool ForceTexturePack { get; set; } = false;
         public List<ResourcePack> Packs { get; set; } = new List<ResourcePack>();

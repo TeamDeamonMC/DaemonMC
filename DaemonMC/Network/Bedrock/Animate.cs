@@ -2,7 +2,7 @@
 {
     public class Animate : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.Animate;
+        public override int Id => (int) Info.Bedrock.Animate;
 
         public int Action { get; set; } = 0;
         public long EntityId { get; set; } = 0;

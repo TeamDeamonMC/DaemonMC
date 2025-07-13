@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class SyncActorProperty : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SyncActorProperty;
+        public override int Id => (int) Info.Bedrock.SyncActorProperty;
 
         public NbtCompound Data { get; set; } = new NbtCompound("");
 

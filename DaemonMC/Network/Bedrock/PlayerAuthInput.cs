@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class PlayerAuthInput : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.PlayerAuthInput;
+        public override int Id => (int) Info.Bedrock.PlayerAuthInput;
 
         public Vector2 Rotation { get; set; } = new Vector2();
         public Vector3 Position { get; set; } = new Vector3();

@@ -6,7 +6,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class InventorySlot : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.InventorySlot;
+        public override int Id => (int) Info.Bedrock.InventorySlot;
 
         public int ContainerID { get; set; } = 0;
         public int Slot { get; set; } = 0;

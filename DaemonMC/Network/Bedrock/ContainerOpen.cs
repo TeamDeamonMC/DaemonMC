@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class ContainerOpen : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ContainerOpen;
+        public override int Id => (int) Info.Bedrock.ContainerOpen;
 
         public byte ContainerId { get; set; } = 0;
         public byte ContainerType { get; set; } = 0;

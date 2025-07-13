@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class ItemRegistry : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ItemRegistry;
+        public override int Id => (int) Info.Bedrock.ItemRegistry;
 
         public Dictionary<short, Item> Items { get; set; } = new Dictionary<short, Item>();
 

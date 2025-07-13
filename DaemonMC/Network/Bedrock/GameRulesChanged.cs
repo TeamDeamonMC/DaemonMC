@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class GameRulesChanged : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.GameRulesChanged;
+        public override int Id => (int) Info.Bedrock.GameRulesChanged;
 
         public Dictionary<string, GameRule> GameRules { get; set; } = new Dictionary<string, GameRule>();
 

@@ -3,7 +3,7 @@
 
     public class PacketViolationWarning : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.PacketViolationWarning;
+        public override int Id => (int) Info.Bedrock.PacketViolationWarning;
 
         public int Type { get; set; } = 0;
         public int Serverity { get; set; } = 0;

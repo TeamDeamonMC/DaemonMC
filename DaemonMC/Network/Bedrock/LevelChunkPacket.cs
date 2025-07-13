@@ -2,7 +2,7 @@
 {
     public class LevelChunk : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.LevelChunk;
+        public override int Id => (int) Info.Bedrock.LevelChunk;
 
         public int ChunkX { get; set; } = 0;
         public int ChunkZ { get; set; } = 0;

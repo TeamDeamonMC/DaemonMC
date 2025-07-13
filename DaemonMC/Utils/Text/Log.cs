@@ -16,6 +16,7 @@ namespace DaemonMC.Utils.Text
 
         public static bool debugMode = false;
         public static bool pkLog = false;
+        public static bool raLog = false;
         public static void debug(string message, ConsoleColor color = ConsoleColor.Gray)
         {
             if (debugMode)
@@ -27,16 +28,16 @@ namespace DaemonMC.Utils.Text
         }
         public static void packetIn(IPEndPoint clientEp, Info.RakNet id)
         {
-            if (ignoredRakPackets.Contains(id) || !pkLog) { return; }
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            if (ignoredRakPackets.Contains(id) || !raLog) { return; }
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
             Console.ResetColor();
         }
 
         public static void packetOut(IPEndPoint clientEp, Info.RakNet id)
         {
-            if (ignoredRakPackets.Contains(id) || !pkLog) { return; }
-            Console.ForegroundColor = ConsoleColor.DarkGray;
+            if (ignoredRakPackets.Contains(id) || !raLog) { return; }
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
             Console.ResetColor();
         }

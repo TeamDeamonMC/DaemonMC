@@ -2,7 +2,7 @@
 {
     public class ModalFormRequest : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ModalFormRequest;
+        public override int Id => (int) Info.Bedrock.ModalFormRequest;
 
         public int ID { get; set; } = 0;
         public string Data { get; set; } = "";

@@ -1,32 +1,26 @@
-﻿using System;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
-    public class OpenConnectionReply1Packet
+    public class OpenConnectionReply1 : Packet
     {
+        public override int Id => (int) Info.RakNet.OpenConnectionReply1;
+
         public string Magic { get; set; }
         public long GUID { get; set; }
         public bool Security { get; set; }
         public int Cookie { get; set; }
         public int Mtu { get; set; }
-    }
 
-    public class OpenConnectionReply1
-    {
-        public static byte id = 6;
-        public static void Decode(byte[] buffer)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(OpenConnectionReply1Packet fields, PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(id);
-            encoder.WriteMagic(fields.Magic);
-            encoder.WriteLongLE(fields.GUID);
+            encoder.WriteMagic(Magic);
+            encoder.WriteLongLE(GUID);
             encoder.WriteByte(0);
-            encoder.WriteShortBE((ushort)fields.Mtu);
-            encoder.SendPacket(id);
+            encoder.WriteShortBE((ushort)Mtu);
         }
     }
 }

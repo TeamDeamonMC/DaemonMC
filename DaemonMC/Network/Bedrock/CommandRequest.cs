@@ -2,7 +2,7 @@
 {
     public class CommandRequest : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.CommandRequest;
+        public override int Id => (int) Info.Bedrock.CommandRequest;
 
         public string Command { get; set; } = "";
 

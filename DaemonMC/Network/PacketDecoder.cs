@@ -35,39 +35,36 @@ namespace DaemonMC.Network
             var pkid = decoder.ReadByte();
             if (pkid <= 127 || pkid >= 141) { Log.packetIn(decoder.clientEp, (Info.RakNet)pkid); }
 
+            switch ((Info.RakNet)pkid)
+            {
+                case Info.RakNet.UnconnectedPing:
+                    new UnconnectedPing().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
+                case Info.RakNet.OpenConnectionRequest1:
+                    new OpenConnectionRequest1().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
+                case Info.RakNet.OpenConnectionRequest2:
+                    new OpenConnectionRequest2().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
+                case Info.RakNet.ACK:
+                    new ACK().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
+                case Info.RakNet.NACK:
+                    new NACK().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
+                default:
+                    if (pkid >= 128 && pkid <= 141)
+                    {
+                        Reliability.ReliabilityHandler(decoder, recv);
+                    }
+                    else
+                    {
+                        Log.error($"[Server] Unknown RakNet packet: {pkid}");
+                        ToDataTypes.HexDump(decoder.buffer, recv);
+                    }
+                    break;
+            }
 
-            if (pkid == UnconnectedPing.id)
-            {
-                UnconnectedPing.Decode(decoder);
-            }
-            else if (pkid == OpenConnectionRequest1.id)
-            {
-                OpenConnectionRequest1.Decode(decoder, recv);
-            }
-            else if (pkid == OpenConnectionRequest2.id)
-            {
-                OpenConnectionRequest2.Decode(decoder);
-            }
-            else if (pkid == ACK.id)
-            {
-                ACK.Decode(decoder);
-            }
-            else if (pkid == NACK.id)
-            {
-                NACK.Decode(decoder);
-            }
-            else
-            {
-                if (pkid >= 128 && pkid <= 141) // Frame Set Packet
-                {
-                    Reliability.ReliabilityHandler(decoder, recv);
-                }
-                else
-                {
-                    Log.error($"[Server] Unknown RakNet packet: {pkid}");
-                    ToDataTypes.HexDump(buffer, recv);
-                }
-            }
             if (decoder.readOffset < recv)
             {
                 Log.warn($"{recv - decoder.readOffset} bytes left while reading {(Info.RakNet)pkid}");
@@ -82,33 +79,28 @@ namespace DaemonMC.Network
             {
                 PacketDecoder decoder = PacketDecoderPool.Get(buffer, decoderT.clientEp);
                 var pkid = decoder.ReadByte();
-                if (pkid != 254) { Log.packetIn(decoder.clientEp, (Info.RakNet)pkid); }
-                if (pkid == ConnectionRequest.id)
+                Log.packetIn(decoder.clientEp, (Info.RakNet)pkid);
+
+                switch ((Info.RakNet)pkid)
                 {
-                    ConnectionRequest.Decode(decoder);
-                }
-                else if (pkid == NewIncomingConnection.id)
-                {
-                    NewIncomingConnection.Decode(decoder);
-                }
-                else if (pkid == ConnectedPing.id)
-                {
-                    ConnectedPing.Decode(decoder);
-                }
-                else if (pkid == (byte)Info.RakNet.Disconnect)
-                {
-                    new RakDisconnect().Decode(decoder);
-                }
-                else
-                {
-                    if (pkid == 254)
-                    {
-                        BedrockPacketDecoder.BedrockDecoder(decoder);
-                    }
-                    else
-                    {
-                        Log.error($"[Server] Unknown RakNet packet2: {pkid}");
-                    }
+                    case Info.RakNet.ConnectionRequest:
+                        new ConnectionRequest().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
+                    case Info.RakNet.NewIncomingConnection:
+                        new NewIncomingConnection().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
+                    case Info.RakNet.ConnectedPing:
+                        new ConnectedPing().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
+                    case Info.RakNet.Disconnect:
+                        new RakDisconnect().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
+                    case Info.RakNet.GamePacket:
+                        new GamePacket().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
+                    default:
+                        Log.error($"[Server] Unknown RakNet packet: {pkid}");
+                        break;
                 }
                 if (decoder.readOffset < decoder.buffer.Length && pkid != 254)
                 {
@@ -297,15 +289,18 @@ namespace DaemonMC.Network
             {
                 ipAddressInfo.IPAddress = new byte[4];
                 Array.Copy(buffer, readOffset, ipAddressInfo.IPAddress, 0, 4);
-                ipAddressInfo.Port = BitConverter.ToUInt16(buffer, readOffset + 4);
-                readOffset += 6;
+                readOffset += 4;
+                ipAddressInfo.Port = ReadShort();
             }
             else if (ipVersion == 6)
             {
+                ReadShort(); //address family
+                ipAddressInfo.Port = ReadShort();
+                ReadInt(); //idk
                 ipAddressInfo.IPAddress = new byte[16];
-                Array.Copy(buffer, readOffset + 4, ipAddressInfo.IPAddress, 0, 16);
-                ipAddressInfo.Port = BitConverter.ToUInt16(buffer, readOffset + 2);
-                readOffset += 32;
+                Array.Copy(buffer, readOffset, ipAddressInfo.IPAddress, 0, 16);
+                readOffset += 16;
+                ReadInt(); //also idk
             }
 
             return ipAddressInfo;
@@ -315,33 +310,20 @@ namespace DaemonMC.Network
         {
             List<IPAddressInfo> internalAddresses = new List<IPAddressInfo>();
 
-            while (buffer.Length - readOffset > 16)
+            for (int i = 0; i < 20; i++)
             {
-                byte ipVersion = buffer[readOffset++];
+                byte ipVersion = buffer[readOffset];
                 IPAddressInfo ipAddressInfo = new IPAddressInfo();
 
-                if (ipVersion == 4)
+                if ((ipVersion == 4 && buffer.Length - readOffset > 16 + 6) || (ipVersion == 6 && buffer.Length - readOffset > 16 + 28))
                 {
-                    if (buffer.Length - readOffset < 6) break;
-                    ipAddressInfo.IPAddress = new byte[4];
-                    Array.Copy(buffer, readOffset, ipAddressInfo.IPAddress, 0, 4);
-                    ipAddressInfo.Port = BitConverter.ToUInt16(buffer, readOffset + 4);
-                    readOffset += 6;
-                }
-                else if (ipVersion == 6)
-                {
-                    if (buffer.Length - readOffset < 31) break;
-                    ipAddressInfo.IPAddress = new byte[16];
-                    ipAddressInfo.Port = BitConverter.ToUInt16(buffer, readOffset + 2);
-                    Array.Copy(buffer, readOffset + 4, ipAddressInfo.IPAddress, 0, 16);
-                    readOffset += 32;
+                    internalAddresses.Add(ReadAddress());
                 }
                 else
                 {
+                    Log.warn($"Unknown IP version {ipVersion}");
                     break;
                 }
-
-                internalAddresses.Add(ipAddressInfo);
             }
 
             return internalAddresses.ToArray();

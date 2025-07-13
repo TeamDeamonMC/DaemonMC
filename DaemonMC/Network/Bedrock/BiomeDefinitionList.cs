@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class BiomeDefinitionList : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.BiomeDefinitionList;
+        public override int Id => (int) Info.Bedrock.BiomeDefinitionList;
 
         public List<Biome> BiomeData { get; set; } = new List<Biome>();
 

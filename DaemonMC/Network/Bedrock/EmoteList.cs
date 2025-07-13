@@ -2,7 +2,7 @@
 {
     public class EmoteList : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.EmoteList;
+        public override int Id => (int) Info.Bedrock.EmoteList;
 
         public long ActorRuntimeId { get; set; } = 0;
         public List<Guid> EmoteIds { get; set; } = new List<Guid>();

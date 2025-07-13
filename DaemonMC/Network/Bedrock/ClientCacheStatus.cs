@@ -2,7 +2,7 @@
 {
     public class ClientCacheStatus : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ClientCacheStatus;
+        public override int Id => (int) Info.Bedrock.ClientCacheStatus;
 
         public bool Status { get; set; } = false;
 

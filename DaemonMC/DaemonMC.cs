@@ -82,7 +82,15 @@ namespace DaemonMC
                     Log.info("/dev - Debugging mode");
                     Log.info("/list - Player list");
                     Log.info("/liste - Entity list");
+                    Log.info("/belog - Toggle Bedrock packet logger");
+                    Log.info("/raklog - Toggle RakNet packet logger");
                     Log.line();
+                    break;
+                case "/belog":
+                    Log.pkLog = !Log.pkLog;
+                    break;
+                case "/raklog":
+                    Log.raLog = !Log.raLog;
                     break;
                 case "/list":
                     Playerlist();
@@ -224,16 +232,6 @@ namespace DaemonMC
                     else
                     {
                         Log.info("Usage: /packet <PacketName> <Field1=Value1> <Field2=Value2> ...");
-                    }
-                    break;
-                case "/pklog":
-                    if (parts.Length == 2 && bool.TryParse(parts[1], out bool boolValue))
-                    {
-                        Log.pkLog = boolValue;
-                    }
-                    else
-                    {
-                        Log.error("Invalid usage. /pklog <Enable (bool)>");
                     }
                     break;
                 case "/actorflags":

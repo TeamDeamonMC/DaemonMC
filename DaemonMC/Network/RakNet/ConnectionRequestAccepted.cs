@@ -1,21 +1,18 @@
 ﻿namespace DaemonMC.Network.RakNet
 {
-    public class ConnectionRequestAcceptedPacket
+    public class ConnectionRequestAccepted : Packet
     {
-        public long Time { get; set; }
-    }
+        public override int Id => (int) Info.RakNet.ConnectionRequestAccepted;
 
-    public class ConnectionRequestAccepted
-    {
-        public static byte id = 16;
-        public static void Decode(byte[] buffer)
+        public long Time { get; set; }
+
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(ConnectionRequestAcceptedPacket fields, PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(id);
             encoder.WriteAddress();
             encoder.WriteShort(0);
 
@@ -24,9 +21,8 @@
                 encoder.WriteAddress();
             }
 
-            encoder.WriteLongLE(fields.Time);
+            encoder.WriteLongLE(Time);
             encoder.WriteLongLE(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            encoder.handlePacket("raknet");
         }
     }
 }

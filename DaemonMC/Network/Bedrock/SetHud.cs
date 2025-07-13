@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class SetHud : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetHud;
+        public override int Id => (int) Info.Bedrock.SetHud;
 
         public Dictionary<HudElements, bool> HudElements { get; set; } = new Dictionary<HudElements, bool>();
 

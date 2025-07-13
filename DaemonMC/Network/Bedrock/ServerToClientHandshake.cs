@@ -2,7 +2,7 @@
 {
     public class ServerToClientHandshake : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ServerToClientHandshake;
+        public override int Id => (int) Info.Bedrock.ServerToClientHandshake;
 
         public string JWT { get; set; } = "";
 

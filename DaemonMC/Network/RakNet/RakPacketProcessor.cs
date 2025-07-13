@@ -1,131 +1,140 @@
 ﻿using System.Net;
+using DaemonMC.Network.Bedrock;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.RakNet
 {
     public class RakPacketProcessor
     {
-        public static int mtuMax = 1500;
-        public static void UnconnectedPing(UnconnectedPingPacket packet, IPEndPoint clientEp)
+        internal static void HandlePacket(Packet packet, IPEndPoint clientEp)
         {
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new UnconnectedPongPacket
+            if (packet is UnconnectedPing unconnectedPing)
             {
-                Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                GUID = 1234567890123456789,
-                Magic = "00ffff00fefefefefdfdfdfd12345678",
-                MOTD = $"MCPE;{DaemonMC.Servername};100;{Info.Version};0;{DaemonMC.MaxOnline};12345678912345678912;{DaemonMC.Worldname};Survival;1;19132;19133;"
-            };
-            UnconnectedPong.Encode(pk, encoder);
-        }
-
-        public static void OpenConnectionRequest1(OpenConnectionRequest1Packet packet, IPEndPoint clientEp)
-        {
-            Log.debug($"{clientEp.Address} requested MTU size:{packet.Mtu}. Replying with MTU size:{packet.Mtu} ...");
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new OpenConnectionReply1Packet
-            {
-                Magic = "00ffff00fefefefefdfdfdfd12345678",
-                GUID = 1234567890123456789,
-                Mtu = packet.Mtu
-            };
-            OpenConnectionReply1.Encode(pk, encoder);
-        }
-
-        public static void OpenConnectionRequest2(OpenConnectionRequest2Packet packet, IPEndPoint clientEp)
-        {
-            Log.debug($"{clientEp.Address} accepted connection with MTU size:{packet.Mtu}");
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new OpenConnectionReply2Packet
-            {
-                Magic = "00ffff00fefefefefdfdfdfd12345678",
-                GUID = 1234567890123456789,
-                Mtu = packet.Mtu
-            };
-            RakSessionManager.getSession(clientEp).MTU = packet.Mtu;
-            OpenConnectionReply2.Encode(pk, encoder);
-        }
-
-        public static void ConnectionRequest(ConnectionRequestPacket packet, IPEndPoint clientEp)
-        {
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new ConnectionRequestAcceptedPacket
-            {
-                Time = packet.Time,
-            };
-            RakSessionManager.addSession(clientEp, packet.GUID);
-            //Console.WriteLine($"[Connection Request] --clientId: {packet.GUID}  time: {packet.Time} security: {packet.Security}");
-            ConnectionRequestAccepted.Encode(pk, encoder);
-        }
-
-        public static void ACK(ACKPacket packet, IPEndPoint clientEp)
-        {
-            var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
-
-              foreach (var ack in packet.ACKs)// check Reliability line 187
-              {
-                  if (ack.singleSequence)
-                  {
-                      if (!sentPackets.Remove(ack.sequenceNumber, out var data))
-                      {
-                          Log.debug($"[RakNet] Unable to ACK {ack.sequenceNumber} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
-                      }
-                  }
-                  else
-                  {
-                      for (uint seq = ack.firstSequenceNumber; seq <= ack.lastSequenceNumber; seq++)
-                      {
-                          if (!sentPackets.Remove(seq, out var data))
-                          {
-                              Log.debug($"[RakNet] Unable to ACK {seq} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
-                          }
-                      }
-                  }
-              }
-        }
-
-        public static void NACK(NACKPacket packet, IPEndPoint clientEp)
-        {
-            foreach (var nack in packet.NACKs)
-            {
-                if (nack.singleSequence)
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new UnconnectedPong
                 {
-                    Reliability.ResendPacket(nack.sequenceNumber, clientEp);
-                }
-                else
+                    Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                    GUID = 1234567890123456789,
+                    Magic = "00ffff00fefefefefdfdfdfd12345678",
+                    MOTD = $"MCPE;{DaemonMC.Servername};100;{Info.Version};0;{DaemonMC.MaxOnline};12345678912345678912;{DaemonMC.Worldname};Survival;1;19132;19133;"
+                };
+                pk.EncodePacket(encoder);
+            }
+
+            if (packet is OpenConnectionRequest1 openConnectionRequest1)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new OpenConnectionReply1
                 {
-                    for (uint seq = nack.firstSequenceNumber; seq <= nack.lastSequenceNumber; seq++)
+                    Magic = "00ffff00fefefefefdfdfdfd12345678",
+                    GUID = 1234567890123456789,
+                    Mtu = openConnectionRequest1.Mtu
+                };
+                pk.EncodePacket(encoder);
+                Log.debug($"{clientEp} requested MTU size:{openConnectionRequest1.Mtu}. Replying with MTU size:{openConnectionRequest1.Mtu} ...");
+            }
+
+            if (packet is OpenConnectionRequest2 openConnectionRequest2)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new OpenConnectionReply2
+                {
+                    Magic = "00ffff00fefefefefdfdfdfd12345678",
+                    GUID = 1234567890123456789,
+                    Mtu = openConnectionRequest2.Mtu
+                };
+                RakSessionManager.getSession(clientEp).MTU = openConnectionRequest2.Mtu;
+                pk.EncodePacket(encoder);
+                Log.debug($"... {clientEp} accepted connection with MTU size:{openConnectionRequest2.Mtu}");
+            }
+
+            if (packet is ConnectionRequest connectionRequest)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new ConnectionRequestAccepted
+                {
+                    Time = connectionRequest.Time,
+                };
+                RakSessionManager.addSession(clientEp, connectionRequest.GUID);
+                pk.EncodePacket(encoder);
+            }
+
+            if (packet is ACK ack)
+            {
+                var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
+
+                foreach (var acks in ack.ACKs)
+                {
+                    if (acks.singleSequence)
                     {
-                        Reliability.ResendPacket(seq, clientEp);
+                        if (!sentPackets.Remove(acks.sequenceNumber, out var data))
+                        {
+                            Log.debug($"[RakNet] Unable to ACK {acks.sequenceNumber} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
+                        }
+                    }
+                    else
+                    {
+                        for (uint seq = acks.firstSequenceNumber; seq <= acks.lastSequenceNumber; seq++)
+                        {
+                            if (!sentPackets.Remove(seq, out var data))
+                            {
+                                Log.debug($"[RakNet] Unable to ACK {seq} for {clientEp.Address}. Unexpected sequence number.", ConsoleColor.DarkYellow);
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        public static void NewIncomingConnection(NewIncomingConnectionPacket packet, IPEndPoint clientEp)
-        {
-            Log.debug($"[RakNet] New Connection: {clientEp.Address} incommingTime: {packet.incommingTime} serverTime: {packet.incommingTime}", ConsoleColor.DarkYellow);
-            //Log.warn($"NewIncomingConnectionPacket: {packet.serverAddress.IPAddress[0]}.{packet.serverAddress.IPAddress[1]}.{packet.serverAddress.IPAddress[2]}.{packet.serverAddress.IPAddress[3]}:{packet.serverAddress.Port} / {packet.incommingTime} / {packet.serverTime} / {packet.internalAddress.Count()}");
-        }
-
-        public static void ConnectedPing(ConnectedPingPacket packet, IPEndPoint clientEp)
-        {
-            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-            var pk = new ConnectedPongPacket
+            if (packet is NACK nack)
             {
-                pingTime = packet.Time,
-                pongTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            };
-            ConnectedPong.Encode(pk, encoder);
-        }
-
-        public static void Disconnect(RakDisconnectPacket packet, IPEndPoint clientEp)
-        {
-            if (RakSessionManager.getSession(clientEp) != null)
-            {
-                Server.RemovePlayer(RakSessionManager.getSession(clientEp).EntityID);
+                foreach (var nacks in nack.NACKs)
+                {
+                    if (nacks.singleSequence)
+                    {
+                        Reliability.ResendPacket(nacks.sequenceNumber, clientEp);
+                    }
+                    else
+                    {
+                        for (uint seq = nacks.firstSequenceNumber; seq <= nacks.lastSequenceNumber; seq++)
+                        {
+                            Reliability.ResendPacket(seq, clientEp);
+                        }
+                    }
+                }
             }
-            RakSessionManager.deleteSession(clientEp);
+
+            if (packet is NewIncomingConnection newIncomingConnection)
+            {
+                DateTimeOffset incomingTime = DateTimeOffset.FromUnixTimeSeconds(newIncomingConnection.incommingTime);
+                DateTimeOffset serverTime = DateTimeOffset.FromUnixTimeSeconds(newIncomingConnection.serverTime);
+
+                Log.debug($"[RakNet] New Connection: {clientEp.Address} incommingTime: {incomingTime.ToString("yyyy.MM.dd HH:mm:ss")} serverTime: {serverTime.ToString("yyyy.MM.dd HH:mm:ss")}", ConsoleColor.DarkYellow);
+            }
+
+            if (packet is ConnectedPing connectedPing)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new ConnectedPong
+                {
+                    pingTime = connectedPing.Time,
+                    pongTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                };
+                pk.EncodePacket(encoder);
+            }
+
+            if (packet is GamePacket gamePacket)
+            {
+                BedrockPacketDecoder.BedrockDecoder(PacketDecoderPool.Get(gamePacket.Payload, clientEp));
+            }
+
+            if (packet is RakDisconnect disconnect)
+            {
+                if (RakSessionManager.getSession(clientEp) != null)
+                {
+                    Server.RemovePlayer(RakSessionManager.getSession(clientEp).EntityID);
+                }
+                RakSessionManager.deleteSession(clientEp);
+            }
         }
     }
 }

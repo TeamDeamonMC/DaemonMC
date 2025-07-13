@@ -2,7 +2,7 @@
 {
     public class Disconnect : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.Disconnect;
+        public override int Id => (int) Info.Bedrock.Disconnect;
 
         public int Reason { get; set; } = 0;
         public bool SkipMessage { get; set; } = false;

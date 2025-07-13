@@ -2,7 +2,7 @@
 {
     public class NetworkSettings : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.NetworkSettings;
+        public override int Id => (int) Info.Bedrock.NetworkSettings;
 
         public ushort CompressionThreshold { get; set; } = 0;
         public ushort CompressionAlgorithm { get; set; } = 0;

@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class SetActorMotion : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetActorMotion;
+        public override int Id => (int) Info.Bedrock.SetActorMotion;
 
         public long EntityId { get; set; } = 0;
         public Vector3 Motion { get; set; } = new Vector3();

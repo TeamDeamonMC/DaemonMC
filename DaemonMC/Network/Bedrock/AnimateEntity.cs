@@ -2,7 +2,7 @@
 {
     public class AnimateEntity : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.AnimateEntity;
+        public override int Id => (int) Info.Bedrock.AnimateEntity;
 
         public string Animation { get; set; } = "";
         public string NextState { get; set; } = "";

@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class PlayerSkin : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.PlayerSkin;
+        public override int Id => (int) Info.Bedrock.PlayerSkin;
 
         public Guid UUID { get; set; } = Guid.NewGuid();
         public Skin Skin { get; set; } = new Skin();

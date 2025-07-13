@@ -154,7 +154,7 @@ namespace DaemonMC
                 var packet2 = new RakDisconnect
                 {
                 };
-                packet2.Encode(encoder2);
+                packet2.EncodePacket(encoder2);
                 Server.RemovePlayer(EntityID);
                 RakSessionManager.deleteSession(ep);
             });

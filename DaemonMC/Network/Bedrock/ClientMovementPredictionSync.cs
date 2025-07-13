@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class ClientMovementPredictionSync : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ClientMovementPredictionSync;
+        public override int Id => (int) Info.Bedrock.ClientMovementPredictionSync;
 
         public List<ActorFlags> ActorData { get; set; } = new List<ActorFlags>();
         public float Scale { get; set; } = 0;

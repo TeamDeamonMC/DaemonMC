@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class UpdateBlock : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.UpdateBlock;
+        public override int Id => (int) Info.Bedrock.UpdateBlock;
 
         public Vector3 Position { get; set; } = new Vector3();
         public Block Block { get; set; } = new Air();

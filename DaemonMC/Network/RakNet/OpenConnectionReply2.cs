@@ -1,31 +1,27 @@
 ﻿namespace DaemonMC.Network.RakNet
 {
-    public class OpenConnectionReply2Packet
+    public class OpenConnectionReply2 : Packet
     {
+        public override int Id => (int) Info.RakNet.OpenConnectionReply2;
+
         public string Magic { get; set; }
         public long GUID { get; set; }
         public IPAddressInfo clientAddress { get; set; }
         public int Mtu { get; set; }
         public bool Encryption { get; set; }
-    }
 
-    public class OpenConnectionReply2
-    {
-        public static byte id = 8;
-        public static void Decode(byte[] buffer)
+        protected override void Decode(PacketDecoder decoder)
         {
 
         }
 
-        public static void Encode(OpenConnectionReply2Packet fields, PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(id);
-            encoder.WriteMagic(fields.Magic);
-            encoder.WriteLongLE(fields.GUID);
+            encoder.WriteMagic(Magic);
+            encoder.WriteLongLE(GUID);
             encoder.WriteAddress();
-            encoder.WriteShortBE((ushort)fields.Mtu);
+            encoder.WriteShortBE((ushort)Mtu);
             encoder.WriteByte(0);
-            encoder.SendPacket(id);
         }
     }
 }

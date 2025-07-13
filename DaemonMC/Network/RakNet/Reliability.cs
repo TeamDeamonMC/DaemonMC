@@ -139,11 +139,11 @@ namespace DaemonMC.Network.RakNet
                 acks.Add(ack);
 
                 PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
-                var pk = new ACKPacket
+                var pk = new ACK
                 {
                     ACKs = acks,
                 };
-                ACK.Encode(pk, encoder);
+                pk.EncodePacket(encoder);
             }
         }
 

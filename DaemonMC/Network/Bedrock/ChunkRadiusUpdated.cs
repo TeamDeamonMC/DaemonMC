@@ -2,7 +2,7 @@
 {
     public class ChunkRadiusUpdated : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ChunkRadiusUpdated;
+        public override int Id => (int) Info.Bedrock.ChunkRadiusUpdated;
 
         public int Radius { get; set; } = 0;
 

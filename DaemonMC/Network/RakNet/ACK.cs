@@ -1,26 +1,14 @@
-﻿using System.Net;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
-    public class ACKPacket
+    public class ACK : Packet
     {
-        public List<ACKdata> ACKs { get; set; }
-    }
+        public override int Id => (int) Info.RakNet.ACK;
 
-    public class ACKdata
-    {
-        public bool singleSequence { get; set; }
-        public uint sequenceNumber { get; set; }
-        public uint firstSequenceNumber { get; set; }
-        public uint lastSequenceNumber { get; set; }
-    }
+        public List<ACKdata> ACKs { get; set; } = new List<ACKdata>();
 
-    public class ACK
-    {
-        public static byte id = 192;
-        public static void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var ACKs = new List<ACKdata>();
+            var ACKlist = new List<ACKdata>();
             var count = decoder.ReadShortBE();
             for (int i = 0; i < count; ++i)
             {
@@ -37,21 +25,14 @@ namespace DaemonMC.Network.RakNet
                 }
                 ACKs.Add(ACK);
             }
-            var packet = new ACKPacket
-            {
-                ACKs = ACKs
-            };
-
-            RakPacketProcessor.ACK(packet, decoder.clientEp);
+            ACKs = ACKlist;
         }
 
-        public static void Encode(ACKPacket fields, PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(id);
             encoder.WriteShortBE(1);
             encoder.WriteBool(true);
-            encoder.WriteUInt24LE(fields.ACKs[0].sequenceNumber);
-            encoder.SendPacket(id);
+            encoder.WriteUInt24LE(ACKs[0].sequenceNumber);
         }
     }
 }

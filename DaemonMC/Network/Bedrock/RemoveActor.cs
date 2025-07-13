@@ -2,7 +2,7 @@
 {
     public class RemoveActor : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.RemoveActor;
+        public override int Id => (int) Info.Bedrock.RemoveActor;
 
         public long EntityId { get; set; } = 0;
 

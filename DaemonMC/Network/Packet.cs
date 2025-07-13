@@ -1,4 +1,5 @@
 ﻿using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.RakNet;
 using DaemonMC.Plugin;
 using DaemonMC.Utils.Text;
 
@@ -6,7 +7,7 @@ namespace DaemonMC.Network
 {
     public abstract class Packet : IPacket
     {
-        public abstract Info.Bedrock Id { get; }
+        public abstract int Id { get; }
 
         public void DecodePacket(PacketDecoder decoder, PacketHandler handler = PacketHandler.Player)
         {
@@ -43,7 +44,7 @@ namespace DaemonMC.Network
                         BedrockPacketProcessor.HandlePacket(this, decoder.clientEp);
                         break;
                     case PacketHandler.Raknet:
-                        //todo
+                        RakPacketProcessor.HandlePacket(this, decoder.clientEp);
                         break;
                 }
             }
@@ -53,20 +54,48 @@ namespace DaemonMC.Network
         {
             if (PluginManager.PacketSent(encoder.clientEp, this))
             {
-                encoder.PacketId(Id);
+                switch (this)
+                {
+                    case UnconnectedPong:
+                    case ACK:
+                    case NACK:
+                    case OpenConnectionReply1:
+                    case OpenConnectionReply2:
+                    case ConnectedPong:
+                    case ConnectionRequestAccepted:
+                    case Disconnect:
+                    case GamePacket:
+                        encoder.WriteByte((byte)Id);
+                        break;
+                    default:
+                        encoder.PacketId(Id);
+                        break;
+                }
                 Encode(encoder);
-                encoder.handlePacket();
+                switch (this)
+                {
+                    case UnconnectedPong:
+                    case ACK:
+                    case NACK:
+                    case OpenConnectionReply1:
+                    case OpenConnectionReply2:
+                        encoder.SendPacket((byte)Id);
+                        break;
+                    case ConnectedPong:
+                    case ConnectionRequestAccepted:
+                    case Disconnect:
+                    case GamePacket:
+                        encoder.handlePacket("raknet");
+                        break;
+                    default:
+                        encoder.handlePacket();
+                        break;
+                }
             }
         }
 
         protected abstract void Decode(PacketDecoder decoder);
         protected abstract void Encode(PacketEncoder encoder);
-    }
-
-    public interface IPacket
-    {
-        void DecodePacket(PacketDecoder decoder, PacketHandler handler);
-        void EncodePacket(PacketEncoder encoder);
     }
 
     public enum PacketHandler

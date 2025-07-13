@@ -1,29 +1,25 @@
-﻿namespace DaemonMC.Network.RakNet
+﻿using System.Net;
+
+namespace DaemonMC.Network.RakNet
 {
-    public class OpenConnectionRequest2Packet
+    public class OpenConnectionRequest2 : Packet
     {
+        public override int Id => (int) Info.RakNet.OpenConnectionRequest2;
+
         public string Magic { get; set; }
         public IPAddressInfo Address { get; set; }
         public short Mtu { get; set; }
         public long ClientId { get; set; }
-    }
 
-    public class OpenConnectionRequest2
-    {
-        public static byte id = 7;
-        public static void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new OpenConnectionRequest2Packet
-            {
-                Magic = decoder.ReadMagic(),
-                Address = decoder.ReadAddress(),
-                Mtu = decoder.ReadSignedShort(),
-                ClientId = decoder.ReadLong()
-            };
-            RakPacketProcessor.OpenConnectionRequest2(packet, decoder.clientEp);
+            Magic = decoder.ReadMagic();
+            Address = decoder.ReadAddress();
+            Mtu = decoder.ReadSignedShort();
+            ClientId = decoder.ReadLong();
         }
 
-        public static void Encode(OpenConnectionRequest2Packet fields)
+        protected override void Encode(PacketEncoder encoder)
         {
 
         }

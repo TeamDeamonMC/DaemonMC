@@ -2,7 +2,7 @@
 {
     public class ContainerClose : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ContainerClose;
+        public override int Id => (int) Info.Bedrock.ContainerClose;
 
         public byte ContainerId { get; set; } = 0;
         public byte ContainerType { get; set; } = 0;

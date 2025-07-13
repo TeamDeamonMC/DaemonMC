@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class Interact : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.Interact;
+        public override int Id => (int) Info.Bedrock.Interact;
 
         public byte Action { get; set; } = 0;
         public long ActorRuntimeId { get; set; } = 0;

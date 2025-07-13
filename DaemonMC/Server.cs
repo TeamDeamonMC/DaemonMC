@@ -23,6 +23,7 @@ namespace DaemonMC
         public static bool Crash = false;
         public static List<World> Levels = new List<World>();
         public static List<ResourcePack> Packs = new List<ResourcePack>();
+        private static byte[] bufferAlloc = new byte[8192];
 
         public static void ServerF()
         {
@@ -68,15 +69,18 @@ namespace DaemonMC
                 EndPoint ep = iep;
                 try
                 {
-                    byte[] buffer = new byte[8192];
-                    int recv = Sock.ReceiveFrom(buffer, ref ep);
+                    Span<byte> spanBuffer = bufferAlloc.AsSpan();
+
+                    int recv = Sock.ReceiveFrom(bufferAlloc, ref ep);
 
                     if (recv != 0)
                     {
+                        var receivedData = spanBuffer.Slice(0, recv);
+
                         var client = (IPEndPoint)ep;
                         RakSessionManager.createSession(client);
 
-                        PacketDecoder decoder = PacketDecoderPool.Get(buffer, client);
+                        PacketDecoder decoder = PacketDecoderPool.Get(receivedData.ToArray(), client);
                         decoder.RakDecoder(decoder, recv);
                     }
                 }

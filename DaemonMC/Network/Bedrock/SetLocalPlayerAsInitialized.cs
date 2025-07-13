@@ -2,7 +2,7 @@
 {
     public class SetLocalPlayerAsInitialized : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetLocalPlayerAsInitialized;
+        public override int Id => (int) Info.Bedrock.SetLocalPlayerAsInitialized;
 
         public long EntityID { get; set; } = 0;
 

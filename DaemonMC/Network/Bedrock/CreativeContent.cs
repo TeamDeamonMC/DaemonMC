@@ -2,7 +2,7 @@
 {
     public class CreativeContent : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.CreativeContent;
+        public override int Id => (int) Info.Bedrock.CreativeContent;
         protected override void Decode(PacketDecoder decoder)
         {
 

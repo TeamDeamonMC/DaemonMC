@@ -149,6 +149,8 @@ namespace DaemonMC.Network.Bedrock
 
                 }
             }
+
+            PacketDecoderPool.Return(decoder);
         }
     }
 }

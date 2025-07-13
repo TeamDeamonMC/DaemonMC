@@ -98,6 +98,7 @@
             UnconnectedPong = 28,                 //0x1c
             NACK = 160,                           //0xa0
             ACK = 192,                            //0xc0
+            GamePacket = 254,                     //0xfe
         }
     }
 }

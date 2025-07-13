@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class SetActorData : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetActorData;
+        public override int Id => (int) Info.Bedrock.SetActorData;
 
         public long EntityId { get; set; } = 0;
         public Dictionary<ActorData, Metadata> Metadata { get; set; } = new Dictionary<ActorData, Metadata>();

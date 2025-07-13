@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class MoveActorDelta : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.MoveActorDelta;
+        public override int Id => (int) Info.Bedrock.MoveActorDelta;
 
         public long EntityId { get; set; } = 0;
         public ushort Header { get; set; } = 0;

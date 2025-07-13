@@ -2,7 +2,7 @@
 {
     public class Example : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.Example;
+        public override int Id => (int) Info.Bedrock.Example;
 
         public int Variable { get; set; } = 0;
         public string AnotherVariable { get; set; } = "";

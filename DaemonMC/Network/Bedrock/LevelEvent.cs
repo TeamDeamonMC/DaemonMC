@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class LevelEvent : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.LevelEvent;
+        public override int Id => (int) Info.Bedrock.LevelEvent;
 
         public LevelEvents EventID { get; set; } = LevelEvents.Undefined;
         public Vector3 Position { get; set; } = new Vector3();

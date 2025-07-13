@@ -2,7 +2,7 @@
 {
     public class SetTitle : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetTitle;
+        public override int Id => (int) Info.Bedrock.SetTitle;
 
         public int Type { get; set; } = 0;
         public string Text { get; set; } = "";

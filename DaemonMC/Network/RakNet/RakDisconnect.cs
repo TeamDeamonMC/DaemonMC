@@ -1,25 +1,17 @@
 ﻿namespace DaemonMC.Network.RakNet
 {
-    public class RakDisconnectPacket
+    public class RakDisconnect : Packet
     {
+        public override int Id => (int) Info.RakNet.Disconnect;
 
-    }
-
-    public class RakDisconnect
-    {
-        public byte id = 21;
-        public void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new RakDisconnectPacket
-            {
-            };
-            RakPacketProcessor.Disconnect(packet, decoder.clientEp);
+
         }
 
-        public void Encode(PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(id);
-            encoder.handlePacket("raknet");
+
         }
     }
 }

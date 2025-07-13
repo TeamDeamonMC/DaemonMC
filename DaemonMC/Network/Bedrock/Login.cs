@@ -2,7 +2,7 @@
 {
     public class Login : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.Login;
+        public override int Id => (int) Info.Bedrock.Login;
 
         public int ProtocolVersion { get; set; } = 0;
         public string Request { get; set; } = "";

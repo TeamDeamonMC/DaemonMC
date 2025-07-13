@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class MovePlayer : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.MovePlayer;
+        public override int Id => (int) Info.Bedrock.MovePlayer;
 
         public long ActorRuntimeId { get; set; } = 0;
         public Vector3 Position { get; set; } = new Vector3();

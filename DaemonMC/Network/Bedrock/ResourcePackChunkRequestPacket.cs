@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class ResourcePackChunkRequest : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ResourcePackChunkRequest;
+        public override int Id => (int) Info.Bedrock.ResourcePackChunkRequest;
 
         public string PackName { get; set; } = "";
         public int Chunk { get; set; } = 0;

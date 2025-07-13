@@ -9,7 +9,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class AddPlayer : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.AddPlayer;
+        public override int Id => (int) Info.Bedrock.AddPlayer;
 
         public Guid UUID { get; set; } = Guid.NewGuid();
         public string Username { get; set; } = "";

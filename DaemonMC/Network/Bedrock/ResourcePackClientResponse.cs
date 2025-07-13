@@ -2,7 +2,7 @@
 {
     public class ResourcePackClientResponse : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ResourcePackClientResponse;
+        public override int Id => (int) Info.Bedrock.ResourcePackClientResponse;
 
         public byte Response { get; set; } = 0;
         public List<string> Packs { get; set; } = new List<string>();

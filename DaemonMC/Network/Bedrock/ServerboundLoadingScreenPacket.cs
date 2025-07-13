@@ -2,7 +2,7 @@
 {
     public class ServerboundLoadingScreen : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ServerboundLoadingScreen;
+        public override int Id => (int) Info.Bedrock.ServerboundLoadingScreen;
 
         public int ScreenType { get; set; } = 0;
         public int? ScreenId { get; set; } = 0;

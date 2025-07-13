@@ -7,7 +7,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class AddActor : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.AddActor;
+        public override int Id => (int) Info.Bedrock.AddActor;
 
         public long EntityId { get; set; } = 0;
         public string ActorType { get; set; } = "";

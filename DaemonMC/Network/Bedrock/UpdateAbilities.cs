@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class UpdateAbilities : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.UpdateAbilities;
+        public override int Id => (int) Info.Bedrock.UpdateAbilities;
 
         public long EntityId { get; set; } = 0;
         public byte PlayerPermissions { get; set; } = 0;

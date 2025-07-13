@@ -2,7 +2,7 @@
 {
     public class ResourcePacksInfo : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.ResourcePacksInfo;
+        public override int Id => (int) Info.Bedrock.ResourcePacksInfo;
 
         public bool Force { get; set; } = false;
         public bool IsAddon { get; set; } = false;

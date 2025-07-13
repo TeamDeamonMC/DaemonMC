@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class AvailableCommands : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.AvailableCommands;
+        public override int Id => (int) Info.Bedrock.AvailableCommands;
 
         public List<string> EnumValues { get; set; } = new List<string>();
         public List<CommandEnum> Enums { get; set; } = new List<CommandEnum>();

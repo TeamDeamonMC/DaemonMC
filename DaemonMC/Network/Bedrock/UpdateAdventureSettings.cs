@@ -2,7 +2,7 @@
 {
     public class UpdateAdventureSettings : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.UpdateAdventureSettings;
+        public override int Id => (int) Info.Bedrock.UpdateAdventureSettings;
 
         public bool noPvM { get; set; } = false;
         public bool noMvP { get; set; } = false;

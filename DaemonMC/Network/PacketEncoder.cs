@@ -41,7 +41,7 @@ namespace DaemonMC.Network
                 Log.packetOut(clientEp, (Info.Bedrock)packetID);
 
                 bool useCompression = session.initCompression;
-                byte[] bedrockId = useCompression ? new byte[] { 254, (byte)DaemonMC.Compression } : new byte[] { 254 };
+                byte[] bedrockId = useCompression ? new byte[] { (byte)DaemonMC.Compression } : new byte[] { };
 
                 byte[] lengthVarInt = ToDataTypes.WriteVarint(trimmedBuffer.Length);
 
@@ -63,7 +63,12 @@ namespace DaemonMC.Network
                 byte[] finalPacket = bedrockId.Concat(toCompress).ToArray();
 
                 ResetStream();
-                Reliability.ReliabilityHandler(this, finalPacket);
+
+                var packet = new GamePacket
+                {
+                    Payload = finalPacket
+                };
+                packet.EncodePacket(this);
                 return;
             }
 
@@ -104,11 +109,6 @@ namespace DaemonMC.Network
             if (pooled) { PacketEncoderPool.Return(this); }
         }
 
-        //FE FF 0C 05 00 00 00 04 74 65 73 74 00 00 00 00
-        //FE - 254 Bedrock packet
-        //FF - 255 no compression
-        //05 - packet id
-
         public void Reset()
         {
             clientEp = null;
@@ -116,7 +116,7 @@ namespace DaemonMC.Network
             byteStream.Position = 0;
         }
 
-        public void PacketId(Info.Bedrock id)
+        public void PacketId(int id)
         {
             WriteVarInt((uint)id);
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class MobEquipment : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.MobEquipment;
+        public override int Id => (int) Info.Bedrock.MobEquipment;
 
         public long EntityId { get; set; } = 0;
         public Item Item { get; set; } = new Air();

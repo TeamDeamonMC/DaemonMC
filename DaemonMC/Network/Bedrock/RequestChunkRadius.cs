@@ -2,7 +2,7 @@
 {
     public class RequestChunkRadius : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.RequestChunkRadius;
+        public override int Id => (int) Info.Bedrock.RequestChunkRadius;
 
         public int Radius { get; set; } = 0;
         public byte MaxRadius { get; set; } = 0;

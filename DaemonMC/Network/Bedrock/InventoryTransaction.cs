@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class InventoryTransaction : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.InventoryTransaction;
+        public override int Id => (int) Info.Bedrock.InventoryTransaction;
 
         public int RawID { get; set; } = 0;
         public Transaction Transaction { get; set; } = new Transaction();

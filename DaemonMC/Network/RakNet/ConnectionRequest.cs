@@ -1,36 +1,25 @@
-﻿using System.Net;
-
-namespace DaemonMC.Network.RakNet
+﻿namespace DaemonMC.Network.RakNet
 {
-    public class ConnectionRequestPacket
+    public class ConnectionRequest : Packet
     {
+        public override int Id => (int) Info.RakNet.ConnectionRequest;
+
         public long Time { get; set; }
         public long GUID { get; set; }
         public byte Security { get; set; }
-    }
 
-    public class ConnectionRequest
-    {
-        public static byte id = 9;
-        public static void Decode(PacketDecoder decoder)
+        protected override void Decode(PacketDecoder decoder)
         {
-            var packet = new ConnectionRequestPacket
-            {
-                GUID = decoder.ReadLong(),
-                Time = decoder.ReadLongLE(),
-                Security = decoder.ReadByte()
-            };
-
-            RakPacketProcessor.ConnectionRequest(packet, decoder.clientEp);
+            GUID = decoder.ReadLong();
+            Time = decoder.ReadLongLE();
+            Security = decoder.ReadByte();
         }
 
-        public static void Encode(ConnectionRequestPacket fields, PacketEncoder encoder)
+        protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(id);
-            encoder.WriteLong(fields.GUID);
-            encoder.WriteLongLE(fields.Time);
-            encoder.WriteByte(fields.Security);
-            encoder.handlePacket("raknet");
+            encoder.WriteLong(GUID);
+            encoder.WriteLongLE(Time);
+            encoder.WriteByte(Security);
         }
     }
 }

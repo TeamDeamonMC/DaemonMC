@@ -2,7 +2,7 @@
 {
     public class PlayStatus : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.PlayStatus;
+        public override int Id => (int) Info.Bedrock.PlayStatus;
 
         public int Status { get; set; } = 0;
 

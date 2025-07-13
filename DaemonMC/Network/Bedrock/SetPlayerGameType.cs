@@ -2,7 +2,7 @@
 {
     public class SetPlayerGameType : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetPlayerGameType;
+        public override int Id => (int) Info.Bedrock.SetPlayerGameType;
 
         public int GameMode { get; set; } = 0;
 

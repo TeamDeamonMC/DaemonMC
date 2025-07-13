@@ -2,7 +2,7 @@
 {
     public class SetTime : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.SetTime;
+        public override int Id => (int) Info.Bedrock.SetTime;
 
         public int Time { get; set; } = 0;
 

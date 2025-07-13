@@ -2,7 +2,7 @@
 {
     public class RequestNetworkSettings : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.RequestNetworkSettings;
+        public override int Id => (int) Info.Bedrock.RequestNetworkSettings;
 
         public int ProtocolVersion { get; set; } = 0;
 

@@ -4,7 +4,7 @@ namespace DaemonMC.Network.Bedrock
 {
     public class StartGame : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.StartGame;
+        public override int Id => (int) Info.Bedrock.StartGame;
 
         public string LevelName = "";
         public long EntityId { get; set; } = 0;

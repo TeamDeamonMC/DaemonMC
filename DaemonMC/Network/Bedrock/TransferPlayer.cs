@@ -2,7 +2,7 @@
 {
     public class TransferPlayer : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.TransferPlayer;
+        public override int Id => (int) Info.Bedrock.TransferPlayer;
 
         public string IpAddress { get; set; } = "";
         public ushort Port { get; set; } = 0;

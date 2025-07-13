@@ -2,7 +2,7 @@
 {
     public class TextMessage : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.TextMessage;
+        public override int Id => (int) Info.Bedrock.TextMessage;
 
         public byte MessageType { get; set; } = 0;
         public bool Localized { get; set; } = false;

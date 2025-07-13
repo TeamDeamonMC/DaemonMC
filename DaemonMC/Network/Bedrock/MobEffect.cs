@@ -2,7 +2,7 @@
 {
     public class MobEffect : Packet
     {
-        public override Info.Bedrock Id => Info.Bedrock.MobEffect;
+        public override int Id => (int) Info.Bedrock.MobEffect;
 
         public long EntityId { get; set; } = 0;
         public byte EventId { get; set; } = 0;

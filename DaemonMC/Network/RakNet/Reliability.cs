@@ -131,7 +131,12 @@ namespace DaemonMC.Network.RakNet
                 {
                     decoder.packetBuffers.Add(body);
                 }
-               //Console.WriteLine($"[Frame Set Packet] seq: {sequence} f: {flags} pL: {pLength} rtype: {reliabilityType} frag: {isFragmented} relIndx: {reliableIndex} seqIndxL: {sequenceIndex} ordIndx: {orderIndex} ordCh: {orderChannel} compSize: {compSize} compIndx: {compIndex} compId: {compId}");
+                //Console.WriteLine($"[Frame Set Packet] seq: {sequence} f: {flags} pL: {pLength} rtype: {reliabilityType} frag: {isFragmented} relIndx: {reliableIndex} seqIndxL: {sequenceIndex} ordIndx: {orderIndex} ordCh: {orderChannel} compSize: {compSize} compIndx: {compIndex} compId: {compId}");
+
+                if (decoder.clientEp.Port == 0)
+                {
+                    return;
+                }
 
                 var ack = new ACKdata { sequenceNumber = sequence };
 

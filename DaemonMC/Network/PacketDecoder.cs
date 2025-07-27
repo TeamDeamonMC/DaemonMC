@@ -20,12 +20,13 @@ namespace DaemonMC.Network
         public int protocolVersion = 0;
         public Player player;
 
+        //if ep is null PacketDecoder won't handle packets and will only do decoding to get packet content using method Packet.GetDecodedPacket(decoder). This is packet debugging feature.
         public PacketDecoder(byte[] byteBuffer, IPEndPoint ep)
         {
             buffer = byteBuffer;
             readOffset = 0;
-            clientEp = ep;
-            protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
+            clientEp = ep == null ? new IPEndPoint(0, 0) : ep;
+            protocolVersion = ep == null ? Info.ProtocolVersion.Last() : RakSessionManager.getSession(ep).protocolVersion;
         }
 
         public void RakDecoder(PacketDecoder decoder, int recv)
@@ -233,21 +234,13 @@ namespace DaemonMC.Network
             return value;
         }
 
-        public string ReadMagic()
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 16; ++i)
-            {
-                sb.Append(buffer[readOffset + i].ToString("X2"));
-            }
-            readOffset += 16;
-            return sb.ToString();
-        }
-
         public string ReadRakString()
         {
-            ushort length = BitConverter.ToUInt16(buffer, readOffset);
-            readOffset += 2;
+            int length = ReadShortBE() + 3; //todo hmm what
+            if (length < 0 || readOffset + length > buffer.Length)
+            {
+                throw new Exception($"Invalid string lenght {length}");
+            }
             string str = Encoding.UTF8.GetString(buffer, readOffset, length);
             readOffset += length;
 
@@ -354,6 +347,15 @@ namespace DaemonMC.Network
                 size++;
             }
 
+            return value;
+        }
+
+
+        public long ReadSignedVarLong()
+        {
+
+            long rawVarLong = ReadVarInt();
+            long value = (rawVarLong >> 1) ^ -(rawVarLong & 1);
             return value;
         }
 

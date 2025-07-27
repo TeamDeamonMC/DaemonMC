@@ -8,7 +8,7 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            JWT = decoder.ReadString();
         }
 
         protected override void Encode(PacketEncoder encoder)

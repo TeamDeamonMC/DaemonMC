@@ -233,12 +233,8 @@ namespace DaemonMC.Network
 
         public void WriteRakString(string str)
         {
-            ushort length = (ushort)str.Length;
-            byte[] lengthBytes = BitConverter.GetBytes(length);
-            Array.Reverse(lengthBytes);
-            byteStream.Write(lengthBytes, 0, lengthBytes.Length);
-
             byte[] strBytes = Encoding.UTF8.GetBytes(str);
+            WriteShortBE((ushort)strBytes.Length);
             byteStream.Write(strBytes, 0, strBytes.Length);
         }
 

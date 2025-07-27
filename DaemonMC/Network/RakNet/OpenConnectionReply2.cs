@@ -4,7 +4,7 @@
     {
         public override int Id => (int) Info.RakNet.OpenConnectionReply2;
 
-        public string Magic { get; set; }
+        public byte[] Magic { get; set; }
         public long GUID { get; set; }
         public IPAddressInfo clientAddress { get; set; }
         public int Mtu { get; set; }
@@ -12,16 +12,20 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Magic = decoder.ReadBytes(16);
+            GUID = decoder.ReadLongLE();
+            clientAddress = decoder.ReadAddress();
+            Mtu = decoder.ReadShortBE();
+            Encryption = decoder.ReadBool();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteMagic(Magic);
+            encoder.WriteBytes(Magic, false);
             encoder.WriteLongLE(GUID);
-            encoder.WriteAddress();
+            encoder.WriteAddress(clientAddress.IPAddress.ToString());
             encoder.WriteShortBE((ushort)Mtu);
-            encoder.WriteByte(0);
+            encoder.WriteBool(Encryption);
         }
     }
 }

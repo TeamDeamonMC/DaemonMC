@@ -9,6 +9,12 @@ namespace DaemonMC.Network
     {
         public abstract int Id { get; }
 
+        public Packet GetDecodedPacket(PacketDecoder decoder)
+        {
+            Decode(decoder);
+            return this;
+        }
+
         public void DecodePacket(PacketDecoder decoder, PacketHandler handler = PacketHandler.Player)
         {
             try

@@ -9,7 +9,8 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            pingTime = decoder.ReadLongLE();
+            pongTime = decoder.ReadLongLE();
         }
 
         protected override void Encode(PacketEncoder encoder)

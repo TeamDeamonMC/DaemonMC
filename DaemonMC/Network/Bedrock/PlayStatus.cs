@@ -8,7 +8,7 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Status = decoder.ReadIntBE();
         }
 
         protected override void Encode(PacketEncoder encoder)

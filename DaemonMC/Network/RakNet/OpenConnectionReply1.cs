@@ -4,7 +4,7 @@
     {
         public override int Id => (int) Info.RakNet.OpenConnectionReply1;
 
-        public string Magic { get; set; }
+        public byte[] Magic { get; set; }
         public long GUID { get; set; }
         public bool Security { get; set; }
         public int Cookie { get; set; }
@@ -12,14 +12,17 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Magic = decoder.ReadBytes(16);
+            GUID = decoder.ReadLongLE();
+            Security = decoder.ReadBool();
+            Mtu = decoder.ReadShortBE();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteMagic(Magic);
+            encoder.WriteBytes(Magic, false);
             encoder.WriteLongLE(GUID);
-            encoder.WriteByte(0);
+            encoder.WriteBool(Security);
             encoder.WriteShortBE((ushort)Mtu);
         }
     }

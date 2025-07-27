@@ -15,7 +15,7 @@ namespace DaemonMC.Network.RakNet
                 {
                     Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                     GUID = 1234567890123456789,
-                    Magic = "00ffff00fefefefefdfdfdfd12345678",
+                    Magic = [0x00, 0xFF, 0xFF, 0x00, 0xFE, 0xFE, 0xFE, 0xFE, 0xFD, 0xFD, 0xFD, 0xFD, 0x12, 0x34, 0x56, 0x78],
                     MOTD = $"MCPE;{DaemonMC.Servername};100;{Info.Version};0;{DaemonMC.MaxOnline};12345678912345678912;{DaemonMC.Worldname};Survival;1;19132;19133;"
                 };
                 pk.EncodePacket(encoder);
@@ -26,7 +26,7 @@ namespace DaemonMC.Network.RakNet
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new OpenConnectionReply1
                 {
-                    Magic = "00ffff00fefefefefdfdfdfd12345678",
+                    Magic = [0x00, 0xFF, 0xFF, 0x00, 0xFE, 0xFE, 0xFE, 0xFE, 0xFD, 0xFD, 0xFD, 0xFD, 0x12, 0x34, 0x56, 0x78],
                     GUID = 1234567890123456789,
                     Mtu = openConnectionRequest1.Mtu
                 };
@@ -39,7 +39,7 @@ namespace DaemonMC.Network.RakNet
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new OpenConnectionReply2
                 {
-                    Magic = "00ffff00fefefefefdfdfdfd12345678",
+                    Magic = [0x00, 0xFF, 0xFF, 0x00, 0xFE, 0xFE, 0xFE, 0xFE, 0xFD, 0xFD, 0xFD, 0xFD, 0x12, 0x34, 0x56, 0x78],
                     GUID = 1234567890123456789,
                     Mtu = openConnectionRequest2.Mtu
                 };

@@ -23,6 +23,7 @@ namespace DaemonMC.Network.Bedrock
         public int SpawnBlockZ { get; set; } = 0;
         public int EditorType { get; set; } = 0;
         public int StopTime { get; set; } = 0;
+        public bool TickDeathSystems { get; set; } = false;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -129,6 +130,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteUUID(uuid);
             encoder.WriteBool(false);
             encoder.WriteBool(true); //we use hashed block ids
+            if (encoder.protocolVersion >= Info.v1_21_100)
+            {
+                encoder.WriteBool(TickDeathSystems);
+            }
             encoder.WriteBool(true);
         }
     }

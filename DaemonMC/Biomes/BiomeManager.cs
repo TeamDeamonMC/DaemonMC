@@ -5,7 +5,7 @@ namespace DaemonMC.Biomes
     public class BiomeManager
     {
         public static List<Biome> Biomes { get; set; } = new List<Biome>() {
-            new Biome() { BiomeName = "plains", BiomeData = new BiomeDefinitionData() { BiomeID = 1, Temperature = 0.8f, Downfall = 0.4f } }
+            new Biome() { BiomeName = "plains", BiomeData = new BiomeDefinitionData() { Downfall = 0.5f, Depth = 0.125f, Scale = 0.05f } }
         };
 
         public static int GetBiomeId(string biomeName)
@@ -29,7 +29,7 @@ namespace DaemonMC.Biomes
 
     public class BiomeDefinitionData
     {
-        public ushort BiomeID { get; set; } = 0;
+        public short BiomeID { get; set; } = -1;
         public float Temperature { get; set; } = 0;
         public float Downfall { get; set; } = 0;
         public float RedSporeDensity { get; set; } = 0;

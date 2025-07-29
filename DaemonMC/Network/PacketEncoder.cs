@@ -188,6 +188,12 @@ namespace DaemonMC.Network
             byteStream.WriteByte((byte)(value >> 8));
         }
 
+        public void WriteShort(short value)
+        {
+            byteStream.WriteByte((byte)(value & 0xFF));
+            byteStream.WriteByte((byte)((value >> 8) & 0xFF));
+        }
+
         public void WriteShortBE(ushort value)
         {
             byteStream.WriteByte((byte)(value >> 8));
@@ -656,7 +662,14 @@ namespace DaemonMC.Network
             foreach (var biome in biomes)
             {
                 WriteShort(BiomeIndex);
-                WriteOptional();
+                if (protocolVersion >= Info.v1_21_100)
+                {
+                    WriteShort(biome.BiomeData.BiomeID);
+                }
+                else
+                {
+                    WriteOptional();
+                }
                 WriteFloat(biome.BiomeData.Temperature);
                 WriteFloat(biome.BiomeData.Downfall);
                 WriteFloat(biome.BiomeData.RedSporeDensity);

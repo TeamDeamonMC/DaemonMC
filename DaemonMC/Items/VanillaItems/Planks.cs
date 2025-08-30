@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Planks()
         {
             Name = "minecraft:planks";
-            Id = 790;
+            Id = 801;
             Version = 2;
             ComponentBased = false;
         }

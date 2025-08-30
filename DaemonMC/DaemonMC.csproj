@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>1.0.19-alpha</Version>
+    <Version>1.0.20-alpha</Version>
     <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -15,9 +15,9 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DaemonMC</Title>
     <Description>Simple and lightning fast Minecraft Bedrock Edition server software</Description>
-    <Copyright>laz1444</Copyright>
-    <PackageProjectUrl>https://github.com/laz1444/DaemonMC/wiki</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/laz1444/DaemonMC</RepositoryUrl>
+    <Copyright>TeamDeamonMC</Copyright>
+    <PackageProjectUrl>https://github.com/TeamDeamonMC/DaemonMC/wiki</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TeamDeamonMC/DaemonMC</RepositoryUrl>
     <PackageTags>mcpe; bedrock-server; bedrock-dedicated-server; minecraft</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

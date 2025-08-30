@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Wool()
         {
             Name = "minecraft:wool";
-            Id = 768;
+            Id = 779;
             Version = 2;
             ComponentBased = false;
         }

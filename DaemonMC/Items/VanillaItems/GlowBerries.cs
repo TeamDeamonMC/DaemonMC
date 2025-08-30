@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlowBerries()
         {
             Name = "minecraft:glow_berries";
-            Id = 816;
+            Id = 828;
             Version = 0;
             ComponentBased = false;
         }

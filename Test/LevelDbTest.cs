@@ -13,7 +13,7 @@ namespace DaemonMC.Tests
         [TestMethod]
         public void InfoLoadTest()
         {
-            string LevelName = "My World";
+            string LevelName = "hub";
             using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{LevelName}.mcworld"))
             {
                 foreach (var entry in archive.Entries)

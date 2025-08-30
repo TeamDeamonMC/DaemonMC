@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EndCrystal()
         {
             Name = "minecraft:end_crystal";
-            Id = 815;
+            Id = 827;
             Version = 2;
             ComponentBased = false;
         }

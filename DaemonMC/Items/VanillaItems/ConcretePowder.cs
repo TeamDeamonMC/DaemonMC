@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ConcretePowder()
         {
             Name = "minecraft:concrete_powder";
-            Id = 796;
+            Id = 807;
             Version = 2;
             ComponentBased = false;
         }

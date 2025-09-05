@@ -63,7 +63,7 @@ namespace DaemonMC.Network
                     case OpenConnectionReply2:
                     case ConnectedPong:
                     case ConnectionRequestAccepted:
-                    case Disconnect:
+                    case RakDisconnect:
                     case GamePacket:
                         encoder.WriteByte((byte)Id);
                         break;
@@ -83,7 +83,7 @@ namespace DaemonMC.Network
                         break;
                     case ConnectedPong:
                     case ConnectionRequestAccepted:
-                    case Disconnect:
+                    case RakDisconnect:
                     case GamePacket:
                         encoder.handlePacket("raknet");
                         break;

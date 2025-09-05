@@ -672,10 +672,17 @@ namespace DaemonMC.Network
                 }
                 WriteFloat(biome.BiomeData.Temperature);
                 WriteFloat(biome.BiomeData.Downfall);
-                WriteFloat(biome.BiomeData.RedSporeDensity);
-                WriteFloat(biome.BiomeData.BlueSporeDensity);
-                WriteFloat(biome.BiomeData.AshDensity);
-                WriteFloat(biome.BiomeData.WhiteAshDensity);
+                if (protocolVersion >= Info.v1_21_110)
+                {
+                    WriteFloat(biome.BiomeData.FoliageSnow);
+                }
+                if (protocolVersion <= Info.v1_21_100)
+                {
+                    WriteFloat(biome.BiomeData.RedSporeDensity);
+                    WriteFloat(biome.BiomeData.BlueSporeDensity);
+                    WriteFloat(biome.BiomeData.AshDensity);
+                    WriteFloat(biome.BiomeData.WhiteAshDensity);
+                }
                 WriteFloat(biome.BiomeData.Depth);
                 WriteFloat(biome.BiomeData.Scale);
                 WriteFloat(biome.BiomeData.WaterColor);

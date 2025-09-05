@@ -32,6 +32,7 @@ namespace DaemonMC.Biomes
         public short BiomeID { get; set; } = -1;
         public float Temperature { get; set; } = 0;
         public float Downfall { get; set; } = 0;
+        public float FoliageSnow { get; set; } = 0;
         public float RedSporeDensity { get; set; } = 0;
         public float BlueSporeDensity { get; set; } = 0;
         public float AshDensity { get; set; } = 0;

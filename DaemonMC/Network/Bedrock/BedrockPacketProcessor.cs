@@ -1,14 +1,14 @@
 ﻿using System.Net;
+using System.Numerics;
+using System.Security.Cryptography;
+using DaemonMC.Biomes;
+using DaemonMC.Blocks;
+using DaemonMC.Entities;
 using DaemonMC.Level;
 using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
-using System.Security.Cryptography;
-using fNbt;
-using DaemonMC.Blocks;
-using DaemonMC.Entities;
-using DaemonMC.Biomes;
-using System.Numerics;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -21,7 +21,7 @@ namespace DaemonMC.Network.Bedrock
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new NetworkSettings
                 {
-                    CompressionThreshold = 1,
+                    CompressionThreshold = (ushort)(DaemonMC.Compression == CompressionTypes.None ? 0 : 1), //looks like since 1.21.110 if CompressionThreshold > 0 client will use compression even if CompressionAlgorithm is set to 255 (none). What?
                     CompressionAlgorithm = (ushort)DaemonMC.Compression,
                     ClientThrottleEnabled = false,
                     ClientThrottleScalar = 0,

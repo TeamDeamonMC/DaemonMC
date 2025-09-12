@@ -1,13 +1,13 @@
-﻿using DaemonMC.Network.Bedrock;
-using DaemonMC.Network.RakNet;
-using DaemonMC.Utils;
-using DaemonMC.Utils.Text;
-using Newtonsoft.Json;
-using System.Net;
+﻿using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
+using DaemonMC.Utils.Text;
+using Newtonsoft.Json;
 
 namespace DaemonMC.Network.Handler
 {
@@ -55,35 +55,43 @@ namespace DaemonMC.Network.Handler
             if (Cryptography.UseEncryption && player.XUID != "")
             {
                 byte[] publicKeyBytes = Convert.FromBase64String(player.identityPublicKey);
-                Cryptography.verifyKeyInfo(publicKeyBytes);
 
-                Log.debug($"Client Public Key (Base64): {Convert.ToBase64String(publicKeyBytes)}");
+                Cryptography.verifyKeyInfo(publicKeyBytes, player.identityPublicKey);
+
                 using var ecdhRemote = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP384);
                 ecdhRemote.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
 
                 using var ecdhLocal = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP384);
-                using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP384);
-
-                byte[] localPublicKey = ecdhLocal.PublicKey.ToByteArray();
+                var localParams = ecdhLocal.ExportParameters(true);
 
                 byte[] sharedSecret = ecdhLocal.DeriveKeyMaterial(ecdhRemote.PublicKey);
 
-                byte[] secretPrepend = Encoding.UTF8.GetBytes("");
-                using var sha256 = SHA256.Create();
-                byte[] finalSecret = sha256.ComputeHash(secretPrepend.Concat(sharedSecret).ToArray());
-                Log.debug($"AES Key: {BitConverter.ToString(finalSecret)}");
+                Cryptography.verifySharedSecret(sharedSecret);
 
-                var valid = finalSecret.Length == 32 ? "OK" : "INVALID";
-                Log.debug($"SHA256: {valid} {Convert.ToBase64String(finalSecret)}");
+                byte[] secretPrepend = new byte[16];
+                RandomNumberGenerator.Fill(secretPrepend);
+                Log.debug($"SecretPrepend: {Convert.ToBase64String(secretPrepend)}");
+                byte[] combined = secretPrepend.Concat(sharedSecret).ToArray();
+                byte[] aesKey = SHA256.Create().ComputeHash(combined);
 
-                if (valid == "OK")
+                Cryptography.verifyAESKey(aesKey);
+
+                player.encryptor = new Encryptor(aesKey, aesKey);
+
+                var ecdsaParam = new ECParameters
                 {
-                    player.encryptor = new Encryptor(finalSecret);
-                }
+                    Curve = ECCurve.NamedCurves.nistP384,
+                    D = localParams.D,
+                    Q = new ECPoint
+                    {
+                        X = localParams.Q.X,
+                        Y = localParams.Q.Y
+                    }
+                };
 
-                Log.debug($"Public Key (Base64): {Convert.ToBase64String(publicKeyBytes)}");
+                ecdsaParam.Validate();
 
-                Log.debug($"Salt: {Convert.ToBase64String(secretPrepend)}");
+                using var ecdsa = ECDsa.Create(ecdsaParam);
 
                 string chain = JWT.CreateHandshakeJwt(secretPrepend, ecdsa);
 
@@ -93,7 +101,6 @@ namespace DaemonMC.Network.Handler
                     JWT = chain,
                 };
                 pk1.EncodePacket(encoder1);
-               // Log.debug(pk1.JWT);
             }
             else
             {

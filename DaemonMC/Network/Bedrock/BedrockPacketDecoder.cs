@@ -12,14 +12,13 @@ namespace DaemonMC.Network.Bedrock
 
             if (session.encryptor != null)
             {
-                if (!session.encryptor.validated)
+                /*if (!session.encryptor.validated)
                 {
                     session.encryptor.Validate(decoder);
-                }
+                }*/
 
                 Log.debug($"Encrypted Packet Data: {BitConverter.ToString(decoder.buffer)}");
-                decoder.buffer = session.encryptor.Decrypt(decoder.buffer.Skip(1).ToArray().Take(decoder.buffer.Length - 9).ToArray());
-                decoder.readOffset++;
+                decoder.buffer = session.encryptor.Decrypt(decoder.buffer);
                 Log.debug($"Decrypted Packet Data: {BitConverter.ToString(decoder.buffer)}");
             }
 

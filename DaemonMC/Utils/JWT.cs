@@ -131,9 +131,10 @@ namespace DaemonMC.Utils
 
         public static string CreateHandshakeJwt(byte[] secret, ECDsa ecdsa)
         {
-            ECParameters signParams = ecdsa.ExportParameters(true);
+            byte[] publicKeyBytes = ecdsa.ExportSubjectPublicKeyInfo();
+            string b64PublicKey = Convert.ToBase64String(publicKeyBytes);
 
-            var headerJson = $"{{\"alg\":\"ES384\",\"x5u\":\"{Convert.ToBase64String(ecdsa.ExportSubjectPublicKeyInfo())}\"}}";
+            var headerJson = $"{{\"alg\":\"ES384\",\"x5u\":\"{b64PublicKey}\"}}";
             string headerBase64 = Base64UrlEncode(Encoding.UTF8.GetBytes(headerJson));
 
             var payloadJson = $"{{\"salt\":\"{Convert.ToBase64String(secret)}\"}}";
@@ -147,7 +148,8 @@ namespace DaemonMC.Utils
             return $"{message}.{signatureBase64}";
         }
 
-        private static string DecodeBase64Url(string base64Url)
+
+        public static string DecodeBase64Url(string base64Url)
         {
             string base64 = base64Url.Replace('-', '+').Replace('_', '/');
             switch (base64.Length % 4)
@@ -160,7 +162,7 @@ namespace DaemonMC.Utils
             return Encoding.UTF8.GetString(data);
         }
 
-        private static string Base64UrlEncode(byte[] bytes)
+        public static string Base64UrlEncode(byte[] bytes)
         {
             return Convert.ToBase64String(bytes)
                 .TrimEnd('=')

@@ -145,7 +145,6 @@ namespace DaemonMC.Utils
             using var sha256 = SHA256.Create();
 
             byte[] counterBytes = BitConverter.GetBytes(counter);
-            if (BitConverter.IsLittleEndian) Array.Reverse(counterBytes);
 
             sha256.TransformBlock(counterBytes, 0, counterBytes.Length, null, 0);
             sha256.TransformBlock(payload, 0, payload.Length, null, 0);

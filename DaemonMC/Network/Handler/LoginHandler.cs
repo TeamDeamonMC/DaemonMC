@@ -71,12 +71,14 @@ namespace DaemonMC.Network.Handler
                 byte[] secretPrepend = new byte[16];
                 RandomNumberGenerator.Fill(secretPrepend);
                 Log.debug($"SecretPrepend: {Convert.ToBase64String(secretPrepend)}");
-                byte[] combined = secretPrepend.Concat(sharedSecret).ToArray();
+                byte[] combined = new byte[secretPrepend.Length + sharedSecret.Length];
+                Buffer.BlockCopy(secretPrepend, 0, combined, 0, secretPrepend.Length);
+                Buffer.BlockCopy(sharedSecret, 0, combined, secretPrepend.Length, sharedSecret.Length);
                 byte[] aesKey = SHA256.Create().ComputeHash(combined);
 
                 Cryptography.verifyAESKey(aesKey);
 
-                player.encryptor = new Encryptor(aesKey, aesKey);
+                player.encryptor = new Encryptor(aesKey);
 
                 var ecdsaParam = new ECParameters
                 {
@@ -91,7 +93,7 @@ namespace DaemonMC.Network.Handler
 
                 ecdsaParam.Validate();
 
-                using var ecdsa = ECDsa.Create(ecdsaParam);
+                var ecdsa = ECDsa.Create(ecdsaParam);
 
                 string chain = JWT.CreateHandshakeJwt(secretPrepend, ecdsa);
 

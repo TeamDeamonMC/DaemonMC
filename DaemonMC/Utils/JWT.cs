@@ -131,10 +131,10 @@ namespace DaemonMC.Utils
 
         public static string CreateHandshakeJwt(byte[] secret, ECDsa ecdsa)
         {
-            byte[] publicKeyBytes = ecdsa.ExportSubjectPublicKeyInfo();
-            string b64PublicKey = Convert.ToBase64String(publicKeyBytes);
+            byte[] spki = ecdsa.ExportSubjectPublicKeyInfo();
+            string b64Spkiy = Convert.ToBase64String(spki);
 
-            var headerJson = $"{{\"alg\":\"ES384\",\"x5u\":\"{b64PublicKey}\"}}";
+            var headerJson = $"{{\"alg\":\"ES384\",\"x5u\":\"{b64Spkiy}\"}}";
             string headerBase64 = Base64UrlEncode(Encoding.UTF8.GetBytes(headerJson));
 
             var payloadJson = $"{{\"salt\":\"{Convert.ToBase64String(secret)}\"}}";

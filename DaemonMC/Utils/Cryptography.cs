@@ -77,11 +77,11 @@ namespace DaemonMC.Utils
         private ulong _decryptCounter;
         public bool validated;
 
-        public Encryptor(byte[] key, byte[] ecdhSharedSecret)
+        public Encryptor(byte[] key)
         {
             _key = key;
 
-            _ivBase = ecdhSharedSecret.Take(12).Concat(new byte[] { 0, 0, 0, 2 }).ToArray();
+            _ivBase = key.Take(12).Concat(new byte[] { 0, 0, 0, 2 }).ToArray();
 
             using (Aes aes = Aes.Create())
             {

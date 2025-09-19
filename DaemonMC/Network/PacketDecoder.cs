@@ -13,6 +13,7 @@ namespace DaemonMC.Network
 {
     public class PacketDecoder
     {
+        public readonly object Sync = new object();
         public List<byte[]> packetBuffers = new List<byte[]>();
         public byte[] buffer;
         public int readOffset;
@@ -563,10 +564,12 @@ namespace DaemonMC.Network
             InUse++;
             if (Pool.Count > 0)
             {
+                var session = RakSessionManager.getSession(clientEp);
                 PacketDecoder decoder = Pool.Pop();
                 decoder.Reset(buffer);
                 decoder.clientEp = clientEp;
-                decoder.protocolVersion = RakSessionManager.getSession(clientEp).protocolVersion;
+                decoder.player = Server.OnlinePlayers.ContainsKey(session.EntityID) ? Server.GetPlayer(session.EntityID) : null;
+                decoder.protocolVersion = session.protocolVersion;
                 return decoder;
             }
             else

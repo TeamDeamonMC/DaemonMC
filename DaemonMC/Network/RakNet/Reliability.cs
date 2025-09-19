@@ -172,86 +172,94 @@ namespace DaemonMC.Network.RakNet
                 return;
             }
 
-            int maxPayloadSize = session.MTU - 32;
-            bool isFragmented = body.Length > maxPayloadSize;
-            maxPayloadSize -= reliabilityType == ReliabilityType.reliable ? 6 : 3;
-            maxPayloadSize -= isFragmented ? 10 : 0;
-            int totalFragments = isFragmented ? (int)Math.Ceiling((double)body.Length / maxPayloadSize) : 1;
-
-            int compIndex = 0;
-            uint seqIndex = 0;
-            byte orderChannel = 0;
-
-            for (int i = 0; i < totalFragments; i++)
+            lock (session.Sync)
             {
-                session.sentPackets.TryAdd(RakSessionManager.getSession(encoder.clientEp).sequenceNumber, (body, false));
 
-                int start = i * maxPayloadSize;
-                int length = Math.Min(maxPayloadSize, body.Length - start);
+                int maxPayloadSize = session.MTU - 32;
+                bool isFragmented = body.Length > maxPayloadSize;
+                maxPayloadSize -= reliabilityType == ReliabilityType.reliable ? 6 : 3;
+                maxPayloadSize -= isFragmented ? 10 : 0;
+                int totalFragments = isFragmented ? (int)Math.Ceiling((double)body.Length / maxPayloadSize) : 1;
+                uint currentSequenceNumber = session.sequenceNumber;
 
-                byte flags = (byte)(((int)reliabilityType << 5) & 0b01110000);
+                int compIndex = 0;
+                uint seqIndex = 0;
+                byte orderChannel = 0;
+
+                for (int i = 0; i < totalFragments; i++)
+                {
+                    session.sentPackets.TryAdd(RakSessionManager.getSession(encoder.clientEp).sequenceNumber, (body, false));
+
+                    int start = i * maxPayloadSize;
+                    int length = Math.Min(maxPayloadSize, body.Length - start);
+
+                    byte flags = (byte)(((int)reliabilityType << 5) & 0b01110000);
+                    if (isFragmented)
+                    {
+                        flags |= 0b00010000;
+                    }
+                    else
+                    {
+                        flags |= 0x00;
+                    }
+
+                    encoder.WriteByte((byte)(isFragmented ? 140 : 128));
+                    encoder.WriteUInt24LE(session.sequenceNumber);
+                    encoder.WriteByte(flags);
+                    encoder.WriteShortBE((ushort)(isFragmented ? length * 8 : body.Count() * 8));
+
+                    if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableSequenced)
+                    {
+                        encoder.WriteUInt24LE(seqIndex);
+                        seqIndex++;
+                    }
+
+                    if (reliabilityType == ReliabilityType.reliable || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableACK || reliabilityType == ReliabilityType.reliableOrderedACK)
+                    {
+                        encoder.WriteUInt24LE(reliableIndex);
+                        reliableIndex++;
+                    }
+
+                    if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableOrderedACK)
+                    {
+                        encoder.WriteUInt24LE(session.orderIndex);
+                        encoder.WriteByte(orderChannel);
+                    }
+
+                    if (isFragmented)
+                    {
+                        encoder.WriteIntBE(totalFragments);
+                        encoder.WriteShortBE(session.compId);
+                        encoder.WriteIntBE(compIndex);
+
+                        byte[] fragment = new byte[length];
+                        Array.Copy(body, start, fragment, 0, length);
+
+                        encoder.byteStream.Write(fragment, 0, length);
+                        compIndex++;
+                    }
+                    else
+                    {
+                        encoder.byteStream.Write(body, 0, body.Length);
+                    }
+                    encoder.SendPacket(128, false);
+                    encoder.byteStream.SetLength(0);
+                    encoder.byteStream.Position = 0;
+                }
+
                 if (isFragmented)
                 {
-                    flags |= 0b00010000;
-                }
-                else
-                {
-                    flags |= 0x00;
-                }
-
-                encoder.WriteByte((byte)(isFragmented ? 140 : 128));
-                encoder.WriteUInt24LE(session.sequenceNumber);
-                encoder.WriteByte(flags);
-                encoder.WriteShortBE((ushort)(isFragmented ? length * 8 : body.Count() * 8));
-
-                if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableSequenced)
-                {
-                    encoder.WriteUInt24LE(seqIndex);
-                    seqIndex++;
-                }
-
-                if (reliabilityType == ReliabilityType.reliable || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableACK || reliabilityType == ReliabilityType.reliableOrderedACK)
-                {
-                    encoder.WriteUInt24LE(reliableIndex);
-                    reliableIndex++;
+                    session.compId++;
                 }
 
                 if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableOrderedACK)
                 {
-                    encoder.WriteUInt24LE(session.orderIndex);
-                    encoder.WriteByte(orderChannel);
+                    session.orderIndex++;
                 }
 
-                if (isFragmented)
-                {
-                    encoder.WriteIntBE(totalFragments);
-                    encoder.WriteShortBE(session.compId);
-                    encoder.WriteIntBE(compIndex);
-
-                    byte[] fragment = new byte[length];
-                    Array.Copy(body, start, fragment, 0, length);
-
-                    encoder.byteStream.Write(fragment, 0, length);
-                    compIndex++;
-                }
-                else
-                {
-                    encoder.byteStream.Write(body, 0, body.Length);
-                }
-                encoder.SendPacket(128, false);
-                encoder.byteStream.SetLength(0);
-                encoder.byteStream.Position = 0;
+                session.sequenceNumber = currentSequenceNumber;
             }
 
-            if (isFragmented)
-            {
-                session.compId++;
-            }
-
-            if (reliabilityType == ReliabilityType.unreliableSequenced || reliabilityType == ReliabilityType.reliableOrdered || reliabilityType == ReliabilityType.reliableSequenced || reliabilityType == ReliabilityType.reliableOrderedACK)
-            {
-                session.orderIndex++;
-            }
             PacketEncoderPool.Return(encoder);
         }
 

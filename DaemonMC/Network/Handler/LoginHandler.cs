@@ -58,42 +58,27 @@ namespace DaemonMC.Network.Handler
 
                 Cryptography.verifyKeyInfo(publicKeyBytes, player.identityPublicKey);
 
-                using var ecdhRemote = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP384);
+                var ecdhRemote = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP384);
                 ecdhRemote.ImportSubjectPublicKeyInfo(publicKeyBytes, out _);
 
-                using var ecdhLocal = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP384);
+                var ecdhLocal = ECDiffieHellman.Create(ECCurve.NamedCurves.nistP384);
                 var localParams = ecdhLocal.ExportParameters(true);
 
-                byte[] sharedSecret = ecdhLocal.DeriveKeyMaterial(ecdhRemote.PublicKey);
-
+                byte[] sharedSecret = ecdhLocal.DeriveRawSecretAgreement(ecdhRemote.PublicKey);
                 Cryptography.verifySharedSecret(sharedSecret);
 
                 byte[] secretPrepend = new byte[16];
                 RandomNumberGenerator.Fill(secretPrepend);
-                Log.debug($"SecretPrepend: {Convert.ToBase64String(secretPrepend)}");
-                byte[] combined = new byte[secretPrepend.Length + sharedSecret.Length];
-                Buffer.BlockCopy(secretPrepend, 0, combined, 0, secretPrepend.Length);
-                Buffer.BlockCopy(sharedSecret, 0, combined, secretPrepend.Length, sharedSecret.Length);
-                byte[] aesKey = SHA256.Create().ComputeHash(combined);
+
+                byte[] aesKey = SHA256.HashData(secretPrepend.Concat(sharedSecret).ToArray());
 
                 Cryptography.verifyAESKey(aesKey);
 
                 player.encryptor = new Encryptor(aesKey);
 
-                var ecdsaParam = new ECParameters
-                {
-                    Curve = ECCurve.NamedCurves.nistP384,
-                    D = localParams.D,
-                    Q = new ECPoint
-                    {
-                        X = localParams.Q.X,
-                        Y = localParams.Q.Y
-                    }
-                };
+                localParams.Validate();
 
-                ecdsaParam.Validate();
-
-                var ecdsa = ECDsa.Create(ecdsaParam);
+                var ecdsa = ECDsa.Create(localParams);
 
                 string chain = JWT.CreateHandshakeJwt(secretPrepend, ecdsa);
 

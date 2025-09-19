@@ -1,12 +1,12 @@
 ﻿using System.Security.Cryptography;
-using DaemonMC.Network;
+using System.Net;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Utils
 {
     public class Cryptography
     {
-        public static bool UseEncryption = false; //here to enable encryption
+        public static bool UseEncryption = false;
         public static void verifyKeyInfo(byte[] data, string identityPublicKey)
         {
             using (ECDsa ecdsa = ECDsa.Create())
@@ -32,7 +32,7 @@ namespace DaemonMC.Utils
 
         public static void verifySharedSecret(byte[] data)
         {
-            string result = data.Length == 32 ? "OK" : "INVALID";
+            string result = data.Length == 48 ? "OK" : "INVALID";
 
             Log.debug($"SharedSecret: {result} {Convert.ToBase64String(data)}", result == "INVALID" ? ConsoleColor.Red : ConsoleColor.Gray);
         }
@@ -94,19 +94,21 @@ namespace DaemonMC.Utils
             }
         }
 
-        public void Validate(PacketDecoder decoder)
+        public void Validate(byte[] buffer, IPEndPoint clientEp)
         {
             var expectedHandshake = new byte[] { 0xFF, 0x01, 0x04 };
-            var receivedHandshake = Decrypt(decoder.buffer);
+            Log.debug($"Validating handshake...");
 
-            if (Enumerable.SequenceEqual(receivedHandshake, expectedHandshake))
+            if (Enumerable.SequenceEqual(buffer, expectedHandshake))
             {
                 validated = true;
-                Log.debug($"Established encrypted connection with {decoder.clientEp}");
+                Log.debug($"... OK {BitConverter.ToString(buffer)}");
+                Log.debug($"Established encrypted connection with {clientEp.Address}");
             }
             else
             {
-                Log.error($"Encryption with {decoder.clientEp} validation FAILED. Possibly key mismatch.");
+                Log.debug($"... INVALID {BitConverter.ToString(buffer)}");
+                Log.error($"Encryption with {clientEp.Address} validation FAILED. Possibly key mismatch.");
             }
         }
 
@@ -130,11 +132,27 @@ namespace DaemonMC.Utils
 
             byte[] payload = fullPayload.Take(fullPayload.Length - 8).ToArray();
             byte[] actualChecksum = fullPayload.Skip(fullPayload.Length - 8).ToArray();
-            Log.debug($"AES Key: {BitConverter.ToString(_key)}");
-            Log.debug($"IV: {BitConverter.ToString(_ivBase)}");
             byte[] expectedChecksum = CalculateChecksum(_decryptCounter, payload);
 
-            if (!expectedChecksum.SequenceEqual(actualChecksum)) { Log.error($"Checksum failed at counter {_decryptCounter}. Expected {BitConverter.ToString(expectedChecksum)} got {BitConverter.ToString(actualChecksum)}"); }
+            if (!expectedChecksum.SequenceEqual(actualChecksum)) {
+                Log.debug($"Checksum failed at counter {_decryptCounter}. Expected {BitConverter.ToString(expectedChecksum)} got {BitConverter.ToString(actualChecksum)}", ConsoleColor.Red);
+                if (validated)
+                {
+                    Log.debug("AES-CTR out of sync. Trying to resynchronize...");
+                    for (int i = -2; i < 5; i++) // todo so far never worked lol
+                    {
+                        byte[] recoveryChecksum = CalculateChecksum(_decryptCounter + (ulong)i, payload);
+                        if (recoveryChecksum.SequenceEqual(actualChecksum))
+                        {
+                            Log.debug("...Success");
+                            _decryptCounter = _decryptCounter + (ulong)i;
+                            return Decrypt(encrypted);
+                        }
+                    }
+                    Log.debug("...Failed. Disconnecting client.");
+                    return null;
+                }
+            }
 
             _decryptCounter++;
             return payload;

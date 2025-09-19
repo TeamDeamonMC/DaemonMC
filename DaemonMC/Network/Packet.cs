@@ -11,85 +11,91 @@ namespace DaemonMC.Network
 
         public void DecodePacket(PacketDecoder decoder, PacketHandler handler = PacketHandler.Player)
         {
-            try
+            lock (decoder.Sync)
             {
-                Decode(decoder);
-            }
-            catch (Exception e)
-            {
-                if (decoder.player != null)
+                try
                 {
-                    decoder.player.Kick($"Handling {Id}\n {e}");
+                    Decode(decoder);
                 }
-                else
+                catch (Exception e)
                 {
-                    PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
-                    var packet = new Disconnect
+                    if (decoder.player != null)
                     {
-                        Message = $"Handling {Id}\n {e}"
-                    };
-                    packet.EncodePacket(encoder);
+                        decoder.player.Kick($"Handling {Id}\n {e}");
+                    }
+                    else
+                    {
+                        PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
+                        var packet = new Disconnect
+                        {
+                            Message = $"Handling {Id}\n {e}"
+                        };
+                        packet.EncodePacket(encoder);
+                    }
+                    Log.warn($"Packet decoding error for {decoder.clientEp.Address}. \n Handling {Id}\n {e}");
+                    return;
                 }
-                Log.warn($"Packet decoding error for {decoder.clientEp.Address}. \n Handling {Id}\n {e}");
-                return;
-            }
-            if (PluginManager.PacketReceived(decoder.clientEp, this))
-            {
-                switch (handler)
+                if (PluginManager.PacketReceived(decoder.clientEp, this))
                 {
-                    case PacketHandler.Player:
-                        decoder.player.HandlePacket(this);
-                        break;
-                    case PacketHandler.Bedrock:
-                        BedrockPacketProcessor.HandlePacket(this, decoder.clientEp);
-                        break;
-                    case PacketHandler.Raknet:
-                        RakPacketProcessor.HandlePacket(this, decoder.clientEp);
-                        break;
+                    switch (handler)
+                    {
+                        case PacketHandler.Player when decoder.player != null:
+                            decoder.player.HandlePacket(this);
+                            break;
+                        case PacketHandler.Bedrock:
+                            BedrockPacketProcessor.HandlePacket(this, decoder.clientEp);
+                            break;
+                        case PacketHandler.Raknet:
+                            RakPacketProcessor.HandlePacket(this, decoder.clientEp);
+                            break;
+                    }
                 }
             }
         }
 
         public void EncodePacket(PacketEncoder encoder)
         {
-            if (PluginManager.PacketSent(encoder.clientEp, this))
+            lock (encoder.Sync)
             {
-                switch (this)
+                if (PluginManager.PacketSent(encoder.clientEp, this))
                 {
-                    case UnconnectedPong:
-                    case ACK:
-                    case NACK:
-                    case OpenConnectionReply1:
-                    case OpenConnectionReply2:
-                    case ConnectedPong:
-                    case ConnectionRequestAccepted:
-                    case RakDisconnect:
-                    case GamePacket:
-                        encoder.WriteByte((byte)Id);
-                        break;
-                    default:
-                        encoder.PacketId(Id);
-                        break;
-                }
-                Encode(encoder);
-                switch (this)
-                {
-                    case UnconnectedPong:
-                    case ACK:
-                    case NACK:
-                    case OpenConnectionReply1:
-                    case OpenConnectionReply2:
-                        encoder.SendPacket((byte)Id);
-                        break;
-                    case ConnectedPong:
-                    case ConnectionRequestAccepted:
-                    case RakDisconnect:
-                    case GamePacket:
-                        encoder.handlePacket("raknet");
-                        break;
-                    default:
-                        encoder.handlePacket();
-                        break;
+                    switch (this)
+                    {
+                        case UnconnectedPong:
+                        case ACK:
+                        case NACK:
+                        case OpenConnectionReply1:
+                        case OpenConnectionReply2:
+                        case ConnectedPong:
+                        case ConnectionRequestAccepted:
+                        case RakDisconnect:
+                        case GamePacket:
+                            encoder.WriteByte((byte)Id);
+                            break;
+                        default:
+                            encoder.PacketId(Id);
+                            break;
+                    }
+                    Encode(encoder);
+                    switch (this)
+                    {
+                        case UnconnectedPong:
+                        case ACK:
+                        case NACK:
+                        case OpenConnectionReply1:
+                        case OpenConnectionReply2:
+                            encoder.SendPacket((byte)Id);
+                            break;
+                        case ConnectedPong:
+                        case ConnectionRequestAccepted:
+                        case RakDisconnect:
+                        case GamePacket:
+                            encoder.handlePacket("raknet");
+                            break;
+                        default:
+                            encoder.handlePacket();
+                            break;
+                    }
                 }
             }
         }

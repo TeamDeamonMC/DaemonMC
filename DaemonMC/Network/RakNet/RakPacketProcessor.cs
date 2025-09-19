@@ -113,13 +113,19 @@ namespace DaemonMC.Network.RakNet
 
             if (packet is ConnectedPing connectedPing)
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-                var pk = new ConnectedPong
+                var session = RakSessionManager.getSession(clientEp);
+                if (session != null)
                 {
-                    pingTime = connectedPing.Time,
-                    pongTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                };
-                pk.EncodePacket(encoder);
+                    session.LastPingTime = DateTime.UtcNow;
+
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new ConnectedPong
+                    {
+                        pingTime = connectedPing.Time,
+                        pongTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                    };
+                    pk.EncodePacket(encoder);
+                }
             }
 
             if (packet is GamePacket gamePacket)

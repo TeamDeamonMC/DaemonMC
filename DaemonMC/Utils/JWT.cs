@@ -77,8 +77,8 @@ namespace DaemonMC.Utils
             int index = rawToken.IndexOf("ey");
             string[] tokenParts = rawToken.Substring(index).Split('.');
 
-            string headerJson = DecodeBase64Url(tokenParts[0]);
-            string payloadJson = DecodeBase64Url(tokenParts[1]);
+            string headerJson = Encoding.UTF8.GetString(DecodeBase64Url(tokenParts[0]));
+            string payloadJson = Encoding.UTF8.GetString(DecodeBase64Url(tokenParts[1]));
 
             JObject header = JObject.Parse(headerJson);
             JwtPayload payload = JsonConvert.DeserializeObject<JwtPayload>(payloadJson);
@@ -143,13 +143,12 @@ namespace DaemonMC.Utils
             string message = $"{headerBase64}.{payloadBase64}";
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             byte[] derSignature = ecdsa.SignData(messageBytes, HashAlgorithmName.SHA384);
-            Log.debug($"Raw Signature (Hex): {BitConverter.ToString(derSignature)}");
             string signatureBase64 = Base64UrlEncode(derSignature);
             return $"{message}.{signatureBase64}";
         }
 
 
-        public static string DecodeBase64Url(string base64Url)
+        public static byte[] DecodeBase64Url(string base64Url)
         {
             string base64 = base64Url.Replace('-', '+').Replace('_', '/');
             switch (base64.Length % 4)
@@ -158,8 +157,7 @@ namespace DaemonMC.Utils
                 case 3: base64 += "="; break;
             }
 
-            byte[] data = Convert.FromBase64String(base64);
-            return Encoding.UTF8.GetString(data);
+            return Convert.FromBase64String(base64);
         }
 
         public static string Base64UrlEncode(byte[] bytes)

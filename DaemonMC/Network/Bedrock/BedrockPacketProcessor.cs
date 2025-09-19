@@ -46,6 +46,11 @@ namespace DaemonMC.Network.Bedrock
 
             if (packet is Login login)
             {
+                var session = RakSessionManager.getSession(clientEp);
+                if (session.EntityID != 0)
+                {
+                    return; // already doing login
+                }
                 try
                 {
                     LoginHandler.execute(login, clientEp);
@@ -62,7 +67,6 @@ namespace DaemonMC.Network.Bedrock
                     return;
                 }
 
-                var session = RakSessionManager.getSession(clientEp);
                 session.protocolVersion = login.ProtocolVersion;
 
                 Player player = new Player();
@@ -80,6 +84,16 @@ namespace DaemonMC.Network.Bedrock
                 {
                     player.Abilities[0].AbilityValues.MayFly = true;
                 }
+            }
+
+            if (packet is ClientToServerHandshake clientToServerHandshake)
+            {
+                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                var pk = new PlayStatus
+                {
+                    Status = 0,
+                };
+                pk.EncodePacket(encoder);
             }
 
             if (packet is PacketViolationWarning packetViolationWarning)

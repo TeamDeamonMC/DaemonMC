@@ -4,6 +4,8 @@ namespace DaemonMC.Network.RakNet
 {
     public class RakSession
     {
+        public object Sync { get; } = new object();
+        public DateTime LastPingTime { get; set; } = DateTime.UtcNow;
         public int MTU { get; set; } = 1500;
         public Encryptor encryptor { get; set; }
         public long GUID { get; set; }

@@ -64,6 +64,8 @@ namespace DaemonMC
             Thread titleMonitor = new Thread(titleUpdate);
             titleMonitor.Start();
 
+            RakSessionManager.Init();
+
             while (!Crash)
             {
                 EndPoint ep = iep;

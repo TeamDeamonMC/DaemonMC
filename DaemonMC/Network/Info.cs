@@ -21,6 +21,7 @@
             Login = 1,
             PlayStatus = 2,
             ServerToClientHandshake = 3,
+            ClientToServerHandshake = 4,
             Disconnect = 5,
             ResourcePacksInfo = 6,
             ResourcePackStack = 7,

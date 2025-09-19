@@ -12,14 +12,20 @@ namespace DaemonMC.Network.Bedrock
 
             if (session.encryptor != null)
             {
-                /*if (!session.encryptor.validated)
-                {
-                    session.encryptor.Validate(decoder);
-                }*/
-
-                Log.debug($"Encrypted Packet Data: {BitConverter.ToString(decoder.buffer)}");
                 decoder.buffer = session.encryptor.Decrypt(decoder.buffer);
-                Log.debug($"Decrypted Packet Data: {BitConverter.ToString(decoder.buffer)}");
+
+                if (decoder.buffer == null) //decryption failed
+                {
+                    Server.RemovePlayer(session.EntityID);
+                    RakSessionManager.deleteSession(decoder.clientEp, "Decryption failed");
+                    PacketDecoderPool.Return(decoder);
+                    return;
+                }
+
+                if (!session.encryptor.validated)
+                {
+                    session.encryptor.Validate(decoder.buffer, decoder.clientEp);
+                }
             }
 
             if (session != null)
@@ -42,10 +48,10 @@ namespace DaemonMC.Network.Bedrock
                         decoder.readOffset = 0;
                     }
                 }
-                if (Server.OnlinePlayers.ContainsKey(session.EntityID))
-                {
-                    decoder.player = Server.GetPlayer(session.EntityID);
-                }
+            }
+            else
+            {
+                return;
             }
 
             while (decoder.readOffset < decoder.buffer.Length)
@@ -68,6 +74,9 @@ namespace DaemonMC.Network.Bedrock
                         break;
                     case Info.Bedrock.Login:
                         new Login().DecodePacket(decoder, PacketHandler.Bedrock);
+                        break;
+                    case Info.Bedrock.ClientToServerHandshake:
+                        new ClientToServerHandshake().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
                     case Info.Bedrock.PacketViolationWarning:
                         new PacketViolationWarning().DecodePacket(decoder, PacketHandler.Bedrock);

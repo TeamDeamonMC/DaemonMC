@@ -17,6 +17,7 @@ namespace DaemonMC.Network
 {
     public class PacketEncoder
     {
+        public readonly object Sync = new object();
         public IPEndPoint clientEp = null!;
         public int protocolVersion = 0;
         public MemoryStream byteStream;
@@ -63,6 +64,11 @@ namespace DaemonMC.Network
                 byte[] finalPacket = bedrockId.Concat(toCompress).ToArray();
 
                 ResetStream();
+
+                if (session.encryptor != null && session.encryptor.validated)
+                {
+                    finalPacket = session.encryptor.Encrypt(finalPacket);
+                }
 
                 var packet = new GamePacket
                 {
@@ -787,7 +793,7 @@ namespace DaemonMC.Network
             if (pool.TryPop(out var encoder))
             {
                 encoder.clientEp = clientEp;
-                encoder.protocolVersion = RakSessionManager.getSession(clientEp).protocolVersion;
+                encoder.protocolVersion = RakSessionManager.sessions.TryGetValue(clientEp, out var session) ? session.protocolVersion : Info.ProtocolVersion.Last();
                 return encoder;
             }
 

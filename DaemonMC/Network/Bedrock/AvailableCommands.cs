@@ -17,7 +17,7 @@ namespace DaemonMC.Network.Bedrock
 
         }
 
-        protected override void Encode(PacketEncoder encoder) //todo looks terrible
+        protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteVarInt(EnumValues.Count);
             foreach (var value in EnumValues)
@@ -37,7 +37,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVarInt(Enums.Count);
             foreach (var enumEntry in Enums)
             {
-                encoder.WriteString(enumEntry.Name);
+                encoder.WriteString(enumEntry.EnumName);
                 encoder.WriteVarInt(enumEntry.Values.Count());
                 foreach (var val in enumEntry.Values)
                 {
@@ -69,7 +69,7 @@ namespace DaemonMC.Network.Bedrock
                     {
                         encoder.WriteString(parameter.Name);
                         encoder.WriteInt(CommandManager.GetSymbol(parameter.Type, Enums.FindIndex(p => p.Name == parameter.Name)));
-                        encoder.WriteBool(false);
+                        encoder.WriteBool(parameter.Optional);
                         encoder.WriteByte(0);
                     }
                 }

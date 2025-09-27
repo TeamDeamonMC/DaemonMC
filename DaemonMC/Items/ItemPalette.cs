@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using DaemonMC.Items;
+using DaemonMC.Items.VanillaItems;
 
-namespace DaemonMC.Blocks
+namespace DaemonMC.Items
 {
     public class ItemPalette
     {
@@ -19,6 +19,12 @@ namespace DaemonMC.Blocks
 
                 items[itemInstance.Id] = itemInstance;
             }
+        }
+
+        public static Item? GetItem(string itemName)
+        {
+            var item = items.Values.FirstOrDefault(i => string.Equals(i.Name, itemName, StringComparison.OrdinalIgnoreCase));
+            return item == null ? null : item.Clone();
         }
     }
 }

@@ -2,8 +2,8 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using DaemonMC.Biomes;
-using DaemonMC.Blocks;
 using DaemonMC.Entities;
+using DaemonMC.Items;
 using DaemonMC.Level;
 using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
@@ -172,14 +172,6 @@ namespace DaemonMC.Network.Bedrock
                     if (!player.CurrentWorld.OnlinePlayers.TryAdd(player.EntityID, player)) { return; }
                     player.spawn();
 
-                    var commands = new AvailableCommands
-                    {
-                        EnumValues = CommandManager.EnumValues,
-                        Enums = CommandManager.RealEnums,
-                        Commands = CommandManager.AvailableCommands
-                    };
-                    player.Send(commands);
-
                     if (session.protocolVersion >= Info.v1_21_60)
                     {
                         var items = new ItemRegistry
@@ -188,6 +180,14 @@ namespace DaemonMC.Network.Bedrock
                         };
                         player.Send(items);
                     }
+
+                    var commands = new AvailableCommands
+                    {
+                        EnumValues = CommandManager.EnumValues,
+                        Enums = CommandManager.RealEnums,
+                        Commands = CommandManager.AvailableCommands
+                    };
+                    player.Send(commands);
 
                     var creativeInventory = new CreativeContent
                     {

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BoltArmorTrimSmithingTemplate()
         {
             Name = "minecraft:bolt_armor_trim_smithing_template";
-            Id = 735;
+            Id = 734;
             Version = 2;
             ComponentBased = false;
         }

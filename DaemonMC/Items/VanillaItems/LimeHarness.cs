@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LimeHarness()
         {
             Name = "minecraft:lime_harness";
-            Id = 760;
+            Id = 759;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PinkHarness()
         {
             Name = "minecraft:pink_harness";
-            Id = 763;
+            Id = 762;
             Version = 2;
             ComponentBased = false;
         }

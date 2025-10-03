@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ArmadilloSpawnEgg()
         {
             Name = "minecraft:armadillo_spawn_egg";
-            Id = 739;
+            Id = 738;
             Version = 2;
             ComponentBased = false;
         }

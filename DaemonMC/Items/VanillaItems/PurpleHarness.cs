@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PurpleHarness()
         {
             Name = "minecraft:purple_harness";
-            Id = 764;
+            Id = 763;
             Version = 2;
             ComponentBased = false;
         }

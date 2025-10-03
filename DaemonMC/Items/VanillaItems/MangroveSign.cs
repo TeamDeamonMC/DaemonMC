@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MangroveSign()
         {
             Name = "minecraft:mangrove_sign";
-            Id = 671;
+            Id = 670;
             Version = 2;
             ComponentBased = false;
         }

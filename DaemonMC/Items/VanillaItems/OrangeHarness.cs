@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public OrangeHarness()
         {
             Name = "minecraft:orange_harness";
-            Id = 762;
+            Id = 761;
             Version = 2;
             ComponentBased = false;
         }

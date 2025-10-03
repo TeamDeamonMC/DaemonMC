@@ -1,11 +1,11 @@
 namespace DaemonMC.Items.VanillaItems
 {
-    public class ItemChain : Item
+    public class OakShelf : Item
     {
-        public ItemChain()
+        public OakShelf()
         {
-            Name = "minecraft:item.chain";
-            Id = -286;
+            Name = "minecraft:oak_shelf";
+            Id = -1047;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscOtherside()
         {
             Name = "minecraft:music_disc_otherside";
-            Id = 663;
+            Id = 662;
             Version = 2;
             ComponentBased = true;
         }

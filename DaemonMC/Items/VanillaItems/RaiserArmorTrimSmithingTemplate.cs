@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RaiserArmorTrimSmithingTemplate()
         {
             Name = "minecraft:raiser_armor_trim_smithing_template";
-            Id = 731;
+            Id = 730;
             Version = 2;
             ComponentBased = false;
         }

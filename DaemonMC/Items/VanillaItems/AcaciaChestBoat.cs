@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AcaciaChestBoat()
         {
             Name = "minecraft:acacia_chest_boat";
-            Id = 679;
+            Id = 678;
             Version = 2;
             ComponentBased = false;
         }

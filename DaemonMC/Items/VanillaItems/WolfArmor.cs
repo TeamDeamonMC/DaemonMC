@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WolfArmor()
         {
             Name = "minecraft:wolf_armor";
-            Id = 741;
+            Id = 740;
             Version = 2;
             ComponentBased = true;
         }

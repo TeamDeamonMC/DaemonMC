@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BlackHarness()
         {
             Name = "minecraft:black_harness";
-            Id = 752;
+            Id = 751;
             Version = 2;
             ComponentBased = false;
         }

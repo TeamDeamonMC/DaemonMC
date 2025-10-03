@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperPickaxe()
         {
             Name = "minecraft:copper_pickaxe";
-            Id = 771;
+            Id = 770;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LightBlueHarness()
         {
             Name = "minecraft:light_blue_harness";
-            Id = 758;
+            Id = 757;
             Version = 2;
             ComponentBased = false;
         }

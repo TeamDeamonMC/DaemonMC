@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChestBoat()
         {
             Name = "minecraft:chest_boat";
-            Id = 682;
+            Id = 681;
             Version = 2;
             ComponentBased = false;
         }

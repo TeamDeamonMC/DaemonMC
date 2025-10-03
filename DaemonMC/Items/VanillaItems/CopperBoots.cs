@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperBoots()
         {
             Name = "minecraft:copper_boots";
-            Id = 777;
+            Id = 776;
             Version = 2;
             ComponentBased = false;
         }

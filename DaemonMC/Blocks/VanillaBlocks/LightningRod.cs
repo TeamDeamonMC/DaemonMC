@@ -7,6 +7,7 @@
             Name = "minecraft:lightning_rod";
 
             States["facing_direction"] = 0;
+            States["powered_bit"] = (byte)0;
         }
     }
 }

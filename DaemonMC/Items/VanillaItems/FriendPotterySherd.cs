@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FriendPotterySherd()
         {
             Name = "minecraft:friend_pottery_sherd";
-            Id = 702;
+            Id = 701;
             Version = 2;
             ComponentBased = false;
         }

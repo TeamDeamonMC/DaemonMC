@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RecoveryCompass()
         {
             Name = "minecraft:recovery_compass";
-            Id = 683;
+            Id = 682;
             Version = 2;
             ComponentBased = false;
         }

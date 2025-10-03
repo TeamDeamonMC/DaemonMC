@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WardArmorTrimSmithingTemplate()
         {
             Name = "minecraft:ward_armor_trim_smithing_template";
-            Id = 722;
+            Id = 721;
             Version = 2;
             ComponentBased = false;
         }

@@ -477,7 +477,14 @@ namespace DaemonMC.Network
                         break;
                     case int value:
                         WriteVarInt(2);
-                        WriteSignedVarInt(value);
+                        if (protocolVersion >= Info.v1_21_111)
+                        {
+                            WriteVarInt(value);
+                        }
+                        else
+                        {
+                            WriteSignedVarInt(value);
+                        }
                         break;
                     case float value:
                         WriteVarInt(3);
@@ -678,7 +685,7 @@ namespace DaemonMC.Network
                 }
                 WriteFloat(biome.BiomeData.Temperature);
                 WriteFloat(biome.BiomeData.Downfall);
-                if (protocolVersion >= Info.v1_21_110)
+                if (protocolVersion >= Info.v1_21_111)
                 {
                     WriteFloat(biome.BiomeData.FoliageSnow);
                 }

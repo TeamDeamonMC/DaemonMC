@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HeartPotterySherd()
         {
             Name = "minecraft:heart_pottery_sherd";
-            Id = 704;
+            Id = 703;
             Version = 2;
             ComponentBased = false;
         }

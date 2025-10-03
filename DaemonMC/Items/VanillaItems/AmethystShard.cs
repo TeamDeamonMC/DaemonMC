@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AmethystShard()
         {
             Name = "minecraft:amethyst_shard";
-            Id = 661;
+            Id = 660;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscPigstep()
         {
             Name = "minecraft:music_disc_pigstep";
-            Id = 657;
+            Id = 656;
             Version = 2;
             ComponentBased = true;
         }

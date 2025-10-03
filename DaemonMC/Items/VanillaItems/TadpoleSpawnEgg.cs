@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TadpoleSpawnEgg()
         {
             Name = "minecraft:tadpole_spawn_egg";
-            Id = 666;
+            Id = 665;
             Version = 2;
             ComponentBased = false;
         }

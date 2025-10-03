@@ -1,10 +1,10 @@
 ﻿namespace DaemonMC.Blocks
 {
-    public class Chain : Block
+    public class IronChain : Block
     {
-        public Chain()
+        public IronChain()
         {
-            Name = "minecraft:chain";
+            Name = "minecraft:iron_chain";
 
             States["pillar_axis"] = "y";
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoatHorn()
         {
             Name = "minecraft:goat_horn";
-            Id = 664;
+            Id = 663;
             Version = 2;
             ComponentBased = false;
         }

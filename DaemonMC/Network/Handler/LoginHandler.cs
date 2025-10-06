@@ -1,12 +1,9 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
-using DaemonMC.Utils.Text;
 using Newtonsoft.Json;
 
 namespace DaemonMC.Network.Handler
@@ -15,40 +12,37 @@ namespace DaemonMC.Network.Handler
     {
         public static void execute(Login packet, IPEndPoint clientEp)
         {
-            byte[] jwtBuffer = Encoding.UTF8.GetBytes(packet.Request);
-            string filteredJWT;
-            string tokenJWT;
+            byte[] Buffer = packet.Request;
 
-            if (packet.ProtocolVersion >= Info.v1_21_90)
+            using (var ms = new MemoryStream(Buffer))
+            using (var reader = new BinaryReader(ms))
             {
-                int jsonStart = packet.Request.IndexOf('{');
-                int jsonEnd = packet.Request.LastIndexOf("}");
+                string filteredJWT;
+                string tokenJWT;
 
-                string jsonPart = packet.Request.Substring(jsonStart, jsonEnd - jsonStart + 1);
+                if (packet.ProtocolVersion >= Info.v1_21_90)
+                {
+                    uint chainLength = reader.ReadUInt32();
+                    string jsonPart = Encoding.UTF8.GetString(reader.ReadBytes((int)chainLength));
 
-                var loginJson = JsonConvert.DeserializeObject<LoginJson>(jsonPart);
-                var certJson = JsonDocument.Parse(loginJson.Certificate);
-                var chainArray = certJson.RootElement.GetProperty("chain");
+                    var loginJson = JsonConvert.DeserializeObject<LoginJson>(jsonPart);
+                    filteredJWT = loginJson.Certificate;
 
-                filteredJWT = $"{{\"chain\":{chainArray.GetRawText()}}}";
+                    uint tokenLength = reader.ReadUInt32();
+                    tokenJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)tokenLength));
+                }
+                else
+                {
+                    uint chainLength = reader.ReadUInt32();
+                    filteredJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)chainLength));
 
-                byte[] jwtBytes = Encoding.UTF8.GetBytes(packet.Request);
-                int tokenStart = Encoding.UTF8.GetBytes(jsonPart).Length + 8;
+                    uint tokenLength = reader.ReadUInt32();
+                    tokenJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)tokenLength));
+                }
 
-                tokenJWT = Encoding.UTF8.GetString(jwtBytes, tokenStart, jwtBytes.Length - tokenStart);
+                JWT.processJWTchain(filteredJWT, clientEp);
+                JWT.processJWTtoken(tokenJWT, clientEp);
             }
-            else
-            {
-                string pattern = @"{""chain"":\[.*?\]}";
-                var match = Regex.Match(packet.Request, pattern);
-                filteredJWT = match.Value;
-
-                int tokenStart = Encoding.UTF8.GetBytes(filteredJWT).Length + 8;
-                tokenJWT = Encoding.UTF8.GetString(jwtBuffer, tokenStart, jwtBuffer.Length - tokenStart);
-            }
-
-            JWT.processJWTchain(filteredJWT, clientEp);
-            JWT.processJWTtoken(tokenJWT, clientEp);
 
             var player = RakSessionManager.getSession(clientEp);
 

@@ -231,6 +231,16 @@ namespace DaemonMC.Network
             return result;
         }
 
+        public byte[] ReadBytes()
+        {
+            int length = ReadVarInt();
+            byte[] result = new byte[length];
+            Array.Copy(buffer, readOffset, result, 0, length);
+            readOffset += length;
+
+            return result;
+        }
+
         public long ReadLong()
         {
             long value = BitConverter.ToInt64(buffer, readOffset);

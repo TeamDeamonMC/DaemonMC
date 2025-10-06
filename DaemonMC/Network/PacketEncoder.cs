@@ -124,6 +124,7 @@ namespace DaemonMC.Network
 
         public void Reset()
         {
+            clientEp = null;
             byteStream.SetLength(0);
             byteStream.Position = 0;
         }

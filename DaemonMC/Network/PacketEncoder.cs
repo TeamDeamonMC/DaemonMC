@@ -110,14 +110,20 @@ namespace DaemonMC.Network
                 Log.warn($"Tried to send data to disconnected client {clientEp.Address}");
                 return;
             }
-            Server.Sock.SendTo(trimmedBuffer, clientEp);
+            if (session.isClient == true)
+            {
+                session.client.Sock.SendTo(trimmedBuffer, clientEp);
+            }
+            else
+            {
+                Server.Sock.SendTo(trimmedBuffer, clientEp);
+            }
             if (pkid == 128) { RakSessionManager.getSession(clientEp).sequenceNumber++; };
             if (pooled) { PacketEncoderPool.Return(this); }
         }
 
         public void Reset()
         {
-            clientEp = null;
             byteStream.SetLength(0);
             byteStream.Position = 0;
         }
@@ -261,16 +267,23 @@ namespace DaemonMC.Network
             byteStream.Write(strBytes, 0, strBytes.Length);
         }
 
-        public void WriteAddress(string ip = "127.0.0.1")
+        public void WriteMTU(int mtu)
         {
-            string[] ipParts = ip.Split('.');
-            byte[] ipAddress = new byte[] { byte.Parse(ipParts[0]), byte.Parse(ipParts[1]), byte.Parse(ipParts[2]), byte.Parse(ipParts[3]) };
+            int payloadLength = mtu - 28;
+            byte[] payload = new byte[payloadLength];
+            byteStream.Write(payload, 0, payload.Length);
+        }
+
+        public void WriteAddress(IPAddressInfo info)
+        {
+            byte[] ipParts = info.IPAddress;
+            byte[] ipAddress = new byte[] { ipParts[0], ipParts[1], ipParts[2], ipParts[3] };
 
             byteStream.WriteByte(4);
 
             byteStream.Write(ipAddress, 0, ipAddress.Length);
 
-            byte[] portBytes = BitConverter.GetBytes((ushort)Server.Port);
+            byte[] portBytes = BitConverter.GetBytes(info.Port);
             Array.Reverse(portBytes);
             byteStream.Write(portBytes, 0, portBytes.Length);
         }

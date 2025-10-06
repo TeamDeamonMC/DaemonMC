@@ -6,22 +6,26 @@
 
         public string Magic { get; set; }
         public long GUID { get; set; }
-        public IPAddressInfo clientAddress { get; set; }
+        public IPAddressInfo Address { get; set; }
         public int Mtu { get; set; }
         public bool Encryption { get; set; }
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Magic = decoder.ReadMagic();
+            GUID = decoder.ReadLongLE();
+            Address = decoder.ReadAddress();
+            Mtu = decoder.ReadShortBE();
+            Encryption = decoder.ReadBool();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteMagic(Magic);
             encoder.WriteLongLE(GUID);
-            encoder.WriteAddress();
+            encoder.WriteAddress(Address);
             encoder.WriteShortBE((ushort)Mtu);
-            encoder.WriteByte(0);
+            encoder.WriteBool(Encryption);
         }
     }
 }

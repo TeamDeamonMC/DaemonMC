@@ -11,7 +11,10 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Reason = decoder.ReadVarInt();
+            SkipMessage = decoder.ReadBool();
+            Message = decoder.ReadString();
+            FilteredMessage = decoder.ReadString();
         }
 
         protected override void Encode(PacketEncoder encoder)

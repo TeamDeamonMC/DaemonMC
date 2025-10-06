@@ -19,7 +19,13 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteAddress(serverAddress);
+            for (int i = 0; i < internalAddress.Length; ++i)
+            {
+                encoder.WriteAddress(internalAddress[i]);
+            }
+            encoder.WriteLongLE(incommingTime);
+            encoder.WriteLongLE(serverTime);
         }
     }
 }

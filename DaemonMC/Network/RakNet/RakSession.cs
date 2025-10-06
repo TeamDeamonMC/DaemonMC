@@ -22,6 +22,9 @@ namespace DaemonMC.Network.RakNet
         public int protocolVersion { get; set; } = 0;
         public Skin skin { get; set; } = new Skin();
 
+        public bool isClient = false;
+        public Client client { get; set; }
+
         public RakSession(bool compression = false)
         {
             initCompression = compression;

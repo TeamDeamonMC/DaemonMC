@@ -12,7 +12,8 @@ namespace DaemonMC
 {
     public class Server
     {
-        public static int Port { get; set; } = 19132;
+        public static ushort Port { get; set; } = 19132;
+        public static IPEndPoint iep { get; set; }
         public static Socket Sock { get; set; } = null!;
         public static Dictionary<long, Player> OnlinePlayers = new Dictionary<long, Player>();
         public static long NextId = 10;
@@ -29,7 +30,7 @@ namespace DaemonMC
         public static void ServerF()
         {
             Sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPEndPoint iep = new IPEndPoint(IPAddress.Any, Port);
+            iep = new IPEndPoint(IPAddress.Any, Port);
 
             try
             {

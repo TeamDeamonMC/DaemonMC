@@ -21,7 +21,10 @@ namespace DaemonMC.Network.RakNet
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteMagic(Magic);
+            encoder.WriteAddress(Address);
+            encoder.WriteShortBE((ushort)Mtu);
+            encoder.WriteLong(ClientId);
         }
     }
 }

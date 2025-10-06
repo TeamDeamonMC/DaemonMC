@@ -41,11 +41,20 @@ namespace DaemonMC.Network
                 case Info.RakNet.UnconnectedPing:
                     new UnconnectedPing().DecodePacket(decoder, PacketHandler.Raknet);
                     break;
+                case Info.RakNet.UnconnectedPong:
+                    new UnconnectedPong().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
                 case Info.RakNet.OpenConnectionRequest1:
                     new OpenConnectionRequest1().DecodePacket(decoder, PacketHandler.Raknet);
                     break;
+                case Info.RakNet.OpenConnectionReply1:
+                    new OpenConnectionReply1().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
                 case Info.RakNet.OpenConnectionRequest2:
                     new OpenConnectionRequest2().DecodePacket(decoder, PacketHandler.Raknet);
+                    break;
+                case Info.RakNet.OpenConnectionReply2:
+                    new OpenConnectionReply2().DecodePacket(decoder, PacketHandler.Raknet);
                     break;
                 case Info.RakNet.ACK:
                     new ACK().DecodePacket(decoder, PacketHandler.Raknet);
@@ -86,6 +95,9 @@ namespace DaemonMC.Network
                 {
                     case Info.RakNet.ConnectionRequest:
                         new ConnectionRequest().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
+                    case Info.RakNet.ConnectionRequestAccepted:
+                        new ConnectionRequestAccepted().DecodePacket(decoder, PacketHandler.Raknet);
                         break;
                     case Info.RakNet.NewIncomingConnection:
                         new NewIncomingConnection().DecodePacket(decoder, PacketHandler.Raknet);
@@ -247,8 +259,11 @@ namespace DaemonMC.Network
 
         public string ReadRakString()
         {
-            ushort length = BitConverter.ToUInt16(buffer, readOffset);
-            readOffset += 2;
+            short length = ReadShortBE();
+            if (length < 0 || readOffset + length > buffer.Length)
+            {
+                throw new Exception($"Invalid rakstring lenght {length}");
+            }
             string str = Encoding.UTF8.GetString(buffer, readOffset, length);
             readOffset += length;
 
@@ -268,11 +283,11 @@ namespace DaemonMC.Network
             return str;
         }
 
-        public int ReadMTU(int lenght)
+        public short ReadMTU(int lenght)
         {
             int paddingSize = lenght - readOffset;
 
-            int estimatedMTU = readOffset + paddingSize + 28;
+            short estimatedMTU = (short)(readOffset + paddingSize + 28);
 
             readOffset = (paddingSize + readOffset);
 

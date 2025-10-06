@@ -6,7 +6,7 @@
 
         public string Magic { get; set; }
         public byte Protocol { get; set; }
-        public int Mtu { get; set; }
+        public short Mtu { get; set; }
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -17,7 +17,9 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteMagic(Magic);
+            encoder.WriteByte(Protocol);
+            encoder.WriteMTU(Mtu);
         }
     }
 }

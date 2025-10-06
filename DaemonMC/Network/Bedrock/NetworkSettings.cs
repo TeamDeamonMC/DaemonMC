@@ -12,7 +12,11 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            CompressionThreshold = decoder.ReadShort();
+            CompressionAlgorithm = decoder.ReadShort();
+            ClientThrottleEnabled = decoder.ReadBool();
+            ClientThrottleThreshold = decoder.ReadByte();
+            ClientThrottleScalar = decoder.ReadFloat();
         }
 
         protected override void Encode(PacketEncoder encoder)

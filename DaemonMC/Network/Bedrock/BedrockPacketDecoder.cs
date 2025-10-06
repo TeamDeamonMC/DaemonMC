@@ -69,8 +69,14 @@ namespace DaemonMC.Network.Bedrock
 
                 switch (pkid)
                 {
+                    case Info.Bedrock.PlayStatus:
+                        new PlayStatus().DecodePacket(decoder, PacketHandler.Client);
+                        break;
                     case Info.Bedrock.RequestNetworkSettings:
                         new RequestNetworkSettings().DecodePacket(decoder, PacketHandler.Bedrock);
+                        break;
+                    case Info.Bedrock.NetworkSettings:
+                        new NetworkSettings().DecodePacket(decoder, PacketHandler.Client);
                         break;
                     case Info.Bedrock.Login:
                         new Login().DecodePacket(decoder, PacketHandler.Bedrock);
@@ -140,6 +146,9 @@ namespace DaemonMC.Network.Bedrock
                         break;
                     case Info.Bedrock.ClientMovementPredictionSync:
                         new ClientMovementPredictionSync().DecodePacket(decoder);
+                        break;
+                    case Info.Bedrock.Disconnect:
+                        new Disconnect().DecodePacket(decoder, PacketHandler.Client);
                         break;
 
 

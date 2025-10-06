@@ -17,7 +17,9 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteLongLE(Time);
+            encoder.WriteMagic(Magic);
+            encoder.WriteLong(ClientId);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace DaemonMC
             DaemonMC.DrawDistance = config.DrawDistance;
             DaemonMC.UnloadChunks = config.UnloadChunks;
             DaemonMC.Compression = ToCompressionType(config.Compression);
-            Server.Port = config.Port;
+            Server.Port = (ushort)config.Port;
             JWT.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;
             Cryptography.UseEncryption = config.Encryption;

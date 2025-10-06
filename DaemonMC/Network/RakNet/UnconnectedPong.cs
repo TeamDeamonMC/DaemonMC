@@ -11,7 +11,10 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Time = decoder.ReadLongLE();
+            GUID = decoder.ReadLongLE();
+            Magic = decoder.ReadMagic();
+            MOTD = decoder.ReadRakString();
         }
 
         protected override void Encode(PacketEncoder encoder)

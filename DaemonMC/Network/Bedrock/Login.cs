@@ -16,7 +16,8 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteIntBE(ProtocolVersion);
+            encoder.WriteString(Request);
         }
     }
 }

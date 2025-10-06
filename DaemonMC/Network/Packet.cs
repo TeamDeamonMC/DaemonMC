@@ -48,6 +48,10 @@ namespace DaemonMC.Network
                         case PacketHandler.Raknet:
                             RakPacketProcessor.HandlePacket(this, decoder.clientEp);
                             break;
+                        case PacketHandler.Client:
+                            var session = RakSessionManager.getSession(decoder.clientEp);
+                            session.client.PacketReceivedEvent(this);
+                            break;
                     }
                 }
             }
@@ -61,13 +65,18 @@ namespace DaemonMC.Network
                 {
                     switch (this)
                     {
+                        case UnconnectedPing:
                         case UnconnectedPong:
                         case ACK:
                         case NACK:
+                        case OpenConnectionRequest1:
                         case OpenConnectionReply1:
+                        case OpenConnectionRequest2:
                         case OpenConnectionReply2:
                         case ConnectedPong:
+                        case ConnectionRequest:
                         case ConnectionRequestAccepted:
+                        case NewIncomingConnection:
                         case RakDisconnect:
                         case GamePacket:
                             encoder.WriteByte((byte)Id);
@@ -79,15 +88,20 @@ namespace DaemonMC.Network
                     Encode(encoder);
                     switch (this)
                     {
+                        case UnconnectedPing:
                         case UnconnectedPong:
                         case ACK:
                         case NACK:
+                        case OpenConnectionRequest1:
                         case OpenConnectionReply1:
+                        case OpenConnectionRequest2:
                         case OpenConnectionReply2:
                             encoder.SendPacket((byte)Id);
                             break;
                         case ConnectedPong:
+                        case ConnectionRequest:
                         case ConnectionRequestAccepted:
+                        case NewIncomingConnection:
                         case RakDisconnect:
                         case GamePacket:
                             encoder.handlePacket("raknet");
@@ -108,6 +122,7 @@ namespace DaemonMC.Network
     {
         Player,
         Bedrock,
-        Raknet
+        Raknet,
+        Client
     }
 }

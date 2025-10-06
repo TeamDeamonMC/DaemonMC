@@ -8,18 +8,22 @@
         public long GUID { get; set; }
         public bool Security { get; set; }
         public int Cookie { get; set; }
-        public int Mtu { get; set; }
+        public short Mtu { get; set; }
 
         protected override void Decode(PacketDecoder decoder)
         {
-
+            Magic = decoder.ReadMagic();
+            GUID = decoder.ReadLongLE();
+            Security = decoder.ReadBool();
+            //todo cookie
+            Mtu = decoder.ReadShortBE();
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteMagic(Magic);
             encoder.WriteLongLE(GUID);
-            encoder.WriteByte(0);
+            encoder.WriteBool(Security);
             encoder.WriteShortBE((ushort)Mtu);
         }
     }

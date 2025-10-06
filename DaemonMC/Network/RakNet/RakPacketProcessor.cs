@@ -8,6 +8,76 @@ namespace DaemonMC.Network.RakNet
     {
         internal static void HandlePacket(Packet packet, IPEndPoint clientEp)
         {
+            var session = RakSessionManager.getSession(clientEp);
+
+            if (session.isClient)
+            {
+                if (session.client.PacketReceivedEvent(packet))
+                {
+                    return;
+                }
+
+                if (packet is UnconnectedPong unconnectedPong)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new OpenConnectionRequest1
+                    {
+                        Magic = "00ffff00fefefefefdfdfdfd12345678",
+                        Protocol = 11,
+                        Mtu = 1492
+                    };
+                    pk.EncodePacket(encoder);
+                }
+
+                if (packet is OpenConnectionReply1 openConnectionReply1)
+                {
+                    byte[] bytes = new byte[8];
+                    Random rnd = new Random();
+                    rnd.NextBytes(bytes);
+                    session.GUID = BitConverter.ToInt64(bytes, 0);
+                    session.client.Unconnected = false;
+
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new OpenConnectionRequest2
+                    {
+                        Magic = "00ffff00fefefefefdfdfdfd12345678",
+                        Address = new IPAddressInfo() { IPAddress = session.client.iep.Address.GetAddressBytes(), Port = (ushort)session.client.iep.Port },
+                        Mtu = 1492,
+                        ClientId = session.GUID
+                    };
+                    pk.EncodePacket(encoder);
+                }
+
+                if (packet is OpenConnectionReply2 openConnectionReply2)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new ConnectionRequest
+                    {
+                        Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                        GUID = session.GUID
+                    };
+                    pk.EncodePacket(encoder);
+                }
+
+                if (packet is ConnectionRequestAccepted connectionRequestAccepted)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+                    var pk = new NewIncomingConnection
+                    {
+                        serverAddress = connectionRequestAccepted.ClientAddress,
+                        internalAddress = Enumerable.Repeat(new IPAddressInfo() { IPAddress = IPAddress.Parse("255.255.255.255").GetAddressBytes(), Port = 0 }, 20).ToArray(),
+                    };
+                    pk.EncodePacket(encoder);
+
+                    PacketEncoder encoder2 = PacketEncoderPool.Get(clientEp);
+                    var pk2 = new RequestNetworkSettings
+                    {
+                        ProtocolVersion = session.protocolVersion
+                    };
+                    pk2.EncodePacket(encoder2);
+                }
+            }
+
             if (packet is UnconnectedPing unconnectedPing)
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
@@ -41,6 +111,7 @@ namespace DaemonMC.Network.RakNet
                 {
                     Magic = "00ffff00fefefefefdfdfdfd12345678",
                     GUID = 1234567890123456789,
+                    Address = new IPAddressInfo() { IPAddress = Server.iep.Address.GetAddressBytes(), Port = Server.Port },
                     Mtu = openConnectionRequest2.Mtu
                 };
                 RakSessionManager.getSession(clientEp).MTU = openConnectionRequest2.Mtu;
@@ -53,7 +124,10 @@ namespace DaemonMC.Network.RakNet
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new ConnectionRequestAccepted
                 {
-                    Time = connectionRequest.Time,
+                    ClientAddress = new IPAddressInfo() { IPAddress = Server.iep.Address.GetAddressBytes(), Port = Server.Port },
+                    SystemAddress = Enumerable.Repeat(new IPAddressInfo() { IPAddress = Server.iep.Address.GetAddressBytes(), Port = Server.Port }, 20).ToArray(),
+                    PingTime = connectionRequest.Time,
+                    PongTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 };
                 RakSessionManager.addSession(clientEp, connectionRequest.GUID);
                 pk.EncodePacket(encoder);
@@ -113,7 +187,6 @@ namespace DaemonMC.Network.RakNet
 
             if (packet is ConnectedPing connectedPing)
             {
-                var session = RakSessionManager.getSession(clientEp);
                 if (session != null)
                 {
                     session.LastPingTime = DateTime.UtcNow;

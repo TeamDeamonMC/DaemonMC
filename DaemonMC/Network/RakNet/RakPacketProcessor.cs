@@ -35,7 +35,7 @@ namespace DaemonMC.Network.RakNet
                     Random rnd = new Random();
                     rnd.NextBytes(bytes);
                     session.GUID = BitConverter.ToInt64(bytes, 0);
-                    session.client.Unconnected = false;
+                    session.client.ConnectionState = -1;
 
                     PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                     var pk = new OpenConnectionRequest2
@@ -75,6 +75,7 @@ namespace DaemonMC.Network.RakNet
                         ProtocolVersion = session.protocolVersion
                     };
                     pk2.EncodePacket(encoder2);
+                    session.client.ConnectionState = 1;
                 }
             }
 

@@ -1,13 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
-using DaemonMC.Network.Bedrock;
 using DaemonMC.Network;
+using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
 
 namespace DaemonMC.Utils
 {
@@ -127,6 +129,75 @@ namespace DaemonMC.Utils
             }
 
             Log.info($"{player.username} with client version {payload.GameVersion} doing login...");
+        }
+
+        public static string CreateJWTchain()
+        {
+            using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+            var keyParams = ecdsa.ExportParameters(true);
+            var securityKey = new ECDsaSecurityKey(ecdsa);
+
+            var extraData = new
+            {
+                XUID = "",
+                displayName = "Sunny",
+                identity = "e0e8697d-d37d-3c5c-816b-474dc9418b58"
+            };
+
+            var now = DateTimeOffset.UtcNow;
+            var payloadDict = new Dictionary<string, object>
+        {
+            { "exp", now.AddYears(1).ToUnixTimeSeconds() },
+            { "nbf", now.ToUnixTimeSeconds() },
+            { "identityPublicKey", ExportPublicKeyToX509Base64(keyParams) },
+            { "extraData", extraData }
+        };
+
+            string json = JsonConvert.SerializeObject(payloadDict);
+            var jwtPayload = System.IdentityModel.Tokens.Jwt.JwtPayload.Deserialize(json);
+
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.EcdsaSha384);
+            var header = new JwtHeader(credentials);
+            header["x5u"] = ExportPublicKeyToX509Base64(keyParams);
+
+            var token = new JwtSecurityToken(header, jwtPayload);
+
+            var handler = new JwtSecurityTokenHandler();
+            string jwt = handler.WriteToken(token);
+
+            return jwt;
+        }
+
+        public static string CreateJWTtoken()
+        {
+            using var ecdsa = ECDsa.Create(ECCurve.NamedCurves.nistP384);
+            var securityKey = new ECDsaSecurityKey(ecdsa);
+
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.EcdsaSha384);
+
+            var data = new JwtPayload();
+            data.GameVersion = "1.21.111";
+            data.ClientRandomId = new Random().Next();
+            data.DeviceId = Guid.NewGuid().ToString();
+            data.DeviceOS = (int)BuildPlatform.UWP;
+            data.LanguageCode = "en_US";
+
+            string payloadJson = JsonConvert.SerializeObject(data);
+            var jwtPayload = System.IdentityModel.Tokens.Jwt.JwtPayload.Deserialize(payloadJson);
+
+            var header = new JwtHeader(credentials);
+            header["typ"] = "JWT";
+
+            var token = new JwtSecurityToken(header, jwtPayload);
+            var handler = new JwtSecurityTokenHandler();
+            return handler.WriteToken(token);
+        }
+
+        private static string ExportPublicKeyToX509Base64(ECParameters keyParams)
+        {
+            using var ec = ECDsa.Create(keyParams);
+            var pubKey = ec.ExportSubjectPublicKeyInfo();
+            return Convert.ToBase64String(pubKey);
         }
 
         public static string CreateHandshakeJwt(byte[] secret, ECDsa ecdsa)

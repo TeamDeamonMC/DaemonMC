@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using Newtonsoft.Json;
 
@@ -10,7 +11,7 @@ namespace DaemonMC
 {
     public class Client
     {
-        public bool Unconnected = true;
+        public int ConnectionState = 0;
         public bool Running = true;
         public Socket Sock { get; set; } = null!;
         public string Username { get; set; } = "Daemon123";
@@ -31,7 +32,8 @@ namespace DaemonMC
             Sock.Bind(new IPEndPoint(IPAddress.Any, 50001));
             iep = new IPEndPoint(IPAddress.Broadcast, 19132);
             RakSessionManager.createSession(iep);
-            RakSessionManager.sessions.TryGetValue(iep, out var session);
+            var session = RakSessionManager.getSession(iep);
+            session.username = Username;
             session.isClient = true;
             session.client = this;
             session.protocolVersion = ProtocolVersion;
@@ -49,16 +51,19 @@ namespace DaemonMC
                 if (packet is Disconnect disconnect)
                 {
                     Console.WriteLine($"Disconnect: {disconnect.Reason}");
+                    ConnectionState = 0;
                 }
                 if (packet is NetworkSettings networkSettings)
                 {
                     Console.WriteLine($"NetworkSettings: {JsonConvert.SerializeObject(networkSettings, Formatting.Indented)}");
+                    session.initCompression = true;
+
 
                     PacketEncoder encoder = PacketEncoderPool.Get(iep);
                     var pk = new Login
                     {
                         ProtocolVersion = ProtocolVersion,
-
+                        Request = LoginHandler.createRequest(),
                     };
                     pk.EncodePacket(encoder);
                 }
@@ -93,19 +98,31 @@ namespace DaemonMC
 
             var pingThread = new Thread(() =>
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(iep);
-                while (Unconnected)
+                while (true)
                 {
-                    var pk = new UnconnectedPing
+                    if (ConnectionState == 0)
                     {
-                        Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                        Magic = "00ffff00fefefefefdfdfdfd12345678",
-                        ClientId = 123456,
-                    };
-                    pk.EncodePacket(encoder);
-
-                    encoder.Reset();
-                    Thread.Sleep(1000);
+                        PacketEncoder encoder = PacketEncoderPool.Get(iep);
+                        var pk = new UnconnectedPing
+                        {
+                            Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                            Magic = "00ffff00fefefefefdfdfdfd12345678",
+                            ClientId = 123456,
+                        };
+                        pk.EncodePacket(encoder);
+                        encoder.Reset();
+                    }
+                    else if (ConnectionState == 1)
+                    {
+                        PacketEncoder encoder = PacketEncoderPool.Get(iep);
+                        var pk = new ConnectedPing
+                        {
+                            Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                        };
+                        pk.EncodePacket(encoder);
+                        encoder.Reset();
+                    }
+                    Thread.Sleep(ConnectionState == 0 ? 1000 : 5000);
                 }
 
             });

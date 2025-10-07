@@ -180,7 +180,6 @@ namespace DaemonMC.Network.RakNet
                 maxPayloadSize -= reliabilityType == ReliabilityType.reliable ? 6 : 3;
                 maxPayloadSize -= isFragmented ? 10 : 0;
                 int totalFragments = isFragmented ? (int)Math.Ceiling((double)body.Length / maxPayloadSize) : 1;
-                uint currentSequenceNumber = session.sequenceNumber;
 
                 int compIndex = 0;
                 uint seqIndex = 0;
@@ -256,8 +255,6 @@ namespace DaemonMC.Network.RakNet
                 {
                     session.orderIndex++;
                 }
-
-                session.sequenceNumber = currentSequenceNumber;
             }
 
             PacketEncoderPool.Return(encoder);

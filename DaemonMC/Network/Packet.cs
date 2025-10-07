@@ -73,6 +73,7 @@ namespace DaemonMC.Network
                         case OpenConnectionReply1:
                         case OpenConnectionRequest2:
                         case OpenConnectionReply2:
+                        case ConnectedPing:
                         case ConnectedPong:
                         case ConnectionRequest:
                         case ConnectionRequestAccepted:
@@ -98,6 +99,7 @@ namespace DaemonMC.Network
                         case OpenConnectionReply2:
                             encoder.SendPacket((byte)Id);
                             break;
+                        case ConnectedPing:
                         case ConnectedPong:
                         case ConnectionRequest:
                         case ConnectionRequestAccepted:

@@ -10,7 +10,7 @@ namespace DaemonMC.Network.Handler
 {
     public class LoginHandler
     {
-        public static void execute(Login packet, IPEndPoint clientEp)
+        public static void handleRequest(Login packet, IPEndPoint clientEp)
         {
             byte[] Buffer = packet.Request;
 
@@ -27,18 +27,15 @@ namespace DaemonMC.Network.Handler
 
                     var loginJson = JsonConvert.DeserializeObject<LoginJson>(jsonPart);
                     filteredJWT = loginJson.Certificate;
-
-                    uint tokenLength = reader.ReadUInt32();
-                    tokenJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)tokenLength));
                 }
                 else
                 {
                     uint chainLength = reader.ReadUInt32();
                     filteredJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)chainLength));
-
-                    uint tokenLength = reader.ReadUInt32();
-                    tokenJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)tokenLength));
                 }
+
+                uint tokenLength = reader.ReadUInt32();
+                tokenJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)tokenLength));
 
                 JWT.processJWTchain(filteredJWT, clientEp);
                 JWT.processJWTtoken(tokenJWT, clientEp);
@@ -91,6 +88,35 @@ namespace DaemonMC.Network.Handler
                     Status = 0,
                 };
                 pk.EncodePacket(encoder);
+            }
+        }
+
+        public static byte[] createRequest()
+        {
+            var loginJson = new LoginJson
+            {
+                AuthenticationType = 2,
+                Certificate = $"{{\"chain\":[\"{JWT.CreateJWTchain()}\"]}}"
+            };
+
+            string jsonPart = JsonConvert.SerializeObject(loginJson);
+            byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonPart);
+
+            string tokenJWT = JWT.CreateJWTtoken();
+            byte[] tokenBytes = Encoding.UTF8.GetBytes(tokenJWT);
+
+            using (var ms = new MemoryStream())
+            using (var writer = new BinaryWriter(ms))
+            {
+                writer.Write((uint)jsonBytes.Length);
+
+                writer.Write(jsonBytes);
+
+                writer.Write((uint)tokenBytes.Length);
+
+                writer.Write(tokenBytes);
+
+                return ms.ToArray();
             }
         }
     }

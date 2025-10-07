@@ -53,7 +53,7 @@ namespace DaemonMC.Network.Bedrock
                 }
                 try
                 {
-                    LoginHandler.execute(login, clientEp);
+                    LoginHandler.handleRequest(login, clientEp);
                 }
                 catch (Exception e)
                 {

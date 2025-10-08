@@ -114,6 +114,7 @@ namespace DaemonMC
                 level.Unload();
             }
             Thread.Sleep(2000);
+            Log.InitMsg(false);
         }
 
         public static long AddPlayer(Player player, IPEndPoint ep)

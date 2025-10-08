@@ -5,6 +5,9 @@ namespace DaemonMC.Utils.Text
 {
     public class Log
     {
+        private static string currentLogFile;
+        private static StreamWriter writer;
+
         public static List<Info.Bedrock> ignoredPackets = new List<Info.Bedrock> {
             Info.Bedrock.PlayerAuthInput,
             Info.Bedrock.LevelChunk
@@ -22,7 +25,7 @@ namespace DaemonMC.Utils.Text
             if (debugMode)
             {
                 Console.ForegroundColor = color;
-                Console.WriteLine($"[DEBUG] {message}");
+                ToLog($"[DEBUG] {message}");
                 Console.ResetColor();
             }
         }
@@ -30,7 +33,7 @@ namespace DaemonMC.Utils.Text
         {
             if (ignoredRakPackets.Contains(id) || !raLog) { return; }
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            ToLog($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
             Console.ResetColor();
         }
 
@@ -38,7 +41,7 @@ namespace DaemonMC.Utils.Text
         {
             if (ignoredRakPackets.Contains(id) || !raLog) { return; }
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            ToLog($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
             Console.ResetColor();
         }
 
@@ -46,7 +49,7 @@ namespace DaemonMC.Utils.Text
         {
             if (ignoredPackets.Contains(id) || !pkLog) { return; }
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            ToLog($"[Server] <-- [{clientEp.Address,-16}:{clientEp.Port}] {id}");
             Console.ResetColor();
         }
 
@@ -54,7 +57,7 @@ namespace DaemonMC.Utils.Text
         {
             if (ignoredPackets.Contains(id) || !pkLog) { return; }
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
+            ToLog($"[Server] --> [{clientEp.Address,-16}:{clientEp.Port}] {id}");
             Console.ResetColor();
         }
 
@@ -66,7 +69,7 @@ namespace DaemonMC.Utils.Text
         public static void info(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"[INFO] {message}");
+            ToLog($"[INFO] {message}");
             Console.ResetColor();
         }
 
@@ -78,7 +81,7 @@ namespace DaemonMC.Utils.Text
         public static void warn(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"[WARN] {message}");
+            ToLog($"[WARN] {message}");
             Console.ResetColor();
         }
 
@@ -90,7 +93,7 @@ namespace DaemonMC.Utils.Text
         public static void error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"[ERROR] {message}");
+            ToLog($"[ERROR] {message}");
             Console.ResetColor();
         }
 
@@ -102,6 +105,38 @@ namespace DaemonMC.Utils.Text
         public static void line()
         {
             Console.WriteLine();
+        }
+
+        public static void ToLog(string message, bool print = true)
+        {
+            UpdateLogFile();
+            Console.WriteLine(message);
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            writer.WriteLine($"[{timestamp}] {message}");
+        }
+
+        public static void InitMsg(bool startup)
+        {
+            UpdateLogFile();
+            string state = startup ? "started" : "shutdown";
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            writer.WriteLine($"============= Server {state} at {timestamp} =============");
+        }
+
+        private static void UpdateLogFile()
+        {
+            string date = DateTime.Now.ToString("yyyy-MM-dd");
+            string logFile = $"{date}.log";
+
+            if (logFile != currentLogFile)
+            {
+                writer?.Dispose();
+                currentLogFile = logFile;
+                writer = new StreamWriter(currentLogFile, append: true)
+                {
+                    AutoFlush = true
+                };
+            }
         }
     }
 }

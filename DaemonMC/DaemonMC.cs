@@ -23,6 +23,7 @@ namespace DaemonMC
         internal static string GitHash = "unknown";
         public static void Main()
         {
+            Log.InitMsg(true);
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnExit);
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnExit);
 

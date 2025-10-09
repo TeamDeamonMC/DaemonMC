@@ -231,10 +231,14 @@ namespace DaemonMC.Plugin
             foreach (var plugin in _plugins)
             {
                 plugin.PluginInstance.OnPlayerMove(ev);
-                if (!ev.IsCancelled)
+                if (ev.IsCancelled)
                 {
-                    continue;
+                    break;
                 }
+            }
+
+            if (ev.IsCancelled)
+            {
                 player.MoveTo(oldPosition);
             }
         }
@@ -296,8 +300,12 @@ namespace DaemonMC.Plugin
                 plugin.PluginInstance.OnPlayerSentMessage(ev);
                 if (ev.IsCancelled)
                 {
-                    continue;
+                    break;
                 }
+            }
+
+            if (!ev.IsCancelled)
+            {
                 var msg = new TextMessage
                 {
                     MessageType = 1,
@@ -318,19 +326,12 @@ namespace DaemonMC.Plugin
 
                 if (ev.IsCancelled)
                 {
-                    var pk = new PlayerSkin
-                    {
-                        UUID = player.UUID,
-                        Skin = player.Skin,
-                        Name = player.Skin.SkinId,
-                        OldName = player.Skin.SkinId,
-                        Trusted = player.Skin.PremiumSkin,
-                    };
-                    player.Send(pk);
-                    Log.error("cancel");
-                    continue;
+                    break;
                 }
+            }
 
+            if (!ev.IsCancelled)
+            {
                 var pk2 = new PlayerSkin
                 {
                     UUID = player.UUID,

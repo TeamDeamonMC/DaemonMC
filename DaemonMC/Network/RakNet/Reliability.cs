@@ -10,7 +10,7 @@ namespace DaemonMC.Network.RakNet
         public int Count;
         public byte[][] Fragments;
 
-        public FragmentedPacket(int totalSize, int fragmentCount)
+        public FragmentedPacket(int fragmentCount, int totalSize)
         {
             TotalSize = totalSize;
             ReceivedSize = 0;

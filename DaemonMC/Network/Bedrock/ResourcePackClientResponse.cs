@@ -15,7 +15,8 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteByte(Response);
+            encoder.WritePackNames(Packs);
         }
     }
 }

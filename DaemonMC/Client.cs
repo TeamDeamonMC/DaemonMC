@@ -29,7 +29,7 @@ namespace DaemonMC
         {
             Sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             Sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
-            Sock.Bind(new IPEndPoint(IPAddress.Any, 50001));
+            Sock.Bind(new IPEndPoint(IPAddress.Any, 0));
             iep = new IPEndPoint(IPAddress.Broadcast, 19132);
             RakSessionManager.createSession(iep);
             var session = RakSessionManager.getSession(iep);
@@ -47,6 +47,13 @@ namespace DaemonMC
                 if (packet is PlayStatus playStatus)
                 {
                     Console.WriteLine($"PlayStatus: {(PlayStatusTypes)playStatus.Status}");
+
+                    PacketEncoder encoder = PacketEncoderPool.Get(iep);
+                    var pk = new ClientCacheStatus
+                    {
+                        Status = false
+                    };
+                    pk.EncodePacket(encoder);
                 }
                 if (packet is Disconnect disconnect)
                 {
@@ -64,6 +71,24 @@ namespace DaemonMC
                     {
                         ProtocolVersion = ProtocolVersion,
                         Request = LoginHandler.createRequest(),
+                    };
+                    pk.EncodePacket(encoder);
+                }
+                if (packet is ResourcePacksInfo resourcePacksInfo)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(iep);
+                    var pk = new ResourcePackClientResponse
+                    {
+                        Response = 3
+                    };
+                    pk.EncodePacket(encoder);
+                }
+                if (packet is ResourcePackStack resourcePackStack)
+                {
+                    PacketEncoder encoder = PacketEncoderPool.Get(iep);
+                    var pk = new ResourcePackClientResponse
+                    {
+                        Response = 4
                     };
                     pk.EncodePacket(encoder);
                 }

@@ -180,10 +180,10 @@ namespace DaemonMC.Network.RakNet
 
             if (packet is NewIncomingConnection newIncomingConnection)
             {
-                DateTimeOffset incomingTime = DateTimeOffset.FromUnixTimeSeconds(newIncomingConnection.incommingTime);
+               /* DateTimeOffset incomingTime = DateTimeOffset.FromUnixTimeSeconds(newIncomingConnection.incommingTime);
                 DateTimeOffset serverTime = DateTimeOffset.FromUnixTimeSeconds(newIncomingConnection.serverTime);
 
-                Log.debug($"[RakNet] New Connection: {clientEp.Address} incommingTime: {incomingTime.ToString("yyyy.MM.dd HH:mm:ss")} serverTime: {serverTime.ToString("yyyy.MM.dd HH:mm:ss")}", ConsoleColor.DarkYellow);
+                Log.debug($"[RakNet] New Connection: {clientEp.Address} incommingTime: {incomingTime.ToString("yyyy.MM.dd HH:mm:ss")} serverTime: {serverTime.ToString("yyyy.MM.dd HH:mm:ss")}", ConsoleColor.DarkYellow);*/
             }
 
             if (packet is ConnectedPing connectedPing)

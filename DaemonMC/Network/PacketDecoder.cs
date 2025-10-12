@@ -105,6 +105,9 @@ namespace DaemonMC.Network
                     case Info.RakNet.ConnectedPing:
                         new ConnectedPing().DecodePacket(decoder, PacketHandler.Raknet);
                         break;
+                    case Info.RakNet.ConnectedPong:
+                        new ConnectedPong().DecodePacket(decoder, PacketHandler.Raknet);
+                        break;
                     case Info.RakNet.Disconnect:
                         new RakDisconnect().DecodePacket(decoder, PacketHandler.Raknet);
                         break;

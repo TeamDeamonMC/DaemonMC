@@ -140,7 +140,7 @@ namespace DaemonMC.Utils
             var extraData = new
             {
                 XUID = "",
-                displayName = "Sunny",
+                displayName = "Daemon123",
                 identity = "e0e8697d-d37d-3c5c-816b-474dc9418b58"
             };
 

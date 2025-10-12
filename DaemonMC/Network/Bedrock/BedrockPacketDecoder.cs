@@ -90,8 +90,14 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.ClientCacheStatus:
                         new ClientCacheStatus().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;
+                    case Info.Bedrock.ResourcePacksInfo:
+                        new ResourcePacksInfo().DecodePacket(decoder, PacketHandler.Client);
+                        break;
                     case Info.Bedrock.ResourcePackClientResponse:
                         new ResourcePackClientResponse().DecodePacket(decoder, PacketHandler.Bedrock);
+                        break;
+                    case Info.Bedrock.ResourcePackStack:
+                        new ResourcePackStack().DecodePacket(decoder, PacketHandler.Client);
                         break;
                     case Info.Bedrock.RequestChunkRadius:
                         new RequestChunkRadius().DecodePacket(decoder);

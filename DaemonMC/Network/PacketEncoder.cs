@@ -371,6 +371,15 @@ namespace DaemonMC.Network
             WriteFloat(vec.Y);
         }
 
+        public void WritePackNames(List<string> packs)
+        {
+            WriteShort((ushort)packs.Count());
+            foreach (var pack in packs)
+            {
+                WriteString(pack);
+            }
+        }
+
         public void WriteSkin(Skin skin)
         {
             WriteString(skin.SkinId);

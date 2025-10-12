@@ -1,19 +1,18 @@
 ﻿using System.Net;
-using DaemonMC.Network.Bedrock;
-using DaemonMC.Network;
-using DaemonMC.Utils.Text;
 using System.Numerics;
+using DaemonMC.Blocks;
+using DaemonMC.Entities;
+using DaemonMC.Forms;
 using DaemonMC.Level;
-using DaemonMC.Utils;
+using DaemonMC.Network;
+using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
-using DaemonMC.Utils.Game;
 using DaemonMC.Plugin;
-using DaemonMC.Entities;
-using DaemonMC.Blocks;
-using DaemonMC.Forms;
+using DaemonMC.Utils;
+using DaemonMC.Utils.Game;
+using DaemonMC.Utils.Text;
 using Newtonsoft.Json;
-using DaemonMC.Plugin.Events;
 
 namespace DaemonMC
 {
@@ -31,6 +30,7 @@ namespace DaemonMC
         public long Tick { get; set; }
         public Vector3 Position { get; set; } = new Vector3(0, 100, 0);
         public Vector2 Rotation { get; set; } = new Vector2(0, 0);
+        public float HeadRotation { get; set; } = 0;
         public bool onGround { get; set; }
         public int drawDistance { get; set; }
         public IPEndPoint ep { get; set; }
@@ -604,10 +604,10 @@ namespace DaemonMC
                 }
                 if (Vector3.Distance(Position, playerAuthInput.Position) > 0.01f || Vector2.Distance(Rotation, playerAuthInput.Rotation) > 0.01f)
                 {
-                    PluginManager.PlayerMove(this);
-
-                    Position = playerAuthInput.Position;
                     Rotation = playerAuthInput.Rotation;
+                    HeadRotation = playerAuthInput.HeadRotation;
+
+                    PluginManager.PlayerMove(this, playerAuthInput);
 
                     ushort header = 0;
                     header |= 0x01;
@@ -631,7 +631,7 @@ namespace DaemonMC
                             Header = header,
                             Position = Position,
                             Rotation = Rotation,
-                            YheadRotation = playerAuthInput.HeadRotation
+                            YheadRotation = HeadRotation
                         };
                         movePk.EncodePacket(encoder);
                     }

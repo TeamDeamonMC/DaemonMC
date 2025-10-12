@@ -223,11 +223,10 @@ namespace DaemonMC.Plugin
             }
         }
 
-        public static void PlayerMove(Player player)
+        public static void PlayerMove(Player player, PlayerAuthInput movePk)
         {
-            var oldPosition = player.Position;
             var ev = new PlayerMoveEvent(player);
-
+            
             foreach (var plugin in _plugins)
             {
                 plugin.PluginInstance.OnPlayerMove(ev);
@@ -239,7 +238,22 @@ namespace DaemonMC.Plugin
 
             if (ev.IsCancelled)
             {
-                player.MoveTo(oldPosition);
+                if (player.Position != movePk.Position)
+                {
+                    var packet = new MovePlayer
+                    {
+                        ActorRuntimeId = player.EntityID,
+                        Position = player.Position,
+                        Rotation = player.Rotation,
+                        YheadRotation = player.HeadRotation,
+                        Tick = player.Tick
+                    };
+                    player.Send(packet);
+                }
+            }
+            else
+            {
+                player.Position = movePk.Position;
             }
         }
 

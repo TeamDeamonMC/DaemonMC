@@ -3,7 +3,7 @@
     public class Info
     {
         public static string Version = "1.21.111";
-        public static int[] ProtocolVersion = [748, 766, 776, 786, 800, 818, 819, 827, 844];
+        public static int[] ProtocolVersion = [/*748, 766, 776, 786, 800,*/ 818, 819, 827, 844];
 
         public static int v1_21_40 = 748;
         public static int v1_21_50 = 766;

@@ -2,6 +2,7 @@
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using DaemonMC.Utils;
+using DaemonMC.Network.Handler;
 
 namespace DaemonMC
 {
@@ -61,7 +62,7 @@ namespace DaemonMC
             DaemonMC.UnloadChunks = config.UnloadChunks;
             DaemonMC.Compression = ToCompressionType(config.Compression);
             Server.Port = (ushort)config.Port;
-            JWT.XboxAuth = config.XboxAuth;
+            LoginHandler.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;
             Cryptography.UseEncryption = config.Encryption;
         }

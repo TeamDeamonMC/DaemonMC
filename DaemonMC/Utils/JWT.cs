@@ -5,6 +5,7 @@ using System.Text;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils.Text;
 using Microsoft.IdentityModel.Tokens;
@@ -20,57 +21,46 @@ namespace DaemonMC.Utils
 
     public class JWT
     {
-        public const string RootKey = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
-        public static bool XboxAuth { get; set; } = true;
-
-        public static void processJWTchain(string jsonString, IPEndPoint clientEp)
+        public static void processAuthToken(string authToken, IPEndPoint clientEp)
         {
-            var player = RakSessionManager.getSession(clientEp);
-            JWTObject decodedObject = JsonConvert.DeserializeObject<JWTObject>(jsonString);
             var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(authToken) as JwtSecurityToken;
 
-            if (decodedObject == null)
+            if (jsonToken == null)
             {
+                LoginHandler.Reject(clientEp, "Invalid auth token");
                 return;
             }
 
-            if (decodedObject.Chain.Count == 3)
-            {
-                var jsonToken = handler.ReadToken(decodedObject.Chain[1]) as JwtSecurityToken;  //mojang chain
-                var x5u = jsonToken.Header["x5u"].ToString();
-                if (x5u == RootKey)
-                {
-                    Log.debug("Mojang RootKey: OK");
-                }
+            var payload = jsonToken.Payload;
 
-                var clientToken = handler.ReadToken(decodedObject.Chain[2]) as JwtSecurityToken;  //client chain
-                var extraDataClaim = clientToken.Claims.FirstOrDefault(claim => claim.Type == "extraData");
+            var player = RakSessionManager.getSession(clientEp);
+            player.XUID = payload.Claims.FirstOrDefault(claim => claim.Type == "xid").Value;
 
-                ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
-                player.username = extraData.DisplayName;
-                player.identity = extraData.Identity;
-                player.identityPublicKey = clientToken.Claims.FirstOrDefault(claim => claim.Type == "identityPublicKey").Value;
-                player.XUID = extraData.XUID;
-            }
-            else if (!XboxAuth)
+            if (player.XUID == null)
             {
-                var jsonToken2 = handler.ReadToken(decodedObject.Chain[0]) as JwtSecurityToken;  //client chain
-                var extraDataClaim = jsonToken2.Claims.FirstOrDefault(claim => claim.Type == "extraData");
+                LoginHandler.Reject(clientEp, "Invalid auth token");
+                return;
+            }
 
-                ExtraData extraData = JsonConvert.DeserializeObject<ExtraData>(extraDataClaim.Value);
-                player.username = extraData.DisplayName;
-                player.identity = extraData.Identity;
-                player.XUID = extraData.XUID;
-            }
-            else
+            player.username = payload.Claims.FirstOrDefault(claim => claim.Type == "xname").Value;
+            player.identityPublicKey = payload.Claims.FirstOrDefault(claim => claim.Type == "cpk").Value;
+
+            byte[] data;
+            using (var md5 = MD5.Create())
             {
-                PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-                var packet = new Disconnect
-                {
-                    Message = "You need to login to Xbox Live"
-                };
-                packet.EncodePacket(encoder);
+                data = md5.ComputeHash(Encoding.UTF8.GetBytes("pocket-auth-1-xuid:" + player.XUID));
             }
+
+            data[6] = (byte)((data[6] & 0x0F) | 0x30);
+
+            data[8] = (byte)((data[8] & 0x3F) | 0x80);
+
+            Array.Reverse(data, 0, 4);
+            Array.Reverse(data, 4, 2);
+            Array.Reverse(data, 6, 2);
+
+            player.identity = new Guid(data).ToString();
         }
 
         public static void processJWTtoken(string rawToken, IPEndPoint clientEp)

@@ -10,6 +10,15 @@ namespace DaemonMC.Network.Handler
 {
     public class LoginHandler
     {
+        public static bool XboxAuth { get; set; } = true;
+
+        public enum AuthenticationType
+        {
+            Full,
+            Guest,
+            SelfSigned
+        }
+
         public static void handleRequest(Login packet, IPEndPoint clientEp)
         {
             byte[] Buffer = packet.Request;
@@ -17,27 +26,26 @@ namespace DaemonMC.Network.Handler
             using (var ms = new MemoryStream(Buffer))
             using (var reader = new BinaryReader(ms))
             {
-                string filteredJWT;
+                string authToken;
                 string tokenJWT;
 
-                if (packet.ProtocolVersion >= Info.v1_21_90)
-                {
-                    uint chainLength = reader.ReadUInt32();
-                    string jsonPart = Encoding.UTF8.GetString(reader.ReadBytes((int)chainLength));
+                uint chainLength = reader.ReadUInt32();
+                string jsonPart = Encoding.UTF8.GetString(reader.ReadBytes((int)chainLength));
 
-                    var loginJson = JsonConvert.DeserializeObject<LoginJson>(jsonPart);
-                    filteredJWT = loginJson.Certificate;
-                }
-                else
+                var loginJson = JsonConvert.DeserializeObject<LoginJson>(jsonPart);
+
+                if (XboxAuth && loginJson.AuthenticationType != (int)AuthenticationType.Full)
                 {
-                    uint chainLength = reader.ReadUInt32();
-                    filteredJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)chainLength));
+                    Reject(clientEp, "You need to login to Xbox Live");
+                    return;
                 }
+
+                authToken = loginJson.Token;
 
                 uint tokenLength = reader.ReadUInt32();
                 tokenJWT = Encoding.UTF8.GetString(reader.ReadBytes((int)tokenLength));
 
-                JWT.processJWTchain(filteredJWT, clientEp);
+                JWT.processAuthToken(authToken, clientEp);
                 JWT.processJWTtoken(tokenJWT, clientEp);
             }
 
@@ -95,7 +103,7 @@ namespace DaemonMC.Network.Handler
         {
             var loginJson = new LoginJson
             {
-                AuthenticationType = 2,
+                AuthenticationType = (int)AuthenticationType.SelfSigned,
                 Certificate = $"{{\"chain\":[\"{JWT.CreateJWTchain()}\"]}}"
             };
 
@@ -119,11 +127,22 @@ namespace DaemonMC.Network.Handler
                 return ms.ToArray();
             }
         }
+
+        public static void Reject(IPEndPoint clientEp, string reason)
+        {
+            PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
+            var packet = new Disconnect
+            {
+                Message = reason
+            };
+            packet.EncodePacket(encoder);
+        }
     }
 
     public class LoginJson
     {
         public int AuthenticationType { get; set; } = 0;
-        public string Certificate { get; set; } = "";
+        public string Certificate { get; set; } = ""; //Deprecated
+        public string Token { get; set; } = "";
     }
 }

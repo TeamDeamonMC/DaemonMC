@@ -41,10 +41,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(IsTeacher);
                 encoder.WriteBool(IsHost);
                 encoder.WriteBool(IsSubclient);
-                if (encoder.protocolVersion >= Info.v1_21_80)
-                {
-                    encoder.WriteInt(Color);
-                }
+                encoder.WriteInt(Color);
                 encoder.WriteBool(true);
             }
             else

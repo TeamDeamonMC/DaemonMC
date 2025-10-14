@@ -101,26 +101,15 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteString("");
             encoder.WriteString(LevelName); //level name?
             encoder.WriteString("");
-            if (encoder.protocolVersion >= Info.v1_21_90)
-            {
-                encoder.WriteString(""); //owner id idk
-            }
+            encoder.WriteString(""); //owner id idk
             encoder.WriteBool(false); //trial //ok
                 //synced movement settings
-                if (encoder.protocolVersion <= Info.v1_21_80)
-                {
-                    encoder.WriteSignedVarInt(2);
-                }
                 encoder.WriteSignedVarInt(40);
                 encoder.WriteBool(true);
                 //end of synced movement settings
             encoder.WriteLong(0);
             encoder.WriteSignedVarInt(0);
             encoder.WriteVarInt(0); //block
-            if (encoder.protocolVersion <= Info.v1_21_50)
-            {
-                encoder.WriteVarInt(0); //item
-            }
             encoder.WriteString("");
             encoder.WriteBool(true); //new inventory
             encoder.WriteString(Info.Version);

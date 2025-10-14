@@ -15,14 +15,7 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            if (encoder.protocolVersion >= Info.v1_21_80)
-            {
-                encoder.WriteBiomes(BiomeData);
-            }
-            else
-            {
-                encoder.WriteBiomesOld(BiomeData);
-            }
+            encoder.WriteBiomes(BiomeData);
         }
     }
 }

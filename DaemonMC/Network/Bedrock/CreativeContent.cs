@@ -10,10 +10,7 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            if (encoder.protocolVersion >= Info.v1_21_60)
-            {
-                encoder.WriteVarInt(0); //groups
-            }
+            encoder.WriteVarInt(0); //groups
             encoder.WriteVarInt(0); //items
         }
     }

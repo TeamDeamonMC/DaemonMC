@@ -12,7 +12,7 @@
         {
             Variable = decoder.ReadInt();
             AnotherVariable = decoder.ReadString();
-            if (decoder.protocolVersion >= Info.v1_21_60) //packets have to be backward compatible 
+            if (decoder.protocolVersion >= Info.v1_21_100) //packets have to be backward compatible 
             {
                 decoder.ReadUUID();
             }
@@ -22,7 +22,7 @@
         {
             encoder.WriteInt(Variable);
             encoder.WriteString(AnotherVariable);
-            if (encoder.protocolVersion >= Info.v1_21_60)
+            if (encoder.protocolVersion >= Info.v1_21_100)
             {
                 encoder.WriteUUID(SomeNewID);
             }

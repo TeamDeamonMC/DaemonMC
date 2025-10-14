@@ -531,14 +531,7 @@ namespace DaemonMC.Network
             WriteShort((ushort)packs.Count());
             foreach (var pack in packs)
             {
-                if (protocolVersion >= Info.v1_21_50)
-                {
-                    WriteUUID(pack.UUID);
-                }
-                if (protocolVersion <= Info.v1_21_40)
-                {
-                    WriteString(pack.UUID.ToString());
-                }
+                WriteUUID(pack.UUID);
                 WriteString(pack.PackIdVersion);
                 WriteLong(pack.PackContent.Length);
                 WriteString(pack.ContentKey);
@@ -599,10 +592,7 @@ namespace DaemonMC.Network
                 WriteInt(data.AbilitiesSet);
                 WriteAbilityValues(data.AbilityValues);
                 WriteFloat(data.FlySpeed);
-                if (protocolVersion >= Info.v1_21_60)
-                {
-                    WriteFloat(data.VerticalFlySpeed);
-                }
+                WriteFloat(data.VerticalFlySpeed);
                 WriteFloat(data.WalkSpeed);
             }
         }
@@ -671,24 +661,6 @@ namespace DaemonMC.Network
                 WriteVarInt(entry.Key);
                 WriteFloat(entry.Value);
             }
-        }
-
-        public void WriteBiomesOld(List<Biome> biomes)
-        {
-            var BiomeData = new NbtCompound("");
-            foreach (var biome in biomes)
-            {
-                BiomeData.Add(new NbtCompound(biome.BiomeName)
-                {
-                    new NbtFloat("ash", biome.BiomeData.AshDensity),
-                    new NbtFloat("blue_spores", biome.BiomeData.BlueSporeDensity),
-                    new NbtFloat("downfall", biome.BiomeData.Downfall),
-                    new NbtFloat("red_spores", biome.BiomeData.RedSporeDensity),
-                    new NbtFloat("temperature", biome.BiomeData.Temperature),
-                    new NbtFloat("white_ash", biome.BiomeData.WhiteAshDensity),
-                });
-            }
-            WriteCompoundTag(BiomeData);
         }
 
         public void WriteBiomes(List<Biome> biomes)

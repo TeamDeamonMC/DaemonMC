@@ -62,11 +62,6 @@ namespace DaemonMC.Network.Bedrock
                 var pkid = (Info.Bedrock)decoder.ReadVarInt();
                 Log.packetIn(decoder.clientEp, pkid);
 
-                if ((int)pkid == 315) //1.21.80 client bug?
-                {
-                    return;
-                }
-
                 switch (pkid)
                 {
                     case Info.Bedrock.PlayStatus:

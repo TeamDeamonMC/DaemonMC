@@ -172,14 +172,11 @@ namespace DaemonMC.Network.Bedrock
                     if (!player.CurrentWorld.OnlinePlayers.TryAdd(player.EntityID, player)) { return; }
                     player.spawn();
 
-                    if (session.protocolVersion >= Info.v1_21_60)
+                    var items = new ItemRegistry
                     {
-                        var items = new ItemRegistry
-                        {
-                            Items = ItemPalette.items
-                        };
-                        player.Send(items);
-                    }
+                        Items = ItemPalette.items
+                    };
+                    player.Send(items);
 
                     var commands = new AvailableCommands
                     {

@@ -11,10 +11,6 @@ namespace DaemonMC.Level.Format
             {
                 palette = To1_21_100(palette);
             }
-            if (protocol <= Info.v1_21_50)
-            {
-                palette = To1_21_50(palette);
-            }
 
             return palette;
         }

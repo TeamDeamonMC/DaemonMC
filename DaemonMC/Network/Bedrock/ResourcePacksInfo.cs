@@ -26,11 +26,8 @@
             {
                 encoder.WriteBool(DisableVibrantVisuals);
             }
-            if (encoder.protocolVersion >= Info.v1_21_50)
-            {
-                encoder.WriteUUID(TemplateUUID);
-                encoder.WriteString(TemplateVersion);
-            }
+            encoder.WriteUUID(TemplateUUID);
+            encoder.WriteString(TemplateVersion);
             encoder.WriteResourcePacksInfo(Packs);
         }
     }

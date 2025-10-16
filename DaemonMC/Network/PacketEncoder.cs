@@ -268,6 +268,15 @@ namespace DaemonMC.Network
             byteStream.Write(strBytes, 0, strBytes.Length);
         }
 
+        public void WriteStringList(List<string> list)
+        {
+            WriteVarInt((ushort)list.Count());
+            foreach (var value in list)
+            {
+                WriteString(value);
+            }
+        }
+
         public void WriteMTU(int mtu)
         {
             int payloadLength = mtu - 28;
@@ -724,7 +733,7 @@ namespace DaemonMC.Network
         public void WriteContainerName(FullContainerName ContainerName)
         {
             WriteByte(ContainerName.ContainerName);
-            WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt(ContainerName.DynamicId));
+            WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt((int)ContainerName.DynamicId));
         }
 
         public void WriteItem(Item item)

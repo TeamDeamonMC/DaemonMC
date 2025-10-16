@@ -1,9 +1,8 @@
 ﻿using System.Net;
 using System.Numerics;
 using System.Text;
-using DaemonMC.Blocks;
 using DaemonMC.Items;
-using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
@@ -296,6 +295,17 @@ namespace DaemonMC.Network
             return str;
         }
 
+        public List<string> ReadStringList()
+        {
+            List<string> list = new List<string>();
+            int count = ReadVarInt();
+            for (int i = 0; i < count; i++)
+            {
+                list.Add(ReadString());
+            }
+            return list;
+        }
+
         public short ReadMTU(int lenght)
         {
             int paddingSize = lenght - readOffset;
@@ -386,6 +396,14 @@ namespace DaemonMC.Network
             return value;
         }
 
+        public long ReadSignedVarLong()
+        {
+
+            long rawVarLong = ReadVarLong();
+            long value = (rawVarLong >> 1) ^ -(rawVarLong & 1);
+            return value;
+        }
+
         public Guid ReadUUID()
         {
             byte[] mostSignificantBits = new byte[8];
@@ -408,6 +426,17 @@ namespace DaemonMC.Network
                 X = ReadFloat(),
                 Y = ReadFloat(),
                 Z = ReadFloat()
+            };
+            return value;
+        }
+
+        public Vector3 ReadBlockPos()
+        {
+            var value = new Vector3()
+            {
+                X = ReadSignedVarInt(),
+                Y = ReadSignedVarInt(),
+                Z = ReadSignedVarInt()
             };
             return value;
         }
@@ -557,6 +586,62 @@ namespace DaemonMC.Network
             values.Health = ReadFloat();
             values.Hunger = ReadFloat();
             return values;
+        }
+
+        public List<Actions> ReadActions()
+        {
+            var actions = new List<Actions>();
+            var count = ReadVarInt();
+            for (int i = 0; i < count; i++)
+            {
+                var action = new Actions();
+                action.ActionsType = ReadByte();
+                action.Amount = ReadByte();
+                action.Source = ReadSlotInfo();
+                action.Destination = ReadSlotInfo();
+            }
+            return actions;
+        }
+
+        public ItemStackRequestSlotInfo ReadSlotInfo()
+        {
+            var slotInfo = new ItemStackRequestSlotInfo();
+            slotInfo.ContainerName = ReadContainerName();
+            slotInfo.Slot = ReadByte();
+            slotInfo.NetIdVariant = ReadVarInt();
+            return slotInfo;
+        }
+
+        public FullContainerName ReadContainerName()
+        {
+            var containerName = new FullContainerName();
+            containerName.ContainerName = ReadByte();
+            containerName.DynamicId = ReadOptional(ReadSignedVarInt);
+            return containerName;
+        }
+
+        public PlayerBlockAction ReadBlockActions()
+        {
+            var action = new PlayerBlockAction();
+            var actionCount = ReadSignedVarInt();
+            for (int i = 0; i < actionCount; i++)
+            {
+                action.ActionType = (PlayerActionType)ReadVarInt();
+                switch (action.ActionType)
+                {
+                    case PlayerActionType.PredictDestroyBlock:
+                    case PlayerActionType.StartDestroyBlock:
+                    case PlayerActionType.AbortDestroyBlock:
+                    case PlayerActionType.CrackBlock:
+                    case PlayerActionType.ContinueDestroyBlock:
+                        action.Position = ReadBlockPos();
+                        action.Facing = ReadVarInt();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return action;
         }
 
         public T? ReadOptional<T>(Func<T> readFunction)

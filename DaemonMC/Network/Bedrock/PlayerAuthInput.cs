@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Utils;
+using DaemonMC.Utils.Game;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -22,6 +24,16 @@ namespace DaemonMC.Network.Bedrock
         public Vector3 CameraOrientation { get; set; } = new Vector3();
         public Vector2 RawMove { get; set; } = new Vector2();
 
+        public int ClientRequestID { get; set; } = 0;
+        public List<Actions> ActionsData { get; set; } = new List<Actions>();
+        public List<string> StringsToFilter { get; set; } = new List<string>();
+        public int StringsToFilterOrigin { get; set; } = 0;
+
+        public PlayerBlockAction BlockAction { get; set; } = new PlayerBlockAction();
+
+        public Vector2 VehicleRotation { get; set; } = new Vector2();
+        public long ClientPredictedVehicle { get; set; } = 0;
+
         protected override void Decode(PacketDecoder decoder)
         {
             Rotation = decoder.ReadVec2();
@@ -35,10 +47,26 @@ namespace DaemonMC.Network.Bedrock
             InteractRotation = decoder.ReadVec2();
             Tick = decoder.ReadVarLong();
             PosDelta = decoder.ReadVec3();
-            //ItemUse =
-            //ItemStack =
-            //BlockActions = 
-            //PredictedVehicle =
+            if (InputData.Contains(AuthInputData.PerformItemInteraction))
+            {
+                //todo
+            }
+            if (InputData.Contains(AuthInputData.PerformItemStackRequest))
+            {
+                ClientRequestID = decoder.ReadVarInt();
+                ActionsData = decoder.ReadActions();
+                StringsToFilter = decoder.ReadStringList();
+                StringsToFilterOrigin = decoder.ReadInt();
+            }
+            if (InputData.Contains(AuthInputData.PerformBlockActions))
+            {
+                BlockAction = decoder.ReadBlockActions();
+            }
+            if (InputData.Contains(AuthInputData.IsInClientPredictedVehicle))
+            {
+                VehicleRotation = decoder.ReadVec2();
+                ClientPredictedVehicle = decoder.ReadSignedVarLong();
+            }
             AnalogMove = decoder.ReadVec2();
             CameraOrientation = decoder.ReadVec3();
             RawMove = decoder.ReadVec2();

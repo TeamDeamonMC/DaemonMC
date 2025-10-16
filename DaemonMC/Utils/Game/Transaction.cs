@@ -25,7 +25,22 @@ namespace DaemonMC.Utils.Game
     public class FullContainerName
     {
         public byte ContainerName { get; set; } = 0;
-        public int DynamicId { get; set; } = 0;
+        public int? DynamicId { get; set; } = 0;
+    }
+
+    public class Actions
+    {
+        public byte ActionsType { get; set; }
+        public byte Amount { get; set; }
+        public ItemStackRequestSlotInfo Source { get; set; }
+        public ItemStackRequestSlotInfo Destination { get; set; }
+    }
+
+    public class ItemStackRequestSlotInfo
+    {
+        public FullContainerName ContainerName { get; set; }
+        public byte Slot { get; set; }
+        public int NetIdVariant { get; set; }
     }
 
     public enum TransactionType

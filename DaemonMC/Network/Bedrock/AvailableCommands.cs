@@ -19,21 +19,9 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteVarInt(EnumValues.Count);
-            foreach (var value in EnumValues)
-            {
-                encoder.WriteString(value);
-            }
-            encoder.WriteVarInt(ChainedSubcommandValues.Count);
-            foreach (var value in ChainedSubcommandValues)
-            {
-                encoder.WriteString(value);
-            }
-            encoder.WriteVarInt(PostFixes.Count);
-            foreach (var value in PostFixes)
-            {
-                encoder.WriteString(value);
-            }
+            encoder.WriteStringList(EnumValues);
+            encoder.WriteStringList(ChainedSubcommandValues);
+            encoder.WriteStringList(PostFixes);
             encoder.WriteVarInt(Enums.Count);
             foreach (var enumEntry in Enums)
             {

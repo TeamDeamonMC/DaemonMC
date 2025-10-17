@@ -430,17 +430,6 @@ namespace DaemonMC.Network
             return value;
         }
 
-        public Vector3 ReadBlockPos()
-        {
-            var value = new Vector3()
-            {
-                X = ReadSignedVarInt(),
-                Y = ReadSignedVarInt(),
-                Z = ReadSignedVarInt()
-            };
-            return value;
-        }
-
         public Vector2 ReadVec2()
         {
             var value = new Vector2()
@@ -634,7 +623,9 @@ namespace DaemonMC.Network
                     case PlayerActionType.AbortDestroyBlock:
                     case PlayerActionType.CrackBlock:
                     case PlayerActionType.ContinueDestroyBlock:
-                        action.Position = ReadBlockPos();
+                        action.X = ReadSignedVarInt();
+                        action.Y = ReadSignedVarInt();
+                        action.Z = ReadSignedVarInt();
                         action.Facing = ReadVarInt();
                         break;
                     default:

@@ -63,6 +63,7 @@
             SetLocalPlayerAsInitialized = 113,
             NetworkChunkPublisherUpdate = 121,
             BiomeDefinitionList = 122,
+            LevelSoundEventPacket = 123,
             ClientCacheStatus = 129,
             Emote = 138,
             NetworkSettings = 143,

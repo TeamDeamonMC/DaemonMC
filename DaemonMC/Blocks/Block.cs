@@ -10,6 +10,19 @@ namespace DaemonMC.Blocks
 
         public int GetHash()
         {
+            var nbt = new NbtFile
+            {
+                BigEndian = false,
+                UseVarInt = false,
+                RootTag = GetState(),
+            };
+
+            byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
+            return Fnv1aHash.Hash32(saveToBuffer);
+        }
+
+        public NbtCompound GetState()
+        {
             var statesCompound = new NbtCompound("states");
 
             foreach (var state in States)
@@ -38,15 +51,7 @@ namespace DaemonMC.Blocks
                 statesCompound
             };
 
-            var nbt = new NbtFile
-            {
-                BigEndian = false,
-                UseVarInt = false,
-                RootTag = compound,
-            };
-
-            byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
-            return Fnv1aHash.Hash32(saveToBuffer);
+            return compound;
         }
 
         public Block Clone()

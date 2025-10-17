@@ -469,6 +469,16 @@ namespace DaemonMC
             SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
         }
 
+        public void SendSound(LevelSoundEvent sound, Vector3 playerPos)
+        {
+            var packet = new LevelSoundEventPacket()
+            {
+                EventID = (int)sound,
+                Position = playerPos
+            };
+            Send(packet);
+        }
+
         public void SendForm(Form form, Action<Player, string> callback)
         {
             var packet = new ModalFormRequest()

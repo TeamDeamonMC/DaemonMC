@@ -11,6 +11,7 @@ using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 using fNbt;
 using MiNET.LevelDB;
+using Newtonsoft.Json;
 
 namespace DaemonMC.Level
 {
@@ -62,6 +63,52 @@ namespace DaemonMC.Level
             Send(packet);
         }
 
+        public void SetBlock(Block block, Vector3 playerPos, bool sendBlock = true)
+        {
+            SetBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
+        }
+
+        public void SetBlock(Block block, int x, int y, int z, bool sendBlock = true)
+        {
+            if (sendBlock)
+            {
+                SendBlock(block, x, y, z);
+            }
+
+            int chunkX = (int)Math.Floor(x / 16f);
+            int chunkZ = (int)Math.Floor(z / 16f);
+
+            if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
+            {
+                int subChunkY = (int)Math.Floor((y + 64) / 16f);
+
+                int localX = ((int)x % 16 + 16) % 16;
+                int localY = ((int)y % 16 + 16) % 16;
+                int localZ = ((int)z % 16 + 16) % 16;
+
+                var subChunk = chunk.Chunks[subChunkY];
+
+                if (!BlockPalette.blockHashes.ContainsKey(block.GetHash()))
+                {
+                    Log.warn($"Blockstate hash for {block.Name} not found in BlockPalette. Requested state: {JsonConvert.SerializeObject(block.States, Formatting.Indented)}");
+                    return;
+                }
+
+                if (!subChunk.Palette.Contains(block.GetState()))
+                {
+                    subChunk.Palette.Add(block.GetState());
+                }
+
+                int blockIndex = (localY) | (localZ << 4) | (localX << 8);
+                byte stateIndex = (byte)subChunk.Palette.IndexOf(block.GetState());
+                subChunk.Blocks[blockIndex] = stateIndex;
+            }
+            else
+            {
+                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
+            }
+        }
+
         public void SendBlock(Block block, int x, int y, int z)
         {
             var packet = new UpdateBlock()
@@ -75,6 +122,16 @@ namespace DaemonMC.Level
         public void SendBlock(Block block, Vector3 playerPos)
         {
             SendBlock(block, (int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
+        }
+
+        public void SendSound(LevelSoundEvent sound, Vector3 playerPos)
+        {
+            var packet = new LevelSoundEventPacket()
+            {
+                EventID = (int)sound,
+                Position = playerPos
+            };
+            Send(packet);
         }
 
         public void SendMessage(string message)
@@ -524,21 +581,23 @@ namespace DaemonMC.Level
             });
         }
 
-        public Block GetBlock(Vector3 position)
+        public Block GetBlock(Vector3 playerPos)
         {
-            int posX = (int)(position.X < 0 ? position.X - 1 : position.X);
-            int posZ = (int)(position.Z < 0 ? position.Z - 1 : position.Z);
+            return GetBlock((int)(playerPos.X < 0 ? playerPos.X - 1 : playerPos.X), (int)playerPos.Y - 3, (int)(playerPos.Z < 0 ? playerPos.Z - 1 : playerPos.Z));
+        }
 
-            int chunkX = (int)Math.Floor(posX / 16f);
-            int chunkZ = (int)Math.Floor(posZ / 16f);
+        public Block GetBlock(int x, int y, int z)
+        {
+            int chunkX = (int)Math.Floor(x / 16f);
+            int chunkZ = (int)Math.Floor(z / 16f);
 
             if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
             {
-                int subChunkY = (int)Math.Floor((position.Y + 64) / 16f);
+                int subChunkY = (int)Math.Floor((y + 64) / 16f);
 
-                int localX = ((int)posX % 16 + 16) % 16;
-                int localY = ((int)position.Y % 16 + 16) % 16;
-                int localZ = ((int)posZ % 16 + 16) % 16;
+                int localX = ((int)x % 16 + 16) % 16;
+                int localY = ((int)y % 16 + 16) % 16;
+                int localZ = ((int)z % 16 + 16) % 16;
 
                 if (subChunkY >= chunk.Chunks.Count) { return new Air(); }
 
@@ -571,7 +630,7 @@ namespace DaemonMC.Level
             }
             else
             {
-                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{posX}; y:{position.Y}, z:{posZ}");
+                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
                 return new Air();
             }
         }

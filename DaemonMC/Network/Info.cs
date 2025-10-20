@@ -37,6 +37,7 @@
             Interact = 33,
             MobEquipment = 31,
             MobArmorEquipment = 32,
+            PlayerAction = 36,
             SetActorData = 39,
             SetActorMotion = 40,
             Animate = 44,

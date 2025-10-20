@@ -67,6 +67,9 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.PlayStatus:
                         new PlayStatus().DecodePacket(decoder, PacketHandler.Client);
                         break;
+                    case Info.Bedrock.PlayerAction:
+                        new PlayerAction().DecodePacket(decoder);
+                        break;
                     case Info.Bedrock.RequestNetworkSettings:
                         new RequestNetworkSettings().DecodePacket(decoder, PacketHandler.Bedrock);
                         break;

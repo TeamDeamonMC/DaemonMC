@@ -450,7 +450,7 @@ namespace DaemonMC.Level
                 //chunk.Chunks[i].Biomes = Enumerable.Repeat((byte)0x01, 4096).ToArray();
             }
 
-            Cache.Add((x, z), chunk);
+            Cache.TryAdd((x, z), chunk);
             return chunk;
         }
 

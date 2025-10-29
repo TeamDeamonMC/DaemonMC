@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using DaemonMC.Items;
 
 namespace DaemonMC.Utils.Game
 {
@@ -11,6 +12,7 @@ namespace DaemonMC.Utils.Game
         public long EntityId { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 FromPosition { get; set; }
+        public Item Item { get; set; }
         public int Face { get; set; }
         public int Slot { get; set; }
     }
@@ -20,6 +22,8 @@ namespace DaemonMC.Utils.Game
         public SourceType Source { get; set; }
         public int ContainerID { get; set; }
         public int Slot { get; set; }
+        public Item ItemFrom { get; set; }
+        public Item ItemTo { get; set; }
     }
 
     public class FullContainerName

@@ -31,8 +31,8 @@ namespace DaemonMC.Network.Bedrock
                 }
 
                 action.Slot = decoder.ReadVarInt();
-                decoder.ReadSignedVarInt();
-                decoder.ReadSignedVarInt();
+                action.ItemFrom = decoder.ReadItem();
+                action.ItemTo = decoder.ReadItem();
                 Transaction.Actions.Add(action);
             }
 
@@ -41,7 +41,7 @@ namespace DaemonMC.Network.Bedrock
                 Transaction.EntityId = decoder.ReadVarLong();
                 Transaction.ActionType = decoder.ReadVarInt();
                 Transaction.Slot = decoder.ReadSignedVarInt();
-                decoder.ReadSignedVarInt(); //todo items
+                Transaction.Item = decoder.ReadItem();
                 Transaction.FromPosition = decoder.ReadVec3();
                 Transaction.Position = decoder.ReadVec3();
             }

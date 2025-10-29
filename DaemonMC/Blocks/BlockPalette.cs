@@ -44,6 +44,11 @@ namespace DaemonMC.Blocks
             }
         }
 
+        public static Block? GetBlock(string blockName)
+        {
+            var block = blockHashes.Values.FirstOrDefault(i => string.Equals(i.Name, blockName, StringComparison.OrdinalIgnoreCase));
+            return block == null ? null : block.Clone();
+        }
 
         private static IEnumerable<Dictionary<string, object>> GetCombinations(Dictionary<string, object[]> options)
         {

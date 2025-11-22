@@ -2,14 +2,15 @@
 {
     public class Info
     {
-        public static string Version = "1.21.120";
-        public static int[] ProtocolVersion = [818, 819, 827, 844, 859];
+        public static string Version = "1.21.124";
+        public static int[] ProtocolVersion = [818, 819, 827, 844, 859, 860];
 
         public static int v1_21_90 = 818;
         public static int v1_21_93 = 819;
         public static int v1_21_100 = 827;
         public static int v1_21_111 = 844;
         public static int v1_21_120 = 859;
+        public static int v1_21_124 = 860;
 
         public enum Bedrock
         {

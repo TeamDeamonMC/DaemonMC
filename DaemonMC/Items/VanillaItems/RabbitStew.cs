@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RabbitStew()
         {
             Name = "minecraft:rabbit_stew";
-            Id = 312;
+            Id = 319;
             Version = 0;
             ComponentBased = false;
         }

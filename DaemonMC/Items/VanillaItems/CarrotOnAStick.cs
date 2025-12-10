@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CarrotOnAStick()
         {
             Name = "minecraft:carrot_on_a_stick";
-            Id = 550;
+            Id = 556;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChainmailLeggings()
         {
             Name = "minecraft:chainmail_leggings";
-            Id = 366;
+            Id = 373;
             Version = 2;
             ComponentBased = false;
         }

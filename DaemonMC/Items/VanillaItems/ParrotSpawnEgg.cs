@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ParrotSpawnEgg()
         {
             Name = "minecraft:parrot_spawn_egg";
-            Id = 506;
+            Id = 512;
             Version = 2;
             ComponentBased = false;
         }

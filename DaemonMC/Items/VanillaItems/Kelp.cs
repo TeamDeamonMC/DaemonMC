@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Kelp()
         {
             Name = "minecraft:kelp";
-            Id = 408;
+            Id = 414;
             Version = 2;
             ComponentBased = true;
         }

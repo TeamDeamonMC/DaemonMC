@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperAxe()
         {
             Name = "minecraft:copper_axe";
-            Id = 771;
+            Id = 777;
             Version = 2;
             ComponentBased = false;
         }

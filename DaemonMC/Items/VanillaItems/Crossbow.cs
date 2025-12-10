@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Crossbow()
         {
             Name = "minecraft:crossbow";
-            Id = 608;
+            Id = 614;
             Version = 2;
             ComponentBased = false;
         }

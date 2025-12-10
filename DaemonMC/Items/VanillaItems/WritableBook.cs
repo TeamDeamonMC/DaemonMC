@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WritableBook()
         {
             Name = "minecraft:writable_book";
-            Id = 544;
+            Id = 550;
             Version = 2;
             ComponentBased = false;
         }

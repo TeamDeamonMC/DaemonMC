@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Flint()
         {
             Name = "minecraft:flint";
-            Id = 381;
+            Id = 388;
             Version = 2;
             ComponentBased = false;
         }

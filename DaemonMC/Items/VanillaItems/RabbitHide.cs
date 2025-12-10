@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RabbitHide()
         {
             Name = "minecraft:rabbit_hide";
-            Id = 562;
+            Id = 568;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CommandBlockMinecart()
         {
             Name = "minecraft:command_block_minecart";
-            Id = 596;
+            Id = 602;
             Version = 2;
             ComponentBased = false;
         }

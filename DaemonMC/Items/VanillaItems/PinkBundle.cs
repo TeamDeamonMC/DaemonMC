@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PinkBundle()
         {
             Name = "minecraft:pink_bundle";
-            Id = 269;
+            Id = 278;
             Version = 1;
             ComponentBased = true;
         }

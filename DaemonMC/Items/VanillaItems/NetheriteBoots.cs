@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteBoots()
         {
             Name = "minecraft:netherite_boots";
-            Id = 649;
+            Id = 656;
             Version = 2;
             ComponentBased = false;
         }

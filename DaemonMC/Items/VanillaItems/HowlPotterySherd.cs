@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HowlPotterySherd()
         {
             Name = "minecraft:howl_pottery_sherd";
-            Id = 705;
+            Id = 713;
             Version = 2;
             ComponentBased = false;
         }

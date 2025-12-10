@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Sugar()
         {
             Name = "minecraft:sugar";
-            Id = 442;
+            Id = 448;
             Version = 2;
             ComponentBased = false;
         }

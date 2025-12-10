@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WaterBucket()
         {
             Name = "minecraft:water_bucket";
-            Id = 387;
+            Id = 394;
             Version = 2;
             ComponentBased = false;
         }

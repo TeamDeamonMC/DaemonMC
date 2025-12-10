@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Salmon()
         {
             Name = "minecraft:salmon";
-            Id = 287;
+            Id = 294;
             Version = 0;
             ComponentBased = false;
         }

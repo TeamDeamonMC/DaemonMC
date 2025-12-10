@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TurtleSpawnEgg()
         {
             Name = "minecraft:turtle_spawn_egg";
-            Id = 513;
+            Id = 519;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FireworkStar()
         {
             Name = "minecraft:firework_star";
-            Id = 553;
+            Id = 559;
             Version = 2;
             ComponentBased = false;
         }

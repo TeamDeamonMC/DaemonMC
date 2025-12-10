@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SentryArmorTrimSmithingTemplate()
         {
             Name = "minecraft:sentry_armor_trim_smithing_template";
-            Id = 717;
+            Id = 725;
             Version = 2;
             ComponentBased = false;
         }

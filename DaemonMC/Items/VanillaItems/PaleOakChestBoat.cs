@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PaleOakChestBoat()
         {
             Name = "minecraft:pale_oak_chest_boat";
-            Id = 744;
+            Id = 750;
             Version = 2;
             ComponentBased = false;
         }

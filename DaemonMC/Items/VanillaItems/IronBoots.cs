@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronBoots()
         {
             Name = "minecraft:iron_boots";
-            Id = 371;
+            Id = 378;
             Version = 2;
             ComponentBased = false;
         }

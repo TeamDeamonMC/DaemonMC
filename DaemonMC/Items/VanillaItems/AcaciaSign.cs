@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AcaciaSign()
         {
             Name = "minecraft:acacia_sign";
-            Id = 612;
+            Id = 618;
             Version = 2;
             ComponentBased = false;
         }

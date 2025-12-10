@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenPickaxe()
         {
             Name = "minecraft:golden_pickaxe";
-            Id = 349;
+            Id = 356;
             Version = 2;
             ComponentBased = false;
         }

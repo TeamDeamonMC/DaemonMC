@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SpiderSpawnEgg()
         {
             Name = "minecraft:spider_spawn_egg";
-            Id = 473;
+            Id = 479;
             Version = 2;
             ComponentBased = false;
         }

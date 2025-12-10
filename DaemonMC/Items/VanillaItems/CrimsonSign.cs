@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CrimsonSign()
         {
             Name = "minecraft:crimson_sign";
-            Id = 651;
+            Id = 658;
             Version = 2;
             ComponentBased = false;
         }

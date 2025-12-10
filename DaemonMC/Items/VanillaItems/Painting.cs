@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Painting()
         {
             Name = "minecraft:painting";
-            Id = 382;
+            Id = 389;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LodestoneCompass()
         {
             Name = "minecraft:lodestone_compass";
-            Id = 639;
+            Id = 646;
             Version = 2;
             ComponentBased = false;
         }

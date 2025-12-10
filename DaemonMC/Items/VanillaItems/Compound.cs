@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Compound()
         {
             Name = "minecraft:compound";
-            Id = 631;
+            Id = 638;
             Version = 2;
             ComponentBased = false;
         }

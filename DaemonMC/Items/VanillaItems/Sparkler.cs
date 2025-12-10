@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Sparkler()
         {
             Name = "minecraft:sparkler";
-            Id = 637;
+            Id = 644;
             Version = 2;
             ComponentBased = false;
         }

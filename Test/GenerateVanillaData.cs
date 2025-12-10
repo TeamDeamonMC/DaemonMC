@@ -56,17 +56,20 @@ namespace Test
         [TestMethod]
         public void Items()
         {
-            string json = File.ReadAllText("item_palette.json"); https://github.com/Kaooot/bedrock-network-data/blob/master/preview/....../item_palette.json
+            string json = File.ReadAllText("required_item_list.json"); //https://github.com/pmmp/BedrockData/master/required_item_list.json
             var doc = JsonDocument.Parse(json);
 
             Directory.CreateDirectory("VanillaItems");
 
-            foreach (var item in doc.RootElement.GetProperty("items").EnumerateArray())
+            foreach (var item in doc.RootElement.EnumerateObject())
             {
-                string name = item.GetProperty("name").GetString();
-                int id = item.GetProperty("id").GetInt32();
-                int version = item.GetProperty("version").GetInt32();
-                bool componentBased = item.GetProperty("component_based").GetBoolean();
+                string name = item.Name;
+
+                var obj = item.Value;
+
+                int id = obj.GetProperty("runtime_id").GetInt32();
+                int version = obj.GetProperty("version").GetInt32();
+                bool componentBased = obj.GetProperty("component_based").GetBoolean();
 
                 string className = FixCase(name.Split(':')[1]);
 
@@ -88,7 +91,8 @@ namespace DaemonMC.Items.VanillaItems
                 File.WriteAllText($"VanillaItems/{className}.cs", content.Trim());
                 Console.WriteLine($"Generated: VanillaItems/{className}.cs");
             }
-            Console.WriteLine($"Done");
+
+            Console.WriteLine("Done");
         }
 
 

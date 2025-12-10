@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Lead()
         {
             Name = "minecraft:lead";
-            Id = 580;
+            Id = 586;
             Version = 2;
             ComponentBased = false;
         }

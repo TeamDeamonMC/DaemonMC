@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AxolotlBucket()
         {
             Name = "minecraft:axolotl_bucket";
-            Id = 394;
+            Id = 401;
             Version = 2;
             ComponentBased = false;
         }

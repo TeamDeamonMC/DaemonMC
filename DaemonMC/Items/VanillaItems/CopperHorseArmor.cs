@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperHorseArmor()
         {
             Name = "minecraft:copper_horse_armor";
-            Id = 778;
+            Id = 784;
             Version = 2;
             ComponentBased = false;
         }

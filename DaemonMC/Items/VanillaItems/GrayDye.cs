@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GrayDye()
         {
             Name = "minecraft:gray_dye";
-            Id = 429;
+            Id = 435;
             Version = 2;
             ComponentBased = false;
         }

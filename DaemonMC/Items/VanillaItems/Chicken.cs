@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Chicken()
         {
             Name = "minecraft:chicken";
-            Id = 297;
+            Id = 304;
             Version = 0;
             ComponentBased = false;
         }

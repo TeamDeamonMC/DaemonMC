@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MelonSeeds()
         {
             Name = "minecraft:melon_seeds";
-            Id = 315;
+            Id = 322;
             Version = 0;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Honeycomb()
         {
             Name = "minecraft:honeycomb";
-            Id = 626;
+            Id = 633;
             Version = 0;
             ComponentBased = false;
         }

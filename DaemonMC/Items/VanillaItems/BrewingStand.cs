@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BrewingStand()
         {
             Name = "minecraft:brewing_stand";
-            Id = 458;
+            Id = 464;
             Version = 2;
             ComponentBased = true;
         }

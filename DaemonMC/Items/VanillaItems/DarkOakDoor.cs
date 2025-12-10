@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DarkOakDoor()
         {
             Name = "minecraft:dark_oak_door";
-            Id = 590;
+            Id = 596;
             Version = 2;
             ComponentBased = false;
         }

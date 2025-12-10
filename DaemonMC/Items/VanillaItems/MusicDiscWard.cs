@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscWard()
         {
             Name = "minecraft:music_disc_ward";
-            Id = 576;
+            Id = 582;
             Version = 2;
             ComponentBased = true;
         }

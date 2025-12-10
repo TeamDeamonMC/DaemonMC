@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BlazeSpawnEgg()
         {
             Name = "minecraft:blaze_spawn_egg";
-            Id = 483;
+            Id = 489;
             Version = 2;
             ComponentBased = false;
         }

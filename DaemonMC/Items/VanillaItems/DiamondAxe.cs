@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DiamondAxe()
         {
             Name = "minecraft:diamond_axe";
-            Id = 343;
+            Id = 350;
             Version = 2;
             ComponentBased = false;
         }

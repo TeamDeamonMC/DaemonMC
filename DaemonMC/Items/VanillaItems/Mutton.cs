@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Mutton()
         {
             Name = "minecraft:mutton";
-            Id = 583;
+            Id = 589;
             Version = 0;
             ComponentBased = false;
         }

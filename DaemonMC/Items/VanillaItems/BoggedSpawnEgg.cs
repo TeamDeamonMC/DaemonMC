@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BoggedSpawnEgg()
         {
             Name = "minecraft:bogged_spawn_egg";
-            Id = 490;
+            Id = 496;
             Version = 2;
             ComponentBased = false;
         }

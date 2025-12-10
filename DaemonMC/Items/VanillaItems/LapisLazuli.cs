@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LapisLazuli()
         {
             Name = "minecraft:lapis_lazuli";
-            Id = 440;
+            Id = 446;
             Version = 2;
             ComponentBased = false;
         }

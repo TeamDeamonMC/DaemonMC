@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MojangBannerPattern()
         {
             Name = "minecraft:mojang_banner_pattern";
-            Id = 617;
+            Id = 623;
             Version = 2;
             ComponentBased = false;
         }

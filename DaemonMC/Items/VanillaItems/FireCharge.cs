@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FireCharge()
         {
             Name = "minecraft:fire_charge";
-            Id = 543;
+            Id = 549;
             Version = 2;
             ComponentBased = false;
         }

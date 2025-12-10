@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EchoShard()
         {
             Name = "minecraft:echo_shard";
-            Id = 683;
+            Id = 690;
             Version = 2;
             ComponentBased = false;
         }

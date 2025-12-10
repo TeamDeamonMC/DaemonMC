@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Cod()
         {
             Name = "minecraft:cod";
-            Id = 286;
+            Id = 293;
             Version = 0;
             ComponentBased = false;
         }

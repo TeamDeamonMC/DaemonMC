@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public VexSpawnEgg()
         {
             Name = "minecraft:vex_spawn_egg";
-            Id = 504;
+            Id = 510;
             Version = 2;
             ComponentBased = false;
         }

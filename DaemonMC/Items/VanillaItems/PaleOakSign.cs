@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PaleOakSign()
         {
             Name = "minecraft:pale_oak_sign";
-            Id = 745;
+            Id = 751;
             Version = 2;
             ComponentBased = false;
         }

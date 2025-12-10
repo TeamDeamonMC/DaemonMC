@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SpireArmorTrimSmithingTemplate()
         {
             Name = "minecraft:spire_armor_trim_smithing_template";
-            Id = 727;
+            Id = 735;
             Version = 2;
             ComponentBased = false;
         }

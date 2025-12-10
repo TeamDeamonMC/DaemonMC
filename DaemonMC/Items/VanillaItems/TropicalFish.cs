@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TropicalFish()
         {
             Name = "minecraft:tropical_fish";
-            Id = 288;
+            Id = 295;
             Version = 0;
             ComponentBased = false;
         }

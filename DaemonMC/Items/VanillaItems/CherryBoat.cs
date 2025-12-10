@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CherryBoat()
         {
             Name = "minecraft:cherry_boat";
-            Id = 685;
+            Id = 692;
             Version = 2;
             ComponentBased = false;
         }

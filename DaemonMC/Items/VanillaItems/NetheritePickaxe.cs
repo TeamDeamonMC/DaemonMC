@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheritePickaxe()
         {
             Name = "minecraft:netherite_pickaxe";
-            Id = 642;
+            Id = 649;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenSword()
         {
             Name = "minecraft:golden_sword";
-            Id = 347;
+            Id = 354;
             Version = 2;
             ComponentBased = false;
         }

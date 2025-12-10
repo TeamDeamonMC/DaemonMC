@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PrismarineShard()
         {
             Name = "minecraft:prismarine_shard";
-            Id = 598;
+            Id = 604;
             Version = 2;
             ComponentBased = false;
         }

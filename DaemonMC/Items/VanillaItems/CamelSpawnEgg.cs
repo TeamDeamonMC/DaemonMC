@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CamelSpawnEgg()
         {
             Name = "minecraft:camel_spawn_egg";
-            Id = 691;
+            Id = 698;
             Version = 2;
             ComponentBased = false;
         }

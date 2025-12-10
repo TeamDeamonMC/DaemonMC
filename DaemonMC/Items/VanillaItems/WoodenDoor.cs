@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WoodenDoor()
         {
             Name = "minecraft:wooden_door";
-            Id = 384;
+            Id = 391;
             Version = 2;
             ComponentBased = false;
         }

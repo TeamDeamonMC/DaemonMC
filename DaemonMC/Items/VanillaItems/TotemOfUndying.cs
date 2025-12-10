@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TotemOfUndying()
         {
             Name = "minecraft:totem_of_undying";
-            Id = 601;
+            Id = 607;
             Version = 2;
             ComponentBased = false;
         }

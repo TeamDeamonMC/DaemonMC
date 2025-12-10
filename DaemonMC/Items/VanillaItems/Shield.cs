@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Shield()
         {
             Name = "minecraft:shield";
-            Id = 380;
+            Id = 387;
             Version = 2;
             ComponentBased = false;
         }

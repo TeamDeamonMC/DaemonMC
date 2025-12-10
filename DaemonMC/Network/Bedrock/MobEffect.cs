@@ -11,6 +11,7 @@
         public bool ShowParticles { get; set; } = true;
         public int Duration { get; set; } = 0;
         public long Tick { get; set; } = 0;
+        public bool Ambient { get; set; } = false;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -26,6 +27,10 @@
             encoder.WriteBool(ShowParticles);
             encoder.WriteSignedVarInt(Duration);
             encoder.WriteVarLong(Tick);
+            if (encoder.protocolVersion >= Info.v1_21_130)
+            {
+                encoder.WriteBool(Ambient);
+            }
         }
     }
 }

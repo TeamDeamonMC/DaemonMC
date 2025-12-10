@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteScrap()
         {
             Name = "minecraft:netherite_scrap";
-            Id = 650;
+            Id = 657;
             Version = 2;
             ComponentBased = false;
         }

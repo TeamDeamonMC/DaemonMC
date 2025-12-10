@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GusterBannerPattern()
         {
             Name = "minecraft:guster_banner_pattern";
-            Id = 623;
+            Id = 629;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WhiteHarness()
         {
             Name = "minecraft:white_harness";
-            Id = 765;
+            Id = 771;
             Version = 2;
             ComponentBased = false;
         }

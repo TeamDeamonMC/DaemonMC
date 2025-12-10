@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BlueEgg()
         {
             Name = "minecraft:blue_egg";
-            Id = 748;
+            Id = 754;
             Version = 2;
             ComponentBased = false;
         }

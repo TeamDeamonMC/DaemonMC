@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FlowBannerPattern()
         {
             Name = "minecraft:flow_banner_pattern";
-            Id = 622;
+            Id = 628;
             Version = 2;
             ComponentBased = false;
         }

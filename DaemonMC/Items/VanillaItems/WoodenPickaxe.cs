@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WoodenPickaxe()
         {
             Name = "minecraft:wooden_pickaxe";
-            Id = 334;
+            Id = 341;
             Version = 2;
             ComponentBased = false;
         }

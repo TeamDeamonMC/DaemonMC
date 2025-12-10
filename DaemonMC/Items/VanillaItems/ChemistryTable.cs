@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChemistryTable()
         {
             Name = "minecraft:chemistry_table";
-            Id = 817;
+            Id = 832;
             Version = 2;
             ComponentBased = false;
         }

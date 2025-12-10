@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StainedHardenedClay()
         {
             Name = "minecraft:stained_hardened_clay";
-            Id = 737;
+            Id = 745;
             Version = 2;
             ComponentBased = false;
         }

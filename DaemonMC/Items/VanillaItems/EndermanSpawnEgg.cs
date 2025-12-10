@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EndermanSpawnEgg()
         {
             Name = "minecraft:enderman_spawn_egg";
-            Id = 469;
+            Id = 475;
             Version = 2;
             ComponentBased = false;
         }

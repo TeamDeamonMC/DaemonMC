@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Dye()
         {
             Name = "minecraft:dye";
-            Id = 824;
+            Id = 839;
             Version = 2;
             ComponentBased = false;
         }

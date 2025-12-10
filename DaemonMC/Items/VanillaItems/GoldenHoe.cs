@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenHoe()
         {
             Name = "minecraft:golden_hoe";
-            Id = 358;
+            Id = 365;
             Version = 2;
             ComponentBased = false;
         }

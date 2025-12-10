@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PoppedChorusFruit()
         {
             Name = "minecraft:popped_chorus_fruit";
-            Id = 592;
+            Id = 598;
             Version = 2;
             ComponentBased = false;
         }

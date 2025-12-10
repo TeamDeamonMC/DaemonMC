@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ShulkerSpawnEgg()
         {
             Name = "minecraft:shulker_spawn_egg";
-            Id = 497;
+            Id = 503;
             Version = 2;
             ComponentBased = false;
         }

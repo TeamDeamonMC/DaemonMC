@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LlamaSpawnEgg()
         {
             Name = "minecraft:llama_spawn_egg";
-            Id = 501;
+            Id = 507;
             Version = 2;
             ComponentBased = false;
         }

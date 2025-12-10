@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FlintAndSteel()
         {
             Name = "minecraft:flint_and_steel";
-            Id = 323;
+            Id = 330;
             Version = 2;
             ComponentBased = false;
         }

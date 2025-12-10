@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ZombiePigmanSpawnEgg()
         {
             Name = "minecraft:zombie_pigman_spawn_egg";
-            Id = 475;
+            Id = 481;
             Version = 2;
             ComponentBased = false;
         }

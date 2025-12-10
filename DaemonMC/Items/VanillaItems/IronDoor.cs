@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronDoor()
         {
             Name = "minecraft:iron_door";
-            Id = 397;
+            Id = 404;
             Version = 2;
             ComponentBased = false;
         }

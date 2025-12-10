@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MangroveChestBoat()
         {
             Name = "minecraft:mangrove_chest_boat";
-            Id = 680;
+            Id = 687;
             Version = 2;
             ComponentBased = false;
         }

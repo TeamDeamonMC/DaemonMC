@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MuleSpawnEgg()
         {
             Name = "minecraft:mule_spawn_egg";
-            Id = 494;
+            Id = 500;
             Version = 2;
             ComponentBased = false;
         }

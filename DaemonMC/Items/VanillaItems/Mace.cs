@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Mace()
         {
             Name = "minecraft:mace";
-            Id = 344;
+            Id = 351;
             Version = 2;
             ComponentBased = false;
         }

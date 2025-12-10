@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Trident()
         {
             Name = "minecraft:trident";
-            Id = 579;
+            Id = 585;
             Version = 2;
             ComponentBased = false;
         }

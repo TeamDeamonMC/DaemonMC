@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TropicalFishSpawnEgg()
         {
             Name = "minecraft:tropical_fish_spawn_egg";
-            Id = 507;
+            Id = 513;
             Version = 2;
             ComponentBased = false;
         }

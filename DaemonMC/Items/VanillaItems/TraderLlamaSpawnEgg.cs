@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TraderLlamaSpawnEgg()
         {
             Name = "minecraft:trader_llama_spawn_egg";
-            Id = 684;
+            Id = 691;
             Version = 2;
             ComponentBased = false;
         }

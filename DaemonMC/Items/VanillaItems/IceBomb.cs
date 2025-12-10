@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IceBomb()
         {
             Name = "minecraft:ice_bomb";
-            Id = 632;
+            Id = 639;
             Version = 2;
             ComponentBased = false;
         }

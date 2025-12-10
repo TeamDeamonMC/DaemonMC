@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronChestplate()
         {
             Name = "minecraft:iron_chestplate";
-            Id = 369;
+            Id = 376;
             Version = 2;
             ComponentBased = false;
         }

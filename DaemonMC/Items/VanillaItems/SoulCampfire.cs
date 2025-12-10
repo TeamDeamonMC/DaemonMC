@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SoulCampfire()
         {
             Name = "minecraft:soul_campfire";
-            Id = 658;
+            Id = 665;
             Version = 2;
             ComponentBased = true;
         }

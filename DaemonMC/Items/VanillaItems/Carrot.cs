@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Carrot()
         {
             Name = "minecraft:carrot";
-            Id = 301;
+            Id = 308;
             Version = 0;
             ComponentBased = false;
         }

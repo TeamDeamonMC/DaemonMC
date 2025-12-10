@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EnderDragonSpawnEgg()
         {
             Name = "minecraft:ender_dragon_spawn_egg";
-            Id = 535;
+            Id = 541;
             Version = 2;
             ComponentBased = false;
         }

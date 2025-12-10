@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Beef()
         {
             Name = "minecraft:beef";
-            Id = 295;
+            Id = 302;
             Version = 0;
             ComponentBased = false;
         }

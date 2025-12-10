@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ArmsUpPotterySherd()
         {
             Name = "minecraft:arms_up_pottery_sherd";
-            Id = 694;
+            Id = 702;
             Version = 2;
             ComponentBased = false;
         }

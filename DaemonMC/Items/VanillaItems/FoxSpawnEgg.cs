@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FoxSpawnEgg()
         {
             Name = "minecraft:fox_spawn_egg";
-            Id = 518;
+            Id = 524;
             Version = 2;
             ComponentBased = false;
         }

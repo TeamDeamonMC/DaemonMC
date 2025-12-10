@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AcaciaDoor()
         {
             Name = "minecraft:acacia_door";
-            Id = 589;
+            Id = 595;
             Version = 2;
             ComponentBased = false;
         }

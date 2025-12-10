@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteHelmet()
         {
             Name = "minecraft:netherite_helmet";
-            Id = 646;
+            Id = 653;
             Version = 2;
             ComponentBased = false;
         }

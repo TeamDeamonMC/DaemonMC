@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetherSprouts()
         {
             Name = "minecraft:nether_sprouts";
-            Id = 657;
+            Id = 664;
             Version = 2;
             ComponentBased = true;
         }

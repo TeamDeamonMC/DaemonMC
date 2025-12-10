@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bow()
         {
             Name = "minecraft:bow";
-            Id = 324;
+            Id = 331;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Quartz()
         {
             Name = "minecraft:quartz";
-            Id = 557;
+            Id = 563;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SuspiciousStew()
         {
             Name = "minecraft:suspicious_stew";
-            Id = 625;
+            Id = 631;
             Version = 0;
             ComponentBased = false;
         }

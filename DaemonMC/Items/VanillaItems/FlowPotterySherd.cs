@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FlowPotterySherd()
         {
             Name = "minecraft:flow_pottery_sherd";
-            Id = 700;
+            Id = 708;
             Version = 2;
             ComponentBased = false;
         }

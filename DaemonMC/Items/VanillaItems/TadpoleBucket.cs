@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TadpoleBucket()
         {
             Name = "minecraft:tadpole_bucket";
-            Id = 666;
+            Id = 673;
             Version = 2;
             ComponentBased = false;
         }

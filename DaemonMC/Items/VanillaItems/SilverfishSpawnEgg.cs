@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SilverfishSpawnEgg()
         {
             Name = "minecraft:silverfish_spawn_egg";
-            Id = 470;
+            Id = 476;
             Version = 2;
             ComponentBased = false;
         }

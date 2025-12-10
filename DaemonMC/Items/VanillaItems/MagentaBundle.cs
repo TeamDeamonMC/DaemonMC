@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MagentaBundle()
         {
             Name = "minecraft:magenta_bundle";
-            Id = 267;
+            Id = 276;
             Version = 1;
             ComponentBased = true;
         }

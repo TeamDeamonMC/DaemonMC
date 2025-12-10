@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EnchantedBook()
         {
             Name = "minecraft:enchanted_book";
-            Id = 554;
+            Id = 560;
             Version = 2;
             ComponentBased = false;
         }

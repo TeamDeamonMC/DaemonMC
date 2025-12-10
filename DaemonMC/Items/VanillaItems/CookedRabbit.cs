@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CookedRabbit()
         {
             Name = "minecraft:cooked_rabbit";
-            Id = 311;
+            Id = 318;
             Version = 0;
             ComponentBased = false;
         }

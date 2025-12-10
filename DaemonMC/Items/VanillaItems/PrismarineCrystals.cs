@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PrismarineCrystals()
         {
             Name = "minecraft:prismarine_crystals";
-            Id = 582;
+            Id = 588;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CodBucket()
         {
             Name = "minecraft:cod_bucket";
-            Id = 389;
+            Id = 396;
             Version = 2;
             ComponentBased = false;
         }

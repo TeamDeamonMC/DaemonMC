@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BlazePowder()
         {
             Name = "minecraft:blaze_powder";
-            Id = 456;
+            Id = 462;
             Version = 2;
             ComponentBased = false;
         }

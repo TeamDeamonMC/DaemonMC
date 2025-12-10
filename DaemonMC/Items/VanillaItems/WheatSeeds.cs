@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WheatSeeds()
         {
             Name = "minecraft:wheat_seeds";
-            Id = 313;
+            Id = 320;
             Version = 0;
             ComponentBased = false;
         }

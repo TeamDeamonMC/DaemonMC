@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SalmonBucket()
         {
             Name = "minecraft:salmon_bucket";
-            Id = 390;
+            Id = 397;
             Version = 2;
             ComponentBased = false;
         }

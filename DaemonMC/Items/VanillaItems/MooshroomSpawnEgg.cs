@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MooshroomSpawnEgg()
         {
             Name = "minecraft:mooshroom_spawn_egg";
-            Id = 467;
+            Id = 473;
             Version = 2;
             ComponentBased = false;
         }

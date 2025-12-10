@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EvokerSpawnEgg()
         {
             Name = "minecraft:evoker_spawn_egg";
-            Id = 503;
+            Id = 509;
             Version = 2;
             ComponentBased = false;
         }

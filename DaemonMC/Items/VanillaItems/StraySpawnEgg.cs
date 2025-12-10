@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StraySpawnEgg()
         {
             Name = "minecraft:stray_spawn_egg";
-            Id = 489;
+            Id = 495;
             Version = 2;
             ComponentBased = false;
         }

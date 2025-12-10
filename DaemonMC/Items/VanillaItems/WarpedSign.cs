@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WarpedSign()
         {
             Name = "minecraft:warped_sign";
-            Id = 652;
+            Id = 659;
             Version = 2;
             ComponentBased = false;
         }

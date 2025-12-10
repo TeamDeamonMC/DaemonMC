@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldIngot()
         {
             Name = "minecraft:gold_ingot";
-            Id = 330;
+            Id = 337;
             Version = 2;
             ComponentBased = false;
         }

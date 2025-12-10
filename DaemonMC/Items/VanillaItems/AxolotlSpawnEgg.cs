@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AxolotlSpawnEgg()
         {
             Name = "minecraft:axolotl_spawn_egg";
-            Id = 530;
+            Id = 536;
             Version = 2;
             ComponentBased = false;
         }

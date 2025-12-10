@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public OminousTrialKey()
         {
             Name = "minecraft:ominous_trial_key";
-            Id = 275;
+            Id = 284;
             Version = 1;
             ComponentBased = true;
         }

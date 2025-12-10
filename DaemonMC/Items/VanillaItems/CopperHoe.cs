@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperHoe()
         {
             Name = "minecraft:copper_hoe";
-            Id = 772;
+            Id = 778;
             Version = 2;
             ComponentBased = false;
         }

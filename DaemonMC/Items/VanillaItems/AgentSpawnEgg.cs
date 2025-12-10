@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AgentSpawnEgg()
         {
             Name = "minecraft:agent_spawn_egg";
-            Id = 515;
+            Id = 521;
             Version = 2;
             ComponentBased = false;
         }

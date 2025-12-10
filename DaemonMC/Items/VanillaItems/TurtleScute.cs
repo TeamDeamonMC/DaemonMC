@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TurtleScute()
         {
             Name = "minecraft:turtle_scute";
-            Id = 605;
+            Id = 611;
             Version = 2;
             ComponentBased = false;
         }

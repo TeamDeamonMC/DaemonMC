@@ -229,6 +229,27 @@ namespace DaemonMC
         {
             action.Player.SendMessage($"§fCoordinates: §a{action.Player.Position}");
         }
+
+        public static string GetPermission(byte level)
+        {
+            switch (level)
+            {
+                case 0:
+                    return "any";
+                case 1:
+                    return "gamedirectors";
+                case 2:
+                    return "admin";
+                case 3:
+                    return "host";
+                case 4:
+                    return "owner";
+                case 5:
+                    return "internal";
+                default:
+                    return "any";
+            }
+        }
     }
 
     public class CommandAction

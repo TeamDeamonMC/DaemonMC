@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Redstone()
         {
             Name = "minecraft:redstone";
-            Id = 398;
+            Id = 405;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RavagerSpawnEgg()
         {
             Name = "minecraft:ravager_spawn_egg";
-            Id = 521;
+            Id = 527;
             Version = 2;
             ComponentBased = false;
         }

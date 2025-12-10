@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteHoe()
         {
             Name = "minecraft:netherite_hoe";
-            Id = 644;
+            Id = 651;
             Version = 2;
             ComponentBased = false;
         }

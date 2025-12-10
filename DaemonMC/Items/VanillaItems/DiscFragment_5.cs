@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DiscFragment_5()
         {
             Name = "minecraft:disc_fragment_5";
-            Id = 673;
+            Id = 680;
             Version = 2;
             ComponentBased = false;
         }

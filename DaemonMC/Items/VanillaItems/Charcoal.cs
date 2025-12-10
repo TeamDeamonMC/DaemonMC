@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Charcoal()
         {
             Name = "minecraft:charcoal";
-            Id = 327;
+            Id = 334;
             Version = 2;
             ComponentBased = true;
         }

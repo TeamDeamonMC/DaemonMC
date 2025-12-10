@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BreezeRod()
         {
             Name = "minecraft:breeze_rod";
-            Id = 274;
+            Id = 281;
             Version = 1;
             ComponentBased = true;
         }

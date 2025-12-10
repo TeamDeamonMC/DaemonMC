@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BlazeRod()
         {
             Name = "minecraft:blaze_rod";
-            Id = 449;
+            Id = 455;
             Version = 2;
             ComponentBased = false;
         }

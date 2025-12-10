@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CookedChicken()
         {
             Name = "minecraft:cooked_chicken";
-            Id = 298;
+            Id = 305;
             Version = 0;
             ComponentBased = false;
         }

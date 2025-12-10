@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public InkSac()
         {
             Name = "minecraft:ink_sac";
-            Id = 439;
+            Id = 445;
             Version = 2;
             ComponentBased = false;
         }

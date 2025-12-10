@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HoneyBottle()
         {
             Name = "minecraft:honey_bottle";
-            Id = 627;
+            Id = 634;
             Version = 0;
             ComponentBased = false;
         }

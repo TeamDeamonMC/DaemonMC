@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EnchantedGoldenApple()
         {
             Name = "minecraft:enchanted_golden_apple";
-            Id = 281;
+            Id = 288;
             Version = 0;
             ComponentBased = false;
         }

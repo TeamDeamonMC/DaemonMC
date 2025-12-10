@@ -15,7 +15,10 @@
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteBool(ForceTexturePack);
-            encoder.WriteVarInt(0); //add-on list
+            if (encoder.protocolVersion < Info.v1_21_130)
+            {
+                encoder.WriteVarInt(0); //add-on list
+            }
             encoder.WriteResourcePacksStack(Packs);
             encoder.WriteString(Info.Version);
             encoder.WriteInt(0); //experiments

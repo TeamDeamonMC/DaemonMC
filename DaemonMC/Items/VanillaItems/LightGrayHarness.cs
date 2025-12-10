@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LightGrayHarness()
         {
             Name = "minecraft:light_gray_harness";
-            Id = 758;
+            Id = 764;
             Version = 2;
             ComponentBased = false;
         }

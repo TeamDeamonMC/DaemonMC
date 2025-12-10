@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Feather()
         {
             Name = "minecraft:feather";
-            Id = 352;
+            Id = 359;
             Version = 2;
             ComponentBased = false;
         }

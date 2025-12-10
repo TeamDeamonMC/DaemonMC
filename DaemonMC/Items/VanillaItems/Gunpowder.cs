@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Gunpowder()
         {
             Name = "minecraft:gunpowder";
-            Id = 353;
+            Id = 360;
             Version = 2;
             ComponentBased = false;
         }

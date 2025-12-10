@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LimeDye()
         {
             Name = "minecraft:lime_dye";
-            Id = 431;
+            Id = 437;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LingeringPotion()
         {
             Name = "minecraft:lingering_potion";
-            Id = 595;
+            Id = 601;
             Version = 2;
             ComponentBased = false;
         }

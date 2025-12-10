@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WitherSkeletonSpawnEgg()
         {
             Name = "minecraft:wither_skeleton_spawn_egg";
-            Id = 492;
+            Id = 498;
             Version = 2;
             ComponentBased = false;
         }

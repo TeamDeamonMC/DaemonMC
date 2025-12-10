@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Clock()
         {
             Name = "minecraft:clock";
-            Id = 419;
+            Id = 425;
             Version = 2;
             ComponentBased = false;
         }

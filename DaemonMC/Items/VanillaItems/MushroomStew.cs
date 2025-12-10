@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MushroomStew()
         {
             Name = "minecraft:mushroom_stew";
-            Id = 282;
+            Id = 289;
             Version = 0;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ArmadilloScute()
         {
             Name = "minecraft:armadillo_scute";
-            Id = 739;
+            Id = 747;
             Version = 2;
             ComponentBased = false;
         }

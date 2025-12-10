@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SquidSpawnEgg()
         {
             Name = "minecraft:squid_spawn_egg";
-            Id = 477;
+            Id = 483;
             Version = 2;
             ComponentBased = false;
         }

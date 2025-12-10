@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FilledMap()
         {
             Name = "minecraft:filled_map";
-            Id = 446;
+            Id = 452;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SilenceArmorTrimSmithingTemplate()
         {
             Name = "minecraft:silence_armor_trim_smithing_template";
-            Id = 728;
+            Id = 736;
             Version = 2;
             ComponentBased = false;
         }

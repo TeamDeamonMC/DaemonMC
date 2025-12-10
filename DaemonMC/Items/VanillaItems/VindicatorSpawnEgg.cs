@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public VindicatorSpawnEgg()
         {
             Name = "minecraft:vindicator_spawn_egg";
-            Id = 502;
+            Id = 508;
             Version = 2;
             ComponentBased = false;
         }

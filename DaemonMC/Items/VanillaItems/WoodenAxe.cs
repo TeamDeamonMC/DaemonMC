@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WoodenAxe()
         {
             Name = "minecraft:wooden_axe";
-            Id = 335;
+            Id = 342;
             Version = 2;
             ComponentBased = false;
         }

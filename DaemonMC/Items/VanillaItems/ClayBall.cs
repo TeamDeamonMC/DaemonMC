@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ClayBall()
         {
             Name = "minecraft:clay_ball";
-            Id = 410;
+            Id = 416;
             Version = 2;
             ComponentBased = false;
         }

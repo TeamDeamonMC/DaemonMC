@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Arrow()
         {
             Name = "minecraft:arrow";
-            Id = 325;
+            Id = 332;
             Version = 2;
             ComponentBased = true;
         }

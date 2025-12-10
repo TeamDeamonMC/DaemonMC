@@ -1,11 +1,11 @@
 namespace DaemonMC.Items.VanillaItems
 {
-    public class NetherBrick : Item
+    public class Netherbrick : Item
     {
-        public NetherBrick()
+        public Netherbrick()
         {
-            Name = "minecraft:nether_brick";
-            Id = 112;
+            Name = "minecraft:netherbrick";
+            Id = 562;
             Version = 2;
             ComponentBased = false;
         }

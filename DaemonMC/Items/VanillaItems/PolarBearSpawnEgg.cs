@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PolarBearSpawnEgg()
         {
             Name = "minecraft:polar_bear_spawn_egg";
-            Id = 500;
+            Id = 506;
             Version = 2;
             ComponentBased = false;
         }

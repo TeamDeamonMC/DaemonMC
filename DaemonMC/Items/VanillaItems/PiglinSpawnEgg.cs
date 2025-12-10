@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PiglinSpawnEgg()
         {
             Name = "minecraft:piglin_spawn_egg";
-            Id = 525;
+            Id = 531;
             Version = 2;
             ComponentBased = false;
         }

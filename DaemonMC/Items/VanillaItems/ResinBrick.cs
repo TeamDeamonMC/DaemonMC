@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ResinBrick()
         {
             Name = "minecraft:resin_brick";
-            Id = 747;
+            Id = 753;
             Version = 2;
             ComponentBased = false;
         }

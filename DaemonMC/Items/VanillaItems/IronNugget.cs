@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronNugget()
         {
             Name = "minecraft:iron_nugget";
-            Id = 602;
+            Id = 608;
             Version = 2;
             ComponentBased = false;
         }

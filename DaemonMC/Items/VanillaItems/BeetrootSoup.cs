@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BeetrootSoup()
         {
             Name = "minecraft:beetroot_soup";
-            Id = 308;
+            Id = 315;
             Version = 0;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GhastSpawnEgg()
         {
             Name = "minecraft:ghast_spawn_egg";
-            Id = 481;
+            Id = 487;
             Version = 2;
             ComponentBased = false;
         }

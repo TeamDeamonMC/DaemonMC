@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MelonSlice()
         {
             Name = "minecraft:melon_slice";
-            Id = 294;
+            Id = 301;
             Version = 0;
             ComponentBased = false;
         }

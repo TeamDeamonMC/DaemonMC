@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscRelic()
         {
             Name = "minecraft:music_disc_relic";
-            Id = 735;
+            Id = 743;
             Version = 2;
             ComponentBased = true;
         }

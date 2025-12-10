@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EmptyMap()
         {
             Name = "minecraft:empty_map";
-            Id = 549;
+            Id = 555;
             Version = 2;
             ComponentBased = false;
         }

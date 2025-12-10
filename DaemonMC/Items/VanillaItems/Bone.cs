@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bone()
         {
             Name = "minecraft:bone";
-            Id = 441;
+            Id = 447;
             Version = 2;
             ComponentBased = false;
         }

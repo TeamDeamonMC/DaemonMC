@@ -29,7 +29,14 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteVarInt(enumEntry.Values.Count());
                 foreach (var val in enumEntry.Values)
                 {
-                    encoder.WriteByte((byte)CommandManager.EnumValues.IndexOf(val));
+                    if (encoder.protocolVersion >= Info.v1_21_130)
+                    {
+                        encoder.WriteInt(CommandManager.EnumValues.IndexOf(val));
+                    }
+                    else
+                    {
+                        encoder.WriteByte((byte)CommandManager.EnumValues.IndexOf(val));
+                    }
                 }
             }
 
@@ -41,7 +48,14 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteString(command.Name);
                 encoder.WriteString(command.Description);
                 encoder.WriteShort((ushort)command.Flags);
-                encoder.WriteByte(command.Permission);
+                if (encoder.protocolVersion >= Info.v1_21_130)
+                {
+                    encoder.WriteString(CommandManager.GetPermission(command.Permission));
+                }
+                else
+                {
+                    encoder.WriteByte(command.Permission);
+                }
                 encoder.WriteInt(-1);
                 encoder.WriteVarInt(command.ChainedSubcommandIndex.Count());
                 foreach (var index in command.ChainedSubcommandIndex)

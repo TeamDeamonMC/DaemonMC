@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteIngot()
         {
             Name = "minecraft:netherite_ingot";
-            Id = 645;
+            Id = 652;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EnderEye()
         {
             Name = "minecraft:ender_eye";
-            Id = 460;
+            Id = 466;
             Version = 2;
             ComponentBased = false;
         }

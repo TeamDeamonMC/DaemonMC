@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WhiteBundle()
         {
             Name = "minecraft:white_bundle";
-            Id = 272;
+            Id = 265;
             Version = 1;
             ComponentBased = true;
         }

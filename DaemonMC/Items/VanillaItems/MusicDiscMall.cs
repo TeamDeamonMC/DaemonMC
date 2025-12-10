@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscMall()
         {
             Name = "minecraft:music_disc_mall";
-            Id = 572;
+            Id = 578;
             Version = 2;
             ComponentBased = true;
         }

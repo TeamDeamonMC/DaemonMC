@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CreeperSpawnEgg()
         {
             Name = "minecraft:creeper_spawn_egg";
-            Id = 468;
+            Id = 474;
             Version = 2;
             ComponentBased = false;
         }

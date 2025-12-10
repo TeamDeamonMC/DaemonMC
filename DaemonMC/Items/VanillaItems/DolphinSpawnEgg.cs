@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DolphinSpawnEgg()
         {
             Name = "minecraft:dolphin_spawn_egg";
-            Id = 512;
+            Id = 518;
             Version = 2;
             ComponentBased = false;
         }

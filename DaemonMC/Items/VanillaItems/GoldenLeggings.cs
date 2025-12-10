@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenLeggings()
         {
             Name = "minecraft:golden_leggings";
-            Id = 378;
+            Id = 385;
             Version = 2;
             ComponentBased = false;
         }

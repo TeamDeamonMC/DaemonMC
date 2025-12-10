@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronHoe()
         {
             Name = "minecraft:iron_hoe";
-            Id = 356;
+            Id = 363;
             Version = 2;
             ComponentBased = false;
         }

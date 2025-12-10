@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SnowGolemSpawnEgg()
         {
             Name = "minecraft:snow_golem_spawn_egg";
-            Id = 534;
+            Id = 540;
             Version = 2;
             ComponentBased = false;
         }

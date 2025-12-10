@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CherrySign()
         {
             Name = "minecraft:cherry_sign";
-            Id = 687;
+            Id = 694;
             Version = 2;
             ComponentBased = false;
         }

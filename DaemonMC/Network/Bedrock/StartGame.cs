@@ -119,7 +119,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteUUID(uuid);
             encoder.WriteBool(false);
             encoder.WriteBool(true); //we use hashed block ids
-            if (encoder.protocolVersion >= Info.v1_21_100)
+            if (encoder.protocolVersion >= Info.v1_21_100 && encoder.protocolVersion < Info.v1_21_130)
             {
                 encoder.WriteBool(TickDeathSystems);
             }

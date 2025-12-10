@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WayfinderArmorTrimSmithingTemplate()
         {
             Name = "minecraft:wayfinder_armor_trim_smithing_template";
-            Id = 729;
+            Id = 737;
             Version = 2;
             ComponentBased = false;
         }

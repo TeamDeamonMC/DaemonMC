@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Campfire()
         {
             Name = "minecraft:campfire";
-            Id = 624;
+            Id = 630;
             Version = 2;
             ComponentBased = true;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Spyglass()
         {
             Name = "minecraft:spyglass";
-            Id = 661;
+            Id = 668;
             Version = 2;
             ComponentBased = false;
         }

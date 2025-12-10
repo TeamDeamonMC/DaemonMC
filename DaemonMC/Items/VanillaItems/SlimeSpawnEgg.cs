@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SlimeSpawnEgg()
         {
             Name = "minecraft:slime_spawn_egg";
-            Id = 472;
+            Id = 478;
             Version = 2;
             ComponentBased = false;
         }

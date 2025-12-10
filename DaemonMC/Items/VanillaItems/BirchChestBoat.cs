@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BirchChestBoat()
         {
             Name = "minecraft:birch_chest_boat";
-            Id = 675;
+            Id = 682;
             Version = 2;
             ComponentBased = false;
         }

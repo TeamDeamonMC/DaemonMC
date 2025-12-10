@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscFar()
         {
             Name = "minecraft:music_disc_far";
-            Id = 571;
+            Id = 577;
             Version = 2;
             ComponentBased = true;
         }

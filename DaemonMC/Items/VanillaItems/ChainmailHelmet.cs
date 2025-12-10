@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChainmailHelmet()
         {
             Name = "minecraft:chainmail_helmet";
-            Id = 364;
+            Id = 371;
             Version = 2;
             ComponentBased = false;
         }

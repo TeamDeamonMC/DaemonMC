@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SweetBerries()
         {
             Name = "minecraft:sweet_berries";
-            Id = 309;
+            Id = 316;
             Version = 0;
             ComponentBased = false;
         }

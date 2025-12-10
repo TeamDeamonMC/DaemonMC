@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteLeggings()
         {
             Name = "minecraft:netherite_leggings";
-            Id = 648;
+            Id = 655;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PiglinBannerPattern()
         {
             Name = "minecraft:piglin_banner_pattern";
-            Id = 620;
+            Id = 626;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Compass()
         {
             Name = "minecraft:compass";
-            Id = 417;
+            Id = 423;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Apple()
         {
             Name = "minecraft:apple";
-            Id = 278;
+            Id = 285;
             Version = 1;
             ComponentBased = true;
         }

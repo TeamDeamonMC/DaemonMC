@@ -8,7 +8,7 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-            Command = decoder.ReadString();
+            Command = decoder.ReadString(); //todo add all fields
         }
 
         protected override void Encode(PacketEncoder encoder)

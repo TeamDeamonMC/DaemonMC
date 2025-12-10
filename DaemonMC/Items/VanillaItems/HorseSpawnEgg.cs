@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HorseSpawnEgg()
         {
             Name = "minecraft:horse_spawn_egg";
-            Id = 485;
+            Id = 491;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PumpkinPie()
         {
             Name = "minecraft:pumpkin_pie";
-            Id = 306;
+            Id = 313;
             Version = 0;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PhantomMembrane()
         {
             Name = "minecraft:phantom_membrane";
-            Id = 607;
+            Id = 613;
             Version = 2;
             ComponentBased = false;
         }

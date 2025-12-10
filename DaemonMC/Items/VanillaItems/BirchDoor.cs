@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BirchDoor()
         {
             Name = "minecraft:birch_door";
-            Id = 587;
+            Id = 593;
             Version = 2;
             ComponentBased = false;
         }

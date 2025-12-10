@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Balloon()
         {
             Name = "minecraft:balloon";
-            Id = 635;
+            Id = 642;
             Version = 2;
             ComponentBased = false;
         }

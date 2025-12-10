@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronIngot()
         {
             Name = "minecraft:iron_ingot";
-            Id = 329;
+            Id = 336;
             Version = 2;
             ComponentBased = false;
         }

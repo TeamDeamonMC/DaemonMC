@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Cauldron()
         {
             Name = "minecraft:cauldron";
-            Id = 459;
+            Id = 465;
             Version = 2;
             ComponentBased = true;
         }

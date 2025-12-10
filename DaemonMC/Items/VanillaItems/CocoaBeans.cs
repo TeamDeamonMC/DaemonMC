@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CocoaBeans()
         {
             Name = "minecraft:cocoa_beans";
-            Id = 438;
+            Id = 444;
             Version = 2;
             ComponentBased = false;
         }

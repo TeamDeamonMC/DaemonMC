@@ -151,6 +151,9 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.ClientMovementPredictionSync:
                         new ClientMovementPredictionSync().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.SetPlayerInventoryOptions:
+                        new SetPlayerInventoryOptions().DecodePacket(decoder);
+                        break;
                     case Info.Bedrock.Disconnect:
                         new Disconnect().DecodePacket(decoder, PacketHandler.Client);
                         break;

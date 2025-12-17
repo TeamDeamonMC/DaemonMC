@@ -41,6 +41,7 @@
             MobEquipment = 31,
             MobArmorEquipment = 32,
             PlayerAction = 36,
+            SetPlayerInventoryOptions = 307,
             SetActorData = 39,
             SetActorMotion = 40,
             Animate = 44,

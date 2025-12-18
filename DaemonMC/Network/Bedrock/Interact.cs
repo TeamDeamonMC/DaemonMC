@@ -14,13 +14,13 @@ namespace DaemonMC.Network.Bedrock
         {
             Action = decoder.ReadByte();
             ActorRuntimeId = decoder.ReadVarLong();
-            if (Action == 3 || Action == 4)
+            if (decoder.protocolVersion >= Info.v1_21_130)
             {
-                if (decoder.protocolVersion >= Info.v1_21_130)
-                {
-                    InteractPosition = decoder.ReadOptional(decoder.ReadVec3);
-                }
-                else
+                InteractPosition = decoder.ReadOptional(decoder.ReadVec3);
+            }
+            else
+            {
+                if (Action == 3 || Action == 4)
                 {
                     InteractPosition = decoder.ReadVec3();
                 }

@@ -94,13 +94,13 @@ namespace DaemonMC.Level
                     return;
                 }
 
-                if (!subChunk.Palette.Contains(block.GetState()))
+                if (!NbtUtils.Contains(subChunk.Palette, block.GetState()))
                 {
                     subChunk.Palette.Add(block.GetState());
                 }
 
                 int blockIndex = (localY) | (localZ << 4) | (localX << 8);
-                byte stateIndex = (byte)subChunk.Palette.IndexOf(block.GetState());
+                byte stateIndex = (byte)NbtUtils.IndexOf(subChunk.Palette, block.GetState());
                 subChunk.Blocks[blockIndex] = stateIndex;
             }
             else

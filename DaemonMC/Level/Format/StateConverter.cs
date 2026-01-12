@@ -17,8 +17,10 @@ namespace DaemonMC.Level.Format
 
         static List<NbtCompound> To1_21_100(List<NbtCompound> palette)
         {
-            foreach (var block in palette)
+            foreach (var original in palette)
             {
+                var block = (NbtCompound)original.Clone();
+
                 if (block.TryGet<NbtString>("name", out var nameTag))
                 {
                     string name = nameTag.StringValue;

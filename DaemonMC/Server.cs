@@ -20,7 +20,10 @@ namespace DaemonMC
         public static Queue<long> AvailableIds = new Queue<long>();
         public static int DatGrIn = 0;
         public static int DatGrOut = 0;
-        public static int Nack = 0;
+        public static int NackIn = 0;
+        public static int NackOut = 0;
+        public static int AckIn = 0;
+        public static int AckOut = 0;
         public static int Rsent = 0;
         public static bool Crash = false;
         public static List<World> Levels = new List<World>();
@@ -82,6 +85,13 @@ namespace DaemonMC
                         var receivedData = spanBuffer.Slice(0, recv);
 
                         var client = (IPEndPoint)ep;
+
+                        if (RakSessionManager.blackList.ContainsKey(client))
+                        {
+                            Log.warn($"Refused blocked connection from {client.Address}");
+                            return;
+                        }
+
                         RakSessionManager.createSession(client);
 
                         PacketDecoder decoder = PacketDecoderPool.Get(receivedData.ToArray(), client);
@@ -210,10 +220,13 @@ namespace DaemonMC
         {
             while (true)
             {
-                Console.Title = $"DaeamonMC | Players {OnlinePlayers.Count}/{DaemonMC.MaxOnline} | DatGr/sec in:{DatGrIn} out:{DatGrOut} resend:{Rsent} | NACK/sec in:{Nack} | Pool cache(in-use) in:{PacketDecoderPool.Cached}({PacketDecoderPool.InUse}) out:{PacketEncoderPool.cached}({PacketEncoderPool.inUse})";
+                Console.Title = $"DaeamonMC | Players: {OnlinePlayers.Count}/{DaemonMC.MaxOnline} | DatGr/sec in:{DatGrIn} out:{DatGrOut} resend:{Rsent} | NACK/sec in:{NackIn} out:{NackOut} | ACK/sec in:{AckIn} out:{AckOut}";
                 DatGrIn = 0;
                 DatGrOut = 0;
-                Nack = 0;
+                AckIn = 0;
+                AckOut = 0;
+                NackIn = 0;
+                NackOut = 0;
                 Rsent = 0;
                 Thread.Sleep(1000);
             }

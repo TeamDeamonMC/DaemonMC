@@ -660,12 +660,9 @@ namespace DaemonMC.Network
     public static class PacketDecoderPool
     {
         public static Stack<PacketDecoder> Pool = new Stack<PacketDecoder>();
-        public static int Cached = 0;
-        public static int InUse = 0;
 
         public static PacketDecoder Get(byte[] buffer, IPEndPoint clientEp)
         {
-            InUse++;
             if (Pool.Count > 0)
             {
                 var session = RakSessionManager.getSession(clientEp);
@@ -678,14 +675,12 @@ namespace DaemonMC.Network
             }
             else
             {
-                Cached++;
                 return new PacketDecoder(buffer, clientEp);
             }
         }
 
         public static void Return(PacketDecoder decoder)
         {
-            InUse--;
             Pool.Push(decoder);
         }
     }

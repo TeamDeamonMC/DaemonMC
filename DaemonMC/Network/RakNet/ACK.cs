@@ -25,7 +25,6 @@
                 }
                 ACKs.Add(ACK);
             }
-            ACKs = ACKlist;
         }
 
         protected override void Encode(PacketEncoder encoder)

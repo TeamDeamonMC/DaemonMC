@@ -790,8 +790,6 @@ namespace DaemonMC.Network
     public class PacketEncoderPool
     {
         private static ConcurrentStack<PacketEncoder> pool = new ConcurrentStack<PacketEncoder>();
-        public static int cached;
-        public static int inUse;
 
      public static PacketEncoder Get(Player player)
      {
@@ -800,7 +798,6 @@ namespace DaemonMC.Network
 
         public static PacketEncoder Get(IPEndPoint clientEp)
         {
-            Interlocked.Increment(ref inUse);
             if (pool.TryPop(out var encoder))
             {
                 encoder.clientEp = clientEp;
@@ -808,7 +805,6 @@ namespace DaemonMC.Network
                 return encoder;
             }
 
-            Interlocked.Increment(ref cached);
             return new PacketEncoder(clientEp);
         }
 
@@ -816,7 +812,6 @@ namespace DaemonMC.Network
         {
             encoder.Reset();
             pool.Push(encoder);
-            Interlocked.Decrement(ref inUse);
         }
     }
 }

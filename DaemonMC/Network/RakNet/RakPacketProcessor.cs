@@ -158,6 +158,7 @@ namespace DaemonMC.Network.RakNet
                         }
                     }
                 }
+                Server.AckIn++;
             }
 
             if (packet is NACK nack)

@@ -33,6 +33,11 @@ namespace DaemonMC.Network
                         packet.EncodePacket(encoder);
                     }
                     Log.warn($"Packet decoding error for {decoder.clientEp.Address}. \n Handling {Id}\n {e}");
+                    if (handler == PacketHandler.Raknet)
+                    {
+                        RakSessionManager.blackList.Add(decoder.clientEp, DateTime.Now);
+                        Log.warn($"{decoder.clientEp.Address} connection temporary blocked due to suspicios activity");
+                    }
                     return;
                 }
                 if (PluginManager.PacketReceived(decoder.clientEp, this))

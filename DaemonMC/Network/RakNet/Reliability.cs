@@ -144,6 +144,7 @@ namespace DaemonMC.Network.RakNet
                     ACKs = acks,
                 };
                 pk.EncodePacket(encoder);
+                Server.AckOut++;
             }
         }
 
@@ -276,7 +277,7 @@ namespace DaemonMC.Network.RakNet
                 Log.debug($"[RakNet] Received NACK {sequenceNumber} from {clientEp.Address}. Resending... FAILED. Unexpected sequence number", ConsoleColor.DarkYellow);
             }
             // Log.debug($"[RakNet] Currently unacknowledged messages({sentPackets.Count}):[{string.Join(", ", sentPackets.Keys)}]", ConsoleColor.DarkYellow);
-            Server.Nack++;
+            Server.NackIn++;
         }
     }
 }

@@ -263,7 +263,9 @@ namespace DaemonMC.Network.RakNet
 
         internal static void ResendPacket(uint sequenceNumber, IPEndPoint clientEp)
         {
-            var sentPackets = RakSessionManager.getSession(clientEp).sentPackets;
+            var session = RakSessionManager.getSession(clientEp);
+            var sentPackets = session.sentPackets;
+
             if (sentPackets.TryGetValue(sequenceNumber, out var data))
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
@@ -278,6 +280,13 @@ namespace DaemonMC.Network.RakNet
             }
             // Log.debug($"[RakNet] Currently unacknowledged messages({sentPackets.Count}):[{string.Join(", ", sentPackets.Keys)}]", ConsoleColor.DarkYellow);
             Server.NackIn++;
+
+            if (session.Nacks > 30)
+            {
+                var player = Server.GetPlayer(session.EntityID);
+                player.Kick($"Unacknowledged packet limit exceeded");
+                Log.warn($"{player.Username} (MTU:{session.MTU}) exceeded unacknowledged packet limit");
+            }
         }
     }
 }

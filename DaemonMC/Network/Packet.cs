@@ -36,7 +36,7 @@ namespace DaemonMC.Network
                     if (handler == PacketHandler.Raknet)
                     {
                         RakSessionManager.blackList.Add(decoder.clientEp, DateTime.Now);
-                        Log.warn($"{decoder.clientEp.Address} connection temporary blocked due to suspicios activity");
+                        Log.warn($"{decoder.clientEp.Address} IP temporary blocked due to suspicios activity");
                     }
                     return;
                 }

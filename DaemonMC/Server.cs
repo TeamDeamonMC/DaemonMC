@@ -88,7 +88,7 @@ namespace DaemonMC
 
                         if (RakSessionManager.blackList.ContainsKey(client))
                         {
-                            Log.warn($"Refused blocked connection from {client.Address}");
+                            Log.warn($"Refused connection from blocked IP {client.Address}");
                             return;
                         }
 

@@ -96,26 +96,11 @@ namespace DaemonMC.Network.RakNet
             {
                 if (session.Value.EntityID != 0)
                 {
+                    session.Value.Nacks = 0;
                     if (now - session.Value.LastPingTime > _timeoutThreshold)
                     {
                         Server.RemovePlayer(getSession(session.Key).EntityID);
                         deleteSession(session.Key, "Timed out");
-                    }
-
-                    if (session.Value.sentPackets.Count > 50)
-                    {
-                        var player = Server.GetPlayer(session.Value.EntityID);
-                        player.Kick($"Unacknowledged packet limit exceeded {session.Value.sentPackets.Count}");
-                        Log.warn($"{player.Username} (MTU:{session.Value.MTU}) exceeded unacknowledged packet limit ({session.Value.sentPackets.Count})");
-                        Log.warn($"Last 5 packets:");
-                        for (uint i = 0; i < 5; i++)
-                        {
-                            byte[] data = session.Value.sentPackets[i].Item1;
-
-                            int count = Math.Min(20, data.Length);
-                            string hex = BitConverter.ToString(data, 0, count).Replace("-", " ");
-                            Log.warn($"Size:{data.Length} Hex(first 20 bytes):{hex}");
-                        }
                     }
                 }
             }
@@ -129,7 +114,7 @@ namespace DaemonMC.Network.RakNet
                 if (now - ip.Value > _timeoutThreshold)
                 {
                     blackList.Remove(ip.Key);
-                    Log.warn($"{ip.Key.Address} connection unblocked");
+                    Log.warn($"{ip.Key.Address} IP unblocked");
                 }
             }
         }

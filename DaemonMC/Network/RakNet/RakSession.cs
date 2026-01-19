@@ -19,6 +19,7 @@ namespace DaemonMC.Network.RakNet
         public ushort compId { get; set; } = 0;
         public uint orderIndex { get; set; } = 0;
         public Dictionary<uint, (byte[], bool)> sentPackets { get; set; } = new Dictionary<uint, (byte[], bool)>();
+        public int Nacks { get; set; } = 0;
         public int protocolVersion { get; set; } = 0;
         public Skin skin { get; set; } = new Skin();
 

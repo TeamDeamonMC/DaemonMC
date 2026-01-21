@@ -280,7 +280,7 @@ namespace DaemonMC.Network.RakNet
             }
             // Log.debug($"[RakNet] Currently unacknowledged messages({sentPackets.Count}):[{string.Join(", ", sentPackets.Keys)}]", ConsoleColor.DarkYellow);
             Server.NackIn++;
-
+            session.Nacks++;
             if (session.Nacks > 30)
             {
                 var player = Server.GetPlayer(session.EntityID);

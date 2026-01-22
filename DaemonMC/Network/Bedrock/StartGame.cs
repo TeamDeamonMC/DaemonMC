@@ -95,10 +95,13 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
             //End of Level settings
-            encoder.WriteString("");
-            encoder.WriteString("");
-            encoder.WriteString("");
-            encoder.WriteString("");
+            if (encoder.protocolVersion < Info.v1_26_0)
+            {
+                encoder.WriteString("");
+                encoder.WriteString("");
+                encoder.WriteString("");
+                encoder.WriteString("");
+            }
             encoder.WriteString(LevelName); //level name?
             encoder.WriteString("");
             encoder.WriteString(""); //owner id idk
@@ -124,6 +127,14 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(TickDeathSystems);
             }
             encoder.WriteBool(true);
+            if (encoder.protocolVersion >= Info.v1_26_0)
+            {
+                encoder.WriteBool(false);
+                encoder.WriteString("");
+                encoder.WriteString("");
+                encoder.WriteString("");
+                encoder.WriteString("");
+            }
         }
     }
 }

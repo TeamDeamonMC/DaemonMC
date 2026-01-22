@@ -18,28 +18,35 @@
             {
                 Localized = decoder.ReadBool();
                 byte category = decoder.ReadByte();
-                switch (category)
+                if (decoder.protocolVersion < Info.v1_26_0)
                 {
-                    case 0:
-                        decoder.ReadString(); //todo fix
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        break;
-                    case 1:
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        break;
-                    case 2:
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        decoder.ReadString();
-                        break;
+                    switch (category)
+                    {
+                        case 0:
+                            decoder.ReadString(); //todo fix
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            break;
+                        case 1:
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            break;
+                        case 2:
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            decoder.ReadString();
+                            break;
+                    }
+                    MessageType = decoder.ReadByte();
                 }
-                MessageType = decoder.ReadByte();
+                else
+                {
+                    MessageType = (byte)decoder.ReadVarInt();
+                }
             }
             else
             {
@@ -65,13 +72,20 @@
                 if (encoder.protocolVersion >= Info.v1_21_130)
                 {
                     encoder.WriteByte(0);
-                    encoder.WriteString("raw");
-                    encoder.WriteString("tip");
-                    encoder.WriteString("systemMessage");
-                    encoder.WriteString("textObjectWhisper");
-                    encoder.WriteString("textObjectAnnouncement");
-                    encoder.WriteString("textObject");
-                    encoder.WriteByte(MessageType);
+                    if (encoder.protocolVersion < Info.v1_26_0)
+                    {
+                        encoder.WriteString("raw");
+                        encoder.WriteString("tip");
+                        encoder.WriteString("systemMessage");
+                        encoder.WriteString("textObjectWhisper");
+                        encoder.WriteString("textObjectAnnouncement");
+                        encoder.WriteString("textObject");
+                        encoder.WriteByte(MessageType);
+                    }
+                    else
+                    {
+                        encoder.WriteVarInt(MessageType);
+                    }
                 }
                 encoder.WriteString(Message);
             }
@@ -80,10 +94,17 @@
                 if (encoder.protocolVersion >= Info.v1_21_130)
                 {
                     encoder.WriteByte(1);
-                    encoder.WriteString("chat");
-                    encoder.WriteString("whisper");
-                    encoder.WriteString("announcement");
-                    encoder.WriteByte(MessageType);
+                    if (encoder.protocolVersion < Info.v1_26_0)
+                    {
+                        encoder.WriteString("chat");
+                        encoder.WriteString("whisper");
+                        encoder.WriteString("announcement");
+                        encoder.WriteByte(MessageType);
+                    }
+                    else
+                    {
+                        encoder.WriteVarInt(MessageType);
+                    }
                 }
                 encoder.WriteString(Username);
                 encoder.WriteString(Message);
@@ -93,9 +114,16 @@
                 if (encoder.protocolVersion >= Info.v1_21_130)
                 {
                     encoder.WriteByte(2);
-                    encoder.WriteString("translate");
-                    encoder.WriteString("popup");
-                    encoder.WriteString("jukeboxPopup");
+                    if (encoder.protocolVersion < Info.v1_26_0)
+                    {
+                        encoder.WriteString("translate");
+                        encoder.WriteString("popup");
+                        encoder.WriteString("jukeboxPopup");
+                    }
+                    else
+                    {
+                        encoder.WriteVarInt(MessageType);
+                    }
                     encoder.WriteByte(MessageType);
                 }
                 encoder.WriteString(Message);

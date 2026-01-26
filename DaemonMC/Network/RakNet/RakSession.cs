@@ -18,8 +18,10 @@ namespace DaemonMC.Network.RakNet
         public uint sequenceNumber { get; set; } = 0;
         public ushort compId { get; set; } = 0;
         public uint orderIndex { get; set; } = 0;
-        public Dictionary<uint, (byte[], bool)> sentPackets { get; set; } = new Dictionary<uint, (byte[], bool)>();
+        public Dictionary<uint, byte[]> sentPackets { get; set; } = new Dictionary<uint, byte[]>();
         public int Nacks { get; set; } = 0;
+        public bool MtuReducing { get; set; }
+        public DateTime LastMtuReduced { get; set; }
         public int protocolVersion { get; set; } = 0;
         public Skin skin { get; set; } = new Skin();
 

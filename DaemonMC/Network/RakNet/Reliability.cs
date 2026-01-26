@@ -1,5 +1,5 @@
-﻿using DaemonMC.Utils.Text;
-using System.Net;
+﻿using System.Net;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.RakNet
 {
@@ -188,8 +188,6 @@ namespace DaemonMC.Network.RakNet
 
                 for (int i = 0; i < totalFragments; i++)
                 {
-                    session.sentPackets.TryAdd(RakSessionManager.getSession(encoder.clientEp).sequenceNumber, (body, false));
-
                     int start = i * maxPayloadSize;
                     int length = Math.Min(maxPayloadSize, body.Length - start);
 
@@ -243,6 +241,7 @@ namespace DaemonMC.Network.RakNet
                         encoder.byteStream.Write(body, 0, body.Length);
                     }
                     encoder.SendPacket(128, false);
+                    session.sentPackets.TryAdd(session.sequenceNumber, encoder.byteStream.ToArray());
                     encoder.byteStream.SetLength(0);
                     encoder.byteStream.Position = 0;
                 }
@@ -269,8 +268,8 @@ namespace DaemonMC.Network.RakNet
             if (sentPackets.TryGetValue(sequenceNumber, out var data))
             {
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
-                sentPackets.Remove(sequenceNumber);
-                ReliabilityHandler(encoder, data.Item1);
+                //sentPackets.Remove(sequenceNumber); todo uncommenting like this could leak memory without proper NACK impl. but well see.
+                Server.Sock.SendTo(data, clientEp);
                 Log.debug($"[RakNet] Received NACK {sequenceNumber} from {clientEp.Address}. Resending... OK", ConsoleColor.DarkYellow);
                 Server.Rsent++;
             }
@@ -284,8 +283,33 @@ namespace DaemonMC.Network.RakNet
             if (session.Nacks > 30)
             {
                 var player = Server.GetPlayer(session.EntityID);
-                player.Kick($"Unacknowledged packet limit exceeded");
-                Log.warn($"{player.Username} (MTU:{session.MTU}) exceeded unacknowledged packet limit");
+
+                lock (session.Sync)
+                {
+                    if (session.MtuReducing && (DateTime.UtcNow - session.LastMtuReduced).TotalSeconds < 4)
+                    {
+                        return;
+                    }
+
+                    if (session.MTU > 600)
+                    {
+                        int oldMtu = session.MTU;
+                        session.MTU = Math.Max(session.MTU - 200, 600);
+
+                        session.MtuReducing = true;
+                        session.LastMtuReduced = DateTime.UtcNow;
+
+                        session.sentPackets.Clear();
+                        session.Nacks = 0;
+
+                        Log.debug($"[RakNet] MTU adjusted {oldMtu} -> {session.MTU} for {clientEp.Address}", ConsoleColor.DarkYellow);
+
+                        return;
+                    }
+
+                    player.Kick($"Unacknowledged packet limit exceeded");
+                    Log.warn($"{player.Username} (MTU:{session.MTU}) exceeded unacknowledged packet limit");
+                }
             }
         }
     }

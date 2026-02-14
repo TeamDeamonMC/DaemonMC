@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenSpear()
         {
             Name = "minecraft:golden_spear";
-            Id = 260;
+            Id = 258;
             Version = 1;
             ComponentBased = true;
         }

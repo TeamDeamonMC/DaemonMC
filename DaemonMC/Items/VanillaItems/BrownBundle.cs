@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BrownBundle()
         {
             Name = "minecraft:brown_bundle";
-            Id = 275;
+            Id = 277;
             Version = 1;
             ComponentBased = true;
         }

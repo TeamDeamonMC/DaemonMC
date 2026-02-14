@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LightBlueBundle()
         {
             Name = "minecraft:light_blue_bundle";
-            Id = 271;
+            Id = 279;
             Version = 1;
             ComponentBased = true;
         }

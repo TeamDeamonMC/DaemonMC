@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StoneSpear()
         {
             Name = "minecraft:stone_spear";
-            Id = 259;
+            Id = 261;
             Version = 1;
             ComponentBased = true;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperSpear()
         {
             Name = "minecraft:copper_spear";
-            Id = 258;
+            Id = 259;
             Version = 1;
             ComponentBased = true;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteSpear()
         {
             Name = "minecraft:netherite_spear";
-            Id = 261;
+            Id = 260;
             Version = 1;
             ComponentBased = true;
         }

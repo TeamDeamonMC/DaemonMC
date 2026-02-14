@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bundle()
         {
             Name = "minecraft:bundle";
-            Id = 266;
+            Id = 269;
             Version = 1;
             ComponentBased = true;
         }

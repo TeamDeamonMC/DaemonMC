@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LimeBundle()
         {
             Name = "minecraft:lime_bundle";
-            Id = 273;
+            Id = 271;
             Version = 1;
             ComponentBased = true;
         }

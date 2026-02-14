@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WindCharge()
         {
             Name = "minecraft:wind_charge";
-            Id = 283;
+            Id = 282;
             Version = 1;
             ComponentBased = true;
         }

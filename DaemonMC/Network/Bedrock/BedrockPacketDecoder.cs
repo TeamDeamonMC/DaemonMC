@@ -12,7 +12,7 @@ namespace DaemonMC.Network.Bedrock
 
             if (session.encryptor != null)
             {
-                decoder.buffer = session.encryptor.Decrypt(decoder.buffer);
+                decoder.byteStream = session.encryptor.Decrypt(decoder.byteStream);
 
                 if (decoder.buffer == null) //decryption failed
                 {

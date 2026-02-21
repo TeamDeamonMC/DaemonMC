@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Numerics;
 using System.Text;
 using DaemonMC.Items;
@@ -14,17 +15,15 @@ namespace DaemonMC.Network
     {
         public readonly object Sync = new object();
         public List<byte[]> packetBuffers = new List<byte[]>();
-        public byte[] buffer;
-        public int readOffset;
+        public MemoryStream byteStream;
         public IPEndPoint clientEp;
         public int protocolVersion = 0;
         public Player player;
 
         public PacketDecoder(byte[] byteBuffer, IPEndPoint ep)
         {
-            buffer = byteBuffer;
-            readOffset = 0;
             clientEp = ep;
+            byteStream = new MemoryStream();
             protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
         }
 
@@ -69,14 +68,14 @@ namespace DaemonMC.Network
                     else
                     {
                         Log.error($"[Server] Unknown RakNet packet: {pkid}");
-                        ToDataTypes.HexDump(decoder.buffer, recv);
+                        ToDataTypes.HexDump(decoder.byteStream.ToArray(), recv);
                     }
                     break;
             }
 
-            if (decoder.readOffset < recv)
+            if (decoder.byteStream.Position < recv)
             {
-                Log.warn($"{recv - decoder.readOffset} bytes left while reading {(Info.RakNet)pkid}");
+                Log.warn($"{recv - decoder.byteStream.Position} bytes left while reading {(Info.RakNet)pkid}");
             }
             packetHandler(decoder);
             PacketDecoderPool.Return(decoder);
@@ -117,9 +116,9 @@ namespace DaemonMC.Network
                         Log.error($"[Server] Unknown RakNet packet: {pkid}");
                         break;
                 }
-                if (decoder.readOffset < decoder.buffer.Length && pkid != 254)
+                if (decoder.byteStream.Position < decoder.byteStream.Length && pkid != 254)
                 {
-                    Log.warn($"{decoder.buffer.Length - decoder.readOffset} bytes left while reading {(Info.RakNet)pkid}");
+                    Log.warn($"{decoder.byteStream.Length - decoder.byteStream.Position} bytes left while reading {(Info.RakNet)pkid}");
                 }
                 PacketDecoderPool.Return(decoder);
             }
@@ -127,38 +126,37 @@ namespace DaemonMC.Network
 
         public void Reset(byte[] buffer)
         {
-            this.buffer = buffer;
-            this.readOffset = 0;
+            byteStream.SetLength(0);
+            byteStream.Position = 0;
             this.packetBuffers.Clear();
         }
 
         public bool ReadBool()
         {
-            byte b = buffer[readOffset];
-            readOffset += 1;
+            int b = byteStream.ReadByte();
             return b == 1 ? true : false;
         }
 
         public int ReadInt()
         {
-            int a = BitConverter.ToInt32(buffer, readOffset);
-            readOffset += 4;
-            return a;
+            byte[] bytes = new byte[4];
+            byteStream.Read(bytes, 0, 4);
+            return BitConverter.ToInt32(bytes, 0);
         }
 
         public float ReadFloat()
         {
-            float a = BitConverter.ToSingle(buffer, readOffset);
-            readOffset += 4;
-            return a;
+            byte[] bytes = new byte[4];
+            byteStream.Read(bytes, 0, 4);
+            return BitConverter.ToSingle(bytes, 0);
         }
 
         public int ReadIntBE()
         {
-            Array.Reverse(buffer, readOffset, 4);
-            int a = BitConverter.ToInt32(buffer, readOffset);
-            readOffset += 4;
-            return a;
+            byte[] bytes = new byte[4];
+            byteStream.Read(bytes, 0, 4);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt32(bytes, 0);
         }
 
         public int ReadVarInt()
@@ -168,13 +166,14 @@ namespace DaemonMC.Network
 
             while (true)
             {
-                byte currentByte = buffer[readOffset++];
+                int read = byteStream.ReadByte();
+
+                byte currentByte = (byte)read;
+
                 value |= (currentByte & 0x7F) << (size * 7);
 
                 if ((currentByte & 0x80) == 0)
-                {
                     break;
-                }
 
                 size++;
             }
@@ -192,43 +191,38 @@ namespace DaemonMC.Network
 
         public short ReadSignedShort()
         {
-            short value = (short)((buffer[readOffset] << 8) | buffer[readOffset + 1]);
-            readOffset += 2;
+            short value = (short)((byteStream.ReadByte() << 8) | byteStream.ReadByte());
             return value;
         }
 
         public short ReadShortBE()
         {
-            short value = (short)(buffer[readOffset + 1] | (buffer[readOffset] << 8));
-            readOffset += 2;
+            byte[] bytes = new byte[4];
+            byteStream.Read(bytes, 0, 4);
+            short value = (short)(bytes[1] | (bytes[0] << 8));
             return value;
         }
 
         public ushort ReadShort()
         {
-            ushort value = (ushort)((buffer[readOffset] << 8) | buffer[readOffset + 1]);
-            readOffset += 2;
+            short value = (short)((byteStream.ReadByte() << 8) | byteStream.ReadByte());
             return (ushort)((value >> 8) | (value << 8));
         }
 
         public byte ReadByte()
         {
-            byte b = buffer[readOffset];
-            readOffset += 1;
-            return b;
+            return (byte)byteStream.ReadByte();
         }
 
         public void ReadBytes(byte[] data)
         {
-            Array.Copy(buffer, readOffset, data, 0, data.Length);
-            readOffset += data.Length;
+            byteStream.Read(data, 0, data.Length);
         }
 
         public byte[] ReadBytes(int count)
         {
             byte[] result = new byte[count];
-            Array.Copy(buffer, readOffset, result, 0, count);
-            readOffset += count;
+            byteStream.Read(result, 0, count);
 
             return result;
         }
@@ -236,26 +230,26 @@ namespace DaemonMC.Network
         public byte[] ReadBytes()
         {
             int length = ReadVarInt();
+
             byte[] result = new byte[length];
-            Array.Copy(buffer, readOffset, result, 0, length);
-            readOffset += length;
+            byteStream.Read(result, 0, length);
 
             return result;
         }
 
         public long ReadLong()
         {
-            long value = BitConverter.ToInt64(buffer, readOffset);
-            readOffset += 8;
-            return value;
+            byte[] bytes = new byte[8];
+            byteStream.Read(bytes, 0, 8);
+            return BitConverter.ToInt64(bytes, 0);
         }
 
         public long ReadLongLE()
         {
-            Array.Reverse(buffer, readOffset, 8);
-            long value = BitConverter.ToInt64(buffer, readOffset);
-            readOffset += 8;
-            return value;
+            byte[] bytes = new byte[8];
+            byteStream.Read(bytes, 0, 8);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt64(bytes, 0);
         }
 
         public string ReadMagic()
@@ -263,21 +257,17 @@ namespace DaemonMC.Network
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < 16; ++i)
             {
-                sb.Append(buffer[readOffset + i].ToString("X2"));
+                sb.Append(byteStream.ReadByte().ToString("X2"));
             }
-            readOffset += 16;
             return sb.ToString();
         }
 
         public string ReadRakString()
         {
             short length = ReadShortBE();
-            if (length < 0 || readOffset + length > buffer.Length)
-            {
-                throw new Exception($"Invalid rakstring lenght {length}");
-            }
-            string str = Encoding.UTF8.GetString(buffer, readOffset, length);
-            readOffset += length;
+            byte[] bytes = new byte[length];
+            byteStream.Read(bytes, 0, length);
+            string str = Encoding.UTF8.GetString(bytes, 0, length);
 
             return str;
         }
@@ -285,12 +275,9 @@ namespace DaemonMC.Network
         public string ReadString()
         {
             int length = ReadVarInt();
-            if (length < 0 || readOffset + length > buffer.Length)
-            {
-                throw new Exception($"Invalid string lenght {length}");
-            }
-            string str = Encoding.UTF8.GetString(buffer, readOffset, length);
-            readOffset += length;
+            byte[] bytes = new byte[length];
+            byteStream.Read(bytes, 0, length);
+            string str = Encoding.UTF8.GetString(bytes, 0, length);
 
             return str;
         }
@@ -308,38 +295,38 @@ namespace DaemonMC.Network
 
         public short ReadMTU(int lenght)
         {
-            int paddingSize = lenght - readOffset;
+            long paddingSize = lenght - byteStream.Position;
 
-            short estimatedMTU = (short)(readOffset + paddingSize + 28);
+            short estimatedMTU = (short)(byteStream.Position + paddingSize + 28);
 
-            readOffset = (paddingSize + readOffset);
+            byteStream.Position = (paddingSize + byteStream.Position);
 
             return estimatedMTU;
         }
 
         public IPAddressInfo ReadAddress()
         {
-            byte ipVersion = buffer[readOffset];
-            readOffset++;
+            int version = byteStream.ReadByte();
 
             IPAddressInfo ipAddressInfo = new IPAddressInfo();
 
-            if (ipVersion == 4)
+            if (version == 4)
             {
                 ipAddressInfo.IPAddress = new byte[4];
-                Array.Copy(buffer, readOffset, ipAddressInfo.IPAddress, 0, 4);
-                readOffset += 4;
+                byteStream.Read(ipAddressInfo.IPAddress, 0, 4);
+
                 ipAddressInfo.Port = ReadShort();
             }
-            else if (ipVersion == 6)
+            else if (version == 6)
             {
-                ReadShort(); //address family
+                ReadShort();
                 ipAddressInfo.Port = ReadShort();
-                ReadInt(); //idk
+                ReadInt();
+
                 ipAddressInfo.IPAddress = new byte[16];
-                Array.Copy(buffer, readOffset, ipAddressInfo.IPAddress, 0, 16);
-                readOffset += 16;
-                ReadInt(); //also idk
+                byteStream.Read(ipAddressInfo.IPAddress, 0, 16);
+
+                ReadInt();
             }
 
             return ipAddressInfo;
@@ -351,16 +338,23 @@ namespace DaemonMC.Network
 
             for (int i = 0; i < 20; i++)
             {
-                byte ipVersion = buffer[readOffset];
-                IPAddressInfo ipAddressInfo = new IPAddressInfo();
+                long remaining = byteStream.Length - byteStream.Position;
+                if (remaining <= 0) break;
 
-                if ((ipVersion == 4 && buffer.Length - readOffset > 16 + 6) || (ipVersion == 6 && buffer.Length - readOffset > 16 + 28))
+                int version = byteStream.ReadByte();
+                if (version == -1) break;
+
+                byteStream.Position--;
+
+                bool valid = (version == 4 && remaining > 22) || (version == 6 && remaining > 44);
+
+                if (valid)
                 {
                     internalAddresses.Add(ReadAddress());
                 }
                 else
                 {
-                    Log.warn($"Unknown IP version {ipVersion}");
+                    Log.warn($"Unknown IP version {version}");
                     break;
                 }
             }
@@ -370,8 +364,9 @@ namespace DaemonMC.Network
 
         public uint ReadUInt24LE()
         {
-            uint uint24leValue = (uint)(buffer[readOffset] | (buffer[readOffset + 1] << 8) | (buffer[readOffset + 2] << 16));
-            readOffset += 3;
+            byte[] bytes = new byte[3];
+            byteStream.Read(bytes, 0, 3);
+            uint uint24leValue = (uint)(bytes[0] | (bytes[1] << 8) | (bytes[2] << 16));
             return uint24leValue;
         }
 
@@ -382,7 +377,7 @@ namespace DaemonMC.Network
 
             while (true)
             {
-                byte currentByte = buffer[readOffset++];
+                int currentByte = byteStream.ReadByte();
                 value |= (long)(currentByte & 0x7F) << (size * 7);
 
                 if ((currentByte & 0x80) == 0)

@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using DaemonMC.Biomes;
 using DaemonMC.Entities;
+using DaemonMC.Forms.DDUI;
 using DaemonMC.Items;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.RakNet;
@@ -823,6 +824,52 @@ namespace DaemonMC.Network
                 WriteString(shape.Name);
                 WriteShort(id);
                 id++;
+            }
+        }
+
+        public void WriteDDUIData(List<DDUIData> data, DataStoreType type)
+        {
+            WriteVarInt(data.Count);
+            foreach (var item in data)
+            {
+                WriteVarInt((int)type);
+
+                switch (type)
+                {
+                    case DataStoreType.Update:
+                        WriteString(item.Name);
+                        WriteString(item.Property);
+                        WriteString(item.Path);
+                        if (item.Value is float floatValue)
+                        {
+                            WriteVarInt((int)DataStoreValueType.Double);
+                            WriteFloat(floatValue);
+                        }
+                        else if (item.Value is bool boolValue)
+                        {
+                            WriteVarInt((int)DataStoreValueType.Bool);
+                            WriteBool(boolValue);
+                        }
+                        else if (item.Value is string stringValue)
+                        {
+                            WriteVarInt((int)DataStoreValueType.String);
+                            WriteString(stringValue);
+                        }
+                        else
+                        {
+                            Log.warn($"Unknown DataStoreValueType type: {item.Value}");
+                        }
+                        WriteInt(1);
+                        WriteInt(1);
+                        break;
+                    case DataStoreType.Change:
+                        break;
+                    case DataStoreType.Remove:
+                        break;
+                    default:
+                        Log.warn($"Unknown DataStoreType type: {type}");
+                        break;
+                }
             }
         }
 

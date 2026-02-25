@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using System.Net;
 using System.Numerics;
 using System.Text;
@@ -775,6 +774,56 @@ namespace DaemonMC.Network
             itemData.AddRange(new List<byte> { 0x00, 0x00 });
 
             WriteBytes(itemData.ToArray(), true);
+        }
+
+        public void WriteVoxelShapes(List<VoxelShape> shapes)
+        {
+            WriteVarInt(shapes.Count);
+            foreach (var shape in shapes)
+            {
+                foreach (var cells in shape.Cells)
+                {
+                    WriteByte(cells.Xsize);
+                    WriteByte(cells.Ysize);
+                    WriteByte(cells.Zsize);
+
+                    WriteVarInt(cells.Storage.Count);
+                    foreach (var storage in cells.Storage)
+                    {
+                        WriteByte(storage);
+                    }
+                }
+
+                WriteVarInt(shape.Coordinates.Count);
+                foreach (var coordinate in shape.Coordinates)
+                {
+                    WriteFloat(coordinate.X);
+                }
+
+                WriteVarInt(shape.Coordinates.Count);
+                foreach (var coordinate in shape.Coordinates)
+                {
+                    WriteFloat(coordinate.Y);
+                }
+
+                WriteVarInt(shape.Coordinates.Count);
+                foreach (var coordinate in shape.Coordinates)
+                {
+                    WriteFloat(coordinate.Z);
+                }
+            }
+        }
+
+        public void WriteVoxelNameMap(List<VoxelShape> shapes)
+        {
+            short id = 0;
+            WriteVarInt(shapes.Count);
+            foreach (var shape in shapes)
+            {
+                WriteString(shape.Name);
+                WriteShort(id);
+                id++;
+            }
         }
 
         public void WriteOptional(Action writeFunction = null)

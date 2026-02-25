@@ -87,6 +87,9 @@
             SetHud = 308,
             ServerboundLoadingScreen = 312,
             ClientMovementPredictionSync = 322,
+            ClientboundDataDrivenUIShowScreen = 333,
+            ClientboundDataDrivenUICloseScreen = 334,
+            ClientboundDataDrivenUIReload = 335,
             VoxelShapes = 337
         }
 

@@ -1,7 +1,8 @@
-﻿using DaemonMC.Level;
+﻿using DaemonMC;
+using DaemonMC.Level;
 using MiNET.LevelDB.Utils;
 
-namespace DaemonMC
+namespace Test
 {
     [TestClass]
     public class NetChunkTest

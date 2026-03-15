@@ -71,12 +71,7 @@ namespace DaemonMC.Plugin
             var fullPath = Path.GetFullPath(filePath);
             var loadContext = new PluginLoadContext(fullPath);
 
-            using var fs = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var ms = new MemoryStream();
-            fs.CopyTo(ms);
-            ms.Position = 0;
-
-            var assembly = loadContext.LoadFromStream(ms);
+            var assembly = loadContext.LoadFromAssemblyPath(fullPath);
 
             foreach (var type in assembly.GetTypes())
             {
@@ -377,6 +372,15 @@ namespace DaemonMC.Plugin
             {
                 return LoadFromAssemblyPath(assemblyPath);
             }
+
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.GetName().Name == assemblyName.Name)
+                {
+                    return asm;
+                }
+            }
+
             return null;
         }
     }

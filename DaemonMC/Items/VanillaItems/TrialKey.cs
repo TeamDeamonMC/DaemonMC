@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TrialKey()
         {
             Name = "minecraft:trial_key";
-            Id = 283;
+            Id = 284;
             Version = 1;
             ComponentBased = true;
         }

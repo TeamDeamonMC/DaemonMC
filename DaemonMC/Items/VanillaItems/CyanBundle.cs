@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CyanBundle()
         {
             Name = "minecraft:cyan_bundle";
-            Id = 270;
+            Id = 279;
             Version = 1;
             ComponentBased = true;
         }

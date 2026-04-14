@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GreenBundle()
         {
             Name = "minecraft:green_bundle";
-            Id = 267;
+            Id = 276;
             Version = 1;
             ComponentBased = true;
         }

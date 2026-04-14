@@ -17,7 +17,7 @@ namespace DaemonMC.Level
 {
     public class World
     {
-        private string[] LevelDbVersion { get; set; } = ["1.21.110", "1.21.120", "1.21.130", "1.26.0"];
+        private string[] LevelDbVersion { get; set; } = ["1.21.110", "1.21.120", "1.21.130", "1.26.0", "1.26.10"];
         public Dictionary<(int x, int z), Chunk> Cache { get; set; } = new Dictionary<(int x, int z), Chunk>();
         public bool Temporary { get; set; } = false;
         public string LevelName { get; set; } = "";

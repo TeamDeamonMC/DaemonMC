@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public YellowBundle()
         {
             Name = "minecraft:yellow_bundle";
-            Id = 265;
+            Id = 271;
             Version = 1;
             ComponentBased = true;
         }

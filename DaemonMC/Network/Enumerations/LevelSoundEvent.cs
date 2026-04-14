@@ -561,5 +561,7 @@
         GoldenSpearUse,
         DiamondSpearUse,
         NetheriteSpearUse,
+        PauseGrowth,
+        ResetGrowth,
     }
 }

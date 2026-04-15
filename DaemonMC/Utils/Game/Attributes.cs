@@ -30,13 +30,16 @@
         public float JumpStrength { get; set; } = 0;
         public float Health { get; set; } = 0;
         public float Hunger { get; set; } = 0;
+        public float FrictionModifier { get; set; } = 0;
+        public float Bounciness { get; set; } = 0;
+        public float AirDragModifier { get; set; } = 0;
 
         public AttributesValues()
         {
 
         }
 
-        public AttributesValues(float movementSpeed = 0, float underwaterMovementSpeed = 0, float lavaMovementSpeed = 0, float jumpStrength = 0, float health = 0, float hunger = 0)
+        public AttributesValues(float movementSpeed = 0, float underwaterMovementSpeed = 0, float lavaMovementSpeed = 0, float jumpStrength = 0, float health = 0, float hunger = 0, float frictionModifier = 0, float bounciness = 0, float airDragModifier = 0)
         {
             MovementSpeed = movementSpeed;
             UnderwaterMovementSpeed = underwaterMovementSpeed;
@@ -44,6 +47,9 @@
             JumpStrength = jumpStrength;
             Health = health;
             Hunger = hunger;
+            FrictionModifier = frictionModifier;
+            Bounciness = bounciness;
+            AirDragModifier = airDragModifier;
         }
 
         public AttributeValue Movement_speed()

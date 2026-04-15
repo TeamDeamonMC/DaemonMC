@@ -23,9 +23,18 @@ namespace DaemonMC.Network.Bedrock
         {
             encoder.WriteVarInt(ContainerID);
             encoder.WriteVarInt(Slot);
-            encoder.WriteContainerName(ContainerName);
-            encoder.WriteItem(StorageItem);
-            encoder.WriteItem(Item);
+            if (encoder.protocolVersion >= Info.v1_26_20)
+            {
+                encoder.WriteOptional(() => encoder.WriteContainerName(ContainerName));
+                encoder.WriteOptional(() => encoder.WriteNetItem(StorageItem));
+                encoder.WriteNetItem(Item);
+            }
+            else
+            {
+                encoder.WriteContainerName(ContainerName);
+                encoder.WriteItem(StorageItem);
+                encoder.WriteItem(Item);
+            }
         }
     }
 }

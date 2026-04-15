@@ -735,15 +735,27 @@ namespace DaemonMC.Network
             WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt((int)ContainerName.DynamicId));
         }
 
-        public void WriteItem(Item item)
+        public void WriteNetItem(Item item)
         {
-            if (item is Items.VanillaItems.Air)
+            WriteItem(item, true);
+        }
+
+        public void WriteItem(Item item, bool network = false)
+        {
+            if (!network && item is Items.VanillaItems.Air)
             {
                 WriteSignedVarInt(0);
             }
             else
             {
-                WriteSignedVarInt(item.Id);
+                if (network)
+                {
+                    WriteShort(item.Id);
+                }
+                else
+                {
+                    WriteSignedVarInt(item.Id);
+                }
                 WriteShort(item.Count);
                 WriteVarInt(item.Aux);
                 WriteBool(false);

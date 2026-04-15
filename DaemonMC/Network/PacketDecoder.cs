@@ -546,10 +546,23 @@ namespace DaemonMC.Network
             return EmoteIds;
         }
 
-        public Item ReadItem()
+        public Item ReadNetItem()
         {
-            var id = ReadSignedVarInt();
-            if (id != 0)
+            return ReadItem(true);
+        }
+
+        public Item ReadItem(bool network = false)
+        {
+            var id = 0;
+            if (network)
+            {
+                id = ReadShort();
+            }
+            else
+            {
+                id = ReadSignedVarInt();
+            }
+            if (network || id != 0)
             {
                 if (ItemPalette.items.TryGetValue((short)id, out Item value))
                 {
@@ -574,6 +587,12 @@ namespace DaemonMC.Network
             values.JumpStrength = ReadFloat();
             values.Health = ReadFloat();
             values.Hunger = ReadFloat();
+            if (protocolVersion >= Info.v1_26_20)
+            {
+                values.FrictionModifier = ReadFloat();
+                values.Bounciness = ReadFloat();
+                values.AirDragModifier = ReadFloat();
+            }
             return values;
         }
 

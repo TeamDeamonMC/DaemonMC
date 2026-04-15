@@ -563,5 +563,7 @@
         NetheriteSpearUse,
         PauseGrowth,
         ResetGrowth,
+        PushedByPlayer,
+        Bounce,
     }
 }

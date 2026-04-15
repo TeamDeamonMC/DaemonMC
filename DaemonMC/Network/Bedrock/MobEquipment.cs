@@ -16,7 +16,14 @@ namespace DaemonMC.Network.Bedrock
         protected override void Decode(PacketDecoder decoder)
         {
             EntityId = decoder.ReadVarLong();
-            Item = decoder.ReadItem();
+            if (decoder.protocolVersion >= Info.v1_26_20)
+            {
+                Item = decoder.ReadNetItem();
+            }
+            else
+            {
+                Item = decoder.ReadItem();
+            }
             Slot = decoder.ReadByte();
             SelectedSlot = decoder.ReadByte();
             ContainerId = decoder.ReadByte();
@@ -25,7 +32,14 @@ namespace DaemonMC.Network.Bedrock
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteVarLong(EntityId);
-            encoder.WriteItem(Item);
+            if (encoder.protocolVersion >= Info.v1_26_20)
+            {
+                encoder.WriteNetItem(Item);
+            }
+            else
+            {
+                encoder.WriteItem(Item);
+            }
             encoder.WriteByte(Slot);
             encoder.WriteByte(SelectedSlot);
             encoder.WriteByte(ContainerId);

@@ -11,6 +11,10 @@ namespace Test
         [TestMethod]
         public void Blocks()
         {
+            var json = File.ReadAllText("block_properties_table.json"); //https://github.com/pmmp/BedrockData/blob/master/block_properties_table.json
+
+            var blockProperties = JsonSerializer.Deserialize<Dictionary<string, BlockProperties>>(json);
+
             HashSet<string> generatedBlocks = new HashSet<string>();
             using (var stream = File.OpenRead("canonical_block_states.nbt")) //https://github.com/pmmp/BedrockData/blob/master/canonical_block_states.nbt
             {
@@ -24,6 +28,13 @@ namespace Test
                     if (generatedBlocks.Contains(blockName))
                     {
                         continue;
+                    }
+
+                    BlockProperties props = null;
+
+                    if (blockProperties.TryGetValue(blockName, out var foundProps))
+                    {
+                        props = foundProps;
                     }
 
                     generatedBlocks.Add(blockName);
@@ -41,7 +52,7 @@ namespace Test
                             states[stringTag.Name] = $"\"{stringTag.StringValue}\"";
                     }
 
-                    string classContent = BlockClassBuilder(className, blockName, states);
+                    string classContent = BlockClassBuilder(className, blockName, states, props);
 
                     Directory.CreateDirectory("VanillaBlocks");
 
@@ -173,7 +184,7 @@ namespace DaemonMC.Items.VanillaItems
             return sb.ToString();
         }
 
-        private static string BlockClassBuilder(string className, string blockName, Dictionary<string, string> states)
+        private static string BlockClassBuilder(string className, string blockName, Dictionary<string, string> states, BlockProperties props)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -185,8 +196,20 @@ namespace DaemonMC.Items.VanillaItems
             sb.AppendLine("        {");
             sb.AppendLine($"            Name = \"{blockName}\";\n");
 
+            if (props != null)
+            {
+                sb.AppendLine($"            BlastResistance = {props.blastResistance};");
+                sb.AppendLine($"            Brightness = {props.brightness};");
+                sb.AppendLine($"            FlameEncouragement = {props.flameEncouragement};");
+                sb.AppendLine($"            Flammability = {props.flammability};");
+                sb.AppendLine($"            Friction = {props.friction};");
+                sb.AppendLine($"            Hardness = {props.hardness};");
+                sb.AppendLine($"            Opacity = {props.opacity};");
+            }
+
             if (states.Count > 0)
             {
+                sb.AppendLine();
                 foreach (var state in states)
                 {
                     sb.AppendLine($"            States[\"{state.Key}\"] = {state.Value};");
@@ -206,6 +229,17 @@ namespace DaemonMC.Items.VanillaItems
             file.UseVarInt = true;
             file.LoadFromStream(data, NbtCompression.None);
             return (NbtCompound)file.RootTag;
+        }
+
+        public class BlockProperties
+        {
+            public double blastResistance { get; set; }
+            public double brightness { get; set; }
+            public int flameEncouragement { get; set; }
+            public int flammability { get; set; }
+            public double friction { get; set; }
+            public double hardness { get; set; }
+            public double opacity { get; set; }
         }
     }
 }

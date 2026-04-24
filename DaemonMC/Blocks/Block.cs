@@ -6,6 +6,13 @@ namespace DaemonMC.Blocks
     public abstract class Block
     {
         public string Name { get; protected set; } = "minecraft:air";
+        public double BlastResistance { get; protected set; } = 0;
+        public double Brightness { get; protected set; } = 0;
+        public int FlameEncouragement { get; protected set; } = 0;
+        public int Flammability { get; protected set; } = 0;
+        public double Friction { get; protected set; } = 0.8999999761581421;
+        public double Hardness { get; protected set; } = -1.0;
+        public double Opacity { get; protected set; } = 0;
         public Dictionary<string, object> States { get; set; } = new Dictionary<string, object>();
 
         public int GetHash()

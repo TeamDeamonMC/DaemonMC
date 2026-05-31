@@ -60,6 +60,7 @@ namespace DaemonMC
 
             CommandManager.RegisterBuiltinCommands();
 
+            PluginManager.LoadCorePlugins();
             PluginManager.LoadPlugins("Plugins");
 
             Log.info($"Server listening on port {Port}");

@@ -11,10 +11,55 @@ namespace DaemonMC.Plugin
 {
     public class PluginManager
     {
+        private const string CorePluginNamespace = "DaemonMC.Plugin.Core";
         private static readonly List<LoadedPlugin> _plugins = new List<LoadedPlugin>();
         private static readonly Dictionary<string, DateTime> _reloadDelays = new Dictionary<string, DateTime>();
         private static readonly object _watcherLock = new();
         private static FileSystemWatcher? _watcher;
+
+        public static void LoadCorePlugins(Assembly? assembly = null)
+        {
+            assembly ??= typeof(PluginManager).Assembly;
+            var sourcePath = string.IsNullOrWhiteSpace(assembly.Location)
+                ? assembly.FullName ?? "Core"
+                : Path.GetFullPath(assembly.Location);
+
+            foreach (var type in GetLoadableTypes(assembly))
+            {
+                if (type.Namespace == null || !type.Namespace.StartsWith(CorePluginNamespace, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (!typeof(Plugin).IsAssignableFrom(type) || type.IsInterface || type.IsAbstract)
+                {
+                    continue;
+                }
+
+                var attr = type.GetCustomAttribute<PluginInfo>();
+                if (attr == null)
+                {
+                    continue;
+                }
+
+                var pluginKey = type.AssemblyQualifiedName ?? type.FullName ?? type.Name;
+                if (_plugins.Any(p => p.Path == pluginKey))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var pluginInstance = (Plugin)Activator.CreateInstance(type)!;
+                    RegisterPluginInstance(pluginInstance, pluginKey, sourcePath, true, null);
+                    Log.info($"Loading core plugin: {attr.Name} v{attr.Version}");
+                }
+                catch (Exception ex)
+                {
+                    Log.error($"Couldn't load core plugin {type.FullName}: {ex.Message}");
+                }
+            }
+        }
 
         public static void LoadPlugins(string pluginDirectory)
         {
@@ -24,6 +69,10 @@ namespace DaemonMC.Plugin
             {
                 Log.warn($"{pluginDirectory}/ not found. Creating new folder...");
                 Directory.CreateDirectory(pluginDirectory);
+            }
+
+            if (!Directory.Exists(lib))
+            {
                 Directory.CreateDirectory(lib);
             }
 
@@ -50,6 +99,11 @@ namespace DaemonMC.Plugin
             _watcher.Renamed += (s, e) => HandlePluginRenamed(e.OldFullPath, e.FullPath);
         }
 
+        public void LoadPlugins()
+        {
+            LoadCorePlugins();
+        }
+
         public static void LoadLibrary(string filePath)
         {
             var fullPath = Path.GetFullPath(filePath);
@@ -60,6 +114,7 @@ namespace DaemonMC.Plugin
 
                 Log.info($"Loading library: {filePath}");
             }
+            
             catch (Exception ex)
             {
                 Log.error($"Couldn't load library {filePath}: {ex.Message}");
@@ -73,7 +128,7 @@ namespace DaemonMC.Plugin
 
             var assembly = loadContext.LoadFromAssemblyPath(fullPath);
 
-            foreach (var type in assembly.GetTypes())
+            foreach (var type in GetLoadableTypes(assembly))
             {
                 if (typeof(Plugin).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                 {
@@ -85,31 +140,12 @@ namespace DaemonMC.Plugin
                     else
                     {
                         Log.error($"Plugin {filePath} can't be loaded. Missing metadata. Please check DaemonMC/wiki/Plugin-tutorial.");
-                        return;
+                        continue;
                     }
 
                     var pluginInstance = (Plugin)Activator.CreateInstance(type)!;
-
-                    if (reloaded)
-                    {
-                        if (pluginInstance is not HotReload)
-                        {
-                            Log.error($"Plugin {filePath} can't be loaded. This plugin doesn't support HotReload feature. Please restart server to enable this plugin.");
-                            return;
-                        }
-                        pluginInstance.OnReload();
-                    }
-                    else
-                    {
-                        pluginInstance.OnLoad();
-                    }
-
-                    _plugins.Add(new LoadedPlugin
-                    {
-                        PluginInstance = pluginInstance,
-                        LoadContext = loadContext,
-                        Path = fullPath
-                    });
+                    var pluginKey = $"{fullPath}::{type.AssemblyQualifiedName ?? type.FullName ?? type.Name}";
+                    RegisterPluginInstance(pluginInstance, pluginKey, fullPath, false, loadContext, reloaded);
                 }
             }
         }
@@ -129,7 +165,7 @@ namespace DaemonMC.Plugin
                 try
                 {
                     plugin.PluginInstance.OnUnload();
-                    plugin.LoadContext.Unload();
+                    plugin.LoadContext?.Unload();
                 }
                 catch (Exception ex)
                 {
@@ -147,18 +183,37 @@ namespace DaemonMC.Plugin
 
         public static void UnloadPlugin(string file)
         {
-            var plugin = _plugins.FirstOrDefault(p => p.Path == Path.GetFullPath(file));
-            if (plugin == null) return;
-            if (plugin.PluginInstance is not HotReload) return;
+            var sourcePath = Path.GetFullPath(file);
+            var plugins = _plugins.Where(p => string.Equals(p.SourcePath, sourcePath, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (plugins.Count == 0)
+            {
+                return;
+            }
 
-            plugin.PluginInstance.OnUnload();
-            plugin.LoadContext.Unload();
-            _plugins.Remove(plugin);
+            if (plugins.Any(plugin => !plugin.IsCore && plugin.PluginInstance is not HotReload))
+            {
+                return;
+            }
+
+            foreach (var plugin in plugins)
+            {
+                plugin.PluginInstance.OnUnload();
+            }
+
+            foreach (var loadContext in plugins.Where(p => p.LoadContext != null).Select(p => p.LoadContext).Distinct())
+            {
+                loadContext?.Unload();
+            }
+
+            foreach (var plugin in plugins)
+            {
+                _plugins.Remove(plugin);
+            }
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            Log.info($"Plugin unloaded: {file}");
+            Log.info($"Plugins unloaded: {file}");
         }
 
         private static void HandlePluginChange(string fullPath)
@@ -354,6 +409,50 @@ namespace DaemonMC.Plugin
                 player.Skin = playerSkin.Skin;
             }
         }
+
+        private static void RegisterPluginInstance(Plugin pluginInstance, string path, string sourcePath, bool corePlugin, PluginLoadContext? loadContext, bool reloaded = false)
+        {
+            if (_plugins.Any(p => p.Path == path))
+            {
+                return;
+            }
+
+            if (reloaded)
+            {
+                if (pluginInstance is not HotReload)
+                {
+                    Log.error($"Plugin {path} can't be loaded. This plugin doesn't support HotReload feature. Please restart server to enable this plugin.");
+                    return;
+                }
+
+                pluginInstance.OnReload();
+            }
+            else
+            {
+                pluginInstance.OnLoad();
+            }
+
+            _plugins.Add(new LoadedPlugin
+            {
+                PluginInstance = pluginInstance,
+                LoadContext = loadContext,
+                Path = path,
+                SourcePath = sourcePath,
+                IsCore = corePlugin
+            });
+        }
+
+        private static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                return ex.Types.Where(type => type != null).Cast<Type>();
+            }
+        }
     }
 
     public class PluginLoadContext : AssemblyLoadContext
@@ -387,8 +486,10 @@ namespace DaemonMC.Plugin
 
     public class LoadedPlugin
     {
-        public Plugin PluginInstance { get; set; }
-        public PluginLoadContext LoadContext { get; set; }
-        public string Path { get; set; }
+        public Plugin PluginInstance { get; set; } = null!;
+        public PluginLoadContext? LoadContext { get; set; }
+        public string Path { get; set; } = null!;
+        public string SourcePath { get; set; } = null!;
+        public bool IsCore { get; set; }
     }
 }

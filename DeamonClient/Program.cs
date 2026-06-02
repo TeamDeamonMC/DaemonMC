@@ -3,7 +3,9 @@ using System.Net.Sockets;
 using DaemonMC;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
+using DaemonMC.Utils;
 
 namespace DeamonClient;
 
@@ -14,8 +16,10 @@ internal static class Program
     private static readonly int DefaultProtocol = Info.v1_26_20;
     private const string Magic = "00ffff00fefefefefdfdfdfd12345678";
     private static readonly long ClientGuid = Random.Shared.NextInt64();
-
+    private const string AuthTokenEnv = "";
+    
     private static volatile bool _running = true;
+    private static volatile bool _loginRequested;
 
     private static void Main(string[] args)
     {
@@ -24,6 +28,7 @@ internal static class Program
         int protocolVersion = args.Length > 2 && int.TryParse(args[2], out var parsedProtocol)
             ? parsedProtocol
             : DefaultProtocol;
+        string? authToken = AuthTokenEnv;
 
         var remoteAddress = ResolveAddress(host);
         var remoteEp = new IPEndPoint(remoteAddress, port);
@@ -59,10 +64,6 @@ internal static class Program
             {
                 case UnconnectedPong pong:
                     Console.WriteLine($"MOTD: {pong.MOTD}");
-                    if (client.ConnectionState == 0)
-                    {
-                        client.ConnectionState = 2;
-                    }
                     break;
                 case OpenConnectionReply1 reply1:
                     Console.WriteLine($"OpenConnectionReply1: mtu={reply1.Mtu}, guid={reply1.GUID}");
@@ -76,6 +77,16 @@ internal static class Program
                     Console.WriteLine($"ConnectionRequestAccepted: client={accepted.ClientAddress.Port}, systemIndex={accepted.SystemIndex}");
                     Console.WriteLine("RakNet handshake continuing with NewIncomingConnection and RequestNetworkSettings.");
                     break;
+                case NewIncomingConnection newIncomingConnection:
+                    Console.WriteLine($"NewIncomingConnection: server={newIncomingConnection.serverAddress.Port}");
+                    client.ConnectionState = 1;
+                    break;
+                case RequestNetworkSettings requestNetworkSettings:
+                    Console.WriteLine($"RequestNetworkSettings: protocol={requestNetworkSettings.ProtocolVersion}");
+                    session.protocolVersion = requestNetworkSettings.ProtocolVersion;
+                    client.ProtocolVersion = requestNetworkSettings.ProtocolVersion;
+                    SendRequestNetworkSettings(remoteEp, requestNetworkSettings.ProtocolVersion);
+                    break;
                 case ConnectedPong pong:
                     Console.WriteLine($"Connected pong: ping={pong.pingTime}, pong={pong.pongTime}");
                     break;
@@ -87,6 +98,23 @@ internal static class Program
                 case NetworkSettings networkSettings:
                     Console.WriteLine("Network settings received, enabling compression.");
                     session.initCompression = true;
+                    if (!_loginRequested)
+                    {
+                        SendLogin(remoteEp, client.ProtocolVersion, authToken);
+                        _loginRequested = true;
+                    }
+                    break;
+                case ServerToClientHandshake serverToClientHandshake:
+                    Console.WriteLine($"ServerToClientHandshake received ({serverToClientHandshake.JWT.Length} chars).");
+                    SendClientToServerHandshake(remoteEp);
+                    break;
+                case PlayStatus playStatus:
+                    Console.WriteLine($"PlayStatus: {playStatus.Status}");
+                    if (playStatus.Status == 0)
+                    {
+                        client.ConnectionState = 2;
+                        Console.WriteLine("Login success.");
+                    }
                     break;
                 case ResourcePacksInfo:
                 case ResourcePackStack:
@@ -170,7 +198,7 @@ internal static class Program
                     SendUnconnectedPing(remoteEp);
                     Thread.Sleep(1000);
                 }
-                else if (client.ConnectionState == 1)
+                else if (client.ConnectionState == 2)
                 {
                     SendConnectedPing(remoteEp);
                     Thread.Sleep(5000);
@@ -208,6 +236,68 @@ internal static class Program
             Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
         packet.EncodePacket(encoder);
+    }
+
+    private static void SendRequestNetworkSettings(IPEndPoint remoteEp, int protocolVersion)
+    {
+        var encoder = PacketEncoderPool.Get(remoteEp);
+        var packet = new RequestNetworkSettings
+        {
+            ProtocolVersion = protocolVersion
+        };
+        packet.EncodePacket(encoder);
+    }
+
+    private static void SendLogin(IPEndPoint remoteEp, int protocolVersion, string? authToken)
+    {
+        if (string.IsNullOrWhiteSpace(authToken))
+        {
+            Console.WriteLine($"Missing {AuthTokenEnv}. Set it to the Minecraft/Xbox login token first.");
+            _running = false;
+            return;
+        }
+
+        Console.WriteLine("Sending Login.");
+        var encoder = PacketEncoderPool.Get(remoteEp);
+        var packet = new Login
+        {
+            ProtocolVersion = protocolVersion,
+            Request = CreateLoginRequest(authToken)
+        };
+        packet.EncodePacket(encoder);
+    }
+
+    private static void SendClientToServerHandshake(IPEndPoint remoteEp)
+    {
+        var encoder = PacketEncoderPool.Get(remoteEp);
+        var packet = new ClientToServerHandshake();
+        packet.EncodePacket(encoder);
+    }
+
+    private static byte[] CreateLoginRequest(string authToken)
+    {
+        var loginJson = new LoginJson
+        {
+            AuthenticationType = (int)LoginHandler.AuthenticationType.Full,
+            Certificate = $"{{\"chain\":[\"{JWT.CreateJWTchain()}\"]}}",
+            Token = authToken
+        };
+
+        string jsonPart = Newtonsoft.Json.JsonConvert.SerializeObject(loginJson);
+        byte[] jsonBytes = System.Text.Encoding.UTF8.GetBytes(jsonPart);
+
+        string tokenJWT = JWT.CreateJWTtoken();
+        byte[] tokenBytes = System.Text.Encoding.UTF8.GetBytes(tokenJWT);
+
+        using var ms = new MemoryStream();
+        using var writer = new BinaryWriter(ms);
+
+        writer.Write((uint)jsonBytes.Length);
+        writer.Write(jsonBytes);
+        writer.Write((uint)tokenBytes.Length);
+        writer.Write(tokenBytes);
+
+        return ms.ToArray();
     }
 
     private static IPAddress ResolveAddress(string host)

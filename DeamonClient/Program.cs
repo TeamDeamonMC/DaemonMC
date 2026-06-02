@@ -13,6 +13,7 @@ internal static class Program
     private const int DefaultPort = 19132;
     private static readonly int DefaultProtocol = Info.v1_26_20;
     private const string Magic = "00ffff00fefefefefdfdfdfd12345678";
+    private static readonly long ClientGuid = Random.Shared.NextInt64();
 
     private static volatile bool _running = true;
 
@@ -50,6 +51,7 @@ internal static class Program
         session.isClient = true;
         session.client = client;
         session.protocolVersion = protocolVersion;
+        session.GUID = ClientGuid;
 
         client.OnPacketReceived += packet =>
         {
@@ -57,6 +59,22 @@ internal static class Program
             {
                 case UnconnectedPong pong:
                     Console.WriteLine($"MOTD: {pong.MOTD}");
+                    if (client.ConnectionState == 0)
+                    {
+                        client.ConnectionState = 2;
+                    }
+                    break;
+                case OpenConnectionReply1 reply1:
+                    Console.WriteLine($"OpenConnectionReply1: mtu={reply1.Mtu}, guid={reply1.GUID}");
+                    session.MTU = reply1.Mtu;
+                    break;
+                case OpenConnectionReply2 reply2:
+                    Console.WriteLine($"OpenConnectionReply2: mtu={reply2.Mtu}, guid={reply2.GUID}");
+                    session.MTU = reply2.Mtu;
+                    break;
+                case ConnectionRequestAccepted accepted:
+                    Console.WriteLine($"ConnectionRequestAccepted: client={accepted.ClientAddress.Port}, systemIndex={accepted.SystemIndex}");
+                    Console.WriteLine("RakNet handshake continuing with NewIncomingConnection and RequestNetworkSettings.");
                     break;
                 case ConnectedPong pong:
                     Console.WriteLine($"Connected pong: ping={pong.pingTime}, pong={pong.pongTime}");
@@ -177,7 +195,7 @@ internal static class Program
         {
             Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             Magic = Magic,
-            ClientId = Random.Shared.NextInt64()
+            ClientId = ClientGuid
         };
         packet.EncodePacket(encoder);
     }

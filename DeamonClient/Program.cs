@@ -16,7 +16,7 @@ internal static class Program
     private static readonly int DefaultProtocol = Info.v1_26_20;
     private const string Magic = "00ffff00fefefefefdfdfdfd12345678";
     private static readonly long ClientGuid = Random.Shared.NextInt64();
-    private const string AuthTokenEnv = "";
+    private const string AuthTokenEnvName = "";
     
     private static volatile bool _running = true;
     private static volatile bool _loginRequested;
@@ -28,7 +28,7 @@ internal static class Program
         int protocolVersion = args.Length > 2 && int.TryParse(args[2], out var parsedProtocol)
             ? parsedProtocol
             : DefaultProtocol;
-        string? authToken = AuthTokenEnv;
+        string? authToken = AuthTokenEnvName;
 
         var remoteAddress = ResolveAddress(host);
         var remoteEp = new IPEndPoint(remoteAddress, port);
@@ -252,7 +252,7 @@ internal static class Program
     {
         if (string.IsNullOrWhiteSpace(authToken))
         {
-            Console.WriteLine($"Missing {AuthTokenEnv}. Set it to the Minecraft/Xbox login token first.");
+            Console.WriteLine($"Missing {AuthTokenEnvName}. Set it to the Minecraft/Xbox login token first.");
             _running = false;
             return;
         }

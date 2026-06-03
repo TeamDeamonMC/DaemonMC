@@ -6,7 +6,7 @@ namespace DaemonMC.Utils
 {
     public class Cryptography
     {
-        public static bool UseEncryption = false;
+        public static bool UseEncryption = true;
         public static void verifyKeyInfo(byte[] data, string identityPublicKey)
         {
             using (ECDsa ecdsa = ECDsa.Create())

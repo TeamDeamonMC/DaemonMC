@@ -10,7 +10,7 @@ namespace DaemonMC.Network.Bedrock
         {
             var session = RakSessionManager.getSession(decoder.clientEp);
 
-            if (session.encryptor != null)
+            if (session.encryptor != null && session.encryptor.validated)
             {
                 decoder.buffer = session.encryptor.Decrypt(decoder.buffer);
 
@@ -22,10 +22,6 @@ namespace DaemonMC.Network.Bedrock
                     return;
                 }
 
-                if (!session.encryptor.validated)
-                {
-                    session.encryptor.Validate(decoder.buffer, decoder.clientEp);
-                }
             }
 
             if (session != null)
@@ -78,6 +74,9 @@ namespace DaemonMC.Network.Bedrock
                         break;
                     case Info.Bedrock.Login:
                         new Login().DecodePacket(decoder, PacketHandler.Bedrock);
+                        break;
+                    case Info.Bedrock.ServerToClientHandshake:
+                        new ServerToClientHandshake().DecodePacket(decoder, PacketHandler.Client);
                         break;
                     case Info.Bedrock.ClientToServerHandshake:
                         new ClientToServerHandshake().DecodePacket(decoder, PacketHandler.Bedrock);

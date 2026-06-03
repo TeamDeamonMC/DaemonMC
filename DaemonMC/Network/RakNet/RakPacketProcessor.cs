@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Utils;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.RakNet
@@ -113,7 +114,8 @@ namespace DaemonMC.Network.RakNet
                     Magic = "00ffff00fefefefefdfdfdfd12345678",
                     GUID = 1234567890123456789,
                     Address = new IPAddressInfo() { IPAddress = Server.iep.Address.GetAddressBytes(), Port = Server.Port },
-                    Mtu = openConnectionRequest2.Mtu
+                    Mtu = openConnectionRequest2.Mtu,
+                    Encryption = Cryptography.UseEncryption
                 };
                 RakSessionManager.getSession(clientEp).MTU = openConnectionRequest2.Mtu;
                 pk.EncodePacket(encoder);

@@ -15,6 +15,7 @@ namespace DaemonMC
         public static ushort Port { get; set; } = 19132;
         public static IPEndPoint iep { get; set; }
         public static Socket Sock { get; set; } = null!;
+        public static DateTime StartedAtUtc { get; private set; } = DateTime.UtcNow;
         public static Dictionary<long, Player> OnlinePlayers = new Dictionary<long, Player>();
         public static long NextId = 10;
         public static Queue<long> AvailableIds = new Queue<long>();
@@ -32,6 +33,7 @@ namespace DaemonMC
 
         public static void ServerF()
         {
+            StartedAtUtc = DateTime.UtcNow;
             Sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             iep = new IPEndPoint(IPAddress.Any, Port);
 

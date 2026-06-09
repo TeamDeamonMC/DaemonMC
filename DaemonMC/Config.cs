@@ -20,7 +20,7 @@ namespace DaemonMC
         public bool XboxAuth { get; set; } = true;
         public string Compression { get; set; } = "none";
         public bool Debug { get; set; } = false;
-        public bool Encryption { get; set; } = true;
+        public bool Encryption { get; set; } = false; //todo set true when tested that its stable
 
         public static void Set()
         {
@@ -64,11 +64,7 @@ namespace DaemonMC
             Server.Port = (ushort)config.Port;
             LoginHandler.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;
-            Cryptography.UseEncryption = config.Encryption || config.XboxAuth;
-            if (config.XboxAuth && !config.Encryption)
-            {
-                Log.warn("XboxAuth is enabled, so encryption was forced on. ServerToClientHandshake requires encryption.");
-            }
+            Cryptography.UseEncryption = config.Encryption;
         }
 
         public static int ToGameMode(string gameMode)

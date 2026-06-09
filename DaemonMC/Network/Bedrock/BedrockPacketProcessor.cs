@@ -88,13 +88,6 @@ namespace DaemonMC.Network.Bedrock
 
             if (packet is ClientToServerHandshake clientToServerHandshake)
             {
-                var session = RakSessionManager.getSession(clientEp);
-                if (session.encryptor != null && !session.encryptor.validated)
-                {
-                    session.encryptor.validated = true;
-                    Log.debug($"Established encrypted connection with {clientEp.Address}");
-                }
-
                 PacketEncoder encoder = PacketEncoderPool.Get(clientEp);
                 var pk = new PlayStatus
                 {

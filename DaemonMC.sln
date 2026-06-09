@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaemonMC", "DaemonMC\Daemon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{21016310-8512-4D35-AA17-A9E4DF4EDE43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeamonClient", "DeamonClient\DeamonClient.csproj", "{0E2BF6BC-EA1C-4B54-94A8-A4E5425D59D0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{21016310-8512-4D35-AA17-A9E4DF4EDE43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21016310-8512-4D35-AA17-A9E4DF4EDE43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21016310-8512-4D35-AA17-A9E4DF4EDE43}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E2BF6BC-EA1C-4B54-94A8-A4E5425D59D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E2BF6BC-EA1C-4B54-94A8-A4E5425D59D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E2BF6BC-EA1C-4B54-94A8-A4E5425D59D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E2BF6BC-EA1C-4B54-94A8-A4E5425D59D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -13,9 +13,33 @@ namespace DaemonMC.Network.Bedrock
         {
             RawID = decoder.ReadSignedVarInt();
 
+            bool hasLegacySlots = decoder.ReadBool();
+
+            if (hasLegacySlots)
+            {
+                int legacyCount = decoder.ReadVarInt();
+
+                for (int i = 0; i < legacyCount; i++)
+                {
+                    decoder.ReadByte();
+                    decoder.ReadBytes();
+                    
+                    // ToDo
+                }
+            }
+
+            if (!decoder.ReadBool())
+            {
+                throw new Exception("Expected InventoryTransactionType");
+            }
+
             Transaction = new Transaction();
 
             Transaction.Type = (TransactionType)decoder.ReadVarInt();
+
+            bool hasActions = decoder.ReadBool();
+            if (!hasActions)
+                return;
 
             int count = decoder.ReadVarInt();
 
@@ -39,7 +63,7 @@ namespace DaemonMC.Network.Bedrock
             if (Transaction.Type == TransactionType.ItemUseOnEntityTransaction)
             {
                 Transaction.EntityId = decoder.ReadVarLong();
-                Transaction.ActionType = decoder.ReadVarInt();
+                Transaction.ActionType = decoder.ReadSignedVarInt();
                 Transaction.Slot = decoder.ReadSignedVarInt();
                 Transaction.Item = decoder.ReadItem();
                 Transaction.FromPosition = decoder.ReadVec3();

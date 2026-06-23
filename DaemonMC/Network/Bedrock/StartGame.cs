@@ -102,12 +102,13 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteString("");
                 encoder.WriteString("");
             }
-
+            
             if (encoder.protocolVersion >= Info.v1_26_30)
             {
                 encoder.WriteVarInt(0); // Server Editor Connection Policy
                 encoder.WriteBool(false); // Allow Anonymous Block Drops In Editor Worlds
             }
+            
             encoder.WriteString(LevelName); //level name?
             encoder.WriteString("");
             encoder.WriteString(""); //owner id idk
@@ -133,6 +134,7 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(TickDeathSystems);
             }
             encoder.WriteBool(true);
+            
             if (encoder.protocolVersion >= Info.v1_26_30)
             {
                 encoder.WriteBool(false); // Logging Chat

@@ -12,7 +12,7 @@ namespace DaemonMC.Network.Bedrock
         protected override void Decode(PacketDecoder decoder)
         {
             RawID = decoder.ReadVarInt();
-
+            
             bool hasLegacySlots = decoder.ReadBool();
 
             if (hasLegacySlots)
@@ -30,13 +30,13 @@ namespace DaemonMC.Network.Bedrock
 
             if (!decoder.ReadBool())
             {
-                throw new Exception("Expected InventoryTransactionType");
+                return;
             }
-
+            
             Transaction = new Transaction();
 
             Transaction.Type = (TransactionType)decoder.ReadVarInt();
-
+            
             bool hasActions = decoder.ReadBool();
             if (!hasActions)
                 return;

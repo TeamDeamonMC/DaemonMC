@@ -11,7 +11,7 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Decode(PacketDecoder decoder)
         {
-            RawID = decoder.ReadSignedVarInt();
+            RawID = decoder.ReadVarInt();
 
             bool hasLegacySlots = decoder.ReadBool();
 

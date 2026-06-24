@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Leaves()
         {
             Name = "minecraft:leaves";
-            Id = 811;
+            Id = 813;
             Version = 2;
             ComponentBased = false;
         }

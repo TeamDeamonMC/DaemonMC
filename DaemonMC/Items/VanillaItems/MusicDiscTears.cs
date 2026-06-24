@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscTears()
         {
             Name = "minecraft:music_disc_tears";
-            Id = 830;
+            Id = 832;
             Version = 2;
             ComponentBased = true;
         }

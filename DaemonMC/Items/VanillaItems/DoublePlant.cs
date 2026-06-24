@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DoublePlant()
         {
             Name = "minecraft:double_plant";
-            Id = 815;
+            Id = 817;
             Version = 2;
             ComponentBased = false;
         }

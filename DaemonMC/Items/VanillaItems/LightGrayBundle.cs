@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LightGrayBundle()
         {
             Name = "minecraft:light_gray_bundle";
-            Id = 274;
+            Id = 277;
             Version = 1;
             ComponentBased = true;
         }

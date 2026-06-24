@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscLavaChicken()
         {
             Name = "minecraft:music_disc_lava_chicken";
-            Id = 831;
+            Id = 833;
             Version = 2;
             ComponentBased = true;
         }

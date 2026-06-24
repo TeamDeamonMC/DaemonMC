@@ -1,4 +1,5 @@
 ﻿using DaemonMC.Utils.Game;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -7,39 +8,53 @@ namespace DaemonMC.Network.Bedrock
         public override int Id => (int) Info.Bedrock.InventoryTransaction;
 
         public int RawID { get; set; } = 0;
+        public bool hasLegacySlots { get; set; } = true;
+        public List<LegacySlot> LegacySlots { get; set; } = new List<LegacySlot>();
         public Transaction Transaction { get; set; } = new Transaction();
 
         protected override void Decode(PacketDecoder decoder)
         {
             RawID = decoder.ReadVarInt();
-            
-            bool hasLegacySlots = decoder.ReadBool();
 
-            if (hasLegacySlots)
+            if (decoder.protocolVersion >= Info.v1_26_30)
+            {
+                bool hasLegacySlots = decoder.ReadBool();
+            }
+
+            if (hasLegacySlots && RawID != 0)
             {
                 int legacyCount = decoder.ReadVarInt();
 
                 for (int i = 0; i < legacyCount; i++)
                 {
-                    decoder.ReadByte();
-                    decoder.ReadBytes();
-                    
-                    // ToDo
+                    LegacySlot legacySlot = new LegacySlot();
+                    legacySlot.ContainerId = decoder.ReadByte();
+                    for (int a = 0; a < decoder.ReadVarInt(); a++)
+                    {
+                        legacySlot.Slot[i] = decoder.ReadByte();
+                    }
+                    LegacySlots.Add(legacySlot);
                 }
             }
 
-            if (!decoder.ReadBool())
+            if (decoder.protocolVersion >= Info.v1_26_30)
             {
-                return;
+                if (!decoder.ReadBool())
+                {
+                    return;
+                }
             }
             
             Transaction = new Transaction();
 
             Transaction.Type = (TransactionType)decoder.ReadVarInt();
 
-            bool hasActions = decoder.ReadBool();
-            if (!hasActions)
-                return;
+            if (decoder.protocolVersion >= Info.v1_26_30)
+            {
+                bool hasActions = decoder.ReadBool();
+                if (!hasActions)
+                    return;
+            }
             
             int count = decoder.ReadVarInt();
 
@@ -60,16 +75,41 @@ namespace DaemonMC.Network.Bedrock
                 Transaction.Actions.Add(action);
             }
 
-            if (Transaction.Type == TransactionType.ItemUseOnEntityTransaction)
+            switch (Transaction.Type)
             {
-                Transaction.EntityId = decoder.ReadVarLong();
-                Transaction.ActionType = decoder.ReadSignedVarInt();
-                Transaction.Slot = decoder.ReadSignedVarInt();
-                Transaction.Item = decoder.ReadItem();
-                Transaction.FromPosition = decoder.ReadVec3();
-                Transaction.Position = decoder.ReadVec3();
+                case TransactionType.NormalTransaction:
+                case TransactionType.InventoryMismatch:
+                    break;
+                case TransactionType.ItemUseTransaction:
+                    Transaction.ActionType = decoder.ReadSignedVarInt();
+                    Transaction.TriggerType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte(): decoder.ReadSignedVarInt();
+                    Transaction.BlockPosition = decoder.ReadBlockNetPos();
+                    Transaction.Face = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte() : decoder.ReadSignedVarInt();
+                    Transaction.Slot = decoder.ReadSignedVarInt();
+                    Transaction.Item = decoder.ReadItem(decoder.protocolVersion >= Info.v1_26_30 ? true : false);
+                    Transaction.PlayerPosition = decoder.ReadVec3();
+                    Transaction.ClickPosition = decoder.ReadVec3();
+                    Transaction.BlockRuntimeId = decoder.ReadVarInt();
+                    Transaction.ClientPrediction = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte() : decoder.ReadVarInt();
+                    if (decoder.protocolVersion >= Info.v1_26_10)
+                    {
+                        Transaction.ClientPrediction = decoder.ReadByte();
+                    }
+                    break;
+                case TransactionType.ItemUseOnEntityTransaction:
+                    Transaction.EntityId = decoder.ReadVarLong();
+                    Transaction.ActionType = decoder.ReadSignedVarInt();
+                    Transaction.Slot = decoder.ReadSignedVarInt();
+                    Transaction.Item = decoder.ReadItem(decoder.protocolVersion >= Info.v1_26_30 ? true : false);
+                    Transaction.PlayerPosition = decoder.ReadVec3();
+                    Transaction.ClickPosition = decoder.ReadVec3();
+                    break;
+                case TransactionType.ItemReleaseTransaction:
+                    break;
+                default:
+                    Log.error($"Unknown transaction type {Transaction.Type}");
+                    break;
             }
-
         }
 
         protected override void Encode(PacketEncoder encoder)

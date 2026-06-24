@@ -22,11 +22,22 @@ namespace DaemonMC.Network.Bedrock
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteVarLong(EntityId);
-            encoder.WriteItem(Head);
-            encoder.WriteItem(Chest);
-            encoder.WriteItem(Legs);
-            encoder.WriteItem(Feet);
-            encoder.WriteItem(Body);
+            if (encoder.protocolVersion >= Info.v1_26_30)
+            {
+                encoder.WriteNetItem(Head);
+                encoder.WriteNetItem(Chest);
+                encoder.WriteNetItem(Legs);
+                encoder.WriteNetItem(Feet);
+                encoder.WriteNetItem(Body);
+            }
+            else
+            {
+                encoder.WriteItem(Head);
+                encoder.WriteItem(Chest);
+                encoder.WriteItem(Legs);
+                encoder.WriteItem(Feet);
+                encoder.WriteItem(Body);
+            }
         }
     }
 }

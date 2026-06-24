@@ -759,7 +759,7 @@ namespace DaemonMC.Network
                 WriteShort(item.Count);
                 WriteVarInt(item.Aux);
                 WriteBool(false);
-                WriteSignedVarInt(0); //block runtime id.
+                WriteSignedVarInt(item.BlockRuntimeId);
                 WriteItemData(item.Data);
             }
         }

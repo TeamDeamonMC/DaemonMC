@@ -10,11 +10,15 @@ namespace DaemonMC.Utils.Game
         public int ActionType { get; set; }
         public int TriggerType { get; set; }
         public long EntityId { get; set; }
-        public Vector3 Position { get; set; }
-        public Vector3 FromPosition { get; set; }
+        public Vector3 ClickPosition { get; set; }
+        public Vector3 BlockPosition { get; set; }
+        public Vector3 PlayerPosition { get; set; }
         public Item Item { get; set; }
+        public int BlockRuntimeId { get; set; }
         public int Face { get; set; }
         public int Slot { get; set; }
+        public int ClientPrediction { get; set; }
+        public byte ClientCooldownState { get; set; }
     }
 
     public class TransactionAction
@@ -45,6 +49,12 @@ namespace DaemonMC.Utils.Game
         public FullContainerName ContainerName { get; set; }
         public byte Slot { get; set; }
         public int NetIdVariant { get; set; }
+    }
+
+    public class LegacySlot
+    {
+        public byte ContainerId { get; set; } = 0;
+        public byte[] Slot { get; set; } = Array.Empty<byte>();
     }
 
     public enum TransactionType

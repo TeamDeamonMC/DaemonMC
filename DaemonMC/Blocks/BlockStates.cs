@@ -99,6 +99,7 @@
             { "persistent_bit", new object[] { (byte)0, (byte)1 } },
             { "pillar_axis", new object[] { "y", "x", "z" } },
             { "portal_axis", new object[] { "unknown", "x", "z" } },
+            { "potent_sulfur_state", new object[] { "dry", "wet", "dormant", "erupting", "continuous" } },
             { "powered_bit", new object[] { (byte)0, (byte)1 } },
             { "prismarine_block_type", new object[] { "default", "dark", "bricks" } },
             { "propagule_stage", new object[] { 0, 1, 2, 3, 4 } },

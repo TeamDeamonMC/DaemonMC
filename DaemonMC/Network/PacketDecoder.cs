@@ -430,6 +430,15 @@ namespace DaemonMC.Network
             return value;
         }
 
+        public Vector3 ReadBlockNetPos()
+        {
+            var value = new Vector3();
+            value.X = ReadSignedVarInt();
+            value.Y = ReadSignedVarInt();
+            value.Z = ReadSignedVarInt();
+            return value;
+        }
+
         public Vector2 ReadVec2()
         {
             var value = new Vector2()
@@ -562,18 +571,24 @@ namespace DaemonMC.Network
             {
                 id = ReadSignedVarInt();
             }
-            if (network || id != 0)
+            if (id != 0 || network)
             {
-                if (ItemPalette.items.TryGetValue((short)id, out Item value))
+                Item item = ItemPalette.items.GetValueOrDefault((short)id);
+
+                if (item == null)
                 {
-                    Item item = value.Clone();
-                    item.Count = ReadShort();
-                    item.Aux = ReadVarInt();
-                    ReadBool();//??? todo
-                    ReadSignedVarInt();//block runtime id
-                    ReadString();//nbt data
-                    return value;
+                    item = new Items.VanillaItems.Air();
                 }
+                item.Count = ReadShort();
+                item.Aux = ReadVarInt();
+                if (ReadBool()) //idk whats this for
+                {
+                    ReadVarInt(); //variant
+                    ReadSignedVarInt(); //stack id
+                }
+                item.BlockRuntimeId = ReadSignedVarInt();
+                ReadString();//nbt data. useless for server auth inventory
+                return item;
             }
             return new Items.VanillaItems.Air();
         }

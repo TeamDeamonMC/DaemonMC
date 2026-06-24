@@ -565,5 +565,15 @@
         ResetGrowth,
         PushedByPlayer,
         Bounce,
+        SlimeLanding,
+        AbsorbBlock,
+        EjectBlock,
+        GeyserEruptionStart,
+        GeyserEruptionActive,
+        RecordBounce,
+        BucketFillLandAnimal,
+        BucketEmptyLandAnimal,
+        GeyserContinuousEruptionStart,
+        GeyserContinuousEruptionSctive,
     }
 }

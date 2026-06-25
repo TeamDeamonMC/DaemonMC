@@ -52,7 +52,14 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteSignedVarInt(SpawnBlockY);
                 encoder.WriteSignedVarInt(SpawnBlockZ);
                 encoder.WriteBool(false); //achievements
-                encoder.WriteBool(false);
+                if (encoder.protocolVersion >= Info.v1_26_40)
+                {
+                    encoder.WriteSignedVarInt(0);
+                }
+                else
+                {
+                    encoder.WriteBool(false);
+                }
                 encoder.WriteBool(false); //editorCreated
                 encoder.WriteBool(false); //editorExported
                 encoder.WriteSignedVarInt(StopTime);
@@ -94,6 +101,11 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
+                if (encoder.protocolVersion >= Info.v1_26_30)
+                {
+                    encoder.WriteSignedVarInt(0); // Server Editor Connection Policy
+                    encoder.WriteBool(false); // Allow Anonymous Block Drops In Editor Worlds
+                }
             //End of Level settings
             if (encoder.protocolVersion < Info.v1_26_0)
             {
@@ -101,12 +113,6 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteString("");
                 encoder.WriteString("");
                 encoder.WriteString("");
-            }
-            
-            if (encoder.protocolVersion >= Info.v1_26_30)
-            {
-                encoder.WriteVarInt(0); // Server Editor Connection Policy
-                encoder.WriteBool(false); // Allow Anonymous Block Drops In Editor Worlds
             }
             
             encoder.WriteString(LevelName); //level name?
@@ -135,11 +141,11 @@ namespace DaemonMC.Network.Bedrock
             }
             encoder.WriteBool(true);
             
-            if (encoder.protocolVersion >= Info.v1_26_30)
+            if (encoder.protocolVersion == Info.v1_26_30)
             {
                 encoder.WriteBool(false); // Logging Chat
             }
-            
+
             if (encoder.protocolVersion >= Info.v1_26_0)
             {
                 encoder.WriteBool(false);

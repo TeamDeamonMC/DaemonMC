@@ -536,7 +536,14 @@ namespace DaemonMC.Network
 
         public void WriteResourcePacksInfo(List<ResourcePack> packs)
         {
-            WriteShort((ushort)packs.Count());
+            if (protocolVersion >= Info.v1_26_40)
+            {
+                WriteVarInt(packs.Count());
+            }
+            else
+            {
+                WriteShort((ushort)packs.Count());
+            }
             foreach (var pack in packs)
             {
                 WriteUUID(pack.UUID);

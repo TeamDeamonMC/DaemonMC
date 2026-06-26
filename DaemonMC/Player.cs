@@ -42,6 +42,7 @@ namespace DaemonMC
         public PlayerInventory Inventory { get; set; }
         public Dictionary<Effects, bool> AllEffects { get; set; } = new Dictionary<Effects, bool>();
         public bool Spawned { get; set; } = false;
+        public bool HaveBossBar { get; set; } = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
 
@@ -487,6 +488,85 @@ namespace DaemonMC
                 Data = JsonConvert.SerializeObject(form, new JsonSerializerSettings() { ContractResolver = FormManager.contractResolver })
             };
             FormManager.PendingForms[form.Id] = (form, callback);
+            Send(packet);
+        }
+
+        public void ShowBossBar(string title, float split, float percent = 0)
+        {
+            if (HaveBossBar)
+            {
+                HideBossBar();
+            }
+            var attributes = new AttributesValues() { Health = split };
+            var pk = new AddActor
+            {
+                EntityId = 999990745,
+                ActorType = "minecraft:spider",
+                Position = Position,
+                Metadata = new Dictionary<ActorData, Metadata>() { { ActorData.RESERVED_038, new Metadata(0.0f) } },
+                Attributes = new List<AttributeValue> { attributes.Health_value() },
+            };
+            Send(pk);
+            var packet = new BossEvent()
+            {
+                EventType = BossEventType.Add,
+                EntityId = 999990745,
+                PlayerId = EntityID,
+                Title = title,
+                Health = percent,
+            };
+            Send(packet);
+        }
+
+        public void HideBossBar()
+        {
+            var pk = new RemoveActor
+            {
+                EntityId = 999990745,
+            };
+            Send(pk);
+            var packet = new BossEvent()
+            {
+                EventType = BossEventType.Hide,
+                EntityId = 999990745,
+                PlayerId = EntityID,
+            };
+            Send(packet);
+        }
+
+        public void SetBossBarValue(float percent)
+        {
+            var packet = new BossEvent()
+            {
+                EventType = BossEventType.UpdatePercent,
+                EntityId = 999990745,
+                PlayerId = EntityID,
+                Health = percent,
+            };
+            Send(packet);
+        }
+
+        public void SetBossBarTitle(string title)
+        {
+            var packet = new BossEvent()
+            {
+                EventType = BossEventType.UpdateName,
+                EntityId = 999990745,
+                PlayerId = EntityID,
+                Title = title,
+            };
+            Send(packet);
+        }
+
+        public void SetBossBarColor(BossBarColor color)
+        {
+            var packet = new BossEvent()
+            {
+                EventType = BossEventType.UpdateStyle,
+                EntityId = 999990745,
+                PlayerId = EntityID,
+                Color = color,
+            };
             Send(packet);
         }
 

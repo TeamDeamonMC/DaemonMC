@@ -124,6 +124,9 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.CommandRequest:
                         new CommandRequest().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.BossEvent:
+                        new BossEvent().DecodePacket(decoder);
+                        break;
                     case Info.Bedrock.SetLocalPlayerAsInitialized:
                         new SetLocalPlayerAsInitialized().DecodePacket(decoder);
                         break;

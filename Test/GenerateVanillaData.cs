@@ -150,6 +150,29 @@ namespace DaemonMC.Items.VanillaItems
             }
         }
 
+        [TestMethod]
+        public void Sounds()
+        {
+            string json = File.ReadAllText("level_sound_id_map.json"); //https://github.com/pmmp/BedrockData/blob/master/level_sound_id_map.json
+            var sounds = JsonSerializer.Deserialize<Dictionary<string, int>>(json)!;
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine("public Dictionary<int, string> Sounds = new Dictionary<int, string>()");
+            sb.AppendLine("{");
+
+            foreach (var kv in sounds.OrderBy(x => x.Value))
+            {
+                sb.AppendLine($"    {{ {kv.Value}, \"{kv.Key}\" }},");
+                Console.WriteLine(kv.Key);
+            }
+
+            sb.AppendLine("};");
+
+            File.WriteAllText("Sounds.cs", sb.ToString());
+            Console.WriteLine("Done");
+        }
+
         private static string FixCase(string input)
         {
             input = input.Replace(":", "_").Replace(".", "_");

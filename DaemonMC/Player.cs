@@ -603,6 +603,14 @@ namespace DaemonMC
             Send(packet);
         }
 
+        public void SendToast(string title, string content)
+        {
+            var packet = new ToastRequest();
+            packet.Title = title;
+            packet.Body = content;
+            Send(packet);
+        }
+
         public void UpdateVisibleEffects()
         {
             long effectsData = 0;

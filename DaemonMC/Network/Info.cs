@@ -84,6 +84,7 @@
             AnimateEntity = 158,
             ItemRegistry = 162,
             SyncActorProperty = 165,
+            ToastRequest = 186,
             UpdateAbilities = 187,
             UpdateAdventureSettings = 188,
             RequestNetworkSettings = 193,

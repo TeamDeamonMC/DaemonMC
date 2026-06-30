@@ -2,8 +2,11 @@
 
 public enum CreativeCategoryType
 {
+    All,
     Construction,
     Nature,
     Equipment,
-    Items
+    Items,
+    ItemCommandOnly,
+    None
 }

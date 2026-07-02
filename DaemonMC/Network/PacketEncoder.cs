@@ -767,12 +767,7 @@ namespace DaemonMC.Network
             WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt((int)ContainerName.DynamicId));
         }
 
-        public void WriteNetItem(Item item)
-        {
-            WriteItem(item, true);
-        }
-
-        public void WriteItem(Item item, bool network = false)
+        public void WriteItemInstance(Item item, bool network = false)
         {
             if (!network && item is Items.VanillaItems.Air)
             {
@@ -790,6 +785,35 @@ namespace DaemonMC.Network
                 }
                 WriteShort(item.Count);
                 WriteVarInt(item.Aux);
+                WriteSignedVarInt(item.BlockRuntimeId);
+                WriteItemData(item.Data);
+            }
+        }
+        
+        public void WriteNetItemStack(Item item)
+        {
+            WriteItemStack(item, true);
+        }
+
+        public void WriteItemStack(Item item, bool network = false)
+        {
+            if (!network && item is Items.VanillaItems.Air)
+            {
+                WriteSignedVarInt(0);
+            }
+            else
+            {
+                if (network)
+                {
+                    WriteShort(item.Id);
+                }
+                else
+                {
+                    WriteSignedVarInt(item.Id);
+                }
+                WriteShort(item.Count);
+                WriteVarInt(item.Aux);
+                WriteBool(false);
                 WriteSignedVarInt(item.BlockRuntimeId);
                 WriteItemData(item.Data);
             }

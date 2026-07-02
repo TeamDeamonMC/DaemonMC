@@ -32,7 +32,7 @@ namespace DaemonMC.Network.Bedrock
                 var group = Groups[groupIndex];
                 encoder.WriteInt((int)group.Category);
                 encoder.WriteString(group.Name);
-                encoder.WriteItem(group.Icon ?? ItemPalette.GetItem("minecraft:air"));
+                encoder.WriteItemInstance(group.Icon ?? ItemPalette.GetItem("minecraft:air"));
             }
 
             var creativeNetId = 0;
@@ -43,7 +43,7 @@ namespace DaemonMC.Network.Bedrock
             {
                 creativeNetId++;
                 encoder.WriteVarInt(creativeNetId);
-                encoder.WriteItem(entry.Key);
+                encoder.WriteItemInstance(entry.Key);
                 encoder.WriteVarInt(entry.Value?.GroupId ?? 0);
             }
         }

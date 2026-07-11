@@ -1,4 +1,5 @@
 ﻿using DaemonMC.Utils.Game;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -7,16 +8,33 @@ namespace DaemonMC.Network.Bedrock
         public override int Id => (int) Info.Bedrock.InventoryTransaction;
 
         public int RawID { get; set; } = 0;
+        public List<LegacySlot> LegacySlots { get; set; } = new List<LegacySlot>();
         public Transaction Transaction { get; set; } = new Transaction();
 
         protected override void Decode(PacketDecoder decoder)
         {
-            RawID = decoder.ReadSignedVarInt();
+            RawID = decoder.ReadVarInt();
+            LegacySlots = decoder.ReadLegacySlots(RawID);
 
+            if (decoder.protocolVersion >= Info.v1_26_30)
+            {
+                if (!decoder.ReadBool())
+                {
+                    return;
+                }
+            }
+            
             Transaction = new Transaction();
 
             Transaction.Type = (TransactionType)decoder.ReadVarInt();
 
+            if (decoder.protocolVersion >= Info.v1_26_30)
+            {
+                bool hasActions = decoder.ReadBool();
+                if (!hasActions)
+                    return;
+            }
+            
             int count = decoder.ReadVarInt();
 
             for (int b = 0; b < count; b++)
@@ -36,16 +54,41 @@ namespace DaemonMC.Network.Bedrock
                 Transaction.Actions.Add(action);
             }
 
-            if (Transaction.Type == TransactionType.ItemUseOnEntityTransaction)
+            switch (Transaction.Type)
             {
-                Transaction.EntityId = decoder.ReadVarLong();
-                Transaction.ActionType = decoder.ReadVarInt();
-                Transaction.Slot = decoder.ReadSignedVarInt();
-                Transaction.Item = decoder.ReadItem();
-                Transaction.FromPosition = decoder.ReadVec3();
-                Transaction.Position = decoder.ReadVec3();
+                case TransactionType.NormalTransaction:
+                case TransactionType.InventoryMismatch:
+                    break;
+                case TransactionType.ItemUseTransaction:
+                    Transaction.ActionType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadSignedVarInt() : decoder.ReadVarInt();
+                    Transaction.TriggerType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte(): decoder.ReadSignedVarInt();
+                    Transaction.BlockPosition = decoder.ReadBlockNetPos();
+                    Transaction.Face = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte() : decoder.ReadSignedVarInt();
+                    Transaction.Slot = decoder.ReadSignedVarInt();
+                    Transaction.Item = decoder.ReadItem(decoder.protocolVersion >= Info.v1_26_30 ? true : false);
+                    Transaction.PlayerPosition = decoder.ReadVec3();
+                    Transaction.ClickPosition = decoder.ReadVec3();
+                    Transaction.BlockRuntimeId = decoder.ReadVarInt();
+                    Transaction.ClientPrediction = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte() : decoder.ReadVarInt();
+                    if (decoder.protocolVersion >= Info.v1_26_10)
+                    {
+                        Transaction.ClientPrediction = decoder.ReadByte();
+                    }
+                    break;
+                case TransactionType.ItemUseOnEntityTransaction:
+                    Transaction.EntityId = decoder.ReadVarLong();
+                    Transaction.ActionType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadSignedVarInt() : decoder.ReadVarInt();
+                    Transaction.Slot = decoder.ReadSignedVarInt();
+                    Transaction.Item = decoder.ReadItem(decoder.protocolVersion >= Info.v1_26_30 ? true : false);
+                    Transaction.PlayerPosition = decoder.ReadVec3();
+                    Transaction.ClickPosition = decoder.ReadVec3();
+                    break;
+                case TransactionType.ItemReleaseTransaction:
+                    break;
+                default:
+                    Log.error($"Unknown transaction type {Transaction.Type}");
+                    break;
             }
-
         }
 
         protected override void Encode(PacketEncoder encoder)

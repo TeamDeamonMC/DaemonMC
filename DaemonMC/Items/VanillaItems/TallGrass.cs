@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public Tallgrass()
         {
             Name = "minecraft:tallgrass";
-            Id = 818;
+            Id = 820;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

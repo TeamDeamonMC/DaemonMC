@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public ColoredTorchBp()
         {
             Name = "minecraft:colored_torch_bp";
-            Id = 836;
+            Id = 839;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

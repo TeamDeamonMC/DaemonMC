@@ -45,7 +45,7 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVec3(Velocity);
             encoder.WriteVec2(Rotation);
             encoder.WriteFloat(YheadRotation);
-            encoder.WriteItem(Item);
+            encoder.WriteItemStack(Item);
             encoder.WriteVarInt(GameMode);
             encoder.WriteMetadata(Metadata);
             encoder.WriteProperties(Properties);

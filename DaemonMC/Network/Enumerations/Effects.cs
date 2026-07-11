@@ -32,6 +32,13 @@
         SlowFalling,
         BadOmen,
         HeroOfTheVillage,
-        Darkness
+        Darkness,
+        Infested,
+        Oozing,
+        Weaving,
+        WindCharged,
+        RaidOmen,
+        TrialOmen,
+        BreathOfTheNautilus
     }
 }

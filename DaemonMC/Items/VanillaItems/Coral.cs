@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public Coral()
         {
             Name = "minecraft:coral";
-            Id = 817;
+            Id = 819;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

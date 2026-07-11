@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public Sapling()
         {
             Name = "minecraft:sapling";
-            Id = 810;
+            Id = 812;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

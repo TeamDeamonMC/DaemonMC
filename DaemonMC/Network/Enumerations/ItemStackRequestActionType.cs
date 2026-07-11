@@ -1,0 +1,30 @@
+﻿namespace DaemonMC.Network.Enumerations
+{
+    public enum ItemStackRequestActionType
+    {
+        Take,
+        Place,
+        Swap,
+        Drop,
+        Destroy,
+        Consume,
+        Create,
+        PlaceInItemContainer_DEPRECATED,
+        TakeFromItemContainer_DEPRECATED,
+        ScreenLabTableCombine,
+        ScreenBeaconPayment,
+        ScreenHUDMineBlock,
+        CraftRecipe,
+        CraftRecipeAuto,
+        CraftCreative,
+        CraftRecipeOptional,
+        CraftRepairAndDisenchant,
+        CraftLoom,
+        CraftNonImplemented_DEPRECATEDASKTYLAING,
+        CraftResults_DEPRECATEDASKTYLAING,
+        ifdef,
+        TEST_INFRASTRUCTURE_ENABLED,
+        Test,
+        endif
+    }
+}

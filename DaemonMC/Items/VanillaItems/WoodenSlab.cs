@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public WoodenSlab()
         {
             Name = "minecraft:wooden_slab";
-            Id = 813;
+            Id = 815;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

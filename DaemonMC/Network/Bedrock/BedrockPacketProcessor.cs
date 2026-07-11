@@ -83,6 +83,8 @@ namespace DaemonMC.Network.Bedrock
                 if (player.GameMode == 2)
                 {
                     player.Abilities[0].AbilityValues.MayFly = true;
+                    player.Abilities[0].AbilityValues.WorldBuilder = true;
+                    player.Abilities[0].AbilityValues.Instabuild = true;
                 }
             }
 
@@ -170,6 +172,16 @@ namespace DaemonMC.Network.Bedrock
                     }
 
                     if (!player.CurrentWorld.OnlinePlayers.TryAdd(player.EntityID, player)) { return; }
+
+                    if (session.protocolVersion >= Info.v1_26_10)
+                    {
+                        var voxelShapes = new VoxelShapes
+                        {
+                            //todo api update
+                        };
+                        player.Send(voxelShapes);
+                    }
+
                     player.spawn();
 
                     var items = new ItemRegistry
@@ -188,7 +200,7 @@ namespace DaemonMC.Network.Bedrock
 
                     var creativeInventory = new CreativeContent
                     {
-
+                        Groups = CreativeContentManager.Groups,
                     };
                     player.Send(creativeInventory);
 

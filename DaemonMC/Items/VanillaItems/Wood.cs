@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public Wood()
         {
             Name = "minecraft:wood";
-            Id = 826;
+            Id = 828;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

@@ -5,9 +5,10 @@ namespace DaemonMC.Items.VanillaItems
         public Stonebrick()
         {
             Name = "minecraft:stonebrick";
-            Id = 798;
+            Id = 800;
             Version = 2;
             ComponentBased = false;
+            ComponentData = "";
         }
     }
 }

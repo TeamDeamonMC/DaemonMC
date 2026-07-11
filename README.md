@@ -6,10 +6,14 @@
 Fast and lightweight server software for Minecraft: Bedrock Edition designed for mini games.
 
 [![Discord](https://img.shields.io/discord/932359565612294224?logo=discord&logoColor=white&color=blue)](https://discord.gg/A6BBcXSCj4)
-![Minecraft - Version](https://img.shields.io/badge/Minecraft_1.21.90_--_1.26.0-darkgreen)
-![LevelDB](https://img.shields.io/badge/LevelDB_1.21.110_--_1.26.0-gray)
+![Minecraft - Version](https://img.shields.io/badge/Minecraft_1.21.90_--_1.26.30-darkgreen)
+![LevelDB](https://img.shields.io/badge/LevelDB_1.21.110_--_1.26.30-gray)
 
 Instead of vanilla features and mechanics, here game is completely driven by plugins. DaemonMC provide only server core with simple API so you can add only what you need. No unnecessary server resources and network usage by various features like block tick or mobs.
+
+List of publicly available plugins [Public plugins and tools](https://github.com/TeamDeamonMC/DaemonMC/wiki/Public-plugins-and-tools)
+
+To learn how to create plugins check [Plugin tutorial](https://github.com/TeamDeamonMC/DaemonMC/wiki/Plugin-tutorial)
 
 ## Getting started
 
@@ -37,6 +41,10 @@ Just remember that because of the latest world format, players using older game 
 
 **Simple plugin API:** Plugin tutoral, API and other useful things can be found in [Wiki](https://github.com/TeamDeamonMC/DaemonMC/wiki).
 
-Click here to learn how to create first plugin [Plugin tutorial](https://github.com/TeamDeamonMC/DaemonMC/wiki/Plugin-tutorial)
-
 Want to contribute? That's really cool. Here's some useful information: [Contributing.md](https://github.com/TeamDeamonMC/DaemonMC/blob/main/Contributing.md)
+
+## Servers running on DaemonMC
+
+Want to see your server here? Make pull request and add your server to the list!
+
+**lazon.top:19132** - test server with lobby and TNTRun

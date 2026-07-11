@@ -1,11 +1,12 @@
 ﻿using System.IO.Compression;
+using DaemonMC;
 using DaemonMC.Blocks;
 using DaemonMC.Utils;
 using fNbt;
 using MiNET.LevelDB;
 using MiNET.LevelDB.Utils;
 
-namespace DaemonMC.Tests
+namespace Test
 {
     [TestClass]
     public class LevelDbTest
@@ -50,8 +51,8 @@ namespace DaemonMC.Tests
         public void Data3DLoadTest()
         {
             string LevelName = "My World";
-            int x = 4;
-            int z = 4;
+            int x = 0;
+            int z = 0;
             int count = 0;
 
             var tempData = Path.Combine(Path.GetTempPath(), $"{LevelName}.mcworld");

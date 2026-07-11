@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Utils
+﻿using Newtonsoft.Json;
+
+namespace DaemonMC.Utils
 {
     public class Skin
     {
@@ -24,18 +26,52 @@
 
         public static Skin Create(string skinPng, string geometryJson)
         {
+            var json = File.ReadAllText(geometryJson);
+            var geometry = JsonConvert.DeserializeObject<GeometryRoot>(json);
+            var desription = geometry.minecraftgeometry.FirstOrDefault(g => g.Description.Identifier == "geometry.humanoid.custom").Description;
+
             return new Skin()
             {
                 ArmSize = "wide",
                 PremiumSkin = true,
                 SkinData = Texture.PngToBytes(skinPng),
-                SkinGeometryData = File.ReadAllText(geometryJson),
-                SkinImageHeight = 64,
-                SkinImageWidth = 64,
+                SkinGeometryData = json,
+                SkinImageHeight = (int)desription.Texture_Height,
+                SkinImageWidth = (int)desription.TextureWidth,
                 SkinResourcePatch = "{\n   \"geometry\" : {\n      \"default\" : \"geometry.humanoid.custom\"\n   }\n}\n",
                 CapeOnClassicSkin = false,
             };
         }
+    }
+
+    public class GeometryRoot
+    {
+        [JsonProperty("format_version")]
+        public string Version { get; set; }
+        [JsonProperty("minecraft:geometry")]
+        public List<MinecraftGeometry> minecraftgeometry { get; set; }
+    }
+
+    public class MinecraftGeometry
+    {
+        [JsonProperty("description")]
+        public Description Description { get; set; }
+    }
+
+    public class Description
+    {
+        [JsonProperty("identifier")]
+        public string Identifier { get; set; }
+        [JsonProperty("texture_width")]
+        public float TextureWidth { get; set; }
+        [JsonProperty("texture_height")]
+        public float Texture_Height { get; set; }
+        [JsonProperty("visible_bounds_width")]
+        public float VisibleBoundsWidth { get; set; }
+        [JsonProperty("visible_bounds_height")]
+        public double VisibleBoundsHeight { get; set; }
+        [JsonProperty("visible_bounds_offset")]
+        public List<double> VisibleBoundsOffset { get; set; }
     }
 
     public class Cape

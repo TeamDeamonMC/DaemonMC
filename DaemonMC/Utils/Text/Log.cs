@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using DaemonMC.Network;
+using Newtonsoft.Json;
 
 namespace DaemonMC.Utils.Text
 {
@@ -29,6 +30,15 @@ namespace DaemonMC.Utils.Text
                 Console.ResetColor();
             }
         }
+
+        public static void dump(Object obj)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            ToLog($"[DUMP] {obj.GetType()}");
+            ToLog(JsonConvert.SerializeObject(obj, Formatting.Indented));
+            Console.ResetColor();
+        }
+
         public static void packetIn(IPEndPoint clientEp, Info.RakNet id)
         {
             if (ignoredRakPackets.Contains(id) || !raLog) { return; }

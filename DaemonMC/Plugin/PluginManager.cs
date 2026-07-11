@@ -5,7 +5,9 @@ using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Plugin.Events;
+using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
+using DaemonMC.Items;
 
 namespace DaemonMC.Plugin
 {
@@ -71,12 +73,7 @@ namespace DaemonMC.Plugin
             var fullPath = Path.GetFullPath(filePath);
             var loadContext = new PluginLoadContext(fullPath);
 
-            using var fs = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using var ms = new MemoryStream();
-            fs.CopyTo(ms);
-            ms.Position = 0;
-
-            var assembly = loadContext.LoadFromStream(ms);
+            var assembly = loadContext.LoadFromAssemblyPath(fullPath);
 
             foreach (var type in assembly.GetTypes())
             {
@@ -359,6 +356,22 @@ namespace DaemonMC.Plugin
                 player.Skin = playerSkin.Skin;
             }
         }
+
+        public static bool InventoryAction(Player player, Actions action, Item sourceItem, Item destinationItem)
+        {
+            var ev = new InventoryActionEvent(player, action, sourceItem, destinationItem);
+
+            foreach (var plugin in _plugins)
+            {
+                plugin.PluginInstance.OnInventoryAction(ev);
+
+                if (ev.IsCancelled)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     public class PluginLoadContext : AssemblyLoadContext
@@ -377,6 +390,15 @@ namespace DaemonMC.Plugin
             {
                 return LoadFromAssemblyPath(assemblyPath);
             }
+
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (asm.GetName().Name == assemblyName.Name)
+                {
+                    return asm;
+                }
+            }
+
             return null;
         }
     }

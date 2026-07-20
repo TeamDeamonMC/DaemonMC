@@ -83,6 +83,8 @@ namespace DaemonMC.Network.Bedrock
                 if (player.GameMode == 2)
                 {
                     player.Abilities[0].AbilityValues.MayFly = true;
+                    player.Abilities[0].AbilityValues.WorldBuilder = true;
+                    player.Abilities[0].AbilityValues.Instabuild = true;
                 }
             }
 
@@ -198,7 +200,7 @@ namespace DaemonMC.Network.Bedrock
 
                     var creativeInventory = new CreativeContent
                     {
-
+                        Groups = CreativeContentManager.Groups,
                     };
                     player.Send(creativeInventory);
 

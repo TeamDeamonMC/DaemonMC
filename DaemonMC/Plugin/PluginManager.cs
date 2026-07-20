@@ -5,7 +5,9 @@ using DaemonMC.Entities;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Plugin.Events;
+using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
+using DaemonMC.Items;
 
 namespace DaemonMC.Plugin
 {
@@ -353,6 +355,22 @@ namespace DaemonMC.Plugin
 
                 player.Skin = playerSkin.Skin;
             }
+        }
+
+        public static bool InventoryAction(Player player, Actions action, Item sourceItem, Item destinationItem)
+        {
+            var ev = new InventoryActionEvent(player, action, sourceItem, destinationItem);
+
+            foreach (var plugin in _plugins)
+            {
+                plugin.PluginInstance.OnInventoryAction(ev);
+
+                if (ev.IsCancelled)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 

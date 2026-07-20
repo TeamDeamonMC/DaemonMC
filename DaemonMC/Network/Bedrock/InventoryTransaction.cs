@@ -8,34 +8,13 @@ namespace DaemonMC.Network.Bedrock
         public override int Id => (int) Info.Bedrock.InventoryTransaction;
 
         public int RawID { get; set; } = 0;
-        public bool hasLegacySlots { get; set; } = true;
         public List<LegacySlot> LegacySlots { get; set; } = new List<LegacySlot>();
         public Transaction Transaction { get; set; } = new Transaction();
 
         protected override void Decode(PacketDecoder decoder)
         {
             RawID = decoder.ReadVarInt();
-
-            if (decoder.protocolVersion >= Info.v1_26_30)
-            {
-                bool hasLegacySlots = decoder.ReadBool();
-            }
-
-            if (hasLegacySlots && RawID != 0)
-            {
-                int legacyCount = decoder.ReadVarInt();
-
-                for (int i = 0; i < legacyCount; i++)
-                {
-                    LegacySlot legacySlot = new LegacySlot();
-                    legacySlot.ContainerId = decoder.ReadByte();
-                    for (int a = 0; a < decoder.ReadVarInt(); a++)
-                    {
-                        legacySlot.Slot[i] = decoder.ReadByte();
-                    }
-                    LegacySlots.Add(legacySlot);
-                }
-            }
+            LegacySlots = decoder.ReadLegacySlots(RawID);
 
             if (decoder.protocolVersion >= Info.v1_26_30)
             {
@@ -81,7 +60,7 @@ namespace DaemonMC.Network.Bedrock
                 case TransactionType.InventoryMismatch:
                     break;
                 case TransactionType.ItemUseTransaction:
-                    Transaction.ActionType = decoder.ReadSignedVarInt();
+                    Transaction.ActionType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadSignedVarInt() : decoder.ReadVarInt();
                     Transaction.TriggerType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte(): decoder.ReadSignedVarInt();
                     Transaction.BlockPosition = decoder.ReadBlockNetPos();
                     Transaction.Face = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadByte() : decoder.ReadSignedVarInt();
@@ -98,7 +77,7 @@ namespace DaemonMC.Network.Bedrock
                     break;
                 case TransactionType.ItemUseOnEntityTransaction:
                     Transaction.EntityId = decoder.ReadVarLong();
-                    Transaction.ActionType = decoder.ReadSignedVarInt();
+                    Transaction.ActionType = decoder.protocolVersion >= Info.v1_26_30 ? decoder.ReadSignedVarInt() : decoder.ReadVarInt();
                     Transaction.Slot = decoder.ReadSignedVarInt();
                     Transaction.Item = decoder.ReadItem(decoder.protocolVersion >= Info.v1_26_30 ? true : false);
                     Transaction.PlayerPosition = decoder.ReadVec3();

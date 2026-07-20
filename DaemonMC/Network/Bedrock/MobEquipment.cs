@@ -34,11 +34,11 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVarLong(EntityId);
             if (encoder.protocolVersion >= Info.v1_26_20)
             {
-                encoder.WriteNetItemStack(Item);
+                encoder.WriteNetItem(Item);
             }
             else
             {
-                encoder.WriteItemStack(Item);
+                encoder.WriteItem(Item);
             }
             encoder.WriteByte(Slot);
             encoder.WriteByte(SelectedSlot);

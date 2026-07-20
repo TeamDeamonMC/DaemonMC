@@ -62,8 +62,6 @@ namespace DaemonMC
 
             PluginManager.LoadPlugins("Plugins");
 
-            CreativeContentManager.Init();
-
             Log.info($"Server listening on port {Port}");
             Log.line();
             Log.info("Type /help to see available commands");

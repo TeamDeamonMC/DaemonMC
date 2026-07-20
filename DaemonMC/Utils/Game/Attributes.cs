@@ -56,10 +56,5 @@
         {
             return new AttributeValue("minecraft:movement", 0, float.MaxValue, MovementSpeed, 0, float.MaxValue, MovementSpeed);
         }
-
-        public AttributeValue Health_value()
-        {
-            return new AttributeValue("minecraft:health", 0, float.MaxValue, Health, 0, float.MaxValue, Health);
-        }
     }
 }

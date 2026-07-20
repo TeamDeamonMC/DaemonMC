@@ -21,9 +21,9 @@ namespace DaemonMC.Network.Bedrock
             {
                 encoder.WriteString(item.Value.Name);
                 encoder.WriteShort((ushort)item.Value.Id);
-                encoder.WriteBool(item.Value.ComponentBased);
-                encoder.WriteSignedVarInt(item.Value.Version);
-                encoder.WriteCompoundTag(item.Value.ComponentData != "" ? new NbtCompound(ToDataTypes.Base64ToNbt(item.Value.ComponentData, true, false)) : new NbtCompound(""));
+                encoder.WriteBool(false); //components
+                encoder.WriteVarInt(0);
+                encoder.WriteCompoundTag(new NbtCompound(""));
             }
         }
     }

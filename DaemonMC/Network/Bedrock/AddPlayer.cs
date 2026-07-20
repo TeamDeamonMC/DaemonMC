@@ -47,11 +47,11 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteFloat(YheadRotation);
             if (encoder.protocolVersion >= Info.v1_26_40)
             {
-                encoder.WriteNetItemStack(Item);
+                encoder.WriteNetItem(Item);
             }
             else
             {
-                encoder.WriteItemStack(Item);
+                encoder.WriteItem(Item);
             }
             encoder.WriteVarInt(GameMode);
             encoder.WriteMetadata(Metadata);

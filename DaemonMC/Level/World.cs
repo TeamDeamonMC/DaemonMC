@@ -248,14 +248,6 @@ namespace DaemonMC.Level
             }
         }
 
-        public void SendToast(string title, string content)
-        {
-            var packet = new ToastRequest();
-            packet.Title = title;
-            packet.Body = content;
-            Send(packet);
-        }
-
         public void SendTime(int time)
         {
             var packet = new SetTime()

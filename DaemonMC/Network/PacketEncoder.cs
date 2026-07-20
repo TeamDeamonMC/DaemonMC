@@ -646,41 +646,9 @@ namespace DaemonMC.Network
             {
                 value |= (1 << (int)AbilitiesIndex.Teleport);
             }
-            if (permissions.Invulnerable)
-            {
-                value |= (1 << (int)AbilitiesIndex.Invulnerable);
-            }
-            if (permissions.Flying)
-            {
-                value |= (1 << (int)AbilitiesIndex.Flying);
-            }
             if (permissions.MayFly)
             {
                 value |= (1 << (int)AbilitiesIndex.MayFly);
-            }
-            if (permissions.Instabuild)
-            {
-                value |= (1 << (int)AbilitiesIndex.Instabuild);
-            }
-            if (permissions.Muted)
-            {
-                value |= (1 << (int)AbilitiesIndex.Muted);
-            }
-            if (permissions.WorldBuilder)
-            {
-                value |= (1 << (int)AbilitiesIndex.WorldBuilder);
-            }
-            if (permissions.NoClip)
-            {
-                value |= (1 << (int)AbilitiesIndex.NoClip);
-            }
-            if (permissions.PrivilegedBuilder)
-            {
-                value |= (1 << (int)AbilitiesIndex.PrivilegedBuilder);
-            }
-            if (permissions.VerticalFlySpeed)
-            {
-                value |= (1 << (int)AbilitiesIndex.VerticalFlySpeed);
             }
             WriteInt(value);
         }
@@ -769,39 +737,16 @@ namespace DaemonMC.Network
 
         public void WriteContainerName(FullContainerName ContainerName)
         {
-            WriteByte((byte)ContainerName.ContainerName);
+            WriteByte(ContainerName.ContainerName);
             WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt((int)ContainerName.DynamicId));
         }
 
-        public void WriteItemInstance(Item item, bool network = false)
+        public void WriteNetItem(Item item)
         {
-            if (!network && item is Items.VanillaItems.Air)
-            {
-                WriteSignedVarInt(0);
-            }
-            else
-            {
-                if (network)
-                {
-                    WriteShort(item.Id);
-                }
-                else
-                {
-                    WriteSignedVarInt(item.Id);
-                }
-                WriteShort(item.Count);
-                WriteVarInt(item.Aux);
-                WriteSignedVarInt(item.BlockRuntimeId);
-                WriteItemData(item.Data);
-            }
-        }
-        
-        public void WriteNetItemStack(Item item)
-        {
-            WriteItemStack(item, true);
+            WriteItem(item, true);
         }
 
-        public void WriteItemStack(Item item, bool network = false)
+        public void WriteItem(Item item, bool network = false)
         {
             if (!network && item is Items.VanillaItems.Air)
             {
@@ -825,39 +770,28 @@ namespace DaemonMC.Network
             }
         }
 
-        public void WriteItemData(NbtCompound? nbt)
+        public void WriteItemData(NbtCompound nbt)
         {
-            using var userData = new MemoryStream();
-            using var writer = new BinaryWriter(userData);
-
             if (nbt == null)
             {
-                writer.Write((short)0);
+                WriteByte(0);
+                return;
             }
-            else
+
+            nbt.Name = "";
+
+            var file = new NbtFile(nbt)
             {
-                nbt.Name = "";
+                BigEndian = false,
+                UseVarInt = false
+            };
 
-                var file = new NbtFile(nbt)
-                {
-                    BigEndian = false,
-                    UseVarInt = false
-                };
+            var itemData = new List<byte>();
+            itemData.AddRange(new List<byte> { 0xFF, 0xFF, 0x01 });
+            itemData.AddRange(file.SaveToBuffer(NbtCompression.None));
+            itemData.AddRange(new List<byte> { 0x00, 0x00 });
 
-                byte[] nbtBytes = file.SaveToBuffer(NbtCompression.None);
-
-                writer.Write((short)-1);
-                writer.Write((byte)1);
-                writer.Write(nbtBytes);
-            }
-
-            // CanPlaceOn count
-            writer.Write(0);
-
-            // CanDestroy count
-            writer.Write(0);
-
-            WriteBytes(userData.ToArray(), true);
+            WriteBytes(itemData.ToArray(), true);
         }
 
         public void WriteVoxelShapes(List<VoxelShape> shapes)
@@ -907,20 +841,6 @@ namespace DaemonMC.Network
                 WriteString(shape.Name);
                 WriteShort(id);
                 id++;
-            }
-        }
-
-        public void WriteItemStackResponse(List<ItemStackResponseInfo> itemStackResponse)
-        {
-            WriteVarInt(itemStackResponse.Count);
-            foreach (var response in itemStackResponse)
-            {
-                WriteByte(response.Result);
-                WriteVarInt(response.RequestId);
-                if (response.RequestId == 0) //success
-                {
-                    //todo
-                }
             }
         }
 

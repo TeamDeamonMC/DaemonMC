@@ -7,7 +7,6 @@ using DaemonMC.Level;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
-using DaemonMC.Network.Handler;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Plugin;
 using DaemonMC.Utils;
@@ -43,7 +42,6 @@ namespace DaemonMC
         public PlayerInventory Inventory { get; set; }
         public Dictionary<Effects, bool> AllEffects { get; set; } = new Dictionary<Effects, bool>();
         public bool Spawned { get; set; } = false;
-        public bool HaveBossBar { get; set; } = false;
         private int LastChunkX = 0;
         private int LastChunkZ = 0;
 
@@ -492,85 +490,6 @@ namespace DaemonMC
             Send(packet);
         }
 
-        public void ShowBossBar(string title, float split, float percent = 0)
-        {
-            if (HaveBossBar)
-            {
-                HideBossBar();
-            }
-            var attributes = new AttributesValues() { Health = split };
-            var pk = new AddActor
-            {
-                EntityId = 999990745,
-                ActorType = "minecraft:spider",
-                Position = Position,
-                Metadata = new Dictionary<ActorData, Metadata>() { { ActorData.RESERVED_038, new Metadata(0.0f) } },
-                Attributes = new List<AttributeValue> { attributes.Health_value() },
-            };
-            Send(pk);
-            var packet = new BossEvent()
-            {
-                EventType = BossEventType.Add,
-                EntityId = 999990745,
-                PlayerId = EntityID,
-                Title = title,
-                Health = percent,
-            };
-            Send(packet);
-        }
-
-        public void HideBossBar()
-        {
-            var pk = new RemoveActor
-            {
-                EntityId = 999990745,
-            };
-            Send(pk);
-            var packet = new BossEvent()
-            {
-                EventType = BossEventType.Hide,
-                EntityId = 999990745,
-                PlayerId = EntityID,
-            };
-            Send(packet);
-        }
-
-        public void SetBossBarValue(float percent)
-        {
-            var packet = new BossEvent()
-            {
-                EventType = BossEventType.UpdatePercent,
-                EntityId = 999990745,
-                PlayerId = EntityID,
-                Health = percent,
-            };
-            Send(packet);
-        }
-
-        public void SetBossBarTitle(string title)
-        {
-            var packet = new BossEvent()
-            {
-                EventType = BossEventType.UpdateName,
-                EntityId = 999990745,
-                PlayerId = EntityID,
-                Title = title,
-            };
-            Send(packet);
-        }
-
-        public void SetBossBarColor(BossBarColor color)
-        {
-            var packet = new BossEvent()
-            {
-                EventType = BossEventType.UpdateStyle,
-                EntityId = 999990745,
-                PlayerId = EntityID,
-                Color = color,
-            };
-            Send(packet);
-        }
-
         public void Transfer(string address, ushort port)
         {
             var packet = new TransferPlayer()
@@ -601,14 +520,6 @@ namespace DaemonMC
             {
                 HudElements = elements,
             };
-            Send(packet);
-        }
-
-        public void SendToast(string title, string content)
-        {
-            var packet = new ToastRequest();
-            packet.Title = title;
-            packet.Body = content;
             Send(packet);
         }
 
@@ -692,44 +603,6 @@ namespace DaemonMC
 
         internal void HandlePacket(Packet packet)
         {
-            if (packet is ItemStackRequest itemStackRequest)
-            {
-                //Log.dump(itemStackRequest);
-                var itemStack = itemStackRequest.ItemStack;
-
-                foreach (var stack in itemStack)
-                {
-                    var actions = stack.Actions;
-
-                    foreach (var action in actions)
-                    {
-                        switch (action.ActionsType)
-                        {
-                            case ItemStackRequestActionType.Take:
-                                InventoryTransactionHandler.TakeAction(this, (TakeAction)action, stack);
-                                break;
-                            case ItemStackRequestActionType.Place:
-                                InventoryTransactionHandler.PlaceAction(this, (PlaceAction)action, stack);
-                                break;
-                            case ItemStackRequestActionType.Destroy:
-                                InventoryTransactionHandler.DestoryAction(this, (DestoryAction)action);
-                                break;
-                            case ItemStackRequestActionType.CraftCreative:
-                                InventoryTransactionHandler.CreaftCreativeAction(this, (CraftCreativeAction)action, stack);
-                                break;
-                            case ItemStackRequestActionType.CraftResults_DEPRECATEDASKTYLAING:
-                                //still sent from client but couldn't find use
-                                break;
-                            default:
-                                Log.warn($"Unhandled inventory action {action.ActionsType} with RequestId {stack.RequestId}");
-                               // InventoryTransactionHandler.DeclineRequest(this, stack.RequestId); nope
-                               // todo resend player inventory
-                                return;
-                        }
-                    }
-                }
-            }
-
             if (packet is PlayerAuthInput playerAuthInput)
             {
                 Tick = playerAuthInput.Tick;

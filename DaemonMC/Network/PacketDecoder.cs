@@ -597,47 +597,6 @@ namespace DaemonMC.Network
             return new Items.VanillaItems.Air();
         }
 
-        public List<Item> ReadCraftResultsDeprecatedItems()
-        {
-            var items = new List<Item>();
-
-            var count = ReadVarInt();
-            for (int i = 0; i < count; i++)
-            {
-                items.Add(ReadItemInstance(true));
-            }
-
-            return items;
-        }
-
-        public Item ReadItemInstance(bool network = false)
-        {
-            var id = 0;
-            if (network)
-            {
-                id = ReadShort();
-            }
-            else
-            {
-                id = ReadSignedVarInt();
-            }
-            if (id != 0 || network)
-            {
-                Item item = ItemPalette.items.GetValueOrDefault((short)id);
-
-                if (item == null)
-                {
-                    item = new Items.VanillaItems.Air();
-                }
-                item.Count = ReadShort();
-                item.Aux = ReadVarInt();
-                item.BlockRuntimeId = ReadSignedVarInt();
-                ReadString();//nbt data. useless for server auth inventory
-                return item;
-            }
-            return new Items.VanillaItems.Air();
-        }
-
         public AttributesValues ReadAttributes()
         {
             var values = new AttributesValues();
@@ -663,7 +622,7 @@ namespace DaemonMC.Network
             for (int i = 0; i < count; i++)
             {
                 var action = new Actions();
-                action.ActionsType = (ItemStackRequestActionType)ReadByte();
+                action.ActionsType = ReadByte();
                 action.Amount = ReadByte();
                 action.Source = ReadSlotInfo();
                 action.Destination = ReadSlotInfo();
@@ -683,7 +642,7 @@ namespace DaemonMC.Network
         public FullContainerName ReadContainerName()
         {
             var containerName = new FullContainerName();
-            containerName.ContainerName = (ContainerEnumName)ReadByte();
+            containerName.ContainerName = ReadByte();
             containerName.DynamicId = ReadOptional(ReadSignedVarInt);
             return containerName;
         }
@@ -712,108 +671,6 @@ namespace DaemonMC.Network
                 }
             }
             return action;
-        }
-
-        public List<LegacySlot> ReadLegacySlots(int rawID)
-        {
-            bool hasLegacySlots = true;
-            var legacySlots = new List<LegacySlot>();
-
-            if (protocolVersion >= Info.v1_26_30)
-            {
-                 hasLegacySlots = ReadBool();
-            }
-
-            if (hasLegacySlots && rawID != 0)
-            {
-                int legacyCount = ReadVarInt();
-
-                for (int i = 0; i < legacyCount; i++)
-                {
-                    LegacySlot legacySlot = new LegacySlot();
-                    legacySlot.ContainerId = ReadByte();
-                    for (int a = 0; a < ReadVarInt(); a++)
-                    {
-                        legacySlot.Slot[i] = ReadByte();
-                    }
-                    legacySlots.Add(legacySlot);
-                }
-            }
-
-            return legacySlots;
-        }
-
-        public List<ItemStack> ReadItemStack()
-        {
-            var stacks = new List<ItemStack>();
-            var size = ReadVarInt();
-
-            for (int i = 0; i < size; i++)
-            {
-                var stack = new ItemStack();
-                stack.RequestId = ReadVarInt();
-
-                int actionCount = ReadVarInt();
-
-                for (int a = 0; a < actionCount; a++)
-                {
-                    var actionType = (ItemStackRequestActionType)ReadByte();
-                    Log.debug($"Reading action type: {actionType}");
-                    switch (actionType)
-                    {
-                        case ItemStackRequestActionType.Take:
-                            var take = new TakeAction();
-                            take.ActionsType = actionType;
-                            take.Amount = ReadByte();
-                            take.Source = ReadSlotInfo();
-                            take.Destination = ReadSlotInfo();
-                            stack.Actions.Add(take);
-                            break;
-                        case ItemStackRequestActionType.Place:
-                            var place = new PlaceAction();
-                            place.ActionsType = actionType;
-                            place.Amount = ReadByte();
-                            place.Source = ReadSlotInfo();
-                            place.Destination = ReadSlotInfo();
-                            stack.Actions.Add(place);
-                            break;
-                        case ItemStackRequestActionType.Destroy:
-                            var destory = new DestoryAction();
-                            destory.ActionsType = actionType;
-                            destory.Amount = ReadByte();
-                            destory.Source = ReadSlotInfo();
-                            stack.Actions.Add(destory);
-                            break;
-                        case ItemStackRequestActionType.CraftCreative:
-                            var craftCreative = new CraftCreativeAction();
-                            craftCreative.ActionsType = actionType;
-                            craftCreative.ItemId = ReadVarInt();
-                            craftCreative.CraftCount = ReadByte();
-                            stack.Actions.Add(craftCreative);
-                            break;
-                        case ItemStackRequestActionType.CraftResults_DEPRECATEDASKTYLAING:
-                            var CraftResultsDeprecated = new CraftResults_DEPRECATEDASKTYLAING();
-                            CraftResultsDeprecated.ActionsType = actionType;
-                            CraftResultsDeprecated.Items = ReadCraftResultsDeprecatedItems();
-                            CraftResultsDeprecated.CraftCount = ReadByte();
-                            stack.Actions.Add(CraftResultsDeprecated);
-                            break;
-                        default:
-                            Log.error($"No implementation for action type {actionType}");
-                            break;
-                    }
-                }
-                int stringCount = ReadVarInt();
-                for (int b = 0; b < stringCount; b++)
-                {
-                    stack.StringToFilter.Add(ReadString());
-                }
-
-                stack.StringToFilterOrigin = ReadInt();
-
-                stacks.Add(stack);
-            }
-            return stacks;
         }
 
         public T? ReadOptional<T>(Func<T> readFunction)

@@ -15,7 +15,6 @@ public interface IPlugin {
     void OnPlayerSkinChanged(PlayerSkinChangedEvent ev);
     void OnPacketReceived(PacketEvent ev);
     void OnPacketSent(PacketEvent ev);
-    void OnInventoryAction(InventoryActionEvent ev);
 }
 
 public interface HotReload {
@@ -37,7 +36,6 @@ public abstract class Plugin : IPlugin
     public virtual void OnPlayerSkinChanged(PlayerSkinChangedEvent ev) { }
     public virtual void OnPacketReceived(PacketEvent ev) { }
     public virtual void OnPacketSent(PacketEvent ev) { }
-    public virtual void OnInventoryAction(InventoryActionEvent ev) { }
 }
 
 [AttributeUsage(AttributeTargets.Class)]

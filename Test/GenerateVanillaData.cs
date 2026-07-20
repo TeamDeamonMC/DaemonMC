@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using DaemonMC.Utils;
 using fNbt;
 
 namespace Test
@@ -82,7 +81,6 @@ namespace Test
                 int id = obj.GetProperty("runtime_id").GetInt32();
                 int version = obj.GetProperty("version").GetInt32();
                 bool componentBased = obj.GetProperty("component_based").GetBoolean();
-                string componentNbt = obj.TryGetProperty("component_nbt", out JsonElement value) ? value.GetString() : "";
 
                 string className = FixCase(name.Split(':')[1]);
 
@@ -97,7 +95,6 @@ namespace DaemonMC.Items.VanillaItems
             Id = {id};
             Version = {version};
             ComponentBased = {(componentBased ? "true" : "false")};
-            ComponentData = {componentNbt};
         }}
     }}
 }}";
@@ -151,29 +148,6 @@ namespace DaemonMC.Items.VanillaItems
                 }
                 Console.WriteLine($"Done");
             }
-        }
-
-        [TestMethod]
-        public void Sounds()
-        {
-            string json = File.ReadAllText("level_sound_id_map.json"); //https://github.com/pmmp/BedrockData/blob/master/level_sound_id_map.json
-            var sounds = JsonSerializer.Deserialize<Dictionary<string, int>>(json)!;
-
-            var sb = new StringBuilder();
-
-            sb.AppendLine("public Dictionary<int, string> Sounds = new Dictionary<int, string>()");
-            sb.AppendLine("{");
-
-            foreach (var kv in sounds.OrderBy(x => x.Value))
-            {
-                sb.AppendLine($"    {{ {kv.Value}, \"{kv.Key}\" }},");
-                Console.WriteLine(kv.Key);
-            }
-
-            sb.AppendLine("};");
-
-            File.WriteAllText("Sounds.cs", sb.ToString());
-            Console.WriteLine("Done");
         }
 
         private static string FixCase(string input)

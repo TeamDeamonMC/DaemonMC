@@ -8,7 +8,6 @@ namespace DaemonMC.Items.VanillaItems
             Id = 554;
             Version = 2;
             ComponentBased = true;
-            ComponentData = "";
         }
     }
 }

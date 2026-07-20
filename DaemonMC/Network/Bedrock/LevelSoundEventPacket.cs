@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using DaemonMC.Network.Enumerations;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -33,14 +32,7 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            if (encoder.protocolVersion >= Info.v1_26_30)
-            {
-                encoder.WriteString(SoundIdMap.GetSound(EventID));
-            }
-            else
-            {
-                encoder.WriteVarInt(EventID);
-            }
+            encoder.WriteVarInt(EventID);
             encoder.WriteVec3(Position);
             encoder.WriteSignedVarInt(Data);
             encoder.WriteString(ActorIdentifier);

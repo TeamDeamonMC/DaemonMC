@@ -2,7 +2,7 @@
 {
     public class Info
     {
-        public static string Version = "1.26.40";
+        public static string Version = "1.26.30";
 
         public static int v1_21_90 = 818;
         public static int v1_21_93 = 819;
@@ -15,7 +15,7 @@
         public static int v1_26_10 = 944;
         public static int v1_26_20 = 975;
         public static int v1_26_30 = 1001;
-        public static int v1_26_40 = 2168;
+        public static int v1_26_40 = 2164; //preview 26.40.27 ?? 2164 .. Mojang?
 
         public static int[] ProtocolVersion = [v1_21_90, v1_21_93, v1_21_100, v1_21_111, v1_21_120, v1_21_124, v1_21_130, v1_26_0, v1_26_10, v1_26_20, v1_26_30, v1_26_40];
 

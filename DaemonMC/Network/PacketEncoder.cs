@@ -396,16 +396,16 @@ namespace DaemonMC.Network
             WriteInt(skin.SkinImageWidth);
             WriteInt(skin.SkinImageHeight);
             WriteBytes(skin.SkinData);
-            if (protocolVersion >= Info.v1_26_40) { WriteVarInt(skin.AnimatedImageData.Count()); } else { WriteInt(skin.AnimatedImageData.Count()); }
+            WriteInt(skin.AnimatedImageData.Count());
             foreach (var animation in skin.AnimatedImageData)
             {
                 WriteInt(animation.ImageWidth);
                 WriteInt(animation.ImageHeight);
                 byte[] imageData = Convert.FromBase64String(animation.Image);
                 WriteBytes(imageData);
-                if (protocolVersion >= Info.v1_26_40) { WriteVarInt(animation.Type); } else { WriteInt(animation.Type); }
+                WriteInt(animation.Type);
                 WriteFloat(animation.Frames);
-                if (protocolVersion >= Info.v1_26_40) { WriteVarInt(animation.AnimationExpression); } else { WriteInt(animation.AnimationExpression); }
+                WriteInt(animation.AnimationExpression);
             }
             WriteInt(skin.Cape.CapeImageWidth);
             WriteInt(skin.Cape.CapeImageHeight);
@@ -415,25 +415,25 @@ namespace DaemonMC.Network
             WriteString(skin.SkinAnimationData);
             WriteString(skin.Cape.CapeId);
             WriteString(skin.SkinId + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-            if (protocolVersion >= Info.v1_26_40) { WriteByte(skin.ArmSize); } else { WriteString(skin.ArmSize == 0 ? "slim" : "wide"); }
-            if (protocolVersion >= Info.v1_26_40) { WriteInt(skin.SkinColor); } else { WriteString(""); }//todo
-            if (protocolVersion >= Info.v1_26_40) { WriteVarInt(skin.PersonaPieces.Count()); } else { WriteInt(skin.PersonaPieces.Count()); }
+            WriteString(skin.ArmSize);
+            WriteString(skin.SkinColor);
+            WriteInt(skin.PersonaPieces.Count());
             foreach (var part in skin.PersonaPieces)
             {
                 WriteString(part.PieceId);
-                if (protocolVersion >= Info.v1_26_40) { WriteInt((int)Enum.Parse<PersonaPieceTypes>(part.PieceType)); } else { WriteString(part.PieceType); }
-                if (protocolVersion >= Info.v1_26_40) { WriteUUID(new Guid(part.PackId)); } else { WriteString(part.PackId); }
+                WriteString(part.PieceType);
+                WriteString(part.PackId);
                 WriteBool(part.IsDefault);
                 WriteString(part.ProductId);
             }
-            if (protocolVersion >= Info.v1_26_40) { WriteVarInt(skin.PieceTintColors.Count()); } else { WriteInt(skin.PieceTintColors.Count()); }
+            WriteInt(skin.PieceTintColors.Count());
             foreach (var part in skin.PieceTintColors)
             {
                 WriteString(part.PieceType);
-                if (protocolVersion < Info.v1_26_40) { WriteInt(part.Colors.Count()); }
-                for (int j = 0; j < (protocolVersion >= Info.v1_26_40 ? 4 : part.Colors.Count()); j++)
+                WriteInt(part.Colors.Count());
+                foreach (var color in part.Colors)
                 {
-                    if (protocolVersion >= Info.v1_26_40) { WriteInt(0); } else { WriteString(part.Colors[j]); }//todo
+                    WriteString(color);
                 }
             }
             WriteBool(skin.PremiumSkin);
@@ -441,12 +441,6 @@ namespace DaemonMC.Network
             WriteBool(skin.CapeOnClassicSkin);
             WriteBool(false); //todo whats this?
             WriteBool(skin.OverrideSkin);
-            if (protocolVersion >= Info.v1_26_40)
-            {
-                WriteString(skin.trustedSkinFlag);
-                WriteString(skin.profileHash);
-            }
-
         }
 
         public void WriteMetadata(Dictionary<ActorData, Metadata> metadata)
@@ -455,36 +449,43 @@ namespace DaemonMC.Network
             foreach (var entry in metadata)
             {
                 WriteVarInt((uint)entry.Key);
-                WriteVarInt((uint)entry.Value.Type);
-                WriteByte((byte)entry.Value.Type);
 
                 switch (entry.Value.Value)
                 {
                     case byte value:
+                        WriteVarInt(0);
                         WriteByte(value);
                         break;
                     case short value:
+                        WriteVarInt(1);
                         WriteShort((ushort)value);
                         break;
                     case int value:
+                        WriteVarInt(2);
                         WriteSignedVarInt(value);
                         break;
                     case float value:
+                        WriteVarInt(3);
                         WriteFloat(value);
                         break;
                     case string value:
+                        WriteVarInt(4);
                         WriteString(value);
                         break;
                     case NbtCompound value:
+                        WriteVarInt(5);
                         WriteCompoundTag(value);
                         break;
                     /*case BlockPos value: //todo
+                        WriteVarInt(6);
                         WriteBlockPos(value);
                         break;*/
                     case long value:
+                        WriteVarInt(7);
                         WriteSignedVarLong(value);
                         break;
                     case Vector3 value:
+                        WriteVarInt(8);
                         WriteVec3(value);
                         break;
                 }

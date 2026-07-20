@@ -40,35 +40,32 @@ namespace DaemonMC.Network.Bedrock
             Position = decoder.ReadVec3();
             MoveVector = decoder.ReadVec2();
             HeadRotation = decoder.ReadFloat();
-            InputData = decoder.protocolVersion >= Info.v1_26_40 ? decoder.Read<AuthInputData>() : decoder.ReadLegacy<AuthInputData>();
+            InputData = decoder.Read<AuthInputData>();
             InputMode = decoder.ReadVarInt();
             PlayMode = decoder.ReadVarInt();
             InteractionModel = decoder.ReadVarInt();
             InteractRotation = decoder.ReadVec2();
             Tick = decoder.ReadVarLong();
             PosDelta = decoder.ReadVec3();
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.PerformItemInteraction))
+            if (InputData.Contains(AuthInputData.PerformItemInteraction))
             {
                 //todo
             }
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.PerformItemStackRequest))
+            if (InputData.Contains(AuthInputData.PerformItemStackRequest))
             {
                 ClientRequestID = decoder.ReadVarInt();
                 ActionsData = decoder.ReadActions();
                 StringsToFilter = decoder.ReadStringList();
                 StringsToFilterOrigin = decoder.ReadInt();
             }
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.PerformBlockActions))
+            if (InputData.Contains(AuthInputData.PerformBlockActions))
             {
                 BlockAction = decoder.ReadBlockActions();
             }
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.IsInClientPredictedVehicle))
+            if (InputData.Contains(AuthInputData.IsInClientPredictedVehicle))
             {
-                if (decoder.protocolVersion < Info.v1_26_40)
-                {
-                    VehicleRotation = decoder.ReadVec2();
-                }
-                ClientPredictedVehicle = decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadOptional(decoder.ReadSignedVarLong) : decoder.ReadSignedVarLong();
+                VehicleRotation = decoder.ReadVec2();
+                ClientPredictedVehicle = decoder.ReadSignedVarLong();
             }
             AnalogMove = decoder.ReadVec2();
             CameraOrientation = decoder.ReadVec3();

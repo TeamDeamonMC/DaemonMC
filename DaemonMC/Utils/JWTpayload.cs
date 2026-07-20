@@ -46,6 +46,5 @@
         public bool ThirdPartyNameOnly { get; set; }
         public bool TrustedSkin { get; set; }
         public int UIProfile { get; set; }
-        public string ProfileHash { get; set; } = "";
     }
 }

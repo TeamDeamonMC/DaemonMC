@@ -21,12 +21,7 @@
             encoder.WriteSignedVarInt(ChunkZ);
             encoder.WriteSignedVarInt(Dimension);
             encoder.WriteVarInt(Count);
-            encoder.WriteBool(false); //client cache protocol 
-            if (encoder.protocolVersion >= Info.v1_26_40)
-            {
-                encoder.WriteBool(false); //cache enabled
-                encoder.WriteSignedVarInt(0);
-            }
+            encoder.WriteBool(false);
             encoder.WriteBytes(Data);
         }
     }

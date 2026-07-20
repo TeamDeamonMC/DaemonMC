@@ -1,5 +1,4 @@
 ﻿using DaemonMC.Utils;
-using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -27,10 +26,18 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte(Action);
+            if (encoder.protocolVersion < Info.v1_26_40)
+            {
+                encoder.WriteByte(Action);
+            }
             if (Action == 0)
             {
                 encoder.WriteVarInt(1);
+                if (encoder.protocolVersion >= Info.v1_26_40)
+                {
+                    //encoder.WriteVarInt(1);
+                    encoder.WriteByte(0);//??? todo create new serialization method. why we need two type fields ???
+                }
                 encoder.WriteUUID(UUID);
                 encoder.WriteSignedVarLong(EntityId);
                 encoder.WriteString(Username);
@@ -42,11 +49,19 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(IsHost);
                 encoder.WriteBool(IsSubclient);
                 encoder.WriteInt(Color);
-                encoder.WriteBool(true);
+                if (encoder.protocolVersion < Info.v1_26_40)
+                {
+                    encoder.WriteBool(true);
+                }
             }
             else
             {
                 encoder.WriteVarInt(1);
+                if (encoder.protocolVersion >= Info.v1_26_40)
+                {
+                    encoder.WriteVarInt(0);
+                    encoder.WriteByte(1);
+                }
                 encoder.WriteUUID(UUID);
             }
         }

@@ -2,7 +2,7 @@
 {
     public class Skin
     {
-        public string ArmSize { get; set; } = "";
+        public byte ArmSize { get; set; } = 0;
         public List<AnimatedImageData> AnimatedImageData { get; set; } = new List<AnimatedImageData>();
         public bool OverrideSkin { get; set; }
         public List<PersonaPiece> PersonaPieces { get; set; } = new List<PersonaPiece>();
@@ -11,7 +11,7 @@
         public string PlayFabId { get; set; } = "";
         public bool PremiumSkin { get; set; }
         public string SkinAnimationData { get; set; } = "";
-        public string SkinColor { get; set; } = "";
+        public int SkinColor { get; set; } = 0;
         public byte[] SkinData { get; set; } = new byte[0];
         public string SkinGeometryData { get; set; } = "";
         public string SkinGeometryDataEngineVersion { get; set; } = "0.0.0";
@@ -21,12 +21,14 @@
         public string SkinResourcePatch { get; set; } = "";
         public Cape Cape { get; set; } = new Cape();
         public bool CapeOnClassicSkin { get; set; }
+        public string trustedSkinFlag { get; set; } = "true"; //fallback to trusted for now. Supposed to be "unset" by default. "false", "true" to toggle
+        public string profileHash { get; set; } = "";
 
         public static Skin Create(string skinPng, string geometryJson)
         {
             return new Skin()
             {
-                ArmSize = "wide",
+                ArmSize = 0,
                 PremiumSkin = true,
                 SkinData = Texture.PngToBytes(skinPng),
                 SkinGeometryData = File.ReadAllText(geometryJson),

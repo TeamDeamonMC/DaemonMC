@@ -10,7 +10,7 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-            Response = (byte)(decoder.ReadByte() + 1); //sigh
+            Response = (byte)(decoder.ReadByte() + (decoder.protocolVersion >= Info.v1_26_40 ? 1 : 0)); //sigh
             if (decoder.protocolVersion >= Info.v1_26_40)
             {
                 ResponseType = decoder.ReadString();
@@ -27,7 +27,7 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte((byte)(Response - 1));
+            encoder.WriteByte((byte)(Response - (encoder.protocolVersion >= Info.v1_26_40 ? 1 : 0)));
             if (encoder.protocolVersion >= Info.v1_26_40)
             {
                 encoder.WriteString(ResponseType);

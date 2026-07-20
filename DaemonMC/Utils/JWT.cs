@@ -79,7 +79,7 @@ namespace DaemonMC.Utils
             {
                 player.skin = new Skin()
                 {
-                    ArmSize = payload.ArmSize,
+                    ArmSize = (byte)(payload.ArmSize == "slim" ? 0 : 1),
                     AnimatedImageData = payload.AnimatedImageData,
                     OverrideSkin = payload.OverrideSkin,
                     PersonaPieces = payload.PersonaPieces,
@@ -87,7 +87,7 @@ namespace DaemonMC.Utils
                     PlayFabId = payload.PlayFabId,
                     PremiumSkin = payload.PremiumSkin,
                     SkinAnimationData = payload.SkinAnimationData,
-                    SkinColor = payload.SkinColor,
+                    SkinColor = (payload.SkinColor == "" ? 0 : 0), //todo
                     PieceTintColors = payload.PieceTintColors,
                     SkinData = Convert.FromBase64String(payload.SkinData),
                     SkinGeometryData = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinGeometryData)),
@@ -97,6 +97,7 @@ namespace DaemonMC.Utils
                     SkinImageWidth = payload.SkinImageWidth,
                     SkinResourcePatch = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinResourcePatch)),
                     CapeOnClassicSkin = payload.CapeOnClassicSkin,
+                    profileHash = payload.ProfileHash,
                     Cape = new Cape()
                     {
                         CapeData = Convert.FromBase64String(payload.CapeData),

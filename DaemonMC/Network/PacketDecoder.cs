@@ -472,7 +472,7 @@ namespace DaemonMC.Network
             int skinDataLength = ReadVarInt();
             skin.SkinData = ReadBytes(skinDataLength);
 
-            int animatedDataCount = ReadInt();
+            int animatedDataCount = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadInt();
             skin.AnimatedImageData = new List<AnimatedImageData>();
 
             for (int i = 0; i < animatedDataCount; i++)
@@ -482,9 +482,9 @@ namespace DaemonMC.Network
                 animation.ImageHeight = ReadInt();
                 int imageDataLength = ReadVarInt();
                 animation.Image = Convert.ToBase64String(ReadBytes(imageDataLength));
-                animation.Type = ReadInt();
+                animation.Type = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadInt();
                 animation.Frames = ReadFloat();
-                animation.AnimationExpression = ReadInt();
+                animation.AnimationExpression = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadInt();
 
                 skin.AnimatedImageData.Add(animation);
             }
@@ -499,37 +499,36 @@ namespace DaemonMC.Network
             skin.SkinAnimationData = ReadString();
             skin.Cape.CapeId = ReadString();
             ReadString();
-            skin.ArmSize = ReadString();
-            skin.SkinColor = ReadString();
+            skin.ArmSize = protocolVersion >= Info.v1_26_40 ? ReadByte() : (byte)(ReadString() == "slim" ? 0 : 1);
+            skin.SkinColor = protocolVersion >= Info.v1_26_40 ? ReadInt() : (ReadString() == "" ? 0 : 0);
 
-            int personaPieceCount = ReadInt();
+            int personaPieceCount = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadInt();
             skin.PersonaPieces = new List<PersonaPiece>();
 
             for (int i = 0; i < personaPieceCount; i++)
             {
                 PersonaPiece part = new PersonaPiece();
                 part.PieceId = ReadString();
-                part.PieceType = ReadString();
-                part.PackId = ReadString();
+                part.PieceType = protocolVersion >= Info.v1_26_40 ? ((PersonaPieceTypes)ReadInt()).ToString() : ReadString();
+                part.PackId = protocolVersion >= Info.v1_26_40 ? ReadUUID().ToString() : ReadString();
                 part.IsDefault = ReadBool();
                 part.ProductId = ReadString();
 
                 skin.PersonaPieces.Add(part);
             }
 
-            int pieceTintCount = ReadInt();
+            int pieceTintCount = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadInt();
             skin.PieceTintColors = new List<PieceTintColor>();
 
             for (int i = 0; i < pieceTintCount; i++)
             {
                 PieceTintColor part = new PieceTintColor();
                 part.PieceType = ReadString();
-                int colorCount = ReadInt();
                 part.Colors = new List<string>();
 
-                for (int j = 0; j < colorCount; j++)
+                for (int j = 0; j < 4; j++)
                 {
-                    part.Colors.Add(ReadString());
+                    part.Colors.Add(protocolVersion >= Info.v1_26_40 ? ReadInt().ToString() : ReadString());
                 }
 
                 skin.PieceTintColors.Add(part);
@@ -540,6 +539,11 @@ namespace DaemonMC.Network
             skin.CapeOnClassicSkin = ReadBool();
             ReadBool(); // is primary user
             skin.OverrideSkin = ReadBool();
+            if (protocolVersion >= Info.v1_26_40)
+            {
+                skin.trustedSkinFlag = ReadString();
+                skin.profileHash = ReadString();
+            }
 
             return skin;
         }
@@ -674,7 +678,7 @@ namespace DaemonMC.Network
             return ReadBool() ? readFunction() : default;
         }
 
-        public List<TEnum> Read<TEnum>() where TEnum : Enum
+        public List<TEnum> ReadLegacy<TEnum>() where TEnum : Enum
         {
             ulong value = (ulong)ReadVarLong();
             List<TEnum> result = new List<TEnum>();
@@ -687,6 +691,28 @@ namespace DaemonMC.Network
                     result.Add(enumValue);
                 }
             }
+            return result;
+        }
+
+        public List<TEnum> Read<TEnum>() where TEnum : Enum
+        {
+            List<TEnum> result = new();
+
+            bool hasFlags = ReadBool();
+            if (!hasFlags)
+            {
+                return result;
+            }
+
+            int count = ReadVarInt();
+
+            for (int i = 0; i < count; i++)
+            {
+                int flag = ReadSignedVarInt();
+
+                result.Add((TEnum)Enum.ToObject(typeof(TEnum), flag));
+            }
+
             return result;
         }
     }

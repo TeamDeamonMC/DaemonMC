@@ -34,7 +34,7 @@ namespace DaemonMC.Utils
 
             return new Skin()
             {
-                ArmSize = 0,
+                ArmSize = 1, //wide
                 PremiumSkin = true,
                 SkinData = Texture.PngToBytes(skinPng),
                 SkinGeometryData = json,
@@ -43,6 +43,42 @@ namespace DaemonMC.Utils
                 SkinResourcePatch = "{\n   \"geometry\" : {\n      \"default\" : \"geometry.humanoid.custom\"\n   }\n}\n",
                 CapeOnClassicSkin = false,
             };
+        }
+
+        public static string NormalizeTrustedFlag(string? flag)
+        {
+            switch (flag?.ToLowerInvariant())
+            {
+                case "true":
+                    return "True";
+                case "false":
+                    return "False";
+                default:
+                    return "Unset";
+            }
+        }
+
+        public static int ColorToInt(string? color)
+        {
+            if (string.IsNullOrEmpty(color))
+            {
+                return 0;
+            }
+            string hex = color.StartsWith("#") ? color.Substring(1) : color;
+            if (!uint.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null, out uint value))
+            {
+                return 0;
+            }
+            if (hex.Length == 6)
+            {
+                value |= 0xFF000000;
+            }
+            return unchecked((int)value);
+        }
+
+        public static string IntToColor(int argb)
+        {
+            return argb == 0 ? "#0" : $"#{unchecked((uint)argb):x8}";
         }
     }
 

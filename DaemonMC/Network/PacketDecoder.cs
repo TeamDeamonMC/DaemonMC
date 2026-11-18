@@ -434,7 +434,7 @@ namespace DaemonMC.Network
         {
             var value = new Vector3();
             value.X = ReadSignedVarInt();
-            value.Y = ReadSignedVarInt();
+            value.Y = protocolVersion >= Info.v1_26_10 ? ReadSignedVarInt() : ReadVarInt(); //before 1.26.10 Y was unsigned varint
             value.Z = ReadSignedVarInt();
             return value;
         }
@@ -452,7 +452,7 @@ namespace DaemonMC.Network
         public List<string> ReadPackNames()
         {
             List<string> packs = new List<string>();
-            ushort packCount = ReadShort();
+            int packCount = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadShort();
             for (int i = 0; i < packCount; i++)
             {
                 packs.Add(ReadString());
@@ -465,7 +465,10 @@ namespace DaemonMC.Network
             Skin skin = new Skin();
 
             skin.SkinId = ReadString();
-            skin.PlayFabId = ReadString();
+            if (protocolVersion < Info.v1_26_60)
+            {
+                skin.PlayFabId = ReadString();
+            }
             skin.SkinResourcePatch = ReadString();
             skin.SkinImageWidth = ReadInt();
             skin.SkinImageHeight = ReadInt();
@@ -499,8 +502,16 @@ namespace DaemonMC.Network
             skin.SkinAnimationData = ReadString();
             skin.Cape.CapeId = ReadString();
             ReadString();
-            skin.ArmSize = protocolVersion >= Info.v1_26_40 ? ReadByte() : (byte)(ReadString() == "slim" ? 0 : 1);
-            skin.SkinColor = protocolVersion >= Info.v1_26_40 ? ReadInt() : (ReadString() == "" ? 0 : 0);
+            if (protocolVersion >= Info.v1_26_40)
+            {
+                skin.ArmSize = ReadByte(); //0 slim, 1 wide
+                skin.SkinColor = ReadInt(); //ARGB
+            }
+            else
+            {
+                skin.ArmSize = (byte)(ReadString() == "slim" ? 0 : 1);
+                skin.SkinColor = Skin.ColorToInt(ReadString());
+            }
 
             int personaPieceCount = protocolVersion >= Info.v1_26_40 ? ReadVarInt() : ReadInt();
             skin.PersonaPieces = new List<PersonaPiece>();
@@ -509,7 +520,7 @@ namespace DaemonMC.Network
             {
                 PersonaPiece part = new PersonaPiece();
                 part.PieceId = ReadString();
-                part.PieceType = protocolVersion >= Info.v1_26_40 ? ((PersonaPieceTypes)ReadInt()).ToString() : ReadString();
+                part.PieceType = protocolVersion >= Info.v1_26_40 ? PersonaPieceTypesExtensions.FromId(ReadInt()).ToString() : ReadString();
                 part.PackId = protocolVersion >= Info.v1_26_40 ? ReadUUID().ToString() : ReadString();
                 part.IsDefault = ReadBool();
                 part.ProductId = ReadString();
@@ -526,9 +537,20 @@ namespace DaemonMC.Network
                 part.PieceType = ReadString();
                 part.Colors = new List<string>();
 
-                for (int j = 0; j < 4; j++)
+                if (protocolVersion >= Info.v1_26_40)
                 {
-                    part.Colors.Add(protocolVersion >= Info.v1_26_40 ? ReadInt().ToString() : ReadString());
+                    for (int j = 0; j < 4; j++) //always 4 ARGB colors
+                    {
+                        part.Colors.Add(Skin.IntToColor(ReadInt()));
+                    }
+                }
+                else
+                {
+                    int colorCount = ReadInt();
+                    for (int j = 0; j < colorCount; j++)
+                    {
+                        part.Colors.Add(ReadString());
+                    }
                 }
 
                 skin.PieceTintColors.Add(part);
@@ -563,13 +585,12 @@ namespace DaemonMC.Network
         {
             return ReadItem(true);
         }
-
         public Item ReadItem(bool network = false)
         {
             var id = 0;
             if (network)
             {
-                id = ReadShort();
+                id = (short)ReadShort();
             }
             else
             {
@@ -577,7 +598,7 @@ namespace DaemonMC.Network
             }
             if (id != 0 || network)
             {
-                Item item = ItemPalette.items.GetValueOrDefault((short)id);
+                Item item = ItemPalette.items.GetValueOrDefault((short)id)?.Clone();
 
                 if (item == null)
                 {
@@ -585,13 +606,16 @@ namespace DaemonMC.Network
                 }
                 item.Count = ReadShort();
                 item.Aux = ReadVarInt();
-                if (ReadBool()) //idk whats this for
+                if (ReadBool()) //has stack network id
                 {
-                    ReadVarInt(); //variant
-                    ReadSignedVarInt(); //stack id
+                    if (network && protocolVersion < Info.v1_26_40)
+                    {
+                        ReadVarInt(); //net id variant type
+                    }
+                    ReadSignedVarInt(); //stack network id
                 }
-                item.BlockRuntimeId = ReadSignedVarInt();
-                ReadString();//nbt data. useless for server auth inventory
+                item.BlockRuntimeId = network ? ReadVarInt() : ReadSignedVarInt();
+                ReadBytes();//user data (nbt, can place on, can destroy). Useless for server auth inventory
                 return item;
             }
             return new Items.VanillaItems.Air();
@@ -604,38 +628,43 @@ namespace DaemonMC.Network
             var count = ReadVarInt();
             for (int i = 0; i < count; i++)
             {
-                items.Add(ReadItemInstance(true));
+                items.Add(protocolVersion >= Info.v1_26_40 ? ReadStackRequestItemDescriptor() : ReadItemInstance());
             }
 
             return items;
         }
-
-        public Item ReadItemInstance(bool network = false)
+        public Item ReadItemInstance()
         {
-            var id = 0;
-            if (network)
+            var id = ReadSignedVarInt();
+            if (id == 0 && protocolVersion < Info.v1_26_40)
             {
-                id = ReadShort();
+                return new Items.VanillaItems.Air(); //before 1.26.40 air was written as single varint
             }
-            else
-            {
-                id = ReadSignedVarInt();
-            }
-            if (id != 0 || network)
-            {
-                Item item = ItemPalette.items.GetValueOrDefault((short)id);
 
-                if (item == null)
-                {
-                    item = new Items.VanillaItems.Air();
-                }
-                item.Count = ReadShort();
-                item.Aux = ReadVarInt();
-                item.BlockRuntimeId = ReadSignedVarInt();
-                ReadString();//nbt data. useless for server auth inventory
-                return item;
+            Item item = ItemPalette.items.GetValueOrDefault((short)id)?.Clone() ?? new Items.VanillaItems.Air();
+            item.Count = ReadShort();
+            item.Aux = ReadVarInt();
+            item.BlockRuntimeId = ReadSignedVarInt();
+            ReadBytes();//user data. Useless for server auth inventory
+            return item;
+        }
+        public Item ReadStackRequestItemDescriptor()
+        {
+            int descriptorType = ReadVarInt();
+            ReadByte(); //duplicated descriptor type
+            Item item = new Items.VanillaItems.Air();
+            int aux = 0;
+            if (descriptorType != 0) //0 = invalid descriptor
+            {
+                string name = ReadString();
+                aux = ReadSignedVarInt();
+                item = ItemPalette.GetItem(name) ?? item;
             }
-            return new Items.VanillaItems.Air();
+            item.Count = ReadShort();
+            item.Aux = aux;
+            item.BlockRuntimeId = ReadVarInt();
+            ReadBytes(); //user data
+            return item;
         }
 
         public AttributesValues ReadAttributes()
@@ -656,27 +685,12 @@ namespace DaemonMC.Network
             return values;
         }
 
-        public List<Actions> ReadActions()
-        {
-            var actions = new List<Actions>();
-            var count = ReadVarInt();
-            for (int i = 0; i < count; i++)
-            {
-                var action = new Actions();
-                action.ActionsType = (ItemStackRequestActionType)ReadByte();
-                action.Amount = ReadByte();
-                action.Source = ReadSlotInfo();
-                action.Destination = ReadSlotInfo();
-            }
-            return actions;
-        }
-
         public ItemStackRequestSlotInfo ReadSlotInfo()
         {
             var slotInfo = new ItemStackRequestSlotInfo();
             slotInfo.ContainerName = ReadContainerName();
             slotInfo.Slot = ReadByte();
-            slotInfo.NetIdVariant = ReadVarInt();
+            slotInfo.NetIdVariant = protocolVersion >= Info.v1_26_40 ? ReadInt() : ReadSignedVarInt();
             return slotInfo;
         }
 
@@ -684,17 +698,30 @@ namespace DaemonMC.Network
         {
             var containerName = new FullContainerName();
             containerName.ContainerName = (ContainerEnumName)ReadByte();
-            containerName.DynamicId = ReadOptional(ReadSignedVarInt);
+            containerName.DynamicId = ReadBool() ? ReadInt() : null;
             return containerName;
         }
 
-        public PlayerBlockAction ReadBlockActions()
+        public bool ReadPresence()
         {
-            var action = new PlayerBlockAction();
-            var actionCount = ReadSignedVarInt();
+            if (protocolVersion >= Info.v1_26_50)
+            {
+                return ReadBool();
+            }
+            return ReadBool() && ReadBool();
+        }
+
+        public List<PlayerBlockAction> ReadBlockActions()
+        {
+            var actions = new List<PlayerBlockAction>();
+            bool v1_26_40 = protocolVersion >= Info.v1_26_40;
+            var actionCount = v1_26_40 ? ReadVarInt() : ReadSignedVarInt();
             for (int i = 0; i < actionCount; i++)
             {
-                action.ActionType = (PlayerActionType)ReadVarInt();
+                var action = new PlayerBlockAction();
+                action.PlayerActionType = ReadSignedVarInt();
+                action.ActionType = (PlayerActionType)action.PlayerActionType;
+                bool hasPosition = v1_26_40; //since 1.26.40 every action carries position and face
                 switch (action.ActionType)
                 {
                     case PlayerActionType.PredictDestroyBlock:
@@ -702,29 +729,32 @@ namespace DaemonMC.Network
                     case PlayerActionType.AbortDestroyBlock:
                     case PlayerActionType.CrackBlock:
                     case PlayerActionType.ContinueDestroyBlock:
-                        action.X = ReadSignedVarInt();
-                        action.Y = ReadSignedVarInt();
-                        action.Z = ReadSignedVarInt();
-                        action.Facing = ReadVarInt();
-                        break;
-                    default:
+                        hasPosition = true;
                         break;
                 }
+                if (hasPosition)
+                {
+                    action.X = ReadSignedVarInt();
+                    action.Y = ReadSignedVarInt();
+                    action.Z = ReadSignedVarInt();
+                    action.Facing = ReadSignedVarInt();
+                }
+                actions.Add(action);
             }
-            return action;
+            return actions;
         }
 
-        public List<LegacySlot> ReadLegacySlots(int rawID)
+        public List<LegacySlot> ReadLegacySlots(int legacyRequestId, bool newShape)
         {
             bool hasLegacySlots = true;
             var legacySlots = new List<LegacySlot>();
 
-            if (protocolVersion >= Info.v1_26_30)
+            if (newShape)
             {
                  hasLegacySlots = ReadBool();
             }
 
-            if (hasLegacySlots && rawID != 0)
+            if (hasLegacySlots && legacyRequestId < -1 && (legacyRequestId & 1) == 0)
             {
                 int legacyCount = ReadVarInt();
 
@@ -732,15 +762,83 @@ namespace DaemonMC.Network
                 {
                     LegacySlot legacySlot = new LegacySlot();
                     legacySlot.ContainerId = ReadByte();
-                    for (int a = 0; a < ReadVarInt(); a++)
-                    {
-                        legacySlot.Slot[i] = ReadByte();
-                    }
+                    legacySlot.Slot = ReadBytes();
                     legacySlots.Add(legacySlot);
                 }
             }
 
             return legacySlots;
+        }
+
+        public List<TransactionAction> ReadTransactionActions(bool newShape)
+        {
+            var actions = new List<TransactionAction>();
+            int count = ReadVarInt();
+
+            for (int b = 0; b < count; b++)
+            {
+                TransactionAction action = new TransactionAction();
+
+                action.Source = (SourceType)ReadVarInt();
+
+                if (newShape)
+                {
+                    if (ReadPresence())
+                    {
+                        action.ContainerID = (sbyte)ReadByte();
+                    }
+                    if (ReadPresence())
+                    {
+                        action.Flags = (uint)ReadVarInt();
+                    }
+                    action.Slot = ReadVarInt();
+                    action.ItemFrom = ReadItem(true);
+                    action.ItemTo = ReadItem(true);
+                }
+                else
+                {
+                    switch (action.Source)
+                    {
+                        case SourceType.ContainerInventory:
+                        case SourceType.UntrackedInteractionUI:
+                        case SourceType.NonImplementedTodo:
+                            action.ContainerID = ReadSignedVarInt();
+                            break;
+                        case SourceType.WorldInteraction:
+                            action.Flags = (uint)ReadVarInt();
+                            break;
+                    }
+
+                    action.Slot = ReadVarInt();
+                    action.ItemFrom = ReadItem();
+                    action.ItemTo = ReadItem();
+                }
+                actions.Add(action);
+            }
+
+            return actions;
+        }
+
+        public void ReadItemUseData(Transaction transaction, bool newShape)
+        {
+            transaction.ActionType = newShape ? ReadSignedVarInt() : ReadVarInt();
+            transaction.TriggerType = newShape ? ReadByte() : ReadVarInt();
+            transaction.BlockPosition = ReadBlockNetPos();
+            transaction.Face = newShape ? ReadByte() : ReadSignedVarInt();
+            transaction.Slot = ReadSignedVarInt();
+            if (protocolVersion >= Info.v1_26_50)
+            {
+                transaction.Hand = ReadByte();
+            }
+            transaction.Item = ReadItem(newShape);
+            transaction.PlayerPosition = ReadVec3();
+            transaction.ClickPosition = ReadVec3();
+            transaction.BlockRuntimeId = ReadVarInt();
+            transaction.ClientPrediction = newShape ? ReadByte() : ReadVarInt();
+            if (protocolVersion >= Info.v1_26_10)
+            {
+                transaction.ClientCooldownState = ReadByte();
+            }
         }
 
         public List<ItemStack> ReadItemStack()
@@ -750,70 +848,110 @@ namespace DaemonMC.Network
 
             for (int i = 0; i < size; i++)
             {
-                var stack = new ItemStack();
-                stack.RequestId = ReadVarInt();
-
-                int actionCount = ReadVarInt();
-
-                for (int a = 0; a < actionCount; a++)
-                {
-                    var actionType = (ItemStackRequestActionType)ReadByte();
-                    Log.debug($"Reading action type: {actionType}");
-                    switch (actionType)
-                    {
-                        case ItemStackRequestActionType.Take:
-                            var take = new TakeAction();
-                            take.ActionsType = actionType;
-                            take.Amount = ReadByte();
-                            take.Source = ReadSlotInfo();
-                            take.Destination = ReadSlotInfo();
-                            stack.Actions.Add(take);
-                            break;
-                        case ItemStackRequestActionType.Place:
-                            var place = new PlaceAction();
-                            place.ActionsType = actionType;
-                            place.Amount = ReadByte();
-                            place.Source = ReadSlotInfo();
-                            place.Destination = ReadSlotInfo();
-                            stack.Actions.Add(place);
-                            break;
-                        case ItemStackRequestActionType.Destroy:
-                            var destory = new DestoryAction();
-                            destory.ActionsType = actionType;
-                            destory.Amount = ReadByte();
-                            destory.Source = ReadSlotInfo();
-                            stack.Actions.Add(destory);
-                            break;
-                        case ItemStackRequestActionType.CraftCreative:
-                            var craftCreative = new CraftCreativeAction();
-                            craftCreative.ActionsType = actionType;
-                            craftCreative.ItemId = ReadVarInt();
-                            craftCreative.CraftCount = ReadByte();
-                            stack.Actions.Add(craftCreative);
-                            break;
-                        case ItemStackRequestActionType.CraftResults_DEPRECATEDASKTYLAING:
-                            var CraftResultsDeprecated = new CraftResults_DEPRECATEDASKTYLAING();
-                            CraftResultsDeprecated.ActionsType = actionType;
-                            CraftResultsDeprecated.Items = ReadCraftResultsDeprecatedItems();
-                            CraftResultsDeprecated.CraftCount = ReadByte();
-                            stack.Actions.Add(CraftResultsDeprecated);
-                            break;
-                        default:
-                            Log.error($"No implementation for action type {actionType}");
-                            break;
-                    }
-                }
-                int stringCount = ReadVarInt();
-                for (int b = 0; b < stringCount; b++)
-                {
-                    stack.StringToFilter.Add(ReadString());
-                }
-
-                stack.StringToFilterOrigin = ReadInt();
-
-                stacks.Add(stack);
+                stacks.Add(ReadItemStackRequest());
             }
             return stacks;
+        }
+
+        public ItemStack ReadItemStackRequest()
+        {
+            var stack = new ItemStack();
+            stack.RequestId = ReadVarInt();
+
+            int actionCount = ReadVarInt();
+
+            for (int a = 0; a < actionCount; a++)
+            {
+                ItemStackRequestActionType actionType;
+                if (protocolVersion >= Info.v1_26_40)
+                {
+                    actionType = ItemStackRequestActionTypeMapper.FromNetworkId(ReadVarInt(), protocolVersion);
+                    ReadByte(); //duplicated action type
+                }
+                else
+                {
+                    actionType = (ItemStackRequestActionType)ReadByte();
+                }
+                Log.debug($"Reading action type: {actionType}");
+                stack.Actions.Add(ReadItemStackRequestAction(actionType));
+            }
+            int stringCount = ReadVarInt();
+            for (int b = 0; b < stringCount; b++)
+            {
+                stack.StringToFilter.Add(ReadString());
+            }
+
+            stack.StringToFilterOrigin = ReadInt();
+            return stack;
+        }
+
+        private Actions ReadItemStackRequestAction(ItemStackRequestActionType actionType)
+        {
+            bool v1_26_40 = protocolVersion >= Info.v1_26_40;
+            Actions action;
+            switch (actionType)
+            {
+                case ItemStackRequestActionType.Take:
+                    action = new TakeAction() { Amount = ReadByte(), Source = ReadSlotInfo(), Destination = ReadSlotInfo() };
+                    break;
+                case ItemStackRequestActionType.Place:
+                    action = new PlaceAction() { Amount = ReadByte(), Source = ReadSlotInfo(), Destination = ReadSlotInfo() };
+                    break;
+                case ItemStackRequestActionType.Swap:
+                    action = new SwapAction() { Source = ReadSlotInfo(), Destination = ReadSlotInfo() };
+                    break;
+                case ItemStackRequestActionType.Drop:
+                    action = new DropAction() { Amount = ReadByte(), Source = ReadSlotInfo(), Randomly = ReadBool() };
+                    break;
+                case ItemStackRequestActionType.Destroy:
+                    action = new DestoryAction() { Amount = ReadByte(), Source = ReadSlotInfo() };
+                    break;
+                case ItemStackRequestActionType.Consume:
+                    action = new ConsumeAction() { Amount = ReadByte(), Source = ReadSlotInfo() };
+                    break;
+                case ItemStackRequestActionType.Create:
+                    action = new CreateAction() { ResultsSlot = ReadByte() };
+                    break;
+                case ItemStackRequestActionType.PlaceInItemContainer_DEPRECATED:
+                case ItemStackRequestActionType.TakeFromItemContainer_DEPRECATED:
+                    action = new TakeAction() { Amount = ReadByte(), Source = ReadSlotInfo(), Destination = ReadSlotInfo() };
+                    break;
+                case ItemStackRequestActionType.ScreenLabTableCombine:
+                case ItemStackRequestActionType.CraftNonImplemented_DEPRECATEDASKTYLAING:
+                    action = new EmptyAction();
+                    break;
+                case ItemStackRequestActionType.ScreenBeaconPayment:
+                    action = new BeaconPaymentAction() { PrimaryEffect = ReadSignedVarInt(), SecondaryEffect = ReadSignedVarInt() };
+                    break;
+                case ItemStackRequestActionType.ScreenHUDMineBlock:
+                    action = new MineBlockAction() { HotbarSlot = ReadSignedVarInt(), PredictedDurability = ReadSignedVarInt(), NetId = v1_26_40 ? ReadInt() : ReadSignedVarInt() };
+                    break;
+                case ItemStackRequestActionType.CraftRecipe:
+                    action = new CraftRecipeAction() { RecipeNetId = ReadVarInt(), CraftCount = ReadByte() };
+                    break;
+                case ItemStackRequestActionType.CraftCreative:
+                    action = new CraftCreativeAction() { ItemId = ReadVarInt(), CraftCount = ReadByte() };
+                    break;
+                case ItemStackRequestActionType.CraftRecipeOptional:
+                    action = new CraftRecipeOptionalAction() { RecipeNetId = ReadVarInt(), FilteredStringIndex = ReadInt() };
+                    break;
+                case ItemStackRequestActionType.CraftRepairAndDisenchant:
+                    action = new CraftRepairAndDisenchantAction() { RecipeNetId = v1_26_40 ? ReadInt() : ReadVarInt(), CraftCount = ReadByte(), Cost = ReadSignedVarInt() };
+                    break;
+                case ItemStackRequestActionType.CraftLoom:
+                    action = new CraftLoomAction() { PatternId = ReadString(), CraftCount = ReadByte() };
+                    break;
+                case ItemStackRequestActionType.CraftReserved:
+                    action = new CraftReservedAction() { Id = ReadString(), CraftCount = ReadByte() };
+                    break;
+                case ItemStackRequestActionType.CraftResults_DEPRECATEDASKTYLAING:
+                    action = new CraftResults_DEPRECATEDASKTYLAING() { Items = ReadCraftResultsDeprecatedItems(), CraftCount = ReadByte() };
+                    break;
+                default:
+                    throw new NotSupportedException($"Item stack request action {actionType} is not supported");
+            }
+            action.ActionsType = actionType;
+            return action;
         }
 
         public T? ReadOptional<T>(Func<T> readFunction)

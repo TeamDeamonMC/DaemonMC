@@ -87,7 +87,7 @@ namespace DaemonMC.Utils
                     PlayFabId = payload.PlayFabId,
                     PremiumSkin = payload.PremiumSkin,
                     SkinAnimationData = payload.SkinAnimationData,
-                    SkinColor = (payload.SkinColor == "" ? 0 : 0), //todo
+                    SkinColor = Skin.ColorToInt(payload.SkinColor),
                     PieceTintColors = payload.PieceTintColors,
                     SkinData = Convert.FromBase64String(payload.SkinData),
                     SkinGeometryData = Encoding.UTF8.GetString(Convert.FromBase64String(payload.SkinGeometryData)),

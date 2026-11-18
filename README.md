@@ -6,7 +6,7 @@
 Fast and lightweight server software for Minecraft: Bedrock Edition designed for mini games.
 
 [![Discord](https://img.shields.io/discord/932359565612294224?logo=discord&logoColor=white&color=blue)](https://discord.gg/A6BBcXSCj4)
-![Minecraft - Version](https://img.shields.io/badge/Minecraft_1.21.90_--_1.26.30-darkgreen)
+![Minecraft - Version](https://img.shields.io/badge/Minecraft_1.21.90_--_1.26.60-darkgreen)
 ![LevelDB](https://img.shields.io/badge/LevelDB_1.21.110_--_1.26.30-gray)
 
 Instead of vanilla features and mechanics, here game is completely driven by plugins. DaemonMC provide only server core with simple API so you can add only what you need. No unnecessary server resources and network usage by various features like block tick or mobs.

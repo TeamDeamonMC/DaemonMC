@@ -2,6 +2,7 @@
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
+using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.Bedrock
 {
@@ -24,11 +25,14 @@ namespace DaemonMC.Network.Bedrock
         public Vector3 CameraOrientation { get; set; } = new Vector3();
         public Vector2 RawMove { get; set; } = new Vector2();
 
+        public Transaction? ItemUseTransaction { get; set; } = null;
+
         public int ClientRequestID { get; set; } = 0;
         public List<Actions> ActionsData { get; set; } = new List<Actions>();
         public List<string> StringsToFilter { get; set; } = new List<string>();
         public int StringsToFilterOrigin { get; set; } = 0;
 
+        public List<PlayerBlockAction> BlockActions { get; set; } = new List<PlayerBlockAction>();
         public PlayerBlockAction BlockAction { get; set; } = new PlayerBlockAction();
 
         public Vector2 VehicleRotation { get; set; } = new Vector2();
@@ -36,43 +40,100 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Decode(PacketDecoder decoder)
         {
+            bool v1_26_40 = decoder.protocolVersion >= Info.v1_26_40;
+
             Rotation = decoder.ReadVec2();
             Position = decoder.ReadVec3();
             MoveVector = decoder.ReadVec2();
             HeadRotation = decoder.ReadFloat();
-            InputData = decoder.protocolVersion >= Info.v1_26_40 ? decoder.Read<AuthInputData>() : decoder.ReadLegacy<AuthInputData>();
+            if (v1_26_40)
+            {
+                InputData = ReadInputData(decoder);
+            }
+            else
+            {
+                InputData = decoder.ReadLegacy<AuthInputData>();
+            }
             InputMode = decoder.ReadVarInt();
             PlayMode = decoder.ReadVarInt();
-            InteractionModel = decoder.ReadVarInt();
+            InteractionModel = v1_26_40 ? decoder.ReadSignedVarInt() : decoder.ReadVarInt();
             InteractRotation = decoder.ReadVec2();
             Tick = decoder.ReadVarLong();
             PosDelta = decoder.ReadVec3();
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.PerformItemInteraction))
+
+            try
             {
-                //todo
+                if (v1_26_40 ? decoder.ReadPresence() : InputData.Contains(AuthInputData.PerformItemInteraction))
+                {
+                    ItemUseTransaction = ReadItemUseTransaction(decoder, v1_26_40);
+                }
+                if (v1_26_40 ? decoder.ReadPresence() : InputData.Contains(AuthInputData.PerformItemStackRequest))
+                {
+                    var request = decoder.ReadItemStackRequest();
+                    ClientRequestID = request.RequestId;
+                    ActionsData = request.Actions;
+                    StringsToFilter = request.StringToFilter;
+                    StringsToFilterOrigin = request.StringToFilterOrigin;
+                }
             }
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.PerformItemStackRequest))
+            catch (NotSupportedException e)
             {
-                ClientRequestID = decoder.ReadVarInt();
-                ActionsData = decoder.ReadActions();
-                StringsToFilter = decoder.ReadStringList();
-                StringsToFilterOrigin = decoder.ReadInt();
+                Log.warn($"PlayerAuthInput: {e.Message}");
+                return;
             }
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.PerformBlockActions))
+            if (v1_26_40 ? decoder.ReadPresence() : InputData.Contains(AuthInputData.PerformBlockActions))
             {
-                BlockAction = decoder.ReadBlockActions();
+                BlockActions = decoder.ReadBlockActions();
+                BlockAction = BlockActions.LastOrDefault() ?? new PlayerBlockAction();
             }
-            if (decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadBool() : InputData.Contains(AuthInputData.IsInClientPredictedVehicle))
+            if (v1_26_40)
             {
-                if (decoder.protocolVersion < Info.v1_26_40)
+                if (decoder.ReadPresence())
                 {
                     VehicleRotation = decoder.ReadVec2();
                 }
-                ClientPredictedVehicle = decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadOptional(decoder.ReadSignedVarLong) : decoder.ReadSignedVarLong();
+                if (decoder.ReadPresence())
+                {
+                    ClientPredictedVehicle = decoder.ReadSignedVarLong();
+                }
+            }
+            else if (InputData.Contains(AuthInputData.IsInClientPredictedVehicle))
+            {
+                VehicleRotation = decoder.ReadVec2();
+                ClientPredictedVehicle = decoder.ReadSignedVarLong();
             }
             AnalogMove = decoder.ReadVec2();
             CameraOrientation = decoder.ReadVec3();
             RawMove = decoder.ReadVec2();
+        }
+
+        private static List<AuthInputData> ReadInputData(PacketDecoder decoder)
+        {
+            var result = new List<AuthInputData>();
+            if (decoder.protocolVersion < Info.v1_26_50 && !decoder.ReadBool())
+            {
+                return result;
+            }
+            int count = decoder.ReadVarInt();
+            for (int i = 0; i < count; i++)
+            {
+                result.Add((AuthInputData)decoder.ReadSignedVarInt());
+            }
+            return result;
+        }
+
+        private static Transaction ReadItemUseTransaction(PacketDecoder decoder, bool newShape)
+        {
+            var transaction = new Transaction();
+            transaction.Type = TransactionType.ItemUseTransaction;
+            transaction.LegacyRequestId = decoder.ReadSignedVarInt();
+            transaction.LegacySlots = decoder.ReadLegacySlots(transaction.LegacyRequestId, newShape);
+            if (!newShape || decoder.protocolVersion >= Info.v1_26_50 || (decoder.ReadBool() && decoder.ReadBool()))
+            {
+                transaction.Actions = decoder.ReadTransactionActions(newShape);
+            }
+            decoder.ReadItemUseData(transaction, newShape);
+            return transaction;
         }
 
         protected override void Encode(PacketEncoder encoder)

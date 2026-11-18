@@ -52,18 +52,15 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteSignedVarInt(SpawnBlockY);
                 encoder.WriteSignedVarInt(SpawnBlockZ);
                 encoder.WriteBool(false); //achievements
-                if (encoder.protocolVersion >= Info.v1_26_40)
-                {
-                    encoder.WriteSignedVarInt(0);
-                }
-                else
-                {
-                    encoder.WriteBool(false);
-                }
+                encoder.WriteSignedVarInt(EditorType); //editor world type
                 encoder.WriteBool(false); //editorCreated
                 encoder.WriteBool(false); //editorExported
+                if (encoder.protocolVersion >= Info.v1_26_60)
+                {
+                    encoder.WriteByte(0); //editor level migration version
+                }
                 encoder.WriteSignedVarInt(StopTime);
-                encoder.WriteSignedVarInt(0);
+                encoder.WriteVarInt(0); //education edition offer
                 encoder.WriteBool(false);
                 encoder.WriteString("");
                 encoder.WriteFloat(0);
@@ -80,7 +77,14 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(false);
                 encoder.WriteBool(false); //bonus chest
                 encoder.WriteBool(false); //map
-                encoder.WriteByte(3); //permission level
+                if (encoder.protocolVersion >= Info.v1_26_40)
+                {
+                    encoder.WriteByte(1); //default player permission level
+                }
+                else
+                {
+                    encoder.WriteByte(3); //permission level
+                }
                 encoder.WriteInt(0); //chunk tick range
                 encoder.WriteBool(false);
                 encoder.WriteBool(false);
@@ -125,7 +129,7 @@ namespace DaemonMC.Network.Bedrock
                 //end of synced movement settings
             encoder.WriteLong(0);
             encoder.WriteSignedVarInt(0);
-            encoder.WriteVarInt(0); //block
+            encoder.WriteVarInt(0); //block properties. TODO 1.26.50 vanilla blocks need to be defined by server? No way
             encoder.WriteString("");
             encoder.WriteBool(true); //new inventory
             encoder.WriteString(Info.Version);
@@ -141,7 +145,7 @@ namespace DaemonMC.Network.Bedrock
             }
             encoder.WriteBool(true);
             
-            if (encoder.protocolVersion == Info.v1_26_30)
+            if (encoder.protocolVersion >= Info.v1_26_30 && encoder.protocolVersion < Info.v1_26_40)
             {
                 encoder.WriteBool(false); // Logging Chat
             }

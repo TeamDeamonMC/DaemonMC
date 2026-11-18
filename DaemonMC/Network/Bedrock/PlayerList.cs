@@ -12,7 +12,7 @@ namespace DaemonMC.Network.Bedrock
         public string Username { get; set; } = "";
         public string XUID { get; set; } = "";
         public string PlatformChatId { get; set; } = "";
-        public int BuildPlatform { get; set; } = 0;
+        public int BuildPlatform { get; set; } = (int)Enumerations.BuildPlatform.Unknown;
         public Skin Skin { get; set; } = new Skin();
         public bool IsTeacher { get; set; } = false;
         public bool IsHost { get; set; } = false;
@@ -26,22 +26,28 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
-            if (encoder.protocolVersion < Info.v1_26_40)
+            bool v1_26_40 = encoder.protocolVersion >= Info.v1_26_40;
+            if (!v1_26_40)
             {
                 encoder.WriteByte(Action);
             }
             if (Action == 0)
             {
                 encoder.WriteVarInt(1);
-                if (encoder.protocolVersion >= Info.v1_26_40)
+                if (v1_26_40)
                 {
-                    //encoder.WriteVarInt(1);
-                    encoder.WriteByte(0);//??? todo create new serialization method. why we need two type fields ???
+                    //0 remove, 1 add
+                    encoder.WriteVarInt(1);
+                    encoder.WriteByte(0);
                 }
                 encoder.WriteUUID(UUID);
                 encoder.WriteSignedVarLong(EntityId);
                 encoder.WriteString(Username);
                 encoder.WriteString(XUID);
+                if (encoder.protocolVersion >= Info.v1_26_60)
+                {
+                    encoder.WriteString(Skin.PlayFabId);
+                }
                 encoder.WriteString(PlatformChatId);
                 encoder.WriteInt(BuildPlatform);
                 encoder.WriteSkin(Skin);
@@ -49,15 +55,15 @@ namespace DaemonMC.Network.Bedrock
                 encoder.WriteBool(IsHost);
                 encoder.WriteBool(IsSubclient);
                 encoder.WriteInt(Color);
-                if (encoder.protocolVersion < Info.v1_26_40)
+                if (!v1_26_40)
                 {
-                    encoder.WriteBool(true);
+                    encoder.WriteBool(true); //trusted skin
                 }
             }
             else
             {
                 encoder.WriteVarInt(1);
-                if (encoder.protocolVersion >= Info.v1_26_40)
+                if (v1_26_40)
                 {
                     encoder.WriteVarInt(0);
                     encoder.WriteByte(1);

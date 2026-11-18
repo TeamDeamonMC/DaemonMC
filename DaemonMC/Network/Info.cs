@@ -2,7 +2,7 @@
 {
     public class Info
     {
-        public static string Version = "1.26.40";
+        public static string Version = "1.26.60";
 
         public static int v1_21_90 = 818;
         public static int v1_21_93 = 819;
@@ -15,9 +15,12 @@
         public static int v1_26_10 = 944;
         public static int v1_26_20 = 975;
         public static int v1_26_30 = 1001;
-        public static int v1_26_40 = 2168;
+        public static int v1_26_40 = 2168; //also used by 1.26.44
+        public static int v1_26_45 = 2169;
+        public static int v1_26_50 = 2193;
+        public static int v1_26_60 = 2225;
 
-        public static int[] ProtocolVersion = [v1_21_90, v1_21_93, v1_21_100, v1_21_111, v1_21_120, v1_21_124, v1_21_130, v1_26_0, v1_26_10, v1_26_20, v1_26_30, v1_26_40];
+        public static int[] ProtocolVersion = [v1_21_90, v1_21_93, v1_21_100, v1_21_111, v1_21_120, v1_21_124, v1_21_130, v1_26_0, v1_26_10, v1_26_20, v1_26_30, v1_26_40, v1_26_45, v1_26_50, v1_26_60];
 
         public enum Bedrock
         {
@@ -93,6 +96,7 @@
             SetPlayerInventoryOptions = 307,
             SetHud = 308,
             ServerboundLoadingScreen = 312,
+            JigsawStructureData = 313,
             ClientMovementPredictionSync = 322,
             VoxelShapes = 337
         }

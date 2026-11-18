@@ -2,6 +2,7 @@
 {
     public enum PersonaPieceTypes
     {
+        persona_unknown,
         persona_skeleton,
         persona_body,
         persona_skin,
@@ -27,7 +28,37 @@
         persona_left_arm,
         persona_right_arm,
         persona_capes,
-        persona_classic_Skin,
+        persona_classic_skin,
         persona_emote,
+        persona_coco,
+        unsupported,
     };
+
+    public static class PersonaPieceTypesExtensions
+    {
+        public static PersonaPieceTypes Parse(string? pieceType)
+        {
+            if (string.IsNullOrEmpty(pieceType))
+            {
+                return PersonaPieceTypes.persona_unknown;
+            }
+
+            if (Enum.TryParse(pieceType, true, out PersonaPieceTypes type))
+            {
+                return type;
+            }
+
+            if (Enum.TryParse("persona_" + pieceType, true, out type))
+            {
+                return type;
+            }
+
+            return PersonaPieceTypes.unsupported;
+        }
+
+        public static PersonaPieceTypes FromId(int id)
+        {
+            return Enum.IsDefined(typeof(PersonaPieceTypes), id) ? (PersonaPieceTypes)id : PersonaPieceTypes.unsupported;
+        }
+    }
 }

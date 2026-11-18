@@ -40,6 +40,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteMetadata(Metadata);
             encoder.WriteProperties(Properties);
             encoder.WriteActorLinks(LinkedActors);
+            if (encoder.protocolVersion >= Info.v1_26_60)
+            {
+                encoder.WriteOptional(); //passenger of block arguments
+            }
         }
     }
 }

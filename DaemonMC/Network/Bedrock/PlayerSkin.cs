@@ -16,20 +16,28 @@ namespace DaemonMC.Network.Bedrock
         {
             UUID = decoder.ReadUUID();
             Skin = decoder.ReadSkin();
-            Name = decoder.protocolVersion < Info.v1_26_40 ? decoder.ReadString() : "";
+            Name = decoder.ReadString();
             OldName = decoder.ReadString();
-            Trusted = decoder.protocolVersion < Info.v1_26_40 ? decoder.ReadBool() : true;
-            Name = decoder.protocolVersion >= Info.v1_26_40 ? decoder.ReadString() : "";
+            if (decoder.protocolVersion < Info.v1_26_40)
+            {
+                Trusted = decoder.ReadBool();
+            }
+            else
+            {
+                Trusted = string.Equals(Skin.trustedSkinFlag, "true", StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteUUID(UUID);
             encoder.WriteSkin(Skin);
-            if (encoder.protocolVersion < Info.v1_26_40) encoder.WriteString(Name);
+            encoder.WriteString(Name);
             encoder.WriteString(OldName);
-            if (encoder.protocolVersion < Info.v1_26_40) encoder.WriteBool(Trusted);
-            if (encoder.protocolVersion >= Info.v1_26_40) encoder.WriteString(Name);
+            if (encoder.protocolVersion < Info.v1_26_40)
+            {
+                encoder.WriteBool(Trusted);
+            }
         }
     }
 }

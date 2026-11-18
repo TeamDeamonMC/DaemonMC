@@ -28,7 +28,14 @@ namespace DaemonMC.Network.Bedrock
             for (var groupIndex = 0; groupIndex < Groups.Count; groupIndex++)
             {
                 var group = Groups[groupIndex];
-                encoder.WriteInt((int)group.Category);
+                if (encoder.protocolVersion >= Info.v1_26_40)
+                {
+                    encoder.WriteByte((byte)group.Category);
+                }
+                else
+                {
+                    encoder.WriteInt((int)group.Category);
+                }
                 encoder.WriteString(group.Name);
                 encoder.WriteItemInstance(group.Icon ?? ItemPalette.GetItem("minecraft:air"));
             }

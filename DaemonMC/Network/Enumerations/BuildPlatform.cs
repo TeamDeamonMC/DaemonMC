@@ -16,6 +16,6 @@
         Xbox,
         WindowsPhone_Deprecated,
         Linux,
-        Unknown = -15
+        Unknown = -1
     }
 }

@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.NetherNet;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
 using Newtonsoft.Json;
@@ -51,7 +52,8 @@ namespace DaemonMC.Network.Handler
 
             var player = RakSessionManager.getSession(clientEp);
 
-            if (Cryptography.UseEncryption && player.XUID != "")
+            // NetherNet is encrypted with DTLS, Bedrock encryption is only with RakNet. Great.
+            if (Cryptography.UseEncryption && player.XUID != "" && clientEp is not NetherNetEndPoint)
             {
                 byte[] publicKeyBytes = Convert.FromBase64String(player.identityPublicKey);
 

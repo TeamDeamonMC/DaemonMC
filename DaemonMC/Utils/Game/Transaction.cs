@@ -21,12 +21,17 @@ namespace DaemonMC.Utils.Game
         public int Slot { get; set; }
         public int ClientPrediction { get; set; }
         public byte ClientCooldownState { get; set; }
+        public int LegacyRequestId { get; set; }
+        public List<LegacySlot> LegacySlots { get; set; } = new List<LegacySlot>();
+        public byte Hand { get; set; } //0 main hand, 1 off hand
+        public Vector3 HeadPosition { get; set; }
     }
 
     public class TransactionAction
     {
         public SourceType Source { get; set; }
         public int ContainerID { get; set; }
+        public uint Flags { get; set; }
         public int Slot { get; set; }
         public Item ItemFrom { get; set; }
         public Item ItemTo { get; set; }
@@ -68,6 +73,71 @@ namespace DaemonMC.Utils.Game
     {
         public List<Item> Items { get; set; }
         public byte CraftCount { get; set; }
+    }
+
+    public class SwapAction : Actions
+    {
+    }
+
+    public class DropAction : Actions
+    {
+        public bool Randomly { get; set; }
+    }
+
+    public class ConsumeAction : Actions
+    {
+    }
+
+    public class CreateAction : Actions
+    {
+        public byte ResultsSlot { get; set; }
+    }
+
+    public class BeaconPaymentAction : Actions
+    {
+        public int PrimaryEffect { get; set; }
+        public int SecondaryEffect { get; set; }
+    }
+
+    public class MineBlockAction : Actions
+    {
+        public int HotbarSlot { get; set; }
+        public int PredictedDurability { get; set; }
+        public int NetId { get; set; }
+    }
+
+    public class CraftRecipeAction : Actions
+    {
+        public int RecipeNetId { get; set; }
+        public byte CraftCount { get; set; }
+    }
+
+    public class CraftRecipeOptionalAction : Actions
+    {
+        public int RecipeNetId { get; set; }
+        public int FilteredStringIndex { get; set; }
+    }
+
+    public class CraftRepairAndDisenchantAction : Actions
+    {
+        public int RecipeNetId { get; set; }
+        public byte CraftCount { get; set; }
+        public int Cost { get; set; }
+    }
+
+    public class CraftLoomAction : Actions
+    {
+        public string PatternId { get; set; } = "";
+        public byte CraftCount { get; set; }
+    }
+
+    public class CraftReservedAction : Actions
+    {
+        public string Id { get; set; } = "";
+        public byte CraftCount { get; set; }
+    }
+    public class EmptyAction : Actions
+    {
     }
 
     public class ItemStackRequestSlotInfo
@@ -112,6 +182,8 @@ namespace DaemonMC.Utils.Game
         ContainerInventory,
         GlobalInventory,
         WorldInteraction,
-        CreativeInventory
+        CreativeInventory,
+        UntrackedInteractionUI = 100,
+        NonImplementedTodo = 99999
     }
 }

@@ -21,13 +21,21 @@
             encoder.WriteSignedVarInt(ChunkZ);
             encoder.WriteSignedVarInt(Dimension);
             encoder.WriteVarInt(Count);
-            encoder.WriteBool(false); //client cache protocol 
             if (encoder.protocolVersion >= Info.v1_26_40)
             {
+                encoder.WriteBool(false); //optional client sub chunk request limit
                 encoder.WriteBool(false); //cache enabled
-                encoder.WriteSignedVarInt(0);
+                encoder.WriteVarInt(0); //cache blob ids
+            }
+            else
+            {
+                encoder.WriteBool(false); //cache enabled
             }
             encoder.WriteBytes(Data);
+            if (encoder.protocolVersion >= Info.v1_26_60)
+            {
+                encoder.WriteBool(false); //client biome update
+            }
         }
     }
 }

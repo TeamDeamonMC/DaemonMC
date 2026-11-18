@@ -21,7 +21,10 @@ namespace DaemonMC.Network.Bedrock
             EntityId = decoder.ReadSignedVarLong();
             if (decoder.protocolVersion >= Info.v1_26_30)
             {
-                PlayerId = decoder.ReadSignedVarLong();
+                if (decoder.protocolVersion < Info.v1_26_50)
+                {
+                    PlayerId = decoder.ReadSignedVarLong();
+                }
                 EventType = (BossEventType)decoder.ReadByte();
                 Title = decoder.ReadString();
                 FilteredTitle = decoder.ReadString();
@@ -67,7 +70,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteSignedVarLong(EntityId);
             if (encoder.protocolVersion >= Info.v1_26_30)
             {
-                encoder.WriteSignedVarLong(PlayerId);
+                if (encoder.protocolVersion < Info.v1_26_50)
+                {
+                    encoder.WriteSignedVarLong(PlayerId);
+                }
                 encoder.WriteByte((byte)EventType);
                 encoder.WriteString(Title);
                 encoder.WriteString(FilteredTitle);

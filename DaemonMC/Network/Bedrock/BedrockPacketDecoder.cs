@@ -56,8 +56,8 @@ namespace DaemonMC.Network.Bedrock
 
             while (decoder.readOffset < decoder.buffer.Length)
             {
-                var startOffset = decoder.readOffset;
                 var size = decoder.ReadVarInt(); //packet size
+                var startOffset = decoder.readOffset;
 
                 var pkid = (Info.Bedrock)decoder.ReadVarInt();
                 Log.packetIn(decoder.clientEp, pkid);
@@ -175,9 +175,12 @@ namespace DaemonMC.Network.Bedrock
                 if (decoder.readOffset < expectedOffset)
                 {
                     Log.warn($"{expectedOffset - decoder.readOffset} bytes left while reading {pkid}.");
-                    break;
-
                 }
+                else if (decoder.readOffset > expectedOffset)
+                {
+                    Log.warn($"Read {decoder.readOffset - expectedOffset} bytes past the end of {pkid}.");
+                }
+                decoder.readOffset = expectedOffset;
             }
 
             PacketDecoderPool.Return(decoder);

@@ -35,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BasaltBE.NetherNet" Version="1.0.0" />
     <PackageReference Include="DaemonMC-fNbt" Version="1.0.0.3" />
     <PackageReference Include="MiNET.LevelDB-CobwebSMP" Version="0.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

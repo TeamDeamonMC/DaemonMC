@@ -57,14 +57,16 @@ namespace DaemonMC.Network.RakNet
         public static bool deleteSession(IPEndPoint ip, string reason = "Requested disconnect")
         {
             var player = getSession(ip);
+            string network = ip is NetherNetEndPoint ? "NetherNet" : "RakNet";
+
             if (!sessions.TryRemove(ip, out _))
             {
-                Log.warn($"[RakNet] Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
+                Log.warn($"[{network}] Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
                 return false;
             }
             else
             {
-                Log.debug($"[RakNet] session closed for {player.username} with IP {ip.Address}", ConsoleColor.DarkYellow);
+                Log.debug($"[{network}] session closed for {player.username} with IP {ip.Address}", ConsoleColor.DarkYellow);
                 Log.info($"{player.username} {reason} and got disconnected successfully.");
                 if (ip is NetherNetEndPoint netherNetEp)
                 {

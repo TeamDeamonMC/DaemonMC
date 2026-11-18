@@ -15,7 +15,7 @@
         public static int v1_26_10 = 944;
         public static int v1_26_20 = 975;
         public static int v1_26_30 = 1001;
-        public static int v1_26_40 = 2168; //also used by 1.26.44
+        public static int v1_26_40 = 2168;
         public static int v1_26_45 = 2169;
         public static int v1_26_50 = 2193;
         public static int v1_26_60 = 2225;

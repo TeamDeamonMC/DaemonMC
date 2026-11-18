@@ -55,21 +55,9 @@ namespace DaemonMC.Level
                         int paletteSize = Chunks[i].Palette.Count;
                         VarInt.WriteSInt32(stream, paletteSize);
 
-                        var blockPalette = StateConverter.process(Chunks[i].Palette, protocol);
-
                         for (int v = 0; v < paletteSize; v++)
                         {
-                            var nbt = new NbtFile
-                            {
-                                BigEndian = false,
-                                UseVarInt = false,
-                                RootTag = blockPalette[v],
-                            };
-
-                            byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
-
-                            int blockHash = Fnv1aHash.Hash32(saveToBuffer);
-                            VarInt.WriteSInt32(stream, blockHash);
+                            VarInt.WriteSInt32(stream, StateConverter.GetHash(Chunks[i].Palette[v], protocol));
                         }
                     }
                 }

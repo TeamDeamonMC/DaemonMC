@@ -26,14 +26,14 @@ namespace DaemonMC.Network.Bedrock
             if (encoder.protocolVersion >= Info.v1_26_20)
             {
                 encoder.WriteOptional(() => encoder.WriteContainerName(ContainerName));
-                encoder.WriteOptional(() => encoder.WriteNetItem(StorageItem));
-                encoder.WriteNetItem(Item);
+                encoder.WriteOptional(() => encoder.WriteNetItemStack(StorageItem));
+                encoder.WriteNetItemStack(Item);
             }
             else
             {
                 encoder.WriteContainerName(ContainerName);
-                encoder.WriteItem(StorageItem);
-                encoder.WriteItem(Item);
+                encoder.WriteItemStack(StorageItem);
+                encoder.WriteItemStack(Item);
             }
         }
     }

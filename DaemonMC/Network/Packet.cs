@@ -19,20 +19,22 @@ namespace DaemonMC.Network
                 }
                 catch (Exception e)
                 {
+                    string packetName = handler == PacketHandler.Raknet ? Enum.GetName(typeof(Info.RakNet), Id) ?? $"Unknown ({Id})" : Enum.GetName(typeof(Info.Bedrock), Id) ?? $"Unknown ({Id})";
+
                     if (decoder.player != null)
                     {
-                        decoder.player.Kick($"Handling {Id}\n {e}");
+                        decoder.player.Kick($"Handling {packetName}\n{e}");
                     }
                     else
                     {
                         PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
                         var packet = new Disconnect
                         {
-                            Message = $"Handling {Id}\n {e}"
+                            Message = $"Handling {packetName}\n {e}"
                         };
                         packet.EncodePacket(encoder);
                     }
-                    Log.warn($"Packet decoding error for {decoder.clientEp.Address}. \n Handling {Id}\n {e}");
+                    Log.warn($"Packet decoding error for {decoder.clientEp.Address}. \n Handling {packetName}\n {e}");
                     if (handler == PacketHandler.Raknet)
                     {
                         RakSessionManager.blackList.Add(decoder.clientEp, DateTime.Now);

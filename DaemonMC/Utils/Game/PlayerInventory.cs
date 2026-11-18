@@ -1,12 +1,14 @@
 ﻿using DaemonMC.Items;
 using DaemonMC.Items.VanillaItems;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.Enumerations;
 
 namespace DaemonMC.Utils.Game
 {
     public class PlayerInventory
     {
         internal readonly Player _player;
+        public Item Cursor { get; set; } = new Air();
         public Dictionary<byte, Item> Inventory { get; protected set; } = new Dictionary<byte, Item>(); //0 - 9 hotbar, 10 - 35 inventory
         public Item Head { get; protected set; } = new Air();
         public Item Chest { get; protected set; } = new Air();
@@ -193,11 +195,12 @@ namespace DaemonMC.Utils.Game
             Send(containerId, slot, item);
         }
 
-        public void Send(ContainerId containerId, byte slot, Item item)
+        public void Send(ContainerId containerId, byte slot, Item item, ContainerEnumName containerName = ContainerEnumName.InventoryContainer)
         {
             var pk = new InventorySlot
             {
                 ContainerID = (int)containerId,
+                ContainerName = new FullContainerName() { ContainerName = containerName },
                 Slot = slot,
                 Item = item,
             };

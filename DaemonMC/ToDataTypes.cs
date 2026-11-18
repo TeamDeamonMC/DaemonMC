@@ -1,4 +1,6 @@
-﻿namespace DaemonMC
+﻿using fNbt;
+
+namespace DaemonMC
 {
     public class ToDataTypes
     {
@@ -71,5 +73,22 @@
                 writer.Write(value);
             }
         }
+
+        public static NbtCompound Base64ToNbt(string base64, bool littleEdian, bool varInt)
+        {
+            base64 = base64.Replace("\\/", "/");
+
+            byte[] bytes = Convert.FromBase64String(base64);
+
+            var file = new NbtFile
+            {
+                BigEndian = !littleEdian,
+                UseVarInt = varInt,
+            };
+
+            file.LoadFromBuffer(bytes, 0, bytes.Length, NbtCompression.None);
+            return file.RootTag;
+        }
+
     }
 }

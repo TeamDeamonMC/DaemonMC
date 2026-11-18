@@ -30,6 +30,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteByte((byte)(Teleport ? 2 : 0));
             encoder.WriteBool(IsOnGround);
             encoder.WriteVarLong(VehicleRuntimeId);
+            if (encoder.protocolVersion >= Info.v1_26_40)
+            {
+                encoder.WriteBool(Teleport ? true : false);
+            }
             if (Teleport)
             {
                 encoder.WriteInt(0); //tp cause

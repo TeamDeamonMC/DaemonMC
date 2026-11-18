@@ -24,19 +24,19 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteVarLong(EntityId);
             if (encoder.protocolVersion >= Info.v1_26_30)
             {
-                encoder.WriteNetItem(Head);
-                encoder.WriteNetItem(Chest);
-                encoder.WriteNetItem(Legs);
-                encoder.WriteNetItem(Feet);
-                encoder.WriteNetItem(Body);
+                encoder.WriteNetItemStack(Head);
+                encoder.WriteNetItemStack(Chest);
+                encoder.WriteNetItemStack(Legs);
+                encoder.WriteNetItemStack(Feet);
+                encoder.WriteNetItemStack(Body);
             }
             else
             {
-                encoder.WriteItem(Head);
-                encoder.WriteItem(Chest);
-                encoder.WriteItem(Legs);
-                encoder.WriteItem(Feet);
-                encoder.WriteItem(Body);
+                encoder.WriteItemStack(Head);
+                encoder.WriteItemStack(Chest);
+                encoder.WriteItemStack(Legs);
+                encoder.WriteItemStack(Feet);
+                encoder.WriteItemStack(Body);
             }
         }
     }

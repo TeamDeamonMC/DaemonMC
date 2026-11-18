@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using DaemonMC.Items;
 using DaemonMC.Network;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Utils;
@@ -222,12 +223,12 @@ namespace DaemonMC
 
         public static void about(CommandAction action)
         {
-            action.Player.SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.Version} \n§r§fProject URL: §agithub.com/TeamDeamonMC/DaemonMC \n§r§fGit hash: §a{DaemonMC.GitHash} \n§r§fEnvironment: §a.NET{Environment.Version}, {Environment.OSVersion} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.ProtocolVersion)}");
+            action.GetPlayer().SendMessage($"§k§r§7§lDaemon§8MC§r§k§r {DaemonMC.Version} \n§r§fProject URL: §agithub.com/TeamDeamonMC/DaemonMC \n§r§fGit hash: §a{DaemonMC.GitHash} \n§r§fEnvironment: §a.NET{Environment.Version}, {Environment.OSVersion} \n§r§fSupported MCBE versions: §a{string.Join(", ", Info.ProtocolVersion)}");
         }
 
         public static void position(CommandAction action)
         {
-            action.Player.SendMessage($"§fCoordinates: §a{action.Player.Position}");
+            action.GetPlayer().SendMessage($"§fCoordinates: §a{action.GetPlayer().Position}");
         }
 
         public static string GetPermission(byte level)
@@ -256,6 +257,7 @@ namespace DaemonMC
     {
         public Player Player { get; set; }
         public object[] Data { get; set; }
+        private int index { get; set; } = -1;
 
         public CommandAction(Player player, object[] data)
         {
@@ -271,6 +273,120 @@ namespace DaemonMC
         public object[] GetData()
         {
             return Data;
+        }
+
+        public int GetInt()
+        {
+            index++;
+            if (Data[index] == null)
+            {
+                return 0;
+            }
+            var cmdValue = Data[index].ToString();
+
+            if (!int.TryParse(cmdValue, out int value))
+            {
+                return 0;
+            }
+
+            return value;
+        }
+
+        public Item? GetItem()
+        {
+            index++;
+            var cmdSender = Player;
+            var currentWorld = Player.CurrentWorld;
+            if (Data[index] == null)
+            {
+                return null;
+            }
+            var cmdItem = Data[index].ToString();
+
+            if (cmdItem == null)
+            {
+                return null;
+            }
+
+            var item = ItemPalette.GetItem(cmdItem);
+
+            if (item == null)
+            {
+                item = ItemPalette.GetItem($"minecraft:{cmdItem}");
+            }
+
+            if (item == null)
+            {
+                cmdSender.SendMessage($"Couldn't get item {cmdItem}");
+            }
+
+            return item;
+        }
+
+        public List<Player> GetPlayers()
+        {
+            index++;
+            List<Player> players = new List<Player>();
+
+            var cmdSender = Player;
+            var currentWorld = Player.CurrentWorld;
+            if (Data[index] == null)
+            {
+                return players;
+            }
+            var cmdPlayer = Data[index].ToString();
+
+            if (cmdPlayer == null)
+            {
+                return players;
+            }
+
+            if (cmdPlayer == "@a" || cmdPlayer == "@e") // all players. And entities
+            {
+                foreach (var target in currentWorld.OnlinePlayers)
+                {
+                    players.Add(target.Value);
+                }
+            }
+            else if (cmdPlayer == "@n") // nearest entities
+            {
+
+            }
+            else if (cmdPlayer == "@p") // closest player
+            {
+
+            }
+            else if (cmdPlayer == "@r") // random player
+            {
+
+            }
+            else if (cmdPlayer == "@s") // yourself
+            {
+                players.Add(cmdSender);
+            }
+            else
+            {
+                var player = Server.GetPlayer(cmdPlayer);
+                if (player == null)
+                {
+                    cmdSender.SendMessage($"Couldn't find player {cmdPlayer}");
+                    return players;
+                }
+                players.Add(player);
+            }
+
+            return players;
+        }
+
+        public object GetUnknown()
+        {
+            index++;
+            return Data[index];
+        }
+
+        public void Skip()
+        {
+            index++;
         }
     }
 

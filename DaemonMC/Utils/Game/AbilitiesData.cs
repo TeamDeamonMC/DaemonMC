@@ -30,6 +30,14 @@
         public bool AttackMobs { get; set; }
         public bool OperatorCommands { get; set; }
         public bool Teleport { get; set; }
+        public bool Invulnerable { get; set; }
+        public bool Flying { get; set; }
         public bool MayFly { get; set; }
+        public bool Instabuild { get; set; }
+        public bool WorldBuilder { get; set; }
+        public bool NoClip { get; set; }
+        public bool PrivilegedBuilder { get; set; }
+        public bool VerticalFlySpeed { get; set; }
+        public bool Muted { get; set; }
     }
 }

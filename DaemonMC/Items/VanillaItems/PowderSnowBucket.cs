@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PowderSnowBucket()
         {
             Name = "minecraft:powder_snow_bucket";
-            Id = 400;
+            Id = 371;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public JungleDoor()
         {
             Name = "minecraft:jungle_door";
-            Id = 594;
+            Id = 565;
             Version = 2;
             ComponentBased = false;
         }

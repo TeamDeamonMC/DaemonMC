@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperShovel()
         {
             Name = "minecraft:copper_shovel";
-            Id = 775;
+            Id = 750;
             Version = 2;
             ComponentBased = false;
         }

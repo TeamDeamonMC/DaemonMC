@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteNautilusArmor()
         {
             Name = "minecraft:netherite_nautilus_armor";
-            Id = 792;
+            Id = 767;
             Version = 2;
             ComponentBased = false;
         }

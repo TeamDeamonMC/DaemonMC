@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Repeater()
         {
             Name = "minecraft:repeater";
-            Id = 451;
+            Id = 422;
             Version = 2;
             ComponentBased = true;
         }

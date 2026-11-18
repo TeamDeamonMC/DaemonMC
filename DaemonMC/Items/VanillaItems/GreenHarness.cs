@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GreenHarness()
         {
             Name = "minecraft:green_harness";
-            Id = 762;
+            Id = 737;
             Version = 2;
             ComponentBased = false;
         }

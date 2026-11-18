@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoatSpawnEgg()
         {
             Name = "minecraft:goat_spawn_egg";
-            Id = 537;
+            Id = 508;
             Version = 2;
             ComponentBased = false;
         }

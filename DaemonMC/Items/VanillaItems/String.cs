@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public String()
         {
             Name = "minecraft:string";
-            Id = 358;
+            Id = 329;
             Version = 2;
             ComponentBased = true;
         }

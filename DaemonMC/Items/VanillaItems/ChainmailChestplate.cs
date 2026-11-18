@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChainmailChestplate()
         {
             Name = "minecraft:chainmail_chestplate";
-            Id = 372;
+            Id = 343;
             Version = 2;
             ComponentBased = false;
         }

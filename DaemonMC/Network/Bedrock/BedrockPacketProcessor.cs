@@ -171,6 +171,11 @@ namespace DaemonMC.Network.Bedrock
 
                     if (!player.CurrentWorld.OnlinePlayers.TryAdd(player.EntityID, player)) { return; }
 
+                    if (session.protocolVersion >= Info.v1_26_60)
+                    {
+                        player.Send(new JigsawStructureData());
+                    }
+
                     if (session.protocolVersion >= Info.v1_26_10)
                     {
                         var voxelShapes = new VoxelShapes

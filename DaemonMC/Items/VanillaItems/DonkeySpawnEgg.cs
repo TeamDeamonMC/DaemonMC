@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DonkeySpawnEgg()
         {
             Name = "minecraft:donkey_spawn_egg";
-            Id = 499;
+            Id = 470;
             Version = 2;
             ComponentBased = false;
         }

@@ -1,4 +1,6 @@
-﻿namespace DaemonMC.Network.Bedrock
+﻿using DaemonMC.Network.Enumerations;
+
+namespace DaemonMC.Network.Bedrock
 {
     public class ResourcePackClientResponse : Packet
     {
@@ -10,34 +12,36 @@
 
         protected override void Decode(PacketDecoder decoder)
         {
-            Response = (byte)(decoder.ReadByte() + 1); //sigh
             if (decoder.protocolVersion >= Info.v1_26_40)
             {
+                Response = (byte)(decoder.ReadVarInt() + 1);
                 ResponseType = decoder.ReadString();
-                if (Response == 1)
+                if (Response == (byte)ResourcePackClientResponseStatus.SendPacks)
                 {
                     Packs = decoder.ReadPackNames();
                 }
             }
             else
             {
+                Response = decoder.ReadByte();
                 Packs = decoder.ReadPackNames();
             }
         }
 
         protected override void Encode(PacketEncoder encoder)
         {
-            encoder.WriteByte((byte)(Response - 1));
             if (encoder.protocolVersion >= Info.v1_26_40)
             {
-                encoder.WriteString(ResponseType);
-                if (Response == Response)
+                encoder.WriteVarInt(Response - 1);
+                encoder.WriteString(string.IsNullOrEmpty(ResponseType) ? ResourcePackClientResponseStatusNames.Values[Math.Clamp(Response - 1, 0, ResourcePackClientResponseStatusNames.Values.Length - 1)] : ResponseType);
+                if (Response == (byte)ResourcePackClientResponseStatus.SendPacks)
                 {
                     encoder.WritePackNames(Packs);
                 }
             }
             else
             {
+                encoder.WriteByte(Response);
                 encoder.WritePackNames(Packs);
             }
         }

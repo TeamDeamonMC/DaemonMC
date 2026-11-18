@@ -1,12 +1,15 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using DaemonMC.Network.Bedrock;
+using DaemonMC.Network.NetherNet;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Network.RakNet
 {
     public class RakSessionManager
     {
-        public static Dictionary<IPEndPoint, RakSession> sessions = new Dictionary<IPEndPoint, RakSession>();
+        public static bool Enabled { get; set; } = true;
+        public static ConcurrentDictionary<IPEndPoint, RakSession> sessions = new ConcurrentDictionary<IPEndPoint, RakSession>();
         public static Dictionary<IPEndPoint, DateTime> blackList = new Dictionary<IPEndPoint, DateTime>();
         private static TimeSpan _timeoutThreshold = TimeSpan.FromSeconds(10);
         private static TimeSpan _blacklistThreshold = TimeSpan.FromSeconds(30);
@@ -15,8 +18,10 @@ namespace DaemonMC.Network.RakNet
 
         public static void Init()
         {
+            if (!Enabled) return;
             _timeoutTimer = new Timer(CheckTimeouts, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
             _blacklistTimer = new Timer(CheckBlacklist, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
+            Log.info($"RakNet listening on port {Server.Port}");
         }
 
         public static void createSession(IPEndPoint ip)
@@ -52,15 +57,21 @@ namespace DaemonMC.Network.RakNet
         public static bool deleteSession(IPEndPoint ip, string reason = "Requested disconnect")
         {
             var player = getSession(ip);
-            if (!sessions.Remove(ip))
+            string network = ip is NetherNetEndPoint ? "NetherNet" : "RakNet";
+
+            if (!sessions.TryRemove(ip, out _))
             {
-                Log.warn($"[RakNet] Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
+                Log.warn($"[{network}] Couldn't delete session for {ip.Address.ToString()}, session doesn't exist.");
                 return false;
             }
             else
             {
-                Log.debug($"[RakNet] session closed for {player.username} with IP {ip.Address}", ConsoleColor.DarkYellow);
+                Log.debug($"[{network}] session closed for {player.username} with IP {ip.Address}", ConsoleColor.DarkYellow);
                 Log.info($"{player.username} {reason} and got disconnected successfully.");
+                if (ip is NetherNetEndPoint netherNetEp)
+                {
+                    NetherNetTransport.Disconnect(netherNetEp);
+                }
                 return true;
             }
         }
@@ -94,7 +105,7 @@ namespace DaemonMC.Network.RakNet
             var now = DateTime.UtcNow;
             foreach (var session in sessions.ToList())
             {
-                if (session.Value.EntityID != 0)
+                if (session.Value.EntityID != 0 && session.Key is not NetherNetEndPoint)
                 {
                     session.Value.Nacks = 0;
                     if (now - session.Value.LastPingTime > _timeoutThreshold)

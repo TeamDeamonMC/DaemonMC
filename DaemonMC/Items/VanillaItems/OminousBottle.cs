@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public OminousBottle()
         {
             Name = "minecraft:ominous_bottle";
-            Id = 635;
+            Id = 605;
             Version = 2;
             ComponentBased = false;
         }

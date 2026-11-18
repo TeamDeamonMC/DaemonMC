@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteAxe()
         {
             Name = "minecraft:netherite_axe";
-            Id = 650;
+            Id = 622;
             Version = 2;
             ComponentBased = false;
         }

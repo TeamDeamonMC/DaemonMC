@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bleach()
         {
             Name = "minecraft:bleach";
-            Id = 640;
+            Id = 612;
             Version = 2;
             ComponentBased = false;
         }

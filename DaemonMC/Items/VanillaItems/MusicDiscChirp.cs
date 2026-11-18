@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscChirp()
         {
             Name = "minecraft:music_disc_chirp";
-            Id = 576;
+            Id = 547;
             Version = 2;
             ComponentBased = true;
         }

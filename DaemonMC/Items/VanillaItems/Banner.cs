@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Banner()
         {
             Name = "minecraft:banner";
-            Id = 606;
+            Id = 577;
             Version = 2;
             ComponentBased = false;
         }

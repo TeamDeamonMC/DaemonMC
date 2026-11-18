@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DrownedSpawnEgg()
         {
             Name = "minecraft:drowned_spawn_egg";
-            Id = 517;
+            Id = 488;
             Version = 2;
             ComponentBased = false;
         }

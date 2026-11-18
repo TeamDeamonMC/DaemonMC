@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlowFrame()
         {
             Name = "minecraft:glow_frame";
-            Id = 666;
+            Id = 638;
             Version = 2;
             ComponentBased = true;
         }

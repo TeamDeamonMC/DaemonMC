@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DiamondChestplate()
         {
             Name = "minecraft:diamond_chestplate";
-            Id = 380;
+            Id = 351;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ShaperArmorTrimSmithingTemplate()
         {
             Name = "minecraft:shaper_armor_trim_smithing_template";
-            Id = 739;
+            Id = 711;
             Version = 2;
             ComponentBased = false;
         }

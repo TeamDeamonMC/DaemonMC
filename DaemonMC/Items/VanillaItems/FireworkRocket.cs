@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FireworkRocket()
         {
             Name = "minecraft:firework_rocket";
-            Id = 558;
+            Id = 529;
             Version = 2;
             ComponentBased = false;
         }

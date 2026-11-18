@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MagentaHarness()
         {
             Name = "minecraft:magenta_harness";
-            Id = 766;
+            Id = 741;
             Version = 2;
             ComponentBased = false;
         }

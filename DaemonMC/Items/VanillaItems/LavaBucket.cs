@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LavaBucket()
         {
             Name = "minecraft:lava_bucket";
-            Id = 395;
+            Id = 366;
             Version = 2;
             ComponentBased = false;
         }

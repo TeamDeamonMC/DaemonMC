@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SnortPotterySherd()
         {
             Name = "minecraft:snort_pottery_sherd";
-            Id = 722;
+            Id = 694;
             Version = 2;
             ComponentBased = false;
         }

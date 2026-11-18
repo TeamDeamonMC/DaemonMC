@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChorusFruit()
         {
             Name = "minecraft:chorus_fruit";
-            Id = 597;
+            Id = 568;
             Version = 0;
             ComponentBased = false;
         }

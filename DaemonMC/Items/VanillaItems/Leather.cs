@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Leather()
         {
             Name = "minecraft:leather";
-            Id = 413;
+            Id = 384;
             Version = 2;
             ComponentBased = false;
         }

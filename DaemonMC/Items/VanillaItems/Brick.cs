@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Brick()
         {
             Name = "minecraft:brick";
-            Id = 415;
+            Id = 386;
             Version = 2;
             ComponentBased = false;
         }

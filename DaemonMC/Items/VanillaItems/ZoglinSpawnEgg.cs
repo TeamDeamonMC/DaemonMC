@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ZoglinSpawnEgg()
         {
             Name = "minecraft:zoglin_spawn_egg";
-            Id = 532;
+            Id = 503;
             Version = 2;
             ComponentBased = false;
         }

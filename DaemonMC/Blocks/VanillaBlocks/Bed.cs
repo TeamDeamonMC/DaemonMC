@@ -12,7 +12,7 @@
             Flammability = 0;
             Friction = 0.6000000238418579;
             Hardness = 0.20000000298023224;
-            Opacity = 0.8999999985098839;
+            Opacity = 0.8999999761581421;
 
             States["direction"] = 0;
             States["head_piece_bit"] = (byte)0;

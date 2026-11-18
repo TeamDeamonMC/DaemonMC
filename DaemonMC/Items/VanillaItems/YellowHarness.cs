@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public YellowHarness()
         {
             Name = "minecraft:yellow_harness";
-            Id = 772;
+            Id = 747;
             Version = 2;
             ComponentBased = false;
         }

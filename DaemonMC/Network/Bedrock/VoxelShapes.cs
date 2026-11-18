@@ -17,7 +17,7 @@ namespace DaemonMC.Network.Bedrock
         {
             encoder.WriteVoxelShapes(Shapes);
             encoder.WriteVoxelNameMap(Shapes);
-            encoder.WriteShort(0);//?? todo
+            encoder.WriteShort((ushort)Shapes.Count); //custom shape count
         }
     }
 }

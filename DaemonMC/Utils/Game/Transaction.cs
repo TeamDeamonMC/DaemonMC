@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using DaemonMC.Items;
+using DaemonMC.Items.VanillaItems;
+using DaemonMC.Network.Enumerations;
 
 namespace DaemonMC.Utils.Game
 {
@@ -19,12 +21,17 @@ namespace DaemonMC.Utils.Game
         public int Slot { get; set; }
         public int ClientPrediction { get; set; }
         public byte ClientCooldownState { get; set; }
+        public int LegacyRequestId { get; set; }
+        public List<LegacySlot> LegacySlots { get; set; } = new List<LegacySlot>();
+        public byte Hand { get; set; } //0 main hand, 1 off hand
+        public Vector3 HeadPosition { get; set; }
     }
 
     public class TransactionAction
     {
         public SourceType Source { get; set; }
         public int ContainerID { get; set; }
+        public uint Flags { get; set; }
         public int Slot { get; set; }
         public Item ItemFrom { get; set; }
         public Item ItemTo { get; set; }
@@ -32,16 +39,105 @@ namespace DaemonMC.Utils.Game
 
     public class FullContainerName
     {
-        public byte ContainerName { get; set; } = 0;
+        public ContainerEnumName ContainerName { get; set; } = 0;
         public int? DynamicId { get; set; } = 0;
     }
 
     public class Actions
     {
-        public byte ActionsType { get; set; }
+        public ItemStackRequestActionType ActionsType { get; set; }
         public byte Amount { get; set; }
         public ItemStackRequestSlotInfo Source { get; set; }
         public ItemStackRequestSlotInfo Destination { get; set; }
+    }
+
+    public class TakeAction : Actions
+    {
+    }
+
+    public class PlaceAction : Actions
+    {
+    }
+
+    public class DestoryAction : Actions
+    {
+    }
+
+    public class CraftCreativeAction : Actions
+    {
+        public int ItemId { get; set; }
+        public byte CraftCount { get; set; }
+    }
+
+    public class CraftResults_DEPRECATEDASKTYLAING : Actions
+    {
+        public List<Item> Items { get; set; }
+        public byte CraftCount { get; set; }
+    }
+
+    public class SwapAction : Actions
+    {
+    }
+
+    public class DropAction : Actions
+    {
+        public bool Randomly { get; set; }
+    }
+
+    public class ConsumeAction : Actions
+    {
+    }
+
+    public class CreateAction : Actions
+    {
+        public byte ResultsSlot { get; set; }
+    }
+
+    public class BeaconPaymentAction : Actions
+    {
+        public int PrimaryEffect { get; set; }
+        public int SecondaryEffect { get; set; }
+    }
+
+    public class MineBlockAction : Actions
+    {
+        public int HotbarSlot { get; set; }
+        public int PredictedDurability { get; set; }
+        public int NetId { get; set; }
+    }
+
+    public class CraftRecipeAction : Actions
+    {
+        public int RecipeNetId { get; set; }
+        public byte CraftCount { get; set; }
+    }
+
+    public class CraftRecipeOptionalAction : Actions
+    {
+        public int RecipeNetId { get; set; }
+        public int FilteredStringIndex { get; set; }
+    }
+
+    public class CraftRepairAndDisenchantAction : Actions
+    {
+        public int RecipeNetId { get; set; }
+        public byte CraftCount { get; set; }
+        public int Cost { get; set; }
+    }
+
+    public class CraftLoomAction : Actions
+    {
+        public string PatternId { get; set; } = "";
+        public byte CraftCount { get; set; }
+    }
+
+    public class CraftReservedAction : Actions
+    {
+        public string Id { get; set; } = "";
+        public byte CraftCount { get; set; }
+    }
+    public class EmptyAction : Actions
+    {
     }
 
     public class ItemStackRequestSlotInfo
@@ -55,6 +151,21 @@ namespace DaemonMC.Utils.Game
     {
         public byte ContainerId { get; set; } = 0;
         public byte[] Slot { get; set; } = Array.Empty<byte>();
+    }
+
+    public class ItemStack
+    {
+        public int RequestId { get; set; } = 0;
+        public List<Actions> Actions { get; set; } = new List<Actions>();
+        public List<string> StringToFilter { get; set; } = new List<string>();
+        public int StringToFilterOrigin { get; set; } = 0;
+        public Item OutputContainer { get; set; } = new Air();
+    }
+
+    public class ItemStackResponseInfo
+    {
+        public byte Result { get; set; } = 0; //0 transaction done successfully, 1 unsuccessfully
+        public int RequestId { get; set; } = 0;
     }
 
     public enum TransactionType
@@ -71,6 +182,8 @@ namespace DaemonMC.Utils.Game
         ContainerInventory,
         GlobalInventory,
         WorldInteraction,
-        CreativeInventory
+        CreativeInventory,
+        UntrackedInteractionUI = 100,
+        NonImplementedTodo = 99999
     }
 }

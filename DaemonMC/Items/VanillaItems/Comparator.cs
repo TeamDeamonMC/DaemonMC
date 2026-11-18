@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Comparator()
         {
             Name = "minecraft:comparator";
-            Id = 561;
+            Id = 532;
             Version = 2;
             ComponentBased = true;
         }

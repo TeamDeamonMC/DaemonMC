@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FieldMasonedBannerPattern()
         {
             Name = "minecraft:field_masoned_banner_pattern";
-            Id = 624;
+            Id = 595;
             Version = 2;
             ComponentBased = false;
         }

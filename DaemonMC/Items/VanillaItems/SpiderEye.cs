@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SpiderEye()
         {
             Name = "minecraft:spider_eye";
-            Id = 307;
+            Id = 278;
             Version = 0;
             ComponentBased = false;
         }

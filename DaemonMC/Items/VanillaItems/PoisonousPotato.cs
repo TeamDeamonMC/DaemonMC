@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PoisonousPotato()
         {
             Name = "minecraft:poisonous_potato";
-            Id = 311;
+            Id = 282;
             Version = 0;
             ComponentBased = false;
         }

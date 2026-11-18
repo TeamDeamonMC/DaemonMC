@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenApple()
         {
             Name = "minecraft:golden_apple";
-            Id = 287;
+            Id = 258;
             Version = 0;
             ComponentBased = false;
         }

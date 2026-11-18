@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MilkBucket()
         {
             Name = "minecraft:milk_bucket";
-            Id = 393;
+            Id = 364;
             Version = 2;
             ComponentBased = false;
         }

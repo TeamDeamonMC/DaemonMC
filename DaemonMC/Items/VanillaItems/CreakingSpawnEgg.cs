@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CreakingSpawnEgg()
         {
             Name = "minecraft:creaking_spawn_egg";
-            Id = 752;
+            Id = 727;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Cookie()
         {
             Name = "minecraft:cookie";
-            Id = 300;
+            Id = 271;
             Version = 0;
             ComponentBased = false;
         }

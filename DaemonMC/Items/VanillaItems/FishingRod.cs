@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FishingRod()
         {
             Name = "minecraft:fishing_rod";
-            Id = 424;
+            Id = 395;
             Version = 2;
             ComponentBased = true;
         }

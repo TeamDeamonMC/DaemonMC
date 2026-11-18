@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteShovel()
         {
             Name = "minecraft:netherite_shovel";
-            Id = 648;
+            Id = 620;
             Version = 2;
             ComponentBased = false;
         }

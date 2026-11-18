@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public OakSign()
         {
             Name = "minecraft:oak_sign";
-            Id = 390;
+            Id = 361;
             Version = 2;
             ComponentBased = false;
         }

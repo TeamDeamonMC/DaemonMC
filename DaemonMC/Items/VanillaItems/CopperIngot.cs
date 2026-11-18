@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperIngot()
         {
             Name = "minecraft:copper_ingot";
-            Id = 544;
+            Id = 515;
             Version = 2;
             ComponentBased = false;
         }

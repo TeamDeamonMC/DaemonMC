@@ -1,8 +1,10 @@
-﻿namespace DaemonMC.Utils
+﻿using Newtonsoft.Json;
+
+namespace DaemonMC.Utils
 {
     public class Skin
     {
-        public string ArmSize { get; set; } = "";
+        public byte ArmSize { get; set; } = 0;
         public List<AnimatedImageData> AnimatedImageData { get; set; } = new List<AnimatedImageData>();
         public bool OverrideSkin { get; set; }
         public List<PersonaPiece> PersonaPieces { get; set; } = new List<PersonaPiece>();
@@ -11,7 +13,7 @@
         public string PlayFabId { get; set; } = "";
         public bool PremiumSkin { get; set; }
         public string SkinAnimationData { get; set; } = "";
-        public string SkinColor { get; set; } = "";
+        public int SkinColor { get; set; } = 0;
         public byte[] SkinData { get; set; } = new byte[0];
         public string SkinGeometryData { get; set; } = "";
         public string SkinGeometryDataEngineVersion { get; set; } = "0.0.0";
@@ -21,21 +23,93 @@
         public string SkinResourcePatch { get; set; } = "";
         public Cape Cape { get; set; } = new Cape();
         public bool CapeOnClassicSkin { get; set; }
+        public string trustedSkinFlag { get; set; } = "true"; //fallback to trusted for now. Supposed to be "unset" by default. "false", "true" to toggle
+        public string profileHash { get; set; } = "";
 
         public static Skin Create(string skinPng, string geometryJson)
         {
+            var json = File.ReadAllText(geometryJson);
+            var geometry = JsonConvert.DeserializeObject<GeometryRoot>(json);
+            var desription = geometry.minecraftgeometry.FirstOrDefault(g => g.Description.Identifier == "geometry.humanoid.custom").Description;
+
             return new Skin()
             {
-                ArmSize = "wide",
+                ArmSize = 1, //wide
                 PremiumSkin = true,
                 SkinData = Texture.PngToBytes(skinPng),
-                SkinGeometryData = File.ReadAllText(geometryJson),
-                SkinImageHeight = 64,
-                SkinImageWidth = 64,
+                SkinGeometryData = json,
+                SkinImageHeight = (int)desription.Texture_Height,
+                SkinImageWidth = (int)desription.TextureWidth,
                 SkinResourcePatch = "{\n   \"geometry\" : {\n      \"default\" : \"geometry.humanoid.custom\"\n   }\n}\n",
                 CapeOnClassicSkin = false,
             };
         }
+
+        public static string NormalizeTrustedFlag(string? flag)
+        {
+            switch (flag?.ToLowerInvariant())
+            {
+                case "true":
+                    return "True";
+                case "false":
+                    return "False";
+                default:
+                    return "Unset";
+            }
+        }
+
+        public static int ColorToInt(string? color)
+        {
+            if (string.IsNullOrEmpty(color))
+            {
+                return 0;
+            }
+            string hex = color.StartsWith("#") ? color.Substring(1) : color;
+            if (!uint.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null, out uint value))
+            {
+                return 0;
+            }
+            if (hex.Length == 6)
+            {
+                value |= 0xFF000000;
+            }
+            return unchecked((int)value);
+        }
+
+        public static string IntToColor(int argb)
+        {
+            return argb == 0 ? "#0" : $"#{unchecked((uint)argb):x8}";
+        }
+    }
+
+    public class GeometryRoot
+    {
+        [JsonProperty("format_version")]
+        public string Version { get; set; }
+        [JsonProperty("minecraft:geometry")]
+        public List<MinecraftGeometry> minecraftgeometry { get; set; }
+    }
+
+    public class MinecraftGeometry
+    {
+        [JsonProperty("description")]
+        public Description Description { get; set; }
+    }
+
+    public class Description
+    {
+        [JsonProperty("identifier")]
+        public string Identifier { get; set; }
+        [JsonProperty("texture_width")]
+        public float TextureWidth { get; set; }
+        [JsonProperty("texture_height")]
+        public float Texture_Height { get; set; }
+        [JsonProperty("visible_bounds_width")]
+        public float VisibleBoundsWidth { get; set; }
+        [JsonProperty("visible_bounds_height")]
+        public double VisibleBoundsHeight { get; set; }
+        [JsonProperty("visible_bounds_offset")]
+        public List<double> VisibleBoundsOffset { get; set; }
     }
 
     public class Cape

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DarkOakSign()
         {
             Name = "minecraft:dark_oak_sign";
-            Id = 619;
+            Id = 590;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Book()
         {
             Name = "minecraft:book";
-            Id = 419;
+            Id = 390;
             Version = 2;
             ComponentBased = false;
         }

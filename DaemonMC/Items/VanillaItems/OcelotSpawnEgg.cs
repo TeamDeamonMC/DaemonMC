@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public OcelotSpawnEgg()
         {
             Name = "minecraft:ocelot_spawn_egg";
-            Id = 484;
+            Id = 455;
             Version = 2;
             ComponentBased = false;
         }

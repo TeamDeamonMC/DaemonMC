@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SpruceDoor()
         {
             Name = "minecraft:spruce_door";
-            Id = 592;
+            Id = 563;
             Version = 2;
             ComponentBased = false;
         }

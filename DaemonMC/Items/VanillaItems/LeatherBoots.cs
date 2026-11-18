@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LeatherBoots()
         {
             Name = "minecraft:leather_boots";
-            Id = 370;
+            Id = 341;
             Version = 2;
             ComponentBased = false;
         }

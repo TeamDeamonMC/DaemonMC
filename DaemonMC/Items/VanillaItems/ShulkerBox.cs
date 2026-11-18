@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ShulkerBox()
         {
             Name = "minecraft:shulker_box";
-            Id = 827;
+            Id = 831;
             Version = 2;
             ComponentBased = false;
         }

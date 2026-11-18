@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HopperMinecart()
         {
             Name = "minecraft:hopper_minecart";
-            Id = 565;
+            Id = 536;
             Version = 2;
             ComponentBased = false;
         }

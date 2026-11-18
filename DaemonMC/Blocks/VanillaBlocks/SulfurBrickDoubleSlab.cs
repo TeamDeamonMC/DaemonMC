@@ -6,7 +6,7 @@
         {
             Name = "minecraft:sulfur_brick_double_slab";
 
-            BlastResistance = 3;
+            BlastResistance = 6;
             Brightness = 0;
             FlameEncouragement = 0;
             Flammability = 0;

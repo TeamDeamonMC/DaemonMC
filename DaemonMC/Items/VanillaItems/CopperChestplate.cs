@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperChestplate()
         {
             Name = "minecraft:copper_chestplate";
-            Id = 780;
+            Id = 755;
             Version = 2;
             ComponentBased = false;
         }

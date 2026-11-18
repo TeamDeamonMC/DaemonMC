@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bowl()
         {
             Name = "minecraft:bowl";
-            Id = 353;
+            Id = 324;
             Version = 2;
             ComponentBased = false;
         }

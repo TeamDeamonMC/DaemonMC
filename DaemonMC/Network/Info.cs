@@ -2,7 +2,7 @@
 {
     public class Info
     {
-        public static string Version = "1.26.30";
+        public static string Version = "1.26.60";
 
         public static int v1_21_90 = 818;
         public static int v1_21_93 = 819;
@@ -15,9 +15,12 @@
         public static int v1_26_10 = 944;
         public static int v1_26_20 = 975;
         public static int v1_26_30 = 1001;
-        public static int v1_26_40 = 2164; //preview 26.40.27 ?? 2164 .. Mojang?
+        public static int v1_26_40 = 2168;
+        public static int v1_26_45 = 2169;
+        public static int v1_26_50 = 2193;
+        public static int v1_26_60 = 2225;
 
-        public static int[] ProtocolVersion = [v1_21_90, v1_21_93, v1_21_100, v1_21_111, v1_21_120, v1_21_124, v1_21_130, v1_26_0, v1_26_10, v1_26_20, v1_26_30, v1_26_40];
+        public static int[] ProtocolVersion = [v1_21_90, v1_21_93, v1_21_100, v1_21_111, v1_21_120, v1_21_124, v1_21_130, v1_26_0, v1_26_10, v1_26_20, v1_26_30, v1_26_40, v1_26_45, v1_26_50, v1_26_60];
 
         public enum Bedrock
         {
@@ -46,7 +49,6 @@
             MobEquipment = 31,
             MobArmorEquipment = 32,
             PlayerAction = 36,
-            SetPlayerInventoryOptions = 307,
             SetActorData = 39,
             SetActorMotion = 40,
             Animate = 44,
@@ -59,6 +61,7 @@
             RequestChunkRadius = 69,
             ChunkRadiusUpdated = 70,
             GameRulesChanged = 72,
+            BossEvent = 74,
             AvailableCommands = 76,
             CommandRequest = 77,
             ResourcePackDataInfo = 82,
@@ -79,16 +82,21 @@
             NetworkSettings = 143,
             PlayerAuthInput = 144,
             CreativeContent = 145,
+            ItemStackRequest = 147,
+            ItemStackResponse = 148,
             EmoteList = 152,
             PacketViolationWarning = 156,
             AnimateEntity = 158,
             ItemRegistry = 162,
             SyncActorProperty = 165,
+            ToastRequest = 186,
             UpdateAbilities = 187,
             UpdateAdventureSettings = 188,
             RequestNetworkSettings = 193,
+            SetPlayerInventoryOptions = 307,
             SetHud = 308,
             ServerboundLoadingScreen = 312,
+            JigsawStructureData = 313,
             ClientMovementPredictionSync = 322,
             VoxelShapes = 337
         }

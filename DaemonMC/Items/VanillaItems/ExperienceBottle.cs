@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ExperienceBottle()
         {
             Name = "minecraft:experience_bottle";
-            Id = 548;
+            Id = 519;
             Version = 2;
             ComponentBased = false;
         }

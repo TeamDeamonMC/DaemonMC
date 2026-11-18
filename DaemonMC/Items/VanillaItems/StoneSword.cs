@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StoneSword()
         {
             Name = "minecraft:stone_sword";
-            Id = 343;
+            Id = 314;
             Version = 2;
             ComponentBased = false;
         }

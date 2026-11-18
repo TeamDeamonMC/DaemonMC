@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public VillagerSpawnEgg()
         {
             Name = "minecraft:villager_spawn_egg";
-            Id = 482;
+            Id = 453;
             Version = 2;
             ComponentBased = false;
         }

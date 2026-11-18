@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ArmorStand()
         {
             Name = "minecraft:armor_stand";
-            Id = 591;
+            Id = 562;
             Version = 2;
             ComponentBased = false;
         }

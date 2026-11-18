@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SulfurCubeSpawnEgg()
         {
             Name = "minecraft:sulfur_cube_spawn_egg";
-            Id = 794;
+            Id = 769;
             Version = 2;
             ComponentBased = false;
         }

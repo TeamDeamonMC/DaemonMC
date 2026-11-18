@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Hopper()
         {
             Name = "minecraft:hopper";
-            Id = 566;
+            Id = 537;
             Version = 2;
             ComponentBased = true;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bed()
         {
             Name = "minecraft:bed";
-            Id = 450;
+            Id = 421;
             Version = 2;
             ComponentBased = false;
         }

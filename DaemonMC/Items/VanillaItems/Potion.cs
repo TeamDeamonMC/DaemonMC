@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Potion()
         {
             Name = "minecraft:potion";
-            Id = 459;
+            Id = 430;
             Version = 2;
             ComponentBased = false;
         }

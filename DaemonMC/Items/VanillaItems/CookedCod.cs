@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CookedCod()
         {
             Name = "minecraft:cooked_cod";
-            Id = 297;
+            Id = 268;
             Version = 0;
             ComponentBased = false;
         }

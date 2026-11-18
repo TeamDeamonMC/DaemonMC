@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NautilusSpawnEgg()
         {
             Name = "minecraft:nautilus_spawn_egg";
-            Id = 785;
+            Id = 760;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Skull()
         {
             Name = "minecraft:skull";
-            Id = 744;
+            Id = 718;
             Version = 2;
             ComponentBased = false;
         }

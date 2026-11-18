@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BambooRaft()
         {
             Name = "minecraft:bamboo_raft";
-            Id = 696;
+            Id = 668;
             Version = 2;
             ComponentBased = false;
         }

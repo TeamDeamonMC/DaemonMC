@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscCat()
         {
             Name = "minecraft:music_disc_cat";
-            Id = 574;
+            Id = 545;
             Version = 2;
             ComponentBased = true;
         }

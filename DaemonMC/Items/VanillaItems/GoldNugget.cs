@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldNugget()
         {
             Name = "minecraft:gold_nugget";
-            Id = 458;
+            Id = 429;
             Version = 2;
             ComponentBased = false;
         }

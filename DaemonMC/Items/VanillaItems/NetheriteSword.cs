@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteSword()
         {
             Name = "minecraft:netherite_sword";
-            Id = 647;
+            Id = 619;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenShovel()
         {
             Name = "minecraft:golden_shovel";
-            Id = 355;
+            Id = 326;
             Version = 2;
             ComponentBased = false;
         }

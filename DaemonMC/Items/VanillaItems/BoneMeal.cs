@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BoneMeal()
         {
             Name = "minecraft:bone_meal";
-            Id = 443;
+            Id = 414;
             Version = 2;
             ComponentBased = false;
         }

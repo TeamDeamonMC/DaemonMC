@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DarkOakBoat()
         {
             Name = "minecraft:dark_oak_boat";
-            Id = 412;
+            Id = 383;
             Version = 2;
             ComponentBased = false;
         }

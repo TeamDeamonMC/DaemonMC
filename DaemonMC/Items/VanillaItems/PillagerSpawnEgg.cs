@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PillagerSpawnEgg()
         {
             Name = "minecraft:pillager_spawn_egg";
-            Id = 525;
+            Id = 496;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GusterPotterySherd()
         {
             Name = "minecraft:guster_pottery_sherd";
-            Id = 710;
+            Id = 682;
             Version = 2;
             ComponentBased = false;
         }

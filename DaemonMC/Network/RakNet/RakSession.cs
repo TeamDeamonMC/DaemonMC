@@ -24,6 +24,9 @@ namespace DaemonMC.Network.RakNet
         public DateTime LastMtuReduced { get; set; }
         public int protocolVersion { get; set; } = 0;
         public Skin skin { get; set; } = new Skin();
+        public Dictionary<ushort, FragmentedPacket> fragmentedPackets { get; } = new Dictionary<ushort, FragmentedPacket>();
+        public HashSet<uint> receivedReliableIndexes { get; } = new HashSet<uint>();
+        public uint highestReliableIndex { get; set; } = 0;
 
         public bool isClient = false;
         public Client client { get; set; }

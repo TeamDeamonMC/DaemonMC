@@ -9,6 +9,7 @@ namespace DaemonMC.Network.RakNet
         public int ReceivedSize;
         public int Count;
         public byte[][] Fragments;
+        public DateTime Created = DateTime.UtcNow;
 
         public FragmentedPacket(int fragmentCount, int totalSize)
         {
@@ -34,10 +35,19 @@ namespace DaemonMC.Network.RakNet
     public class Reliability
     {
         public static uint reliableIndex = 0;
-        public static Dictionary<IPAddress, FragmentedPacket> fragmentedPackets = new Dictionary<IPAddress, FragmentedPacket>();
+        private const int MaxFragmentCount = 8192;
+        private const int MaxPendingSplits = 16;
+        private const uint ReliableWindow = 2048;
 
         public static void ReliabilityHandler(PacketDecoder decoder, int recv)
         {
+            var session = RakSessionManager.getSession(decoder.clientEp);
+            if (session == null)
+            {
+                decoder.readOffset = recv;
+                return;
+            }
+
             uint sequence = decoder.ReadUInt24LE();
             uint reliableIndex = 0;
             uint sequenceIndex = 0;
@@ -56,28 +66,32 @@ namespace DaemonMC.Network.RakNet
                 byte reliabilityType = (byte)((flags & 0b011100000) >> 5);
                 bool isFragmented = (flags & 0b00010000) > 0;
 
+                bool isReliable = reliabilityType == 2 || reliabilityType == 3 || reliabilityType == 4 || reliabilityType == 6 || reliabilityType == 7;
+
                 if (reliabilityType == 0)
                 {
                     //nothing
                 }
-                else if (reliabilityType == 1)
+                else if (reliabilityType == 1) // unreliable sequenced
                 {
-                    reliableIndex = decoder.ReadUInt24LE();
                     sequenceIndex = decoder.ReadUInt24LE();
-                }
-                else if (reliabilityType == 2)
-                {
-                    reliableIndex = decoder.ReadUInt24LE();
-                }
-                else if (reliabilityType == 3)
-                {
-                    reliableIndex = decoder.ReadUInt24LE();
-                    sequenceIndex = decoder.ReadUInt24LE();
+                    orderIndex = decoder.ReadUInt24LE();
                     orderChannel = decoder.ReadByte();
                 }
-                else if (reliabilityType == 4)
+                else if (reliabilityType == 2) // reliable
                 {
                     reliableIndex = decoder.ReadUInt24LE();
+                }
+                else if (reliabilityType == 3) // reliable ordered
+                {
+                    reliableIndex = decoder.ReadUInt24LE();
+                    orderIndex = decoder.ReadUInt24LE();
+                    orderChannel = decoder.ReadByte();
+                }
+                else if (reliabilityType == 4) // reliable sequenced
+                {
+                    reliableIndex = decoder.ReadUInt24LE();
+                    sequenceIndex = decoder.ReadUInt24LE();
                     orderIndex = decoder.ReadUInt24LE();
                     orderChannel = decoder.ReadByte();
                 }
@@ -103,49 +117,83 @@ namespace DaemonMC.Network.RakNet
                     compIndex = decoder.ReadIntBE();
                 }
 
-                int lengthInBytes = (pLength + 7) >> 3;
+                int lengthInBytes = (ushort)pLength + 7 >> 3;
+                if (lengthInBytes > recv - decoder.readOffset)
+                {
+                    Log.debug($"[RakNet] Malformed frame from {decoder.clientEp}: length {lengthInBytes} exceeds datagram.");
+                    decoder.readOffset = recv;
+                    break;
+                }
                 byte[] body = new byte[lengthInBytes];
                 Array.Copy(decoder.buffer, decoder.readOffset, body, 0, lengthInBytes);
                 decoder.readOffset += lengthInBytes;
 
-                if (isFragmented)
+                lock (session.Sync)
                 {
-                    if (!fragmentedPackets.ContainsKey(decoder.clientEp.Address))
+                    // Drop duplicate reliable frames (client retransmits when our ACK is late or lost)
+                    if (isReliable)
                     {
-                        fragmentedPackets[decoder.clientEp.Address] = new FragmentedPacket(compSize, lengthInBytes);
+                        if (session.receivedReliableIndexes.Contains(reliableIndex) ||
+                            (session.highestReliableIndex >= ReliableWindow && reliableIndex < session.highestReliableIndex - ReliableWindow))
+                        {
+                            continue;
+                        }
+                        session.receivedReliableIndexes.Add(reliableIndex);
+                        if (reliableIndex > session.highestReliableIndex)
+                        {
+                            session.highestReliableIndex = reliableIndex;
+                        }
+                        if (session.receivedReliableIndexes.Count > ReliableWindow * 2)
+                        {
+                            uint floor = session.highestReliableIndex >= ReliableWindow ? session.highestReliableIndex - ReliableWindow : 0;
+                            session.receivedReliableIndexes.RemoveWhere(i => i < floor);
+                        }
                     }
 
-                    var fragment = fragmentedPackets[decoder.clientEp.Address];
-                    fragment.Fragments[compIndex] = body;
-                    fragment.ReceivedSize += body.Length;
-                    fragment.Count++;
-
-                    if (compSize == fragment.Count)
+                    if (isFragmented)
                     {
-                        byte[] fullPacket = ReassemblePacket(fragment);
-                        decoder.packetBuffers.Add(fullPacket);
-                        fragmentedPackets.Remove(decoder.clientEp.Address);
+                        if (compSize <= 0 || compSize > MaxFragmentCount || compIndex < 0 || compIndex >= compSize)
+                        {
+                            Log.debug($"[RakNet] Invalid split from {decoder.clientEp}: index {compIndex}/{compSize}");
+                            continue;
+                        }
+
+                        ushort splitId = (ushort)compId;
+                        if (!session.fragmentedPackets.TryGetValue(splitId, out var fragment) || fragment.Fragments.Length != compSize)
+                        {
+                            if (session.fragmentedPackets.Count >= MaxPendingSplits)
+                            {
+                                var oldest = session.fragmentedPackets.OrderBy(p => p.Value.Created).First().Key;
+                                session.fragmentedPackets.Remove(oldest);
+                            }
+                            fragment = new FragmentedPacket(compSize, 0);
+                            session.fragmentedPackets[splitId] = fragment;
+                        }
+
+                        if (fragment.Fragments[compIndex] == null)
+                        {
+                            fragment.Fragments[compIndex] = body;
+                            fragment.ReceivedSize += body.Length;
+                            fragment.Count++;
+                        }
+
+                        if (fragment.Count == compSize)
+                        {
+                            decoder.packetBuffers.Add(ReassemblePacket(fragment));
+                            session.fragmentedPackets.Remove(splitId);
+                        }
                     }
-                }
-                else
-                {
-                    decoder.packetBuffers.Add(body);
+                    else
+                    {
+                        decoder.packetBuffers.Add(body);
+                    }
                 }
                //Console.WriteLine($"[Frame Set Packet] seq: {sequence} f: {flags} pL: {pLength} rtype: {reliabilityType} frag: {isFragmented} relIndx: {reliableIndex} seqIndxL: {sequenceIndex} ordIndx: {orderIndex} ordCh: {orderChannel} compSize: {compSize} compIndx: {compIndex} compId: {compId}");
-
-                var ack = new ACKdata { sequenceNumber = sequence };
-
-                var acks = new List<ACKdata>();
-                acks.Add(ack);
-
-                PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
-                var pk = new ACK
-                {
-                    ACKs = acks,
-                };
-                pk.EncodePacket(encoder);
-                Server.AckOut++;
             }
+            var acks = new List<ACKdata> { new ACKdata { sequenceNumber = sequence } };
+            PacketEncoder encoder = PacketEncoderPool.Get(decoder.clientEp);
+            new ACK { ACKs = acks }.EncodePacket(encoder);
+            Server.AckOut++;
         }
 
         private static byte[] ReassemblePacket(FragmentedPacket fragment)

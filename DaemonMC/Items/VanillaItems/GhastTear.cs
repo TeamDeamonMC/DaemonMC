@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GhastTear()
         {
             Name = "minecraft:ghast_tear";
-            Id = 457;
+            Id = 428;
             Version = 2;
             ComponentBased = false;
         }

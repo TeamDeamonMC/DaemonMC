@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronHorseArmor()
         {
             Name = "minecraft:iron_horse_armor";
-            Id = 570;
+            Id = 541;
             Version = 2;
             ComponentBased = false;
         }

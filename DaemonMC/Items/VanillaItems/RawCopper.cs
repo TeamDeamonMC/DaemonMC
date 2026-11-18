@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RawCopper()
         {
             Name = "minecraft:raw_copper";
-            Id = 547;
+            Id = 518;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteHorseArmor()
         {
             Name = "minecraft:netherite_horse_armor";
-            Id = 793;
+            Id = 768;
             Version = 2;
             ComponentBased = false;
         }

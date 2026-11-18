@@ -6,7 +6,7 @@
         {
             Name = "minecraft:cinnabar_wall";
 
-            BlastResistance = 3;
+            BlastResistance = 6;
             Brightness = 0;
             FlameEncouragement = 0;
             Flammability = 0;

@@ -13,6 +13,11 @@
             Friction = 0.6000000238418579;
             Hardness = 10;
             Opacity = 0;
+
+            States["minecraft:connection_east"] = (byte)0;
+            States["minecraft:connection_north"] = (byte)0;
+            States["minecraft:connection_south"] = (byte)0;
+            States["minecraft:connection_west"] = (byte)0;
         }
     }
 }

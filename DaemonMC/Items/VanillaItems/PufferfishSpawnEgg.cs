@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PufferfishSpawnEgg()
         {
             Name = "minecraft:pufferfish_spawn_egg";
-            Id = 515;
+            Id = 486;
             Version = 2;
             ComponentBased = false;
         }

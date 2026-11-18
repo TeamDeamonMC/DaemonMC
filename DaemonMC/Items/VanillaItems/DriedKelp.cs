@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DriedKelp()
         {
             Name = "minecraft:dried_kelp";
-            Id = 299;
+            Id = 270;
             Version = 0;
             ComponentBased = false;
         }

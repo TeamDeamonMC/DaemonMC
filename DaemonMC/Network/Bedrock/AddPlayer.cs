@@ -28,7 +28,7 @@ namespace DaemonMC.Network.Bedrock
         public List<AbilitiesData> Layers { get; set; } = new List<AbilitiesData>();
         public List<EntityLink> LinkedActors { get; set; } = new List<EntityLink>();
         public string DeviceId { get; set; } = "";
-        public int BuildPlatform { get; set; } = 0;
+        public int BuildPlatform { get; set; } = (int)Enumerations.BuildPlatform.Unknown;
 
         protected override void Decode(PacketDecoder decoder)
         {
@@ -54,6 +54,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteByte(CommandPermissions);
             encoder.WriteAbilitiesData(Layers);
             encoder.WriteActorLinks(LinkedActors);
+            if (encoder.protocolVersion >= Info.v1_26_60)
+            {
+                encoder.WriteOptional(); //passenger of block arguments
+            }
             encoder.WriteString(DeviceId);
             encoder.WriteInt(BuildPlatform);
         }

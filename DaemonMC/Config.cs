@@ -1,8 +1,10 @@
-﻿using DaemonMC.Utils.Text;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
+﻿using DaemonMC.Network.Handler;
+using DaemonMC.Network.NetherNet;
+using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
-using DaemonMC.Network.Handler;
+using DaemonMC.Utils.Text;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace DaemonMC
 {
@@ -21,6 +23,9 @@ namespace DaemonMC
         public string Compression { get; set; } = "none";
         public bool Debug { get; set; } = false;
         public bool Encryption { get; set; } = false; //todo set true when tested that its stable
+        public bool NetherNet { get; set; } = true;
+        public bool RakNet { get; set; } = true;
+        public int NetherNetPort { get; set; } = 19132; //todo.. because we also have raknet on 19132..
 
         public static void Set()
         {
@@ -65,6 +70,9 @@ namespace DaemonMC
             LoginHandler.XboxAuth = config.XboxAuth;
             ResourcePackManager.ForcePacks = config.ForcePacks;
             Cryptography.UseEncryption = config.Encryption;
+            NetherNetTransport.Enabled = config.NetherNet;
+            RakSessionManager.Enabled = config.NetherNet;
+            NetherNetTransport.Port = (ushort)config.NetherNetPort;
         }
 
         public static int ToGameMode(string gameMode)

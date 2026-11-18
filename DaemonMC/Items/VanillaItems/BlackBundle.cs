@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BlackBundle()
         {
             Name = "minecraft:black_bundle";
-            Id = 273;
+            Id = 862;
             Version = 1;
             ComponentBased = true;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FlowArmorTrimSmithingTemplate()
         {
             Name = "minecraft:flow_armor_trim_smithing_template";
-            Id = 741;
+            Id = 713;
             Version = 2;
             ComponentBased = false;
         }

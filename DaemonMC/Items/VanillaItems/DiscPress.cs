@@ -1,11 +1,11 @@
 namespace DaemonMC.Items.VanillaItems
 {
-    public class DebugStick : Item
+    public class DiscPress : Item
     {
-        public DebugStick()
+        public DiscPress()
         {
-            Name = "minecraft:debug_stick";
-            Id = 632;
+            Name = "minecraft:disc_press";
+            Id = -1251;
             Version = 2;
             ComponentBased = false;
         }

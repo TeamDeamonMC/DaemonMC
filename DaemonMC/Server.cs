@@ -4,6 +4,7 @@ using DaemonMC.Blocks;
 using DaemonMC.Items;
 using DaemonMC.Level;
 using DaemonMC.Network;
+using DaemonMC.Network.NetherNet;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Plugin;
 using DaemonMC.Utils.Text;
@@ -29,6 +30,7 @@ namespace DaemonMC
         public static List<World> Levels = new List<World>();
         public static List<ResourcePack> Packs = new List<ResourcePack>();
         private static byte[] bufferAlloc = new byte[8192];
+        internal static readonly object PacketLock = new object();
 
         public static void ServerF()
         {
@@ -62,17 +64,24 @@ namespace DaemonMC
 
             PluginManager.LoadPlugins("Plugins");
 
-            Log.info($"Server listening on port {Port}");
-            Log.line();
-            Log.info("Type /help to see available commands");
+            CreativeContentManager.Init();
 
             Thread titleMonitor = new Thread(titleUpdate);
             titleMonitor.Start();
 
             RakSessionManager.Init();
 
-            while (!Crash)
+            NetherNetTransport.Start();
+
+            Log.line();
+            Log.info("Type /help to see available commands");
+
+            while (!Crash)//todo rework this function too
             {
+                if (!RakSessionManager.Enabled)
+                {
+                    continue;
+                }
                 EndPoint ep = iep;
                 try
                 {
@@ -95,7 +104,10 @@ namespace DaemonMC
                         RakSessionManager.createSession(client);
 
                         PacketDecoder decoder = PacketDecoderPool.Get(receivedData.ToArray(), client);
-                        decoder.RakDecoder(decoder, recv);
+                        lock (PacketLock)
+                        {
+                            decoder.RakDecoder(decoder, recv);
+                        }
                     }
                 }
                 catch (SocketException ex)
@@ -116,6 +128,7 @@ namespace DaemonMC
                 player.Kick("Server closed");
             }
             Thread.Sleep(1000);
+            NetherNetTransport.Stop();
             Log.line();
             Log.info("Shutting down...");
             PluginManager.UnloadPlugins();

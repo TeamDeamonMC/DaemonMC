@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LightBlueDye()
         {
             Name = "minecraft:light_blue_dye";
-            Id = 439;
+            Id = 410;
             Version = 2;
             ComponentBased = false;
         }

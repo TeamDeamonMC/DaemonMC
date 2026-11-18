@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public OrangeBundle()
         {
             Name = "minecraft:orange_bundle";
-            Id = 271;
+            Id = 873;
             Version = 1;
             ComponentBased = true;
         }

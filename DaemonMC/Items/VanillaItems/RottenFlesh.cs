@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RottenFlesh()
         {
             Name = "minecraft:rotten_flesh";
-            Id = 306;
+            Id = 277;
             Version = 0;
             ComponentBased = false;
         }

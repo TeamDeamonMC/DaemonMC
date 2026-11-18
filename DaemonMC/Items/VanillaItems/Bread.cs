@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bread()
         {
             Name = "minecraft:bread";
-            Id = 290;
+            Id = 261;
             Version = 0;
             ComponentBased = false;
         }

@@ -7,7 +7,7 @@
             Name = "minecraft:vault";
 
             BlastResistance = 50;
-            Brightness = 0;
+            Brightness = 6;
             FlameEncouragement = 0;
             Flammability = 0;
             Friction = 0.6000000238418579;

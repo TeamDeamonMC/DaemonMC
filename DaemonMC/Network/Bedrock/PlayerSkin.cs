@@ -18,7 +18,14 @@ namespace DaemonMC.Network.Bedrock
             Skin = decoder.ReadSkin();
             Name = decoder.ReadString();
             OldName = decoder.ReadString();
-            Trusted = decoder.ReadBool();
+            if (decoder.protocolVersion < Info.v1_26_40)
+            {
+                Trusted = decoder.ReadBool();
+            }
+            else
+            {
+                Trusted = string.Equals(Skin.trustedSkinFlag, "true", StringComparison.OrdinalIgnoreCase);
+            }
         }
 
         protected override void Encode(PacketEncoder encoder)
@@ -27,7 +34,10 @@ namespace DaemonMC.Network.Bedrock
             encoder.WriteSkin(Skin);
             encoder.WriteString(Name);
             encoder.WriteString(OldName);
-            encoder.WriteBool(Trusted);
+            if (encoder.protocolVersion < Info.v1_26_40)
+            {
+                encoder.WriteBool(Trusted);
+            }
         }
     }
 }

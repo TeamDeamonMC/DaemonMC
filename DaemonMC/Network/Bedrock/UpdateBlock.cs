@@ -20,7 +20,7 @@ namespace DaemonMC.Network.Bedrock
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteBlockNetPos(Position);
-            encoder.WriteVarInt_Signed(Block.GetHash());
+            encoder.WriteVarInt_Signed(Block.GetHash(encoder.protocolVersion));
             encoder.WriteVarInt(Flags);
             encoder.WriteVarInt(Layer);
         }

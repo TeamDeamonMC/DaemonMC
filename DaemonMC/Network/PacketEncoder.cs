@@ -6,6 +6,7 @@ using DaemonMC.Biomes;
 using DaemonMC.Entities;
 using DaemonMC.Items;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Network.NetherNet;
 using DaemonMC.Network.RakNet;
 using DaemonMC.Utils;
 using DaemonMC.Utils.Game;
@@ -64,6 +65,14 @@ namespace DaemonMC.Network
 
                 ResetStream();
 
+                if (clientEp is NetherNetEndPoint netherNetEp)
+                {
+                    // NetherNet send batch directly (no 0xFE), DTLS replace bedrock encryption
+                    NetherNetTransport.Send(netherNetEp, finalPacket);
+                    PacketEncoderPool.Return(this);
+                    return;
+                }
+
                 if (session.encryptor != null && session.encryptor.validated)
                 {
                     finalPacket = session.encryptor.Encrypt(finalPacket);
@@ -81,6 +90,12 @@ namespace DaemonMC.Network
             Log.packetOut(clientEp, (Info.RakNet)trimmedBuffer[0]);
 
             ResetStream();
+
+            if (clientEp is NetherNetEndPoint)
+            {
+                PacketEncoderPool.Return(this);
+                return;
+            }
 
             if (trimmedBuffer[0] == 3)
             {
@@ -104,7 +119,7 @@ namespace DaemonMC.Network
             if (pkid <= 127 || pkid >= 141) { Log.packetOut(clientEp, (Info.RakNet)pkid); };
             byte[] trimmedBuffer = new byte[byteStream.Position];
             Array.Copy(byteStream.ToArray(), trimmedBuffer, byteStream.Position);
-            if (!RakSessionManager.sessions.TryGetValue(clientEp, out var session))
+            if (!RakSessionManager.sessions.TryGetValue(clientEp, out var session) || clientEp is NetherNetEndPoint)
             {
                 Log.warn($"Tried to send data to disconnected client {clientEp.Address}");
                 return;
@@ -381,7 +396,14 @@ namespace DaemonMC.Network
 
         public void WritePackNames(List<string> packs)
         {
-            WriteShort((ushort)packs.Count());
+            if (protocolVersion >= Info.v1_26_40)
+            {
+                WriteVarInt(packs.Count());
+            }
+            else
+            {
+                WriteShort((ushort)packs.Count());
+            }
             foreach (var pack in packs)
             {
                 WriteString(pack);
@@ -390,22 +412,27 @@ namespace DaemonMC.Network
 
         public void WriteSkin(Skin skin)
         {
+            bool v1_26_40 = protocolVersion >= Info.v1_26_40;
+
             WriteString(skin.SkinId);
-            WriteString(skin.PlayFabId);
+            if (protocolVersion < Info.v1_26_60)
+            {
+                WriteString(skin.PlayFabId); //moved to PlayerList
+            }
             WriteString(skin.SkinResourcePatch);
             WriteInt(skin.SkinImageWidth);
             WriteInt(skin.SkinImageHeight);
             WriteBytes(skin.SkinData);
-            WriteInt(skin.AnimatedImageData.Count());
+            if (v1_26_40) { WriteVarInt(skin.AnimatedImageData.Count()); } else { WriteInt(skin.AnimatedImageData.Count()); }
             foreach (var animation in skin.AnimatedImageData)
             {
                 WriteInt(animation.ImageWidth);
                 WriteInt(animation.ImageHeight);
                 byte[] imageData = Convert.FromBase64String(animation.Image);
                 WriteBytes(imageData);
-                WriteInt(animation.Type);
+                if (v1_26_40) { WriteVarInt(animation.Type); } else { WriteInt(animation.Type); }
                 WriteFloat(animation.Frames);
-                WriteInt(animation.AnimationExpression);
+                if (v1_26_40) { WriteVarInt(animation.AnimationExpression); } else { WriteInt(animation.AnimationExpression); }
             }
             WriteInt(skin.Cape.CapeImageWidth);
             WriteInt(skin.Cape.CapeImageHeight);
@@ -415,32 +442,64 @@ namespace DaemonMC.Network
             WriteString(skin.SkinAnimationData);
             WriteString(skin.Cape.CapeId);
             WriteString(skin.SkinId + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-            WriteString(skin.ArmSize);
-            WriteString(skin.SkinColor);
-            WriteInt(skin.PersonaPieces.Count());
+            if (v1_26_40)
+            {
+                WriteByte(skin.ArmSize); //0 slim, 1 wide
+                WriteInt(skin.SkinColor);
+                WriteVarInt(skin.PersonaPieces.Count());
+            }
+            else
+            {
+                WriteString(skin.ArmSize == 0 ? "slim" : "wide");
+                WriteString(Skin.IntToColor(skin.SkinColor));
+                WriteInt(skin.PersonaPieces.Count());
+            }
             foreach (var part in skin.PersonaPieces)
             {
                 WriteString(part.PieceId);
-                WriteString(part.PieceType);
-                WriteString(part.PackId);
+                if (v1_26_40)
+                {
+                    WriteInt((int)PersonaPieceTypesExtensions.Parse(part.PieceType));
+                    WriteUUID(Guid.TryParse(part.PackId, out var packId) ? packId : Guid.Empty);
+                }
+                else
+                {
+                    WriteString(part.PieceType);
+                    WriteString(part.PackId);
+                }
                 WriteBool(part.IsDefault);
                 WriteString(part.ProductId);
             }
-            WriteInt(skin.PieceTintColors.Count());
+            if (v1_26_40) { WriteVarInt(skin.PieceTintColors.Count()); } else { WriteInt(skin.PieceTintColors.Count()); }
             foreach (var part in skin.PieceTintColors)
             {
                 WriteString(part.PieceType);
-                WriteInt(part.Colors.Count());
-                foreach (var color in part.Colors)
+                if (v1_26_40)
                 {
-                    WriteString(color);
+                    for (int j = 0; j < 4; j++) //always 4 ARGB colors
+                    {
+                        WriteInt(j < part.Colors.Count ? Skin.ColorToInt(part.Colors[j]) : 0);
+                    }
+                }
+                else
+                {
+                    WriteInt(part.Colors.Count());
+                    foreach (var color in part.Colors)
+                    {
+                        WriteString(color);
+                    }
                 }
             }
             WriteBool(skin.PremiumSkin);
             WriteBool(skin.PersonaSkin);
             WriteBool(skin.CapeOnClassicSkin);
-            WriteBool(false); //todo whats this?
+            WriteBool(false); //is primary user
             WriteBool(skin.OverrideSkin);
+            if (v1_26_40)
+            {
+                WriteString(Skin.NormalizeTrustedFlag(skin.trustedSkinFlag));
+                WriteString(skin.profileHash);
+            }
         }
 
         public void WriteMetadata(Dictionary<ActorData, Metadata> metadata)
@@ -449,43 +508,39 @@ namespace DaemonMC.Network
             foreach (var entry in metadata)
             {
                 WriteVarInt((uint)entry.Key);
+                WriteVarInt((uint)entry.Value.Type);
+                if (protocolVersion >= Info.v1_26_40)
+                {
+                    WriteByte((byte)entry.Value.Type); //tagged variant index
+                }
 
                 switch (entry.Value.Value)
                 {
                     case byte value:
-                        WriteVarInt(0);
                         WriteByte(value);
                         break;
                     case short value:
-                        WriteVarInt(1);
                         WriteShort((ushort)value);
                         break;
                     case int value:
-                        WriteVarInt(2);
                         WriteSignedVarInt(value);
                         break;
                     case float value:
-                        WriteVarInt(3);
                         WriteFloat(value);
                         break;
                     case string value:
-                        WriteVarInt(4);
                         WriteString(value);
                         break;
                     case NbtCompound value:
-                        WriteVarInt(5);
                         WriteCompoundTag(value);
                         break;
                     /*case BlockPos value: //todo
-                        WriteVarInt(6);
                         WriteBlockPos(value);
                         break;*/
                     case long value:
-                        WriteVarInt(7);
                         WriteSignedVarLong(value);
                         break;
                     case Vector3 value:
-                        WriteVarInt(8);
                         WriteVec3(value);
                         break;
                 }
@@ -647,9 +702,41 @@ namespace DaemonMC.Network
             {
                 value |= (1 << (int)AbilitiesIndex.Teleport);
             }
+            if (permissions.Invulnerable)
+            {
+                value |= (1 << (int)AbilitiesIndex.Invulnerable);
+            }
+            if (permissions.Flying)
+            {
+                value |= (1 << (int)AbilitiesIndex.Flying);
+            }
             if (permissions.MayFly)
             {
                 value |= (1 << (int)AbilitiesIndex.MayFly);
+            }
+            if (permissions.Instabuild)
+            {
+                value |= (1 << (int)AbilitiesIndex.Instabuild);
+            }
+            if (permissions.Muted)
+            {
+                value |= (1 << (int)AbilitiesIndex.Muted);
+            }
+            if (permissions.WorldBuilder)
+            {
+                value |= (1 << (int)AbilitiesIndex.WorldBuilder);
+            }
+            if (permissions.NoClip)
+            {
+                value |= (1 << (int)AbilitiesIndex.NoClip);
+            }
+            if (permissions.PrivilegedBuilder)
+            {
+                value |= (1 << (int)AbilitiesIndex.PrivilegedBuilder);
+            }
+            if (permissions.VerticalFlySpeed)
+            {
+                value |= (1 << (int)AbilitiesIndex.VerticalFlySpeed);
             }
             WriteInt(value);
         }
@@ -657,7 +744,14 @@ namespace DaemonMC.Network
         public void WriteBlockNetPos(Vector3 position)
         {
             WriteSignedVarInt((int)position.X);
-            WriteVarInt_Signed((int)position.Y); //what kind of data type even is this?
+            if (protocolVersion >= Info.v1_26_10)
+            {
+                WriteSignedVarInt((int)position.Y);
+            }
+            else
+            {
+                WriteVarInt_Signed((int)position.Y);
+            }
             WriteSignedVarInt((int)position.Z);
         }
 
@@ -738,20 +832,22 @@ namespace DaemonMC.Network
 
         public void WriteContainerName(FullContainerName ContainerName)
         {
-            WriteByte(ContainerName.ContainerName);
-            WriteOptional(ContainerName.DynamicId == 0 ? null : () => WriteSignedVarInt((int)ContainerName.DynamicId));
+            WriteByte((byte)ContainerName.ContainerName);
+            WriteOptional(ContainerName.DynamicId == null || ContainerName.DynamicId == 0 ? null : () => WriteInt((int)ContainerName.DynamicId));
         }
 
-        public void WriteNetItem(Item item)
-        {
-            WriteItem(item, true);
-        }
-
-        public void WriteItem(Item item, bool network = false)
+        public void WriteItemInstance(Item item, bool network = false)
         {
             if (!network && item is Items.VanillaItems.Air)
             {
                 WriteSignedVarInt(0);
+                if (protocolVersion >= Info.v1_26_40) //air is no longer a single varint
+                {
+                    WriteShort((ushort)0);
+                    WriteVarInt(0);
+                    WriteSignedVarInt(0);
+                    WriteVarInt(0);
+                }
             }
             else
             {
@@ -765,39 +861,99 @@ namespace DaemonMC.Network
                 }
                 WriteShort(item.Count);
                 WriteVarInt(item.Aux);
-                WriteBool(false);
                 WriteSignedVarInt(item.BlockRuntimeId);
                 WriteItemData(item.Data);
             }
         }
 
-        public void WriteItemData(NbtCompound nbt)
+        public void WriteNetItemStack(Item item)
         {
-            if (nbt == null)
-            {
-                WriteByte(0);
-                return;
-            }
-
-            nbt.Name = "";
-
-            var file = new NbtFile(nbt)
-            {
-                BigEndian = false,
-                UseVarInt = false
-            };
-
-            var itemData = new List<byte>();
-            itemData.AddRange(new List<byte> { 0xFF, 0xFF, 0x01 });
-            itemData.AddRange(file.SaveToBuffer(NbtCompression.None));
-            itemData.AddRange(new List<byte> { 0x00, 0x00 });
-
-            WriteBytes(itemData.ToArray(), true);
+            WriteItemStack(item, true);
         }
 
-        public void WriteVoxelShapes(List<VoxelShape> shapes)
+        public void WriteItemStack(Item item, bool network = false)
         {
-            WriteVarInt(shapes.Count);
+            bool air = item is Items.VanillaItems.Air;
+            if (!network && air)
+            {
+                WriteSignedVarInt(0);
+            }
+            else if (network && air && protocolVersion >= Info.v1_26_40)
+            {
+                WriteShort((ushort)0);
+                WriteShort((ushort)0);
+                WriteVarInt(0);
+                WriteBool(false); //has stack net id
+                WriteVarInt(0); //block runtime id
+                WriteVarInt(0); //user data
+            }
+            else
+            {
+                if (network)
+                {
+                    WriteShort(item.Id);
+                }
+                else
+                {
+                    WriteSignedVarInt(item.Id);
+                }
+                WriteShort(item.Count);
+                WriteVarInt(item.Aux);
+                WriteBool(false); //has stack net id
+                if (network)
+                {
+                    WriteVarInt(unchecked((uint)item.BlockRuntimeId));
+                }
+                else
+                {
+                    WriteSignedVarInt(item.BlockRuntimeId);
+                }
+                WriteItemData(item.Data);
+            }
+        }
+
+        public void WriteItemData(NbtCompound? nbt)
+        {
+            using var userData = new MemoryStream();
+            using var writer = new BinaryWriter(userData);
+
+            if (nbt == null)
+            {
+                writer.Write((short)0);
+            }
+            else
+            {
+                nbt.Name = "";
+
+                var file = new NbtFile(nbt)
+                {
+                    BigEndian = false,
+                    UseVarInt = false
+                };
+
+                byte[] nbtBytes = file.SaveToBuffer(NbtCompression.None);
+
+                writer.Write((short)-1);
+                writer.Write((byte)1);
+                writer.Write(nbtBytes);
+            }
+
+            // CanPlaceOn count
+            writer.Write(0);
+
+            // CanDestroy count
+            writer.Write(0);
+
+            WriteBytes(userData.ToArray(), true);
+        }
+
+        public void WriteVoxelShapes(List<VoxelShape> shapes, VanillaVoxelShapes? vanilla = null)
+        {
+            WriteVarInt((vanilla?.ShapeCount ?? 0) + shapes.Count);
+            if (vanilla != null)
+            {
+                WriteBytes(vanilla.Shapes, false);
+            }
             foreach (var shape in shapes)
             {
                 foreach (var cells in shape.Cells)
@@ -833,15 +989,45 @@ namespace DaemonMC.Network
             }
         }
 
-        public void WriteVoxelNameMap(List<VoxelShape> shapes)
+        public void WriteVoxelNameMap(List<VoxelShape> shapes, VanillaVoxelShapes? vanilla = null)
         {
-            short id = 0;
-            WriteVarInt(shapes.Count);
+            WriteVarInt((vanilla?.NameMap.Count ?? 0) + shapes.Count);
+            if (vanilla != null)
+            {
+                foreach (var (name, handle) in vanilla.NameMap)
+                {
+                    WriteString(name);
+                    WriteShort(handle);
+                }
+            }
+            short id = (short)(vanilla?.ShapeCount ?? 0);
             foreach (var shape in shapes)
             {
                 WriteString(shape.Name);
                 WriteShort(id);
                 id++;
+            }
+        }
+
+        public void WriteItemStackResponse(List<ItemStackResponseInfo> itemStackResponse)
+        {
+            WriteVarInt(itemStackResponse.Count);
+            foreach (var response in itemStackResponse)
+            {
+                WriteByte(response.Result);
+                WriteVarInt(response.RequestId);
+                if (protocolVersion >= Info.v1_26_40)
+                {
+                    if (protocolVersion < Info.v1_26_50)
+                    {
+                        WriteBool(true);
+                    }
+                    WriteBool(false); //containers. todo
+                }
+                else if (response.Result == 0) //success
+                {
+                    WriteVarInt(0); //containers. todo
+                }
             }
         }
 

@@ -7,7 +7,7 @@
             Name = "minecraft:campfire";
 
             BlastResistance = 2;
-            Brightness = 0;
+            Brightness = 15;
             FlameEncouragement = 5;
             Flammability = 20;
             Friction = 0.6000000238418579;

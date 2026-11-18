@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Paper()
         {
             Name = "minecraft:paper";
-            Id = 418;
+            Id = 389;
             Version = 2;
             ComponentBased = false;
         }

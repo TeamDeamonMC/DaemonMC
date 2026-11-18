@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Board()
         {
             Name = "minecraft:board";
-            Id = 636;
+            Id = 606;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SlimeBall()
         {
             Name = "minecraft:slime_ball";
-            Id = 420;
+            Id = 391;
             Version = 2;
             ComponentBased = false;
         }

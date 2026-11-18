@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Camera()
         {
             Name = "minecraft:camera";
-            Id = 637;
+            Id = 609;
             Version = 0;
             ComponentBased = false;
         }

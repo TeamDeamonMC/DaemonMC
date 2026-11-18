@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DiamondShovel()
         {
             Name = "minecraft:diamond_shovel";
-            Id = 348;
+            Id = 319;
             Version = 2;
             ComponentBased = false;
         }

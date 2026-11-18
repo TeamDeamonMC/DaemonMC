@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlowstoneDust()
         {
             Name = "minecraft:glowstone_dust";
-            Id = 426;
+            Id = 397;
             Version = 2;
             ComponentBased = false;
         }

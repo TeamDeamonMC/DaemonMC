@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FrogSpawnEgg()
         {
             Name = "minecraft:frog_spawn_egg";
-            Id = 671;
+            Id = 643;
             Version = 2;
             ComponentBased = false;
         }

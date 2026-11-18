@@ -14,6 +14,7 @@
             Hardness = 1.5;
             Opacity = 0.19999998807907104;
 
+            States["minecraft:corner"] = "none";
             States["upside_down_bit"] = (byte)0;
             States["weirdo_direction"] = 0;
         }

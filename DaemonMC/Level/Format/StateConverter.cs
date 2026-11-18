@@ -1,103 +1,249 @@
-﻿using DaemonMC.Network;
+﻿using System.Collections.Concurrent;
+using DaemonMC.Network;
+using DaemonMC.Utils;
 using fNbt;
 
 namespace DaemonMC.Level.Format
 {
-    public class StateConverter //Todo rewrite all this class
+    //renamedIds              -> .RenameBlock("old", "new")
+    //addedProperties         -> .AddState(block(s), "state", ...)
+    //removedProperties       -> .RemoveState(block(s), "state", valueOldClientsExpect)
+    //renamedProperties       -> .RenameState(block(s), "old", "new")
+    //remappedPropertyValues  -> .RemapValue(block(s), "state", oldValue, newValue)
+    //other                   -> .Custom(state => { ...; return changed; })
+
+    public static class StateConverter
     {
-        public static List<NbtCompound> process(List<NbtCompound> palette, int protocol)
+        private static readonly Schema[] Schemas =
+        [
+            new Schema(Info.v1_21_111) // 1.21.100 -> 1.21.110
+                .RenameBlock("minecraft:chain", "minecraft:iron_chain")
+                .AddState("minecraft:lightning_rod", "powered_bit"),
+
+            new Schema(Info.v1_26_30) // 1.26.20 -> 1.26.30
+                .AddState("minecraft:potent_sulfur", "potent_sulfur_state"),
+
+            new Schema(Info.v1_26_50) // 1.26.40 -> 1.26.50
+                .AddState(EndsWith("_fence", "glass_pane", "_bars", ":trip_wire"),
+                    "minecraft:connection_east", "minecraft:connection_north", "minecraft:connection_south", "minecraft:connection_west")
+                .AddState(EndsWith("_stairs"), "minecraft:corner"),
+
+            new Schema(Info.v1_26_60) // 1.26.50 -> 1.26.60
+                .AddState("minecraft:chorus_plant",
+                    "minecraft:connection_down", "minecraft:connection_east", "minecraft:connection_north",
+                    "minecraft:connection_south", "minecraft:connection_up", "minecraft:connection_west")
+                .AddState("minecraft:fire",
+                    "minecraft:connection_east", "minecraft:connection_north", "minecraft:connection_south",
+                    "minecraft:connection_up", "minecraft:connection_west")
+                .AddState("minecraft:redstone_wire", "redstone_east", "redstone_north", "redstone_south", "redstone_west"),
+        ];
+
+        private static readonly ConcurrentDictionary<long, int> HashCache = new();
+
+        public static int GetHash(NbtCompound latestState, int protocol)
         {
-            if (protocol <= Info.v1_21_100)
+            int latestHash = Hash(latestState);
+            int from = FirstSchemaToUndo(protocol);
+
+            if (from == Schemas.Length)
             {
-                palette = To1_21_100(palette);
+                return latestHash;
             }
 
-            return palette;
+            long key = ((long)from << 32) | (uint)latestHash;
+            return HashCache.GetOrAdd(key, _ => Hash(DowngradeFrom(latestState, from)));
         }
 
-        static List<NbtCompound> To1_21_100(List<NbtCompound> palette)
+        public static NbtCompound Downgrade(NbtCompound latestState, int protocol)
         {
-            foreach (var original in palette)
+            return DowngradeFrom(latestState, FirstSchemaToUndo(protocol));
+        }
+
+        public static int Hash(NbtCompound state)
+        {
+            var nbt = new NbtFile
             {
-                var block = (NbtCompound)original.Clone();
+                BigEndian = false,
+                UseVarInt = false,
+                RootTag = state,
+            };
 
-                if (block.TryGet<NbtString>("name", out var nameTag))
+            return Fnv1aHash.Hash32(nbt.SaveToBuffer(NbtCompression.None));
+        }
+
+        private static NbtCompound DowngradeFrom(NbtCompound latestState, int from)
+        {
+            if (from == Schemas.Length)
+            {
+                return latestState;
+            }
+
+            var state = new BlockState(latestState);
+
+            for (int i = Schemas.Length - 1; i >= from; i--)
+            {
+                Schemas[i].Downgrade(state);
+            }
+
+            return state.Changed ? state.ToNbt() : latestState;
+        }
+
+        private static int FirstSchemaToUndo(int protocol)
+        {
+            for (int i = 0; i < Schemas.Length; i++)
+            {
+                if (Schemas[i].Protocol > protocol)
                 {
-                    string name = nameTag.StringValue;
+                    return i;
+                }
+            }
+            return Schemas.Length;
+        }
 
-                    if (name == "minecraft:iron_chain")
+        private static Func<string, bool> EndsWith(params string[] suffixes)
+        {
+            return name => suffixes.Any(s => name.EndsWith(s, StringComparison.Ordinal));
+        }
+
+        public sealed class BlockState
+        {
+            public string Name { get; set; }
+            public SortedDictionary<string, NbtTag> States { get; } = new(StringComparer.Ordinal);
+            public bool Changed { get; set; }
+
+            public BlockState(NbtCompound nbt)
+            {
+                Name = nbt.TryGet<NbtString>("name", out var name) ? name!.Value : "minecraft:air";
+
+                if (nbt.TryGet<NbtCompound>("states", out var states))
+                {
+                    foreach (var tag in states!.Tags)
                     {
-                        block["name"] = new NbtString("name", "minecraft:chain");
-                    }
-
-                    if (name == "minecraft:lightning_rod")
-                    {
-                        if (block.TryGet<NbtCompound>("states", out var statesTag))
-                        {
-                            NbtCompound newStates = new NbtCompound();
-
-                            foreach (var tag in statesTag)
-                            {
-                                if (tag.Name != "powered_bit")
-                                {
-                                    newStates.Add((NbtTag)tag.Clone());
-                                }
-                            }
-
-                            newStates.Name = "states";
-                            block["states"] = newStates;
-                        }
+                        States[tag.Name!] = (NbtTag)tag.Clone();
                     }
                 }
             }
-            return palette;
+
+            public NbtCompound ToNbt()
+            {
+                var states = new NbtCompound("states");
+                foreach (var tag in States.Values)
+                {
+                    states.Add(tag);
+                }
+
+                return new NbtCompound("")
+                {
+                    new NbtString("name", Name),
+                    states
+                };
+            }
         }
 
-        static List<NbtCompound> To1_21_50(List<NbtCompound> palette)
+        private sealed class Schema(int protocol)
         {
-            foreach (var block in palette)
+            public int Protocol { get; } = protocol;
+            private readonly List<Func<BlockState, bool>> rules = new();
+
+            public void Downgrade(BlockState state)
             {
-                if (block.TryGet<NbtString>("name", out var nameTag))
+                for (int i = rules.Count - 1; i >= 0; i--)
                 {
-                    string name = nameTag.StringValue;
-                    if (name.EndsWith("_door") || name.EndsWith("_fence_gate"))
+                    if (rules[i](state))
                     {
-                        if (block.TryGet<NbtCompound>("states", out var statesTag))
-                        {
-                            if (statesTag.TryGet<NbtString>("minecraft:cardinal_direction", out var cardinalTag))
-                            {
-                                int direction = GetDirection(cardinalTag.StringValue);
-
-                                NbtCompound newStates = new NbtCompound();
-                                newStates.Add(new NbtInt("direction", direction));
-                                foreach (var tag in statesTag)
-                                {
-                                    if (tag.Name != "minecraft:cardinal_direction")
-                                    {
-                                        newStates.Add((NbtTag)tag.Clone());
-                                    }
-                                }
-
-                                newStates.Name = "states";
-                                block["states"] = newStates;
-                            }
-                        }
+                        state.Changed = true;
                     }
                 }
             }
 
-            return palette;
-        }
-
-        static int GetDirection(string cardinal)
-        {
-            return cardinal.ToLower() switch
+            public Schema RenameBlock(string oldName, string newName)
             {
-                "south" => 0,
-                "west" => 1,
-                "north" => 2,
-                "east" => 3,
-                _ => -1
+                rules.Add(s =>
+                {
+                    if (s.Name != newName) return false;
+                    s.Name = oldName;
+                    return true;
+                });
+                return this;
+            }
+
+            public Schema AddState(string block, params string[] states) => AddState(n => n == block, states);
+
+            public Schema AddState(Func<string, bool> block, params string[] states)
+            {
+                rules.Add(s =>
+                {
+                    if (!block(s.Name)) return false;
+                    bool changed = false;
+                    foreach (var name in states)
+                    {
+                        changed |= s.States.Remove(name);
+                    }
+                    return changed;
+                });
+                return this;
+            }
+
+            public Schema RemoveState(string block, string state, object oldValue) => RemoveState(n => n == block, state, oldValue);
+
+            public Schema RemoveState(Func<string, bool> block, string state, object oldValue)
+            {
+                rules.Add(s =>
+                {
+                    if (!block(s.Name) || s.States.ContainsKey(state)) return false;
+                    s.States[state] = Tag(state, oldValue);
+                    return true;
+                });
+                return this;
+            }
+
+            public Schema RenameState(string block, string oldName, string newName) => RenameState(n => n == block, oldName, newName);
+
+            public Schema RenameState(Func<string, bool> block, string oldName, string newName)
+            {
+                rules.Add(s =>
+                {
+                    if (!block(s.Name) || !s.States.Remove(newName, out var tag)) return false;
+                    s.States[oldName] = Tag(oldName, Value(tag));
+                    return true;
+                });
+                return this;
+            }
+
+            public Schema RemapValue(string block, string state, object oldValue, object newValue) => RemapValue(n => n == block, state, oldValue, newValue);
+
+            public Schema RemapValue(Func<string, bool> block, string state, object oldValue, object newValue)
+            {
+                rules.Add(s =>
+                {
+                    if (!block(s.Name) || !s.States.TryGetValue(state, out var tag) || !Equals(Value(tag), newValue)) return false;
+                    s.States[state] = Tag(state, oldValue);
+                    return true;
+                });
+                return this;
+            }
+
+            public Schema Custom(Func<BlockState, bool> downgrade)
+            {
+                rules.Add(downgrade);
+                return this;
+            }
+
+            private static object Value(NbtTag tag) => tag switch
+            {
+                NbtByte b => b.Value,
+                NbtInt i => i.Value,
+                NbtString s => s.Value,
+                _ => throw new InvalidOperationException($"Unsupported block state type {tag.TagType} for {tag.Name}")
+            };
+
+            private static NbtTag Tag(string name, object value) => value switch
+            {
+                byte b => new NbtByte(name, b),
+                bool b => new NbtByte(name, (byte)(b ? 1 : 0)),
+                int i => new NbtInt(name, i),
+                string s => new NbtString(name, s),
+                _ => throw new InvalidOperationException($"Unsupported block state value {value?.GetType().Name} for {name}")
             };
         }
     }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NautilusShell()
         {
             Name = "minecraft:nautilus_shell";
-            Id = 609;
+            Id = 580;
             Version = 2;
             ComponentBased = false;
         }

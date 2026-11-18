@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PurpleBundle()
         {
             Name = "minecraft:purple_bundle";
-            Id = 266;
+            Id = 875;
             Version = 1;
             ComponentBased = true;
         }

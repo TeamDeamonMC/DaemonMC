@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CreeperBannerPattern()
         {
             Name = "minecraft:creeper_banner_pattern";
-            Id = 621;
+            Id = 592;
             Version = 2;
             ComponentBased = false;
         }

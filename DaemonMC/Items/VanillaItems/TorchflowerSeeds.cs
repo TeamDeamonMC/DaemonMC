@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TorchflowerSeeds()
         {
             Name = "minecraft:torchflower_seeds";
-            Id = 325;
+            Id = 296;
             Version = 0;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Diamond()
         {
             Name = "minecraft:diamond";
-            Id = 335;
+            Id = 306;
             Version = 2;
             ComponentBased = false;
         }

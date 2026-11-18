@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RedBundle()
         {
             Name = "minecraft:red_bundle";
-            Id = 276;
+            Id = 876;
             Version = 1;
             ComponentBased = true;
         }

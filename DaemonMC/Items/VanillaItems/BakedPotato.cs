@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BakedPotato()
         {
             Name = "minecraft:baked_potato";
-            Id = 310;
+            Id = 281;
             Version = 0;
             ComponentBased = false;
         }

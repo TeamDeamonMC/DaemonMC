@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public JungleBoat()
         {
             Name = "minecraft:jungle_boat";
-            Id = 409;
+            Id = 380;
             Version = 2;
             ComponentBased = false;
         }

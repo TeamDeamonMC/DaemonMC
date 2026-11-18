@@ -14,7 +14,11 @@
             Hardness = 0;
             Opacity = 0.19999998807907104;
 
+            States["redstone_east"] = "none";
+            States["redstone_north"] = "none";
             States["redstone_signal"] = 0;
+            States["redstone_south"] = "none";
+            States["redstone_west"] = "none";
         }
     }
 }

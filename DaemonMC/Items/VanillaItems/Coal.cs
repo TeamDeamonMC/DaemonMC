@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Coal()
         {
             Name = "minecraft:coal";
-            Id = 333;
+            Id = 304;
             Version = 2;
             ComponentBased = true;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenChestplate()
         {
             Name = "minecraft:golden_chestplate";
-            Id = 384;
+            Id = 355;
             Version = 2;
             ComponentBased = false;
         }

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public DragonBreath()
         {
             Name = "minecraft:dragon_breath";
-            Id = 599;
+            Id = 570;
             Version = 2;
             ComponentBased = false;
         }

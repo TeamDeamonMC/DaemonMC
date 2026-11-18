@@ -18,6 +18,10 @@
             encoder.WriteString(IpAddress);
             encoder.WriteShort(Port);
             encoder.WriteBool(Reload);
+            if (encoder.protocolVersion >= Info.v1_26_40)
+            {
+                encoder.WriteOptional(); //gatherings configuration
+            }
         }
     }
 }

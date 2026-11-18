@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WarpedDoor()
         {
             Name = "minecraft:warped_door";
-            Id = 661;
+            Id = 633;
             Version = 2;
             ComponentBased = false;
         }

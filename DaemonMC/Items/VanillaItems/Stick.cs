@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Stick()
         {
             Name = "minecraft:stick";
-            Id = 352;
+            Id = 323;
             Version = 2;
             ComponentBased = false;
         }

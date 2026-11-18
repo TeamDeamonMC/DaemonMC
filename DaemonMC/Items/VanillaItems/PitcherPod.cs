@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PitcherPod()
         {
             Name = "minecraft:pitcher_pod";
-            Id = 326;
+            Id = 297;
             Version = 0;
             ComponentBased = false;
         }

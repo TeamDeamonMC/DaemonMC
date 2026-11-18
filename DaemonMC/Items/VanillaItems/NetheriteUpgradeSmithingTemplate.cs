@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteUpgradeSmithingTemplate()
         {
             Name = "minecraft:netherite_upgrade_smithing_template";
-            Id = 724;
+            Id = 696;
             Version = 2;
             ComponentBased = false;
         }

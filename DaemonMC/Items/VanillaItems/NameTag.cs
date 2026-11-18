@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NameTag()
         {
             Name = "minecraft:name_tag";
-            Id = 587;
+            Id = 558;
             Version = 2;
             ComponentBased = false;
         }

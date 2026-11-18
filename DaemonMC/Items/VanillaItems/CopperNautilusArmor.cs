@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperNautilusArmor()
         {
             Name = "minecraft:copper_nautilus_armor";
-            Id = 788;
+            Id = 763;
             Version = 2;
             ComponentBased = false;
         }

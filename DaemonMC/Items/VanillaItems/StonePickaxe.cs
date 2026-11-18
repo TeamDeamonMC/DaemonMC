@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StonePickaxe()
         {
             Name = "minecraft:stone_pickaxe";
-            Id = 345;
+            Id = 316;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

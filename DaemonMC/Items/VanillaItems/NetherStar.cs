@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetherStar()
         {
             Name = "minecraft:nether_star";
-            Id = 557;
+            Id = 528;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

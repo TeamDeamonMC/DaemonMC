@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StoneShovel()
         {
             Name = "minecraft:stone_shovel";
-            Id = 344;
+            Id = 315;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

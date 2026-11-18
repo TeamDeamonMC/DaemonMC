@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MagentaDye()
         {
             Name = "minecraft:magenta_dye";
-            Id = 440;
+            Id = 411;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

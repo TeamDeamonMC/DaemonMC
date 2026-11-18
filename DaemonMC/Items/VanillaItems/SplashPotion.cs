@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SplashPotion()
         {
             Name = "minecraft:splash_potion";
-            Id = 600;
+            Id = 571;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

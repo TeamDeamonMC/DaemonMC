@@ -97,7 +97,7 @@ namespace DaemonMC.Items.VanillaItems
             Id = {id};
             Version = {version};
             ComponentBased = {(componentBased ? "true" : "false")};
-            ComponentData = {componentNbt};
+            ComponentData = {JsonSerializer.Serialize(componentNbt)};
         }}
     }}
 }}";

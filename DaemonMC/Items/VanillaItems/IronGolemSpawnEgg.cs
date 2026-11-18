@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public IronGolemSpawnEgg()
         {
             Name = "minecraft:iron_golem_spawn_egg";
-            Id = 539;
+            Id = 510;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

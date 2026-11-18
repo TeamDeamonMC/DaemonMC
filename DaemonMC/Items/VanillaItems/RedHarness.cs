@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RedHarness()
         {
             Name = "minecraft:red_harness";
-            Id = 770;
+            Id = 745;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

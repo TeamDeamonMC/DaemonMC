@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EnderPearl()
         {
             Name = "minecraft:ender_pearl";
-            Id = 454;
+            Id = 425;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

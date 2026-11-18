@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenAxe()
         {
             Name = "minecraft:golden_axe";
-            Id = 357;
+            Id = 328;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

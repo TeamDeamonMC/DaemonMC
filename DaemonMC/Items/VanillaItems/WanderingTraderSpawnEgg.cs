@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WanderingTraderSpawnEgg()
         {
             Name = "minecraft:wandering_trader_spawn_egg";
-            Id = 526;
+            Id = 497;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

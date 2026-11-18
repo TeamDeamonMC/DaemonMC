@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FermentedSpiderEye()
         {
             Name = "minecraft:fermented_spider_eye";
-            Id = 461;
+            Id = 432;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

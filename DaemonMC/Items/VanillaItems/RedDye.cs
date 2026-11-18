@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RedDye()
         {
             Name = "minecraft:red_dye";
-            Id = 428;
+            Id = 399;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

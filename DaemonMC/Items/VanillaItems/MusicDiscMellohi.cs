@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscMellohi()
         {
             Name = "minecraft:music_disc_mellohi";
-            Id = 579;
+            Id = 550;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

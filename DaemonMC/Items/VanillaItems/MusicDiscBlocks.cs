@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscBlocks()
         {
             Name = "minecraft:music_disc_blocks";
-            Id = 575;
+            Id = 546;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

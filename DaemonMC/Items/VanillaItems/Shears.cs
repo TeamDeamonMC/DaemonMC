@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Shears()
         {
             Name = "minecraft:shears";
-            Id = 453;
+            Id = 424;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

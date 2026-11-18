@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SulfurCubeBucket()
         {
             Name = "minecraft:sulfur_cube_bucket";
-            Id = 795;
+            Id = 770;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

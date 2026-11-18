@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Minecart()
         {
             Name = "minecraft:minecart";
-            Id = 402;
+            Id = 373;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

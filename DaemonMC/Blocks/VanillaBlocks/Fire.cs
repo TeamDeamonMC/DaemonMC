@@ -15,6 +15,11 @@
             Opacity = 0;
 
             States["age"] = 0;
+            States["minecraft:connection_east"] = (byte)0;
+            States["minecraft:connection_north"] = (byte)0;
+            States["minecraft:connection_south"] = (byte)0;
+            States["minecraft:connection_up"] = (byte)0;
+            States["minecraft:connection_west"] = (byte)0;
         }
     }
 }

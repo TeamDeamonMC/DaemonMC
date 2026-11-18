@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Netherbrick()
         {
             Name = "minecraft:netherbrick";
-            Id = 562;
+            Id = 533;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

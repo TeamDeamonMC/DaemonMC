@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Cake()
         {
             Name = "minecraft:cake";
-            Id = 449;
+            Id = 420;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

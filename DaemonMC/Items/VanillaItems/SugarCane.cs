@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SugarCane()
         {
             Name = "minecraft:sugar_cane";
-            Id = 417;
+            Id = 388;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

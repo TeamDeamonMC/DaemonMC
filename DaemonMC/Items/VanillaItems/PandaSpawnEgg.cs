@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PandaSpawnEgg()
         {
             Name = "minecraft:panda_spawn_egg";
-            Id = 523;
+            Id = 494;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

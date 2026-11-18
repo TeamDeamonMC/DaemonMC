@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GuardianSpawnEgg()
         {
             Name = "minecraft:guardian_spawn_egg";
-            Id = 494;
+            Id = 465;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

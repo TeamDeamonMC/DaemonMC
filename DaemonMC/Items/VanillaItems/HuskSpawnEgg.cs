@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HuskSpawnEgg()
         {
             Name = "minecraft:husk_spawn_egg";
-            Id = 497;
+            Id = 468;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

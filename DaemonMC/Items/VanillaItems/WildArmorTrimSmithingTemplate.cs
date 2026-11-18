@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WildArmorTrimSmithingTemplate()
         {
             Name = "minecraft:wild_armor_trim_smithing_template";
-            Id = 728;
+            Id = 700;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

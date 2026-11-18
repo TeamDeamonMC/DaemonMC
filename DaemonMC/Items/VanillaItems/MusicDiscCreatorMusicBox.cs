@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscCreatorMusicBox()
         {
             Name = "minecraft:music_disc_creator_music_box";
-            Id = 830;
+            Id = 834;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

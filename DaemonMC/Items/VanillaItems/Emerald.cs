@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Emerald()
         {
             Name = "minecraft:emerald";
-            Id = 552;
+            Id = 523;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

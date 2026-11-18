@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FlowerPot()
         {
             Name = "minecraft:flower_pot";
-            Id = 554;
+            Id = 525;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

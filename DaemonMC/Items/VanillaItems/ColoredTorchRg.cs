@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ColoredTorchRg()
         {
             Name = "minecraft:colored_torch_rg";
-            Id = 838;
+            Id = 843;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

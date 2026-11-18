@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SnifferSpawnEgg()
         {
             Name = "minecraft:sniffer_spawn_egg";
-            Id = 534;
+            Id = 505;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

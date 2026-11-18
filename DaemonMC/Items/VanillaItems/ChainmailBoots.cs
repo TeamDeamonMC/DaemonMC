@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ChainmailBoots()
         {
             Name = "minecraft:chainmail_boots";
-            Id = 374;
+            Id = 345;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

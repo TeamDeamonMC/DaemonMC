@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SkullBannerPattern()
         {
             Name = "minecraft:skull_banner_pattern";
-            Id = 622;
+            Id = 593;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

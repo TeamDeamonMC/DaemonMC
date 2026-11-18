@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TurtleHelmet()
         {
             Name = "minecraft:turtle_helmet";
-            Id = 612;
+            Id = 583;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public LeatherChestplate()
         {
             Name = "minecraft:leather_chestplate";
-            Id = 368;
+            Id = 339;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

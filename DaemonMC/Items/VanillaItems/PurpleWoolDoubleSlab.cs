@@ -1,11 +1,11 @@
 namespace DaemonMC.Items.VanillaItems
 {
-    public class DebugStick : Item
+    public class PurpleWoolDoubleSlab : Item
     {
-        public DebugStick()
+        public PurpleWoolDoubleSlab()
         {
-            Name = "minecraft:debug_stick";
-            Id = 632;
+            Name = "minecraft:purple_wool_double_slab";
+            Id = -1194;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

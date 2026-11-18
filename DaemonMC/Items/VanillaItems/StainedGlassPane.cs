@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StainedGlassPane()
         {
             Name = "minecraft:stained_glass_pane";
-            Id = 826;
+            Id = 830;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

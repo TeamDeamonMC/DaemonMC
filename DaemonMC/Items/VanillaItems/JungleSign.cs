@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public JungleSign()
         {
             Name = "minecraft:jungle_sign";
-            Id = 617;
+            Id = 588;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

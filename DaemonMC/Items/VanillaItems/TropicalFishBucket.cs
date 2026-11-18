@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TropicalFishBucket()
         {
             Name = "minecraft:tropical_fish_bucket";
-            Id = 398;
+            Id = 369;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

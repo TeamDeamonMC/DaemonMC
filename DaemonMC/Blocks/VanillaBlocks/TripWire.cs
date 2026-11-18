@@ -16,6 +16,10 @@
 
             States["attached_bit"] = (byte)0;
             States["disarmed_bit"] = (byte)0;
+            States["minecraft:connection_east"] = (byte)0;
+            States["minecraft:connection_north"] = (byte)0;
+            States["minecraft:connection_south"] = (byte)0;
+            States["minecraft:connection_west"] = (byte)0;
             States["powered_bit"] = (byte)0;
             States["suspended_bit"] = (byte)0;
         }

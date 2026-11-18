@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ZombieSpawnEgg()
         {
             Name = "minecraft:zombie_spawn_egg";
-            Id = 480;
+            Id = 451;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public PufferfishBucket()
         {
             Name = "minecraft:pufferfish_bucket";
-            Id = 399;
+            Id = 370;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

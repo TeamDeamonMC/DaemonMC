@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public FlowerBannerPattern()
         {
             Name = "minecraft:flower_banner_pattern";
-            Id = 620;
+            Id = 591;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GoldenHelmet()
         {
             Name = "minecraft:golden_helmet";
-            Id = 383;
+            Id = 354;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

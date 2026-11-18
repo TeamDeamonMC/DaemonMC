@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BambooSign()
         {
             Name = "minecraft:bamboo_sign";
-            Id = 695;
+            Id = 667;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

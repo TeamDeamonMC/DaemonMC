@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscWait()
         {
             Name = "minecraft:music_disc_wait";
-            Id = 584;
+            Id = 555;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

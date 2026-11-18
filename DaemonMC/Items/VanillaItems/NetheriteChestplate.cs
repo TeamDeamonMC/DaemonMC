@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public NetheriteChestplate()
         {
             Name = "minecraft:netherite_chestplate";
-            Id = 654;
+            Id = 626;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

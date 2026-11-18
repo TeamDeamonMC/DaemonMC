@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscPrecipice()
         {
             Name = "minecraft:music_disc_precipice";
-            Id = 831;
+            Id = 835;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

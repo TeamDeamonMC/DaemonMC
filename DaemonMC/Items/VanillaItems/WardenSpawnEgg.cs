@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WardenSpawnEgg()
         {
             Name = "minecraft:warden_spawn_egg";
-            Id = 675;
+            Id = 647;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

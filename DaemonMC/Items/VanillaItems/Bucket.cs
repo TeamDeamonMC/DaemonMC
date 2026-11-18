@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Bucket()
         {
             Name = "minecraft:bucket";
-            Id = 392;
+            Id = 363;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

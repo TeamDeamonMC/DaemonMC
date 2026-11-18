@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RawIron()
         {
             Name = "minecraft:raw_iron";
-            Id = 545;
+            Id = 516;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

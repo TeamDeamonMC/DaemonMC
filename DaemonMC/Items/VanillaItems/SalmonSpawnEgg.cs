@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SalmonSpawnEgg()
         {
             Name = "minecraft:salmon_spawn_egg";
-            Id = 516;
+            Id = 487;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

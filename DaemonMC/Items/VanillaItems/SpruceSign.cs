@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SpruceSign()
         {
             Name = "minecraft:spruce_sign";
-            Id = 615;
+            Id = 586;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WarpedFungusOnAStick()
         {
             Name = "minecraft:warped_fungus_on_a_stick";
-            Id = 662;
+            Id = 634;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

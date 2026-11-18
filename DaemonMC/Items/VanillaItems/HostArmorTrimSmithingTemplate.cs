@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HostArmorTrimSmithingTemplate()
         {
             Name = "minecraft:host_armor_trim_smithing_template";
-            Id = 740;
+            Id = 712;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

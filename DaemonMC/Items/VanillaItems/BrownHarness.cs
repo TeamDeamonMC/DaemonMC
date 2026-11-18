@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BrownHarness()
         {
             Name = "minecraft:brown_harness";
-            Id = 759;
+            Id = 734;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

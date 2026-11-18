@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public BreezeSpawnEgg()
         {
             Name = "minecraft:breeze_spawn_egg";
-            Id = 535;
+            Id = 506;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

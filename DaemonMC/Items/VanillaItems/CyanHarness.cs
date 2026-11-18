@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CyanHarness()
         {
             Name = "minecraft:cyan_harness";
-            Id = 760;
+            Id = 735;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

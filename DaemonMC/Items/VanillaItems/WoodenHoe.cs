@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WoodenHoe()
         {
             Name = "minecraft:wooden_hoe";
-            Id = 361;
+            Id = 332;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public EyeArmorTrimSmithingTemplate()
         {
             Name = "minecraft:eye_armor_trim_smithing_template";
-            Id = 730;
+            Id = 702;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

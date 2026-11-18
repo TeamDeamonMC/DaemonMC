@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CrimsonDoor()
         {
             Name = "minecraft:crimson_door";
-            Id = 660;
+            Id = 632;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

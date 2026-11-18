@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Saddle()
         {
             Name = "minecraft:saddle";
-            Id = 403;
+            Id = 374;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MagmaCream()
         {
             Name = "minecraft:magma_cream";
-            Id = 463;
+            Id = 434;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

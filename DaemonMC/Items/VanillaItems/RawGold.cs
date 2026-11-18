@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RawGold()
         {
             Name = "minecraft:raw_gold";
-            Id = 546;
+            Id = 517;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

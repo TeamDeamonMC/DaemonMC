@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public WolfSpawnEgg()
         {
             Name = "minecraft:wolf_spawn_egg";
-            Id = 472;
+            Id = 443;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

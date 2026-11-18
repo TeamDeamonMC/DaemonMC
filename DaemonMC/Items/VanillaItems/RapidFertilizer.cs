@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RapidFertilizer()
         {
             Name = "minecraft:rapid_fertilizer";
-            Id = 641;
+            Id = 613;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

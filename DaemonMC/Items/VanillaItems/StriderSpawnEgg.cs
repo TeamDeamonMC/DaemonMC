@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public StriderSpawnEgg()
         {
             Name = "minecraft:strider_spawn_egg";
-            Id = 529;
+            Id = 500;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

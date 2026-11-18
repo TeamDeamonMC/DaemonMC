@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MangroveDoor()
         {
             Name = "minecraft:mangrove_door";
-            Id = 676;
+            Id = 648;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

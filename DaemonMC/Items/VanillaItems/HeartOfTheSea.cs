@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public HeartOfTheSea()
         {
             Name = "minecraft:heart_of_the_sea";
-            Id = 610;
+            Id = 581;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

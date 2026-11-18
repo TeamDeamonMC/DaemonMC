@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public SpruceBoat()
         {
             Name = "minecraft:spruce_boat";
-            Id = 410;
+            Id = 381;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

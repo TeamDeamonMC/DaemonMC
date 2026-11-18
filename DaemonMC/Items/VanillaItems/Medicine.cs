@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Medicine()
         {
             Name = "minecraft:medicine";
-            Id = 643;
+            Id = 615;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

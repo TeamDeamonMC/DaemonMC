@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ShulkerShell()
         {
             Name = "minecraft:shulker_shell";
-            Id = 605;
+            Id = 576;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

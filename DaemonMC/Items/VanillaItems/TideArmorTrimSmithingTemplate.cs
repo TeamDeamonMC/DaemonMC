@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public TideArmorTrimSmithingTemplate()
         {
             Name = "minecraft:tide_armor_trim_smithing_template";
-            Id = 732;
+            Id = 704;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

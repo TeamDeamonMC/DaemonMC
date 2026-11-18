@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RabbitSpawnEgg()
         {
             Name = "minecraft:rabbit_spawn_egg";
-            Id = 492;
+            Id = 463;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

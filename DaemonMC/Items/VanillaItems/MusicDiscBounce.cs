@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MusicDiscBounce()
         {
             Name = "minecraft:music_disc_bounce";
-            Id = 834;
+            Id = 838;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

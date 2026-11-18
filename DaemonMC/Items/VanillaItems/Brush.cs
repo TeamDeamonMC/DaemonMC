@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Brush()
         {
             Name = "minecraft:brush";
-            Id = 723;
+            Id = 695;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

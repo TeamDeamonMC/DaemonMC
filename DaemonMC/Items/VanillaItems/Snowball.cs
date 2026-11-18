@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Snowball()
         {
             Name = "minecraft:snowball";
-            Id = 406;
+            Id = 377;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

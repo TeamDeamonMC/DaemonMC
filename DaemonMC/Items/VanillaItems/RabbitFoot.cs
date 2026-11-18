@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public RabbitFoot()
         {
             Name = "minecraft:rabbit_foot";
-            Id = 567;
+            Id = 538;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

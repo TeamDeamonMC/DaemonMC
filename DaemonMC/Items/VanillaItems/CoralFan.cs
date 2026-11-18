@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CoralFan()
         {
             Name = "minecraft:coral_fan";
-            Id = 810;
+            Id = 806;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

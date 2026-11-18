@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlowStick()
         {
             Name = "minecraft:glow_stick";
-            Id = 645;
+            Id = 617;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

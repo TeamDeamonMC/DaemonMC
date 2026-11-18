@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public VexArmorTrimSmithingTemplate()
         {
             Name = "minecraft:vex_armor_trim_smithing_template";
-            Id = 731;
+            Id = 703;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

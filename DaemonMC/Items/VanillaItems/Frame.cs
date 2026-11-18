@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Frame()
         {
             Name = "minecraft:frame";
-            Id = 553;
+            Id = 524;
             Version = 2;
             ComponentBased = true;
             ComponentData = "";

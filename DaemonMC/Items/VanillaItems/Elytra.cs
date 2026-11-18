@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public Elytra()
         {
             Name = "minecraft:elytra";
-            Id = 603;
+            Id = 574;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

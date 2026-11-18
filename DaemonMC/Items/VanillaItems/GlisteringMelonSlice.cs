@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlisteringMelonSlice()
         {
             Name = "minecraft:glistering_melon_slice";
-            Id = 467;
+            Id = 438;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

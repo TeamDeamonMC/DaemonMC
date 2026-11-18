@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlowInkSac()
         {
             Name = "minecraft:glow_ink_sac";
-            Id = 543;
+            Id = 514;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

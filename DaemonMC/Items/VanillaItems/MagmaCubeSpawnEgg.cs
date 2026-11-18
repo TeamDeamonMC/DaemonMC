@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public MagmaCubeSpawnEgg()
         {
             Name = "minecraft:magma_cube_spawn_egg";
-            Id = 488;
+            Id = 459;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

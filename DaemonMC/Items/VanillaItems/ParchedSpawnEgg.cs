@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public ParchedSpawnEgg()
         {
             Name = "minecraft:parched_spawn_egg";
-            Id = 787;
+            Id = 762;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

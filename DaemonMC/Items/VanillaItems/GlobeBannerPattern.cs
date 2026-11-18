@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public GlobeBannerPattern()
         {
             Name = "minecraft:globe_banner_pattern";
-            Id = 627;
+            Id = 598;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

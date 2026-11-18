@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public AllaySpawnEgg()
         {
             Name = "minecraft:allay_spawn_egg";
-            Id = 674;
+            Id = 646;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

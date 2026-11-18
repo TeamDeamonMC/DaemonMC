@@ -5,7 +5,7 @@ namespace DaemonMC.Items.VanillaItems
         public CopperNugget()
         {
             Name = "minecraft:copper_nugget";
-            Id = 783;
+            Id = 758;
             Version = 2;
             ComponentBased = false;
             ComponentData = "";

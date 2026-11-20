@@ -32,6 +32,9 @@ namespace DaemonMC.Level
         public int SpawnY { get; set; } = 384;
         public int SpawnZ { get; set; } = 0;
         public long RandomSeed { get; set; } = 0;
+        private HashSet<(int x, int z)> EntityChunksLoaded { get; } = new HashSet<(int x, int z)>();
+        private static readonly byte[] DigestPrefix = "digp"u8.ToArray();
+        private static readonly byte[] ActorPrefix = "actorprefix"u8.ToArray();
 
         public World(string levelName)
         {
@@ -321,6 +324,10 @@ namespace DaemonMC.Level
                         EntityId = entity.EntityId,
                         ActorType = entity.ActorType,
                         Position = entity.Position,
+                        Velocity = entity.Velocity,
+                        Rotation = entity.Rotation,
+                        YheadRotation = entity.YheadRotation,
+                        YbodyRotation = entity.YbodyRotation,
                         Attributes = entity.Attributes,
                         Metadata = entity.Metadata,
                         Properties = entity.Properties
@@ -487,7 +494,72 @@ namespace DaemonMC.Level
             }
 
             Cache.TryAdd((x, z), chunk);
+
+            if (EntityChunksLoaded.Add((x, z)))
+            {
+                LoadEntities(x, z);
+            }
+
             return chunk;
+        }
+
+        public List<Entity> LoadEntities(int x, int z)
+        {
+            var loaded = new List<Entity>();
+
+            byte[] digestKey = ToDataTypes.GetByteSum(DigestPrefix, ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z)));
+            byte[] digest = Db.Get(digestKey);
+
+            if (digest == null || digest.Length < 8)
+            {
+                return loaded;
+            }
+
+            for (int i = 0; i + 8 <= digest.Length; i += 8)
+            {
+                byte[] actorKey = ToDataTypes.GetByteSum(ActorPrefix, digest.AsSpan(i, 8).ToArray());
+                byte[] actorData = Db.Get(actorKey);
+
+                if (actorData == null)
+                {
+                    Log.warn($"Entity record {Convert.ToHexString(actorKey, ActorPrefix.Length, 8)} listed in chunk x:{x} z:{z} not found in '{LevelName}'");
+                    continue;
+                }
+
+                try
+                {
+                    var nbt = new NbtFile
+                    {
+                        BigEndian = false,
+                        UseVarInt = false
+                    };
+                    nbt.LoadFromBuffer(actorData, 0, actorData.Length, NbtCompression.None);
+                    var tag = (NbtCompound)nbt.RootTag;
+
+                    string identifier = tag.Get<NbtString>("identifier")?.Value ?? "";
+                    if (identifier == "")
+                    {
+                        Log.debug($"Skipped loading empty entity in chunk x:{x} z:{z} of '{LevelName}'");
+                        continue;
+                    }
+
+                    Entity entity = EntityPalette.Create(identifier);
+                    entity.LoadNbt(tag);
+                    entity.Spawn(this);
+                    loaded.Add(entity);
+                }
+                catch (Exception ex)
+                {
+                    Log.error($"Failed to load entity in chunk x:{x} z:{z} of '{LevelName}': {ex.Message}");
+                }
+            }
+
+            if (loaded.Count > 0)
+            {
+                Log.debug($"Loaded {loaded.Count} entities from chunk x:{x} z:{z} in '{LevelName}'");
+            }
+
+            return loaded;
         }
 
         public void Load()

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using DaemonMC.Blocks;
+using DaemonMC.Entities;
 using DaemonMC.Items;
 using DaemonMC.Level;
 using DaemonMC.Network;
@@ -55,6 +56,8 @@ namespace DaemonMC
             BlockPalette.buildPalette();
 
             ItemPalette.buildPalette();
+
+            EntityPalette.buildPalette();
 
             WorldManager.LoadWorlds("Worlds");
 

@@ -9,6 +9,10 @@ Fast and lightweight server software for Minecraft: Bedrock Edition designed for
 
 Instead of vanilla features and mechanics, here game is completely driven by plugins. DaemonMC provide only server core with simple API so you can add only what you need. No unnecessary server resources and network usage by various features like block tick or mobs.
 
+## Plugins
+
+**All supported API methods, tutorials, code examples and more can be found in [Wiki](https://github.com/TeamDeamonMC/DaemonMC/wiki)**
+
 List of publicly available plugins [Public plugins and tools](https://github.com/TeamDeamonMC/DaemonMC/wiki/.-Public-plugins-and-tools)
 
 To learn how to create plugins check [Plugin tutorial](https://github.com/TeamDeamonMC/DaemonMC/wiki/.-Plugin-tutorial)

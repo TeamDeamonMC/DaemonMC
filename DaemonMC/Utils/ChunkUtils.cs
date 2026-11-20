@@ -1,4 +1,5 @@
-﻿using DaemonMC.Level;
+﻿using DaemonMC.Blocks;
+using DaemonMC.Level;
 using fNbt;
 using MiNET.LevelDB.Utils;
 
@@ -84,6 +85,31 @@ namespace DaemonMC.Utils
                 return subChunk; //todo fix and remove here. this usually works but will not always. multiple storages thorw error
             }
             return subChunk; //keep this
+        }
+
+        private static readonly int[] ValidBitsPerBlock = [1, 2, 3, 4, 5, 6, 8];
+
+        public static int GetBitsPerBlock(int paletteSize)
+        {
+            foreach (int bits in ValidBitsPerBlock)
+            {
+                if (paletteSize <= (1 << bits))
+                {
+                    return bits;
+                }
+            }
+            return ValidBitsPerBlock[^1];
+        }
+
+        public static SubChunk CreateEmptySubChunk()
+        {
+            var subChunk = new SubChunk
+            {
+                StorageSize = 1,
+                BitsPerBlock = 1,
+            };
+            subChunk.Palette.Add(new Air().GetState());
+            return subChunk;
         }
 
         public static List<(int x, int z)> GetSequence(int radius, int centerX, int centerZ)

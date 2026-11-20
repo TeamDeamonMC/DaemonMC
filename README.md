@@ -1,19 +1,17 @@
 
 # DaemonMC
-> [!NOTE]
-> This software is still in development. Usable but may contain bugs and unfinished features
 
 Fast and lightweight server software for Minecraft: Bedrock Edition designed for mini games.
 
 [![Discord](https://img.shields.io/discord/932359565612294224?logo=discord&logoColor=white&color=blue)](https://discord.gg/A6BBcXSCj4)
 ![Minecraft - Version](https://img.shields.io/badge/Minecraft_1.21.90_--_1.26.60-darkgreen)
-![LevelDB](https://img.shields.io/badge/LevelDB_1.21.110_--_1.26.30-gray)
+![LevelDB](https://img.shields.io/badge/LevelDB_26.60-gray)
 
 Instead of vanilla features and mechanics, here game is completely driven by plugins. DaemonMC provide only server core with simple API so you can add only what you need. No unnecessary server resources and network usage by various features like block tick or mobs.
 
-List of publicly available plugins [Public plugins and tools](https://github.com/TeamDeamonMC/DaemonMC/wiki/Public-plugins-and-tools)
+List of publicly available plugins [Public plugins and tools](https://github.com/TeamDeamonMC/DaemonMC/wiki/.-Public-plugins-and-tools)
 
-To learn how to create plugins check [Plugin tutorial](https://github.com/TeamDeamonMC/DaemonMC/wiki/Plugin-tutorial)
+To learn how to create plugins check [Plugin tutorial](https://github.com/TeamDeamonMC/DaemonMC/wiki/.-Plugin-tutorial)
 
 ## Getting started
 
@@ -26,9 +24,6 @@ This action will create:
 - DaemonMC.yaml (more info [wiki#daemonmcyaml](https://github.com/TeamDeamonMC/DaemonMC/wiki#daemonmcyaml))
 
 For updating you will need to download latest .dll from [Releases](https://github.com/TeamDeamonMC/DaemonMC/releases) and replace with old one.
-
-> [!NOTE]
-Server don't have it's own world generator (only temporary flat world when starting server without .mcworld file) so you will need to use your own .mcworld file in Worlds folder.
 
 ## Features
 
@@ -47,4 +42,4 @@ Want to contribute? That's really cool. Here's some useful information: [Contrib
 
 Want to see your server here? Make pull request and add your server to the list!
 
-**lazon.top:19132** - test server with lobby and TNTRun
+**lazon.top:19132** - Minigames server

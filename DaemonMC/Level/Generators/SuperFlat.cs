@@ -1,80 +1,52 @@
 ﻿using DaemonMC.Blocks;
-using MiNET.LevelDB.Utils;
+using DaemonMC.Utils;
 
 namespace DaemonMC.Level.Generators
 {
     public class SuperFlat
     {
-        public byte[] generateChunks()
+        public Block[] Layers { get; set; } = [new Bedrock(), new Dirt(), new Dirt(), new GrassBlock()];
+
+        public Chunk GenerateChunk()
         {
-            using (var stream = new MemoryStream())
+            var chunk = new Chunk();
+            int subChunkCount = Math.Max(1, (int)Math.Ceiling(Layers.Length / 16f));
+
+            for (int s = 0; s < subChunkCount; s++)
             {
-                for (int i = 0; i < 1; i++)
+                var subChunk = new SubChunk
                 {
-                    byte version = 8; //chunk version
-                    stream.WriteByte(version);
+                    StorageSize = 1,
+                };
+                subChunk.Palette.Add(new Air().GetState());
 
-                    byte storageSize = 1; // Storage size
-                    stream.WriteByte(storageSize);
+                for (int localY = 0; localY < 16; localY++)
+                {
+                    int layer = s * 16 + localY;
+                    if (layer >= Layers.Length) { break; }
 
-                    for (int a = 0; a < storageSize; a++)
+                    var state = Layers[layer].GetState();
+                    int paletteIndex = NbtUtils.IndexOf(subChunk.Palette, state);
+                    if (paletteIndex == -1)
                     {
-                        bool isRuntime = true; // Is palette runtime/hash or that second NBT type
-                        int bitsPerBlock = 2;
-                        byte flag = (byte)(bitsPerBlock << 1 | (isRuntime ? 1 : 0));
-                        stream.WriteByte(flag);
+                        subChunk.Palette.Add(state);
+                        paletteIndex = subChunk.Palette.Count - 1;
+                    }
 
-                        int blocksPerWord = (int)Math.Floor(32f / bitsPerBlock);
-                        uint wordsPerChunk = (uint)Math.Ceiling(4096f / blocksPerWord);
-
-                        // Writing real blocks
-                        int position = 0;
-                        for (int b = 0; b < wordsPerChunk; b++)
+                    for (int x = 0; x < 16; x++)
+                    {
+                        for (int z = 0; z < 16; z++)
                         {
-                            uint word = 0; // Build the word from block states
-                            for (int block = 0; block < blocksPerWord; block++)
-                            {
-                                int state = 0;
-
-                                int x = position % 16;
-                                int y = position / 256;
-                                int z = position / 16 % 16;
-
-                                if (x == 3) // add grass
-                                {
-                                    state = 1;
-                                }
-                                if (x == 2 || x == 1) // add dirt
-                                {
-                                    state = 2;
-                                }
-                                if (x == 0) // add bedrock
-                                {
-                                    state = 3;
-                                }
-
-                                word |= (uint)(state & (1 << bitsPerBlock) - 1) << position % blocksPerWord * bitsPerBlock;
-                                position++;
-                            }
-                            ToDataTypes.WriteUInt32(stream, word);
-                        }
-
-                        // Write palette
-                        int[] pallette = new int[] { new Air().GetHash(), new GrassBlock().GetHash(), new Dirt().GetHash(), new Bedrock().GetHash() };
-                        VarInt.WriteSInt32(stream, pallette.Count());// How many block types are in palette?
-
-                        foreach (var block in pallette)
-                        {
-                            VarInt.WriteSInt32(stream, block);
+                            subChunk.Blocks[localY | (z << 4) | (x << 8)] = (byte)paletteIndex;
                         }
                     }
                 }
 
-                stream.Write(new byte[256], 0, 256); //not sure about this
-                VarInt.WriteSInt32(stream, 0);
-
-                return stream.ToArray();
+                subChunk.BitsPerBlock = ChunkUtils.GetBitsPerBlock(subChunk.Palette.Count);
+                chunk.Chunks.Add(subChunk);
             }
+
+            return chunk;
         }
     }
 }

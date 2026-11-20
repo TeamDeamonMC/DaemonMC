@@ -20,21 +20,9 @@ namespace DaemonMC.Level
                 }
             }
 
-            if(Server.Levels.Count == 0)
+            if (!Server.Levels.Any(w => w.LevelName == DaemonMC.DefaultWorld))
             {
-                Server.Levels.Add(new World("Temp"));
-            }
-
-            var matchingLevels = Server.Levels
-                .Select((world, index) => new { World = world, Index = index })
-                .Where(w => w.World.LevelName == DaemonMC.DefaultWorld)
-                .ToList();
-
-            if (matchingLevels.Count == 0)
-            {
-                Log.warn($"World name {DaemonMC.DefaultWorld} specified in DaemonMC.yaml not found in Worlds directory.");
-                Log.warn($"Check if DaemonMC.yaml 'spawnWorld' contains correct world name without extension.");
-                Log.warn($"Players will be spawned in next found available world.");
+                Server.Levels.Add(new World(DaemonMC.DefaultWorld));
             }
         }
     }

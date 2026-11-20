@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using DaemonMC.Level.Generators;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
 
@@ -96,32 +95,14 @@ namespace DaemonMC.Utils
 
         internal void SendChunkToPlayer(int chunkX, int chunkZ)
         {
-            List<byte> chunkData = new List<byte>();
-            int chunkCount = 0;
-
-            if (p.CurrentWorld.Temporary)
-            {
-                chunkData = new List<byte>(new SuperFlat().generateChunks());
-                chunkCount = 1;
-            }
-            else
-            {
-                var chunkRaw = p.CurrentWorld.GetChunk(chunkX, chunkZ);
-                chunkData = new List<byte>(chunkRaw.NetworkSerialize(p));
-                chunkCount = chunkRaw.Chunks.Count();
-                if (chunkRaw.Chunks.Count == 0)
-                {
-                    chunkData = new List<byte>(new SuperFlat().generateChunks());
-                    chunkCount = 1;
-                }
-            }
+            var chunkRaw = p.CurrentWorld.GetChunk(chunkX, chunkZ);
 
             var chunk = new LevelChunk
             {
                 ChunkX = chunkX,
                 ChunkZ = chunkZ,
-                Count = chunkCount,
-                Data = chunkData.ToArray()
+                Count = chunkRaw.Chunks.Count,
+                Data = chunkRaw.NetworkSerialize(p)
             };
             p.Send(chunk);
         }

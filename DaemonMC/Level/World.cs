@@ -3,6 +3,7 @@ using System.Numerics;
 using DaemonMC.Biomes;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
+using DaemonMC.Level.Generators;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
@@ -17,15 +18,15 @@ namespace DaemonMC.Level
 {
     public class World
     {
-        private string[] LevelDbVersion { get; set; } = ["1.26.60"];
+        internal static string[] LevelDbVersion { get; } = ["1.26.60"];
         public Dictionary<(int x, int z), Chunk> Cache { get; set; } = new Dictionary<(int x, int z), Chunk>();
-        public bool Temporary { get; set; } = false;
+        public SuperFlat Generator { get; set; } = new SuperFlat();
         public string LevelName { get; set; } = "";
         public Dictionary<long, Player> OnlinePlayers { get; set; } = new Dictionary<long, Player>();
         public Dictionary<long, Entity> Entities { get; set; } = new Dictionary<long, Entity>();
         public Dictionary<string, GameRule> GameRules { get; set; } = new Dictionary<string, GameRule>();
         public Database Db { get; set; }
-        public string LevelDisplayName { get; set; } = "DaemonMC Temp World";
+        public string LevelDisplayName { get; set; } = "";
         public int Version { get; set; } = Info.ProtocolVersion.Last();
         public int SpawnX { get; set; } = 0;
         public int SpawnY { get; set; } = 384;
@@ -82,11 +83,15 @@ namespace DaemonMC.Level
             {
                 int subChunkY = (int)Math.Floor((y + 64) / 16f);
 
+                if (subChunkY < 0 || subChunkY >= 24)
+                {
+                    Log.warn($"Tried to set block outside of world height. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
+                    return;
+                }
+
                 int localX = ((int)x % 16 + 16) % 16;
                 int localY = ((int)y % 16 + 16) % 16;
                 int localZ = ((int)z % 16 + 16) % 16;
-
-                var subChunk = chunk.Chunks[subChunkY];
 
                 if (!BlockPalette.blockHashes.ContainsKey(block.GetHash()))
                 {
@@ -94,9 +99,27 @@ namespace DaemonMC.Level
                     return;
                 }
 
+                while (chunk.Chunks.Count <= subChunkY)
+                {
+                    var emptySubChunk = ChunkUtils.CreateEmptySubChunk();
+                    emptySubChunk.BiomePalette.Add(BiomeManager.GetBiomeId("plains"));
+                    chunk.Chunks.Add(emptySubChunk);
+                }
+
+                var subChunk = chunk.Chunks[subChunkY];
+
+                if (subChunk.StorageSize == 0 || subChunk.Palette.Count == 0)
+                {
+                    var emptySubChunk = ChunkUtils.CreateEmptySubChunk();
+                    emptySubChunk.BiomePalette = subChunk.BiomePalette;
+                    chunk.Chunks[subChunkY] = emptySubChunk;
+                    subChunk = emptySubChunk;
+                }
+
                 if (!NbtUtils.Contains(subChunk.Palette, block.GetState()))
                 {
                     subChunk.Palette.Add(block.GetState());
+                    subChunk.BitsPerBlock = Math.Max(subChunk.BitsPerBlock, ChunkUtils.GetBitsPerBlock(subChunk.Palette.Count));
                 }
 
                 int blockIndex = (localY) | (localZ << 4) | (localX << 8);
@@ -429,6 +452,11 @@ namespace DaemonMC.Level
                 }
             }
 
+            if (lastSubChunkY == -1)
+            {
+                chunk = Generator.GenerateChunk();
+            }
+
             for (int y = 0; y <= lastSubChunkY; y++)
             {
                 byte[] subChunk = subChunks[y];
@@ -469,77 +497,83 @@ namespace DaemonMC.Level
             {
                 Directory.Delete(tempData, true);
             }
-            if (File.Exists($"Worlds/{LevelName}.mcworld"))
+            if (!File.Exists($"Worlds/{LevelName}.mcworld"))
             {
-                Log.info($"Loading world: Worlds\\{LevelName}.mcworld");
-
-                using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{LevelName}.mcworld"))
+                Log.warn($"World Worlds/{LevelName}.mcworld not found. Creating new flat world...");
+                try
                 {
-                    foreach (var entry in archive.Entries)
+                    WorldCreator.Create($"Worlds/{LevelName}.mcworld", LevelName, Generator);
+                }
+                catch (Exception ex)
+                {
+                    Log.error($"Failed to create world Worlds/{LevelName}.mcworld: {ex.Message}");
+                    Server.Crash = true;
+                    return;
+                }
+            }
+
+            Log.info($"Loading world: Worlds\\{LevelName}.mcworld");
+
+            using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{LevelName}.mcworld"))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    if (entry.FullName.EndsWith("level.dat", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (entry.FullName.EndsWith("level.dat", StringComparison.OrdinalIgnoreCase))
+                        using (Stream stream = entry.Open())
                         {
-                            using (Stream stream = entry.Open())
+                            using (var memoryStream = new MemoryStream())
                             {
-                                using (var memoryStream = new MemoryStream())
+                                stream.CopyTo(memoryStream);
+
+                                memoryStream.Position = 8;
+
+                                var nbt = new NbtFile
                                 {
-                                    stream.CopyTo(memoryStream);
+                                    BigEndian = false,
+                                    UseVarInt = false
+                                };
 
-                                    memoryStream.Position = 8;
+                                nbt.LoadFromStream(memoryStream, NbtCompression.None);
+                                NbtTag tag = nbt.RootTag;
 
-                                    var nbt = new NbtFile
+                                RandomSeed = tag["RandomSeed"].LongValue;
+                                LevelDisplayName = tag["LevelName"].StringValue;
+                                Version = tag["NetworkVersion"].IntValue;
+                                SpawnX = tag["SpawnX"].IntValue;
+                                SpawnZ = tag["SpawnZ"].IntValue;
+
+                                if (tag != null && tag["MinimumCompatibleClientVersion"] is NbtList versionList)
+                                {
+                                    string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
+                                    if (!LevelDbVersion.Contains(stringVersion))
                                     {
-                                        BigEndian = false,
-                                        UseVarInt = false
-                                    };
-
-                                    nbt.LoadFromStream(memoryStream, NbtCompression.None);
-                                    NbtTag tag = nbt.RootTag;
-
-                                    RandomSeed = tag["RandomSeed"].LongValue;
-                                    LevelDisplayName = tag["LevelName"].StringValue;
-                                    Version = tag["NetworkVersion"].IntValue;
-                                    SpawnX = tag["SpawnX"].IntValue;
-                                    SpawnZ = tag["SpawnZ"].IntValue;
-
-                                    if (tag != null && tag["MinimumCompatibleClientVersion"] is NbtList versionList)
-                                    {
-                                        string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
-                                        if (!LevelDbVersion.Contains(stringVersion))
-                                        {
-                                            Log.error($"Unsupported world version {stringVersion}!");
-                                            Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {LevelDbVersion.Last()} and export mcworld file again to update world.");
-                                            Server.Crash = true;
-                                        }
+                                        Log.error($"Unsupported world version {stringVersion}!");
+                                        Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {LevelDbVersion.Last()} and export mcworld file again to update world.");
+                                        Server.Crash = true;
                                     }
-
-                                    GameRules.Add("showCoordinates", new GameRule(true));
                                 }
+
+                                GameRules.Add("showCoordinates", new GameRule(true));
                             }
                         }
                     }
                 }
+            }
 
-                Db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
-                Db.Open();
+            Db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
+            Db.Open();
 
-                var SpawnChunk = GetChunk(SpawnX / 16, SpawnZ / 16);
-                if (SpawnChunk.Chunks.Count == 0)
-                {
-                    Log.warn($"Unable to calulate spawn point Y value for {LevelName}. Spawn chunk not found in DB. Y value set to 384");
-                }
-                else
-                {
-                    SpawnY = (SpawnChunk.Chunks.Count * 16) - 64;
-                }
-                Log.debug($"Calculated '{LevelName}' spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
+            var SpawnChunk = GetChunk(SpawnX / 16, SpawnZ / 16);
+            if (SpawnChunk.Chunks.Count == 0)
+            {
+                Log.warn($"Unable to calulate spawn point Y value for {LevelName}. Spawn chunk not found in DB. Y value set to 384");
             }
             else
             {
-                Log.warn($"World Worlds/{LevelName}.mcworld not found. Generating temporary flat world...");
-                GameRules.Add("showCoordinates", new GameRule(true));
-                Temporary = true;
+                SpawnY = (SpawnChunk.Chunks.Count * 16) - 64;
             }
+            Log.debug($"Calculated '{LevelName}' spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
         }
 
         public void UnloadChunks()
@@ -645,7 +679,7 @@ namespace DaemonMC.Level
 
         public void Unload()
         {
-            if (Temporary)
+            if (Db == null)
             {
                 return;
             }

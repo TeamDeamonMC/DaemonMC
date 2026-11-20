@@ -397,7 +397,7 @@ namespace DaemonMC
 
         public void ChangeWorld(World world)
         {
-            doChangeWorld(world, new Vector3(CurrentWorld.SpawnX, CurrentWorld.SpawnY, CurrentWorld.SpawnZ));
+            doChangeWorld(world, new Vector3(world.SpawnX, world.SpawnY, world.SpawnZ));
         }
 
         public void ChangeWorld(World world, Vector3 position)
@@ -405,8 +405,31 @@ namespace DaemonMC
             doChangeWorld(world, position);
         }
 
+        public void ChangeDimension(Dimension dimension)
+        {
+            ChangeWorld(CurrentWorld.GetDimension(dimension));
+        }
+
+        public void ChangeDimension(Dimension dimension, Vector3 position)
+        {
+            ChangeWorld(CurrentWorld.GetDimension(dimension), position);
+        }
+
+        public Dimension Dimension => CurrentWorld.Dimension;
+
+        private uint loadingScreenId = 0;
+        private bool joinedEventFired = false;
+
         public async void doChangeWorld(World world, Vector3 position)
         {
+            if (world == CurrentWorld)
+            {
+                Teleport(position);
+                return;
+            }
+
+            bool dimensionChange = world.Dimension != CurrentWorld.Dimension;
+
             CurrentWorld.RemovePlayer(this);
             foreach (var player in CurrentWorld.OnlinePlayers.Values)
             {
@@ -439,9 +462,37 @@ namespace DaemonMC
                 };
                 Send(packet3);
             }
-            CurrentWorld = world;
-            world.AddPlayer(this);
             _player.ClearChunkCache();
+            CurrentWorld = world;
+
+            if (dimensionChange)
+            {
+                Position = position;
+                LastChunkX = (int)Math.Floor(position.X / 16.0);
+                LastChunkZ = (int)Math.Floor(position.Z / 16.0);
+
+                Send(new ChangeDimension
+                {
+                    Dimension = (int)world.Dimension,
+                    Position = position,
+                    LoadingScreenId = ++loadingScreenId
+                });
+                SendPlayStatus(3);
+
+                Send(new PlayerAction
+                {
+                    EntityId = EntityID,
+                    Action = (int)PlayerActionType.ChangeDimensionAck
+                });//yeah great
+
+                world.AddPlayer(this);
+                _player.SendChunks();
+                SendEntities();
+                Log.debug($"{Username} changed dimension to {world.Dimension} in '{world.LevelName}'");
+                return;
+            }
+
+            world.AddPlayer(this);
             SendEntities();
             await Task.Delay(500); //need a little bit time to clear chunk cache and process packets
             _player.SendChunks();
@@ -832,8 +883,9 @@ namespace DaemonMC
 
             if (packet is ServerboundLoadingScreen serverboundLoadingScreen)
             {
-                if (serverboundLoadingScreen.ScreenType == 4)
+                if (serverboundLoadingScreen.ScreenType == 4 && !joinedEventFired)
                 {
+                    joinedEventFired = true;
                     PluginManager.PlayerJoined(this);
                     SendEntities();
                 }

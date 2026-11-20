@@ -30,7 +30,7 @@ namespace DaemonMC.Utils
                 SpawnBlockY = (int)p.Position.Y,
                 SpawnBlockZ = (int)p.Position.Z,
                 Difficulty = 1,
-                Dimension = 0,
+                Dimension = (int)p.CurrentWorld.Dimension,
                 Seed = p.CurrentWorld.RandomSeed,
                 Generator = 1,
             };
@@ -95,12 +95,14 @@ namespace DaemonMC.Utils
 
         internal void SendChunkToPlayer(int chunkX, int chunkZ)
         {
-            var chunkRaw = p.CurrentWorld.GetChunk(chunkX, chunkZ);
+            var world = p.CurrentWorld;
+            var chunkRaw = world.GetChunk(chunkX, chunkZ);
 
             var chunk = new LevelChunk
             {
                 ChunkX = chunkX,
                 ChunkZ = chunkZ,
+                Dimension = (int)world.Dimension,
                 Count = chunkRaw.Chunks.Count,
                 Data = chunkRaw.NetworkSerialize(p)
             };

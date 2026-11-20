@@ -15,6 +15,7 @@ namespace DaemonMC
         public static string Worldname = "Nice new server";
         public static string MaxOnline = "10";
         public static string DefaultWorld = "My World";
+        public static Level.Dimension DefaultDimension = Level.Dimension.Overworld;
         public static int GameMode = 0;
         public static int DrawDistance = 10;
         public static bool UnloadChunks = true;
@@ -147,15 +148,16 @@ namespace DaemonMC
             table += string.Format("{0,-35} {1,-15} {2,-10}\n", "Entity", "EntityID", "World");
             table += new string('-', 65) + "\n";
 
-            foreach (var world in Server.Levels)
+            foreach (var world in Server.Levels.SelectMany(level => level.LoadedDimensions))
             {
+                string worldName = world.Dimension == Level.Dimension.Overworld ? world.LevelName : $"{world.LevelName} ({world.Dimension})";
                 foreach (var entity in world.Entities.Values)
                 {
-                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", entity.ActorType, entity.EntityId, world.LevelName);
+                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", entity.ActorType, entity.EntityId, worldName);
                 }
                 foreach (var entity in world.OnlinePlayers.Values)
                 {
-                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", $"minecraft:player ({entity.Username})", entity.EntityID, world.LevelName);
+                    table += string.Format("{0,-35} {1,-15} {2,-10}\n", $"minecraft:player ({entity.Username})", entity.EntityID, worldName);
                 }
             }
 

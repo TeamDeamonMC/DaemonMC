@@ -42,7 +42,7 @@ namespace DaemonMC.Network.Bedrock
                     //Spawn settings
                     encoder.WriteShort(BiomeType);
                     encoder.WriteString(BiomeName);
-                    encoder.WriteVarInt(Dimension);
+                    encoder.WriteSignedVarInt(Dimension);
                     //End of Spawn settings
                 encoder.WriteSignedVarInt(Generator);
                 encoder.WriteSignedVarInt(GameType);

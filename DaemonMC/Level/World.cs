@@ -32,15 +32,81 @@ namespace DaemonMC.Level
         public int SpawnY { get; set; } = 384;
         public int SpawnZ { get; set; } = 0;
         public long RandomSeed { get; set; } = 0;
+        public Dimension Dimension { get; } = Dimension.Overworld;
+        public World Overworld { get; }
+        public int MinY => Dimension.MinY();
+        public int MaxY => Dimension.MaxY();
         private HashSet<(int x, int z)> EntityChunksLoaded { get; } = new HashSet<(int x, int z)>();
+        private readonly Dictionary<Dimension, World> dimensions = new Dictionary<Dimension, World>();
+        private readonly object dimensionLock = new object();
         private static readonly byte[] DigestPrefix = "digp"u8.ToArray();
         private static readonly byte[] ActorPrefix = "actorprefix"u8.ToArray();
 
         public World(string levelName)
         {
             LevelName = levelName;
+            Overworld = this;
+            dimensions[Dimension.Overworld] = this;
             Load();
             UnloadChunks();
+        }
+
+        private World(World overworld, Dimension dimension)
+        {
+            Overworld = overworld;
+            Dimension = dimension;
+            LevelName = overworld.LevelName;
+            LevelDisplayName = overworld.LevelDisplayName;
+            Version = overworld.Version;
+            RandomSeed = overworld.RandomSeed;
+            GameRules = overworld.GameRules;
+            Db = overworld.Db;
+            SpawnX = overworld.SpawnX;
+            SpawnZ = overworld.SpawnZ;
+            Generator = dimension switch
+            {
+                Dimension.Nether => new SuperFlat { Layers = [new Bedrock(), new Netherrack(), new Netherrack(), new Netherrack()] },
+                Dimension.End => new SuperFlat { Layers = [new EndStone(), new EndStone(), new EndStone()] },
+                _ => new SuperFlat()
+            };
+            CalculateSpawnY();
+            UnloadChunks();
+        }
+
+        public World GetDimension(Dimension dimension)
+        {
+            var root = Overworld;
+            lock (root.dimensionLock)
+            {
+                if (!root.dimensions.TryGetValue(dimension, out var world))
+                {
+                    Log.debug($"Loading dimension {dimension} of world: {LevelName}");
+                    world = new World(root, dimension);
+                    root.dimensions[dimension] = world;
+                }
+                return world;
+            }
+        }
+
+        public IReadOnlyCollection<World> LoadedDimensions
+        {
+            get
+            {
+                lock (Overworld.dimensionLock)
+                {
+                    return Overworld.dimensions.Values.ToList();
+                }
+            }
+        }
+
+        private byte[] ChunkKey(int x, int z)
+        {
+            byte[] key = ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z));
+            if (Dimension != Dimension.Overworld)
+            {
+                key = ToDataTypes.GetByteSum(key, BitConverter.GetBytes((int)Dimension));
+            }
+            return key;
         }
 
         public void Send(Packet packet, long selfId = -1)
@@ -84,11 +150,11 @@ namespace DaemonMC.Level
 
             if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
             {
-                int subChunkY = (int)Math.Floor((y + 64) / 16f);
+                int subChunkY = (int)Math.Floor((y - MinY) / 16f);
 
-                if (subChunkY < 0 || subChunkY >= 24)
+                if (subChunkY < 0 || subChunkY >= Dimension.SubChunkCount())
                 {
-                    Log.warn($"Tried to set block outside of world height. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
+                    Log.warn($"Tried to set block outside of world height. In '{LevelName}' ({Dimension}) position x:{x}; y:{y}, z:{z}");
                     return;
                 }
 
@@ -404,7 +470,7 @@ namespace DaemonMC.Level
                 };
                 player.Send(armor2);
             }
-            Log.info($"{player.Username} spawned in World:'{LevelName}' X:{player.Position.X} Y:{player.Position.Y} Z:{player.Position.Z}");
+            Log.info($"{player.Username} spawned in World:'{LevelName}' ({Dimension}) X:{player.Position.X} Y:{player.Position.Y} Z:{player.Position.Z}");
         }
 
         public void RemovePlayer(Player player)
@@ -439,17 +505,18 @@ namespace DaemonMC.Level
                 return cachedChunk;
             }
 
-            byte[] index = ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z));
-            byte[] dataKey = ToDataTypes.GetByteSum(index, new byte[] { 0x2f, 0 });
+            byte[] dataKey = ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x2f, 0 });
 
             var chunk = new Chunk();
 
-            List<byte[]> subChunks = new List<byte[]>(24);
+            int subChunkCount = Dimension.SubChunkCount();
+            int minSubChunkIndex = MinY >> 4;
+            List<byte[]> subChunks = new List<byte[]>(subChunkCount);
             int lastSubChunkY = -1;
 
-            for (int y = 0; y < 24; y++) //since 1.18 320 up, -64 down. 64/16=4 negative subchunks. 320/16=20 positive subchunks. max 24 chunks.
+            for (int y = 0; y < subChunkCount; y++)
             {
-                dataKey[^1] = (byte)(y - 4);
+                dataKey[^1] = (byte)(y + minSubChunkIndex);
                 byte[] subChunk = Db.Get(dataKey);
 
                 subChunks.Add(subChunk);
@@ -507,7 +574,7 @@ namespace DaemonMC.Level
         {
             var loaded = new List<Entity>();
 
-            byte[] digestKey = ToDataTypes.GetByteSum(DigestPrefix, ToDataTypes.GetByteSum(BitConverter.GetBytes(x), BitConverter.GetBytes(z)));
+            byte[] digestKey = ToDataTypes.GetByteSum(DigestPrefix, ChunkKey(x, z));
             byte[] digest = Db.Get(digestKey);
 
             if (digest == null || digest.Length < 8)
@@ -636,16 +703,22 @@ namespace DaemonMC.Level
             Db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
             Db.Open();
 
-            var SpawnChunk = GetChunk(SpawnX / 16, SpawnZ / 16);
+            CalculateSpawnY();
+        }
+
+        private void CalculateSpawnY()
+        {
+            var SpawnChunk = GetChunk(SpawnX >> 4, SpawnZ >> 4);
             if (SpawnChunk.Chunks.Count == 0)
             {
-                Log.warn($"Unable to calulate spawn point Y value for {LevelName}. Spawn chunk not found in DB. Y value set to 384");
+                SpawnY = MaxY;
+                Log.warn($"Unable to calulate spawn point Y value for {LevelName} ({Dimension}). Spawn chunk not found in DB. Y value set to {SpawnY}");
             }
             else
             {
-                SpawnY = (SpawnChunk.Chunks.Count * 16) - 64;
+                SpawnY = Math.Min(MinY + SpawnChunk.Chunks.Count * 16, MaxY);
             }
-            Log.debug($"Calculated '{LevelName}' spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
+            Log.debug($"Calculated '{LevelName}' ({Dimension}) spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
         }
 
         public void UnloadChunks()
@@ -676,7 +749,7 @@ namespace DaemonMC.Level
                     }
 
                     var chunksToRemove = Cache.Keys
-                        .Where(chunkCoord => !activeChunks.Contains(chunkCoord) && chunkCoord != (SpawnX / 16, SpawnZ / 16))
+                        .Where(chunkCoord => !activeChunks.Contains(chunkCoord) && chunkCoord != (SpawnX >> 4, SpawnZ >> 4))
                         .ToList();
 
                     int loadedChunks = Cache.Count();
@@ -687,7 +760,7 @@ namespace DaemonMC.Level
                         {
                             Cache.Remove(chunkCoord);
                         }
-                        Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from '{LevelName}'. {Cache.Count()} still loaded.");
+                        Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from '{LevelName}' ({Dimension}). {Cache.Count()} still loaded.");
                     }
                 }
                 await Task.Delay(20000);
@@ -707,7 +780,9 @@ namespace DaemonMC.Level
 
             if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
             {
-                int subChunkY = (int)Math.Floor((y + 64) / 16f);
+                int subChunkY = (int)Math.Floor((y - MinY) / 16f);
+
+                if (subChunkY < 0) { return new Air(); }
 
                 int localX = ((int)x % 16 + 16) % 16;
                 int localY = ((int)y % 16 + 16) % 16;
@@ -751,7 +826,7 @@ namespace DaemonMC.Level
 
         public void Unload()
         {
-            if (Db == null)
+            if (Db == null || Overworld != this) //Nether and End share the Overworld database
             {
                 return;
             }

@@ -56,6 +56,7 @@
             ContainerClose = 47,
             InventorySlot = 50,
             LevelChunk = 58,
+            ChangeDimension = 61,
             SetPlayerGameType = 62,
             PlayerList = 63,
             RequestChunkRadius = 69,

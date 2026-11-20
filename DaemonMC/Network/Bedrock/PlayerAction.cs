@@ -30,14 +30,14 @@
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteVarLong(EntityId);
-            encoder.WriteVarInt(Action);
-            encoder.WriteVarInt(BlockX);
-            encoder.WriteSignedVarInt(BlockY);
-            encoder.WriteVarInt(BlockZ);
-            encoder.WriteVarInt(ResultX);
-            encoder.WriteSignedVarInt(ResultY);
-            encoder.WriteVarInt(ResultZ);
-            encoder.WriteVarInt(Face);
+            encoder.WriteSignedVarInt(Action);
+            encoder.WriteSignedVarInt(BlockX);
+            encoder.WriteVarInt(BlockY);
+            encoder.WriteSignedVarInt(BlockZ);
+            encoder.WriteSignedVarInt(ResultX);
+            encoder.WriteVarInt(ResultY);
+            encoder.WriteSignedVarInt(ResultZ);
+            encoder.WriteSignedVarInt(Face);
         }
     }
 }

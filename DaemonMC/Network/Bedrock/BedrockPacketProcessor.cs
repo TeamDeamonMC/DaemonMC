@@ -163,6 +163,7 @@ namespace DaemonMC.Network.Bedrock
                     World spawnWorld = Server.Levels.FirstOrDefault(w => w.LevelName == DaemonMC.DefaultWorld);
                     if (spawnWorld != null)
                     {
+                        spawnWorld = spawnWorld.GetDimension(DaemonMC.DefaultDimension);
                         player.CurrentWorld = spawnWorld;
                         player.Position = new Vector3(spawnWorld.SpawnX, spawnWorld.SpawnY, spawnWorld.SpawnZ);
                     }

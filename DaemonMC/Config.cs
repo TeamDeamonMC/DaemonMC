@@ -13,6 +13,7 @@ namespace DaemonMC
         public string ServerName { get; set; } = "DaemonMC";
         public string WorldName { get; set; } = "Nice new server";
         public string SpawnWorld { get; set; } = "My World";
+        public string SpawnDimension { get; set; } = "Overworld";
         public string MaxOnline { get; set; } = "10";
         public string DefaultGamemode { get; set; } = "Survival";
         public int DrawDistance { get; set; } = 10;
@@ -62,6 +63,7 @@ namespace DaemonMC
             DaemonMC.Worldname = config.WorldName;
             DaemonMC.MaxOnline = config.MaxOnline;
             DaemonMC.DefaultWorld = config.SpawnWorld;
+            DaemonMC.DefaultDimension = ToDimension(config.SpawnDimension);
             DaemonMC.GameMode = ToGameMode(config.DefaultGamemode);
             DaemonMC.DrawDistance = config.DrawDistance;
             DaemonMC.UnloadChunks = config.UnloadChunks;
@@ -88,6 +90,23 @@ namespace DaemonMC
                 default:
                     Log.warn($"Unknown GameMode {gameMode}. Check DaemonMC.yaml.");
                     return 2;
+            }
+        }
+
+        public static Level.Dimension ToDimension(string dimension)
+        {
+            switch ((dimension ?? "").ToLower())
+            {
+                case "overworld":
+                    return Level.Dimension.Overworld;
+                case "nether":
+                    return Level.Dimension.Nether;
+                case "end":
+                case "the_end":
+                    return Level.Dimension.End;
+                default:
+                    Log.warn($"Unknown SpawnDimension {dimension}. Check DaemonMC.yaml.");
+                    return Level.Dimension.Overworld;
             }
         }
 

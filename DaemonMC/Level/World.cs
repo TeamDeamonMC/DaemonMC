@@ -1,6 +1,6 @@
-﻿using System.IO.Compression;
+﻿using System.Collections.Concurrent;
+using System.IO.Compression;
 using System.Numerics;
-using DaemonMC.Biomes;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
 using DaemonMC.Level.Format;
@@ -20,7 +20,11 @@ namespace DaemonMC.Level
     public class World
     {
         internal static string[] LevelDbVersion { get; } = ["1.26.60"];
-        public Dictionary<(int x, int z), Chunk> Cache { get; set; } = new Dictionary<(int x, int z), Chunk>();
+        // Loaded chunk columns (block entities, height maps, biomes). no block data.
+        public ConcurrentDictionary<(int x, int z), ChunkColumn> Columns { get; } = new ConcurrentDictionary<(int x, int z), ChunkColumn>();
+        //Cached sub chunks
+        public ConcurrentDictionary<(int x, int y, int z), SubChunk> SubChunks { get; } = new ConcurrentDictionary<(int x, int y, int z), SubChunk>();
+        private readonly object loadLock = new object();
         public SuperFlat Generator { get; set; } = new SuperFlat();
         public string LevelName { get; set; } = "";
         public Dictionary<long, Player> OnlinePlayers { get; set; } = new Dictionary<long, Player>();
@@ -149,85 +153,46 @@ namespace DaemonMC.Level
             int chunkX = (int)Math.Floor(x / 16f);
             int chunkZ = (int)Math.Floor(z / 16f);
 
-            if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
+            if (y < MinY || y > MaxY)
             {
-                int subChunkY = (int)Math.Floor((y - MinY) / 16f);
-
-                if (subChunkY < 0 || subChunkY >= Dimension.SubChunkCount())
-                {
-                    Log.warn($"Tried to set block outside of world height. In '{LevelName}' ({Dimension}) position x:{x}; y:{y}, z:{z}");
-                    return;
-                }
-
-                int localX = ((int)x % 16 + 16) % 16;
-                int localY = ((int)y % 16 + 16) % 16;
-                int localZ = ((int)z % 16 + 16) % 16;
-
-                if (!BlockPalette.blockHashes.ContainsKey(block.GetHash()))
-                {
-                    Log.warn($"Blockstate hash for {block.Name} not found in BlockPalette. Requested state: {JsonConvert.SerializeObject(block.States, Formatting.Indented)}");
-                    return;
-                }
-
-                while (chunk.Chunks.Count <= subChunkY)
-                {
-                    var emptySubChunk = ChunkUtils.CreateEmptySubChunk();
-                    emptySubChunk.BiomePalette.Add(BiomeManager.GetBiomeId("plains"));
-                    chunk.Chunks.Add(emptySubChunk);
-                }
-
-                var subChunk = chunk.Chunks[subChunkY];
-
-                if (subChunk.StorageSize == 0 || subChunk.Palette.Count == 0)
-                {
-                    var emptySubChunk = ChunkUtils.CreateEmptySubChunk();
-                    emptySubChunk.BiomePalette = subChunk.BiomePalette;
-                    chunk.Chunks[subChunkY] = emptySubChunk;
-                    subChunk = emptySubChunk;
-                }
-
-                if (!NbtUtils.Contains(subChunk.Palette, block.GetState()))
-                {
-                    subChunk.Palette.Add(block.GetState());
-                    subChunk.BitsPerBlock = Math.Max(subChunk.BitsPerBlock, ChunkUtils.GetBitsPerBlock(subChunk.Palette.Count));
-                }
-
-                int blockIndex = (localY) | (localZ << 4) | (localX << 8);
-                byte stateIndex = (byte)NbtUtils.IndexOf(subChunk.Palette, block.GetState());
-                subChunk.Blocks[blockIndex] = stateIndex;
-
-                chunk.RemoveBlockEntity(x, y, z);
+                Log.warn($"Tried to set block outside of world height. In '{LevelName}' ({Dimension}) position x:{x}; y:{y}, z:{z}");
+                return;
             }
-            else
+
+            if (!BlockPalette.blockHashes.ContainsKey(block.GetHash()))
             {
-                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
+                Log.warn($"Blockstate hash for {block.Name} not found in BlockPalette. Requested state: {JsonConvert.SerializeObject(block.States, Formatting.Indented)}");
+                return;
             }
+
+            int subChunkY = y >> 4;
+            ChunkColumn column;
+            lock (loadLock)
+            {
+                column = GetColumn(chunkX, chunkZ);
+                var subChunk = GetSubChunk(chunkX, subChunkY, chunkZ)!;
+                subChunk.SetBlockState(x & 15, y & 15, z & 15, block.GetState());
+
+                column.HighestSubChunk = Math.Max(column.HighestSubChunk, subChunkY - (MinY >> 4));
+                column.Heights = null;
+            }
+            column.RemoveBlockEntity(x, y, z);
         }
 
         public NbtCompound? GetBlockEntity(int x, int y, int z)
         {
-            if (Cache.TryGetValue(((int)Math.Floor(x / 16f), (int)Math.Floor(z / 16f)), out Chunk chunk))
-            {
-                return chunk.GetBlockEntity(x, y, z);
-            }
-            return null;
+            return GetColumn(x >> 4, z >> 4).GetBlockEntity(x, y, z);
         }
 
         public bool SetBlockEntity(NbtCompound blockEntity, bool send = true)
         {
-            if (!Chunk.TryGetPosition(blockEntity, out int x, out int y, out int z))
+            if (!ChunkColumn.TryGetPosition(blockEntity, out int x, out int y, out int z))
             {
                 Log.warn($"Tried to set block entity without x, y, z position in '{LevelName}'");
                 return false;
             }
 
-            if (!Cache.TryGetValue(((int)Math.Floor(x / 16f), (int)Math.Floor(z / 16f)), out Chunk chunk))
-            {
-                Log.warn($"Tried to set block entity in unloaded chunk. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
-                return false;
-            }
-
-            chunk.SetBlockEntity(blockEntity);
+            GetColumn(x >> 4, z >> 4).SetBlockEntity(blockEntity);
 
             if (send)
             {
@@ -242,11 +207,7 @@ namespace DaemonMC.Level
 
         public bool RemoveBlockEntity(int x, int y, int z)
         {
-            if (Cache.TryGetValue(((int)Math.Floor(x / 16f), (int)Math.Floor(z / 16f)), out Chunk chunk))
-            {
-                return chunk.RemoveBlockEntity(x, y, z);
-            }
-            return false;
+            return GetColumn(x >> 4, z >> 4).RemoveBlockEntity(x, y, z);
         }
 
         public void SendBlock(Block block, int x, int y, int z)
@@ -546,90 +507,151 @@ namespace DaemonMC.Level
             }
         }
 
-        public Chunk GetChunk(int x, int z)
+        public ChunkColumn GetColumn(int x, int z)
         {
-            if (Cache.TryGetValue((x, z), out var cachedChunk))
+            if (Columns.TryGetValue((x, z), out var cached))
             {
-                return cachedChunk;
+                return cached;
             }
 
-            byte[] dataKey = ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x2f, 0 });
-
-            var chunk = new Chunk();
-
-            int subChunkCount = Dimension.SubChunkCount();
-            int minSubChunkIndex = MinY >> 4;
-            List<byte[]> subChunks = new List<byte[]>(subChunkCount);
-            int lastSubChunkY = -1;
-
-            for (int y = 0; y < subChunkCount; y++)
+            lock (loadLock)
             {
-                dataKey[^1] = (byte)(y + minSubChunkIndex);
-                byte[] subChunk = Db.Get(dataKey);
-
-                subChunks.Add(subChunk);
-                if (subChunk != null)
+                if (Columns.TryGetValue((x, z), out cached))
                 {
-                    lastSubChunkY = y;
+                    return cached;
                 }
-            }
 
-            if (lastSubChunkY == -1)
-            {
-                chunk = Generator.GenerateChunk();
-            }
+                var column = new ChunkColumn(x, z, Dimension);
+                int minSubChunkIndex = MinY >> 4;
 
-            for (int y = 0; y <= lastSubChunkY; y++)
-            {
-                byte[] subChunk = subChunks[y];
+                byte[] dataKey = SubChunkKey(x, z);
+                for (int i = Dimension.SubChunkCount() - 1; i >= 0; i--)
+                {
+                    dataKey[^1] = unchecked((byte)(i + minSubChunkIndex));
+                    byte[] data = Db.Get(dataKey);
+                    if (data != null)
+                    {
+                        column.HighestSubChunk = i;
+                        SubChunks[(x, i + minSubChunkIndex, z)] = DecodeSubChunk(data, x, i + minSubChunkIndex, z);
+                        break;
+                    }
+                }
 
-                if (subChunk != null)
+                if (column.HighestSubChunk == -1)
+                {
+                    column.Generated = true;
+                    column.HighestSubChunk = Generator.SubChunkCount - 1;
+                }
+
+                byte[] blockEntityData = Db.Get(ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x31 }));
+                if (blockEntityData != null)
                 {
                     try
                     {
-                        chunk.Chunks.Add(ChunkUtils.DecodeSubChunk(subChunk));
+                        column.LoadBlockEntities(blockEntityData);
                     }
                     catch (Exception ex)
                     {
-                        Log.error($"SubChunk x:{x}; y:{y} z:{z} decoding failed. This shouldn't happen. Sent empty chunk");
+                        Log.error($"Block entities in chunk x:{x}; z:{z} in '{LevelName}' could not be loaded");
                         Log.error(ex.ToString());
-                        chunk.Chunks.Add(new SubChunk());
                     }
+                }
+
+                Columns[(x, z)] = column;
+
+                if (EntityChunksLoaded.Add((x, z)))
+                {
+                    LoadEntities(x, z);
+                }
+
+                return column;
+            }
+        }
+
+        public SubChunk? GetSubChunk(int x, int subChunkY, int z)
+        {
+            int index = subChunkY - (MinY >> 4);
+            if (index < 0 || index >= Dimension.SubChunkCount())
+            {
+                return null;
+            }
+
+            if (SubChunks.TryGetValue((x, subChunkY, z), out var cached))
+            {
+                return cached;
+            }
+
+            lock (loadLock)
+            {
+                var column = GetColumn(x, z);
+
+                if (SubChunks.TryGetValue((x, subChunkY, z), out cached))
+                {
+                    return cached;
+                }
+
+                SubChunk subChunk;
+                if (index > column.HighestSubChunk)
+                {
+                    subChunk = new SubChunk();
+                }
+                else if (column.Generated)
+                {
+                    subChunk = Generator.GenerateSubChunk(index);
                 }
                 else
                 {
-                    chunk.Chunks.Add(new SubChunk());
+                    byte[] dataKey = SubChunkKey(x, z);
+                    dataKey[^1] = unchecked((byte)subChunkY);
+                    byte[] data = Db.Get(dataKey);
+                    subChunk = data != null ? DecodeSubChunk(data, x, subChunkY, z) : new SubChunk();
                 }
-            }
 
-            for (int i = 0; i < chunk.Chunks.Count; i++) //todo temp code to apply plains biome. Need to read these from DB
+                SubChunks[(x, subChunkY, z)] = subChunk;
+                return subChunk;
+            }
+        }
+
+        public int[] GetColumnHeights(int x, int z)
+        {
+            var column = GetColumn(x, z);
+            var heights = column.Heights;
+            if (heights != null)
             {
-                chunk.Chunks[i].BiomePalette.Add(BiomeManager.GetBiomeId("plains"));
-                //chunk.Chunks[i].Biomes = Enumerable.Repeat((byte)0x01, 4096).ToArray();
+                return heights;
             }
 
-            byte[] blockEntityData = Db.Get(ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x31 }));
-            if (blockEntityData != null)
+            lock (loadLock)
             {
-                try
-                {
-                    chunk.LoadBlockEntities(blockEntityData);
-                }
-                catch (Exception ex)
-                {
-                    Log.error($"Block entities in chunk x:{x}; z:{z} in '{LevelName}' could not be loaded");
-                    Log.error(ex.ToString());
-                }
+                int minSubChunkIndex = MinY >> 4;
+                heights = column.Heights ?? ChunkColumn.ComputeHeights(column.HighestSubChunk, i => GetSubChunk(x, i + minSubChunkIndex, z));
+                column.Heights = heights;
+                return heights;
             }
+        }
 
-            Cache.TryAdd((x, z), chunk);
+        public int GetHighestNonAirSubChunk(int x, int z)
+        {
+            return ChunkColumn.HighestNonAirSubChunk(GetColumnHeights(x, z));
+        }
 
-            if (EntityChunksLoaded.Add((x, z)))
+        private byte[] SubChunkKey(int x, int z)
+        {
+            return ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x2f, 0 });
+        }
+
+        private SubChunk DecodeSubChunk(byte[] data, int x, int subChunkY, int z)
+        {
+            try
             {
-                LoadEntities(x, z);
+                return ChunkUtils.DecodeSubChunk(data);
             }
-
-            return chunk;
+            catch (Exception ex)
+            {
+                Log.error($"SubChunk x:{x}; y:{subChunkY} z:{z} in '{LevelName}' ({Dimension}) decoding failed. This shouldn't happen. Using empty sub chunk");
+                Log.error(ex.ToString());
+                return new SubChunk();
+            }
         }
 
         public List<Entity> LoadEntities(int x, int z)
@@ -789,15 +811,15 @@ namespace DaemonMC.Level
 
         private void CalculateSpawnY()
         {
-            var SpawnChunk = GetChunk(SpawnX >> 4, SpawnZ >> 4);
-            if (SpawnChunk.Chunks.Count == 0)
+            var spawnColumn = GetColumn(SpawnX >> 4, SpawnZ >> 4);
+            if (spawnColumn.HighestSubChunk < 0)
             {
                 SpawnY = MaxY;
                 Log.warn($"Unable to calulate spawn point Y value for {LevelName} ({Dimension}). Spawn chunk not found in DB. Y value set to {SpawnY}");
             }
             else
             {
-                SpawnY = Math.Min(MinY + SpawnChunk.Chunks.Count * 16, MaxY);
+                SpawnY = Math.Min(MinY + (spawnColumn.HighestSubChunk + 1) * 16, MaxY);
             }
             Log.debug($"Calculated '{LevelName}' ({Dimension}) spawn point: X:{SpawnX} Y:{SpawnY} Z:{SpawnZ}");
         }
@@ -810,38 +832,47 @@ namespace DaemonMC.Level
             }
             _ = Task.Run(async () =>
             {
-                if (Cache.Count > 0)
+                if (!SubChunks.IsEmpty || !Columns.IsEmpty)
                 {
-                    var activeChunks = new HashSet<(int x, int z)>();
-
+                    //Area around each player that stays cached: view distance in every direction (chunk x/z and absolute sub chunk y).
+                    var activeAreas = new List<(int minX, int maxX, int minY, int maxY, int minZ, int maxZ)>();
                     foreach (var player in OnlinePlayers.Values)
                     {
-                        int playerChunkX = (int)Math.Floor(player.Position.X / 16.0);
-                        int playerChunkZ = (int)Math.Floor(player.Position.Z / 16.0);
+                        int chunkX = (int)Math.Floor(player.Position.X / 16.0);
+                        int subChunkY = (int)Math.Floor(player.Position.Y / 16.0);
+                        int chunkZ = (int)Math.Floor(player.Position.Z / 16.0);
                         int distance = player.drawDistance / 2;
 
-                        for (int dx = -distance; dx <= distance; dx++)
+                        activeAreas.Add((chunkX - distance, chunkX + distance, subChunkY - distance, subChunkY + distance, chunkZ - distance, chunkZ + distance));
+                    }
+
+                    var spawnChunk = (SpawnX >> 4, SpawnZ >> 4);
+                    int removedSubChunks = 0;
+
+                    lock (loadLock)
+                    {
+                        foreach (var key in SubChunks.Keys)
                         {
-                            for (int dz = -distance; dz <= distance; dz++)
+                            bool active = activeAreas.Exists(a => key.x >= a.minX && key.x <= a.maxX && key.y >= a.minY && key.y <= a.maxY && key.z >= a.minZ && key.z <= a.maxZ);
+                            if (!active && SubChunks.TryRemove(key, out _))
                             {
-                                activeChunks.Add((playerChunkX + dx, playerChunkZ + dz));
+                                removedSubChunks++;
+                            }
+                        }
+
+                        var usedColumns = SubChunks.Keys.Select(k => (k.x, k.z)).ToHashSet();
+                        foreach (var chunkCoord in Columns.Keys)
+                        {
+                            if (!usedColumns.Contains(chunkCoord) && chunkCoord != spawnChunk)
+                            {
+                                Columns.TryRemove(chunkCoord, out _);
                             }
                         }
                     }
 
-                    var chunksToRemove = Cache.Keys
-                        .Where(chunkCoord => !activeChunks.Contains(chunkCoord) && chunkCoord != (SpawnX >> 4, SpawnZ >> 4))
-                        .ToList();
-
-                    int loadedChunks = Cache.Count();
-
-                    if (chunksToRemove.Count != 0)
+                    if (removedSubChunks != 0)
                     {
-                        foreach (var chunkCoord in chunksToRemove)
-                        {
-                            Cache.Remove(chunkCoord);
-                        }
-                        Log.debug($"Unloaded {chunksToRemove.Count()} / {loadedChunks} chunks from '{LevelName}' ({Dimension}). {Cache.Count()} still loaded.");
+                        Log.debug($"Unloaded {removedSubChunks} sub chunks from '{LevelName}' ({Dimension}). {SubChunks.Count} sub chunks still loaded.");
                     }
                 }
                 await Task.Delay(20000);
@@ -859,48 +890,28 @@ namespace DaemonMC.Level
             int chunkX = (int)Math.Floor(x / 16f);
             int chunkZ = (int)Math.Floor(z / 16f);
 
-            if (Cache.TryGetValue((chunkX, chunkZ), out Chunk chunk))
+            var subChunk = GetSubChunk(chunkX, y >> 4, chunkZ);
+            var state = subChunk?.GetBlockState(x & 15, y & 15, z & 15);
+
+            if (state == null) { return new Air(); }
+
+            var nbt = new NbtFile
             {
-                int subChunkY = (int)Math.Floor((y - MinY) / 16f);
+                BigEndian = false,
+                UseVarInt = false,
+                RootTag = state,
+            };
 
-                if (subChunkY < 0) { return new Air(); }
+            byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
+            var blockHash = Fnv1aHash.Hash32(saveToBuffer);
 
-                int localX = ((int)x % 16 + 16) % 16;
-                int localY = ((int)y % 16 + 16) % 16;
-                int localZ = ((int)z % 16 + 16) % 16;
-
-                if (subChunkY >= chunk.Chunks.Count) { return new Air(); }
-
-                var subChunk = chunk.Chunks[subChunkY];
-
-                if (subChunk == null) { return new Air(); }
-
-                int blockIndex = (localY) | (localZ << 4) | (localX << 8);
-                int blockStateIndex = subChunk.Blocks[blockIndex];
-
-                var nbt = new NbtFile
-                {
-                    BigEndian = false,
-                    UseVarInt = false,
-                    RootTag = subChunk.Palette[blockStateIndex],
-                };
-
-                byte[] saveToBuffer = nbt.SaveToBuffer(NbtCompression.None);
-                var blockHash = Fnv1aHash.Hash32(saveToBuffer);
-
-                if (BlockPalette.blockHashes.TryGetValue(blockHash, out Block value))
-                {
-                    return value;
-                }
-                else
-                {
-                    Log.warn($"Blockstate hash {blockHash} not found in BlockPalette. Requested state: {subChunk.Palette[blockStateIndex]}");
-                    return new Air();
-                }
+            if (BlockPalette.blockHashes.TryGetValue(blockHash, out Block value))
+            {
+                return value;
             }
             else
             {
-                Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
+                Log.warn($"Blockstate hash {blockHash} not found in BlockPalette. Requested state: {state}");
                 return new Air();
             }
         }

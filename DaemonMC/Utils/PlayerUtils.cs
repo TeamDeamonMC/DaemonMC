@@ -2,6 +2,7 @@
 using DaemonMC.Level;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
+using DaemonMC.Network.RakNet;
 
 namespace DaemonMC.Utils
 {
@@ -97,8 +98,8 @@ namespace DaemonMC.Utils
         internal void SendChunkToPlayer(int chunkX, int chunkZ)
         {
             var world = p.CurrentWorld;
-            var chunkRaw = world.GetChunk(chunkX, chunkZ);
-            int limit = Math.Max(chunkRaw.GetHighestNonAirSubChunk() + 1, 1);
+            var column = world.GetColumn(chunkX, chunkZ);
+            int limit = Math.Max(world.GetHighestNonAirSubChunk(chunkX, chunkZ) + 1, 1);
 
             p.Send(new LevelChunk
             {
@@ -106,7 +107,7 @@ namespace DaemonMC.Utils
                 ChunkZ = chunkZ,
                 Dimension = (int)world.Dimension,
                 SubChunkLimit = limit,
-                Data = chunkRaw.NetworkSerializeBiomes(world.Dimension)
+                Data = column.NetworkSerializeBiomes()
             });
         }
 
@@ -125,7 +126,7 @@ namespace DaemonMC.Utils
                 CenterZ = request.CenterZ,
             };
 
-            var heightsCache = new Dictionary<(int x, int z), int[]>();
+            int protocol = RakSessionManager.getSession(p.ep).protocolVersion;
 
             foreach (var (ox, oy, oz) in request.Offsets)
             {
@@ -152,27 +153,24 @@ namespace DaemonMC.Utils
                     continue;
                 }
 
-                var chunk = world.GetChunk(chunkX, chunkZ);
+                int subChunkY = request.CenterY + oy;
+                var heights = world.GetColumnHeights(chunkX, chunkZ);
 
-                if (!heightsCache.TryGetValue((chunkX, chunkZ), out var heights))
-                {
-                    heights = chunk.GetColumnHeights();
-                    heightsCache[(chunkX, chunkZ)] = heights;
-                }
-
-                entry.HeightMapType = Chunk.BuildSubChunkHeightMap(heights, index, out var heightMap);
+                entry.HeightMapType = ChunkColumn.BuildSubChunkHeightMap(heights, index, out var heightMap);
                 entry.HeightMap = heightMap;
                 entry.RenderHeightMapType = entry.HeightMapType;
                 entry.RenderHeightMap = heightMap;
 
-                if (chunk.IsSubChunkAir(index))
+                var subChunk = world.GetSubChunk(chunkX, subChunkY, chunkZ)!;
+                if (subChunk.IsAir())
                 {
                     entry.Result = SubChunkRequestResult.SuccessAllAir;
                 }
                 else
                 {
+                    var blockEntities = world.GetColumn(chunkX, chunkZ).GetBlockEntitiesInSubChunk(subChunkY);
                     entry.Result = SubChunkRequestResult.Success;
-                    entry.Payload = chunk.NetworkSerializeSubChunk(index, request.CenterY + oy, p);
+                    entry.Payload = subChunk.NetworkSerialize(subChunkY, protocol, blockEntities);
                 }
             }
 

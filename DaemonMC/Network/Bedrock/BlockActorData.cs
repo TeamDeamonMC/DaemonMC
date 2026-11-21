@@ -19,7 +19,7 @@ namespace DaemonMC.Network.Bedrock
         protected override void Encode(PacketEncoder encoder)
         {
             encoder.WriteBlockNetPos(Position);
-            encoder.WriteBytes(Chunk.SerializeNetworkNbt(Nbt), false);
+            encoder.WriteBytes(ChunkColumn.SerializeNetworkNbt(Nbt), false);
         }
     }
 }

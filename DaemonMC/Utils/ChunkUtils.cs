@@ -20,6 +20,7 @@ namespace DaemonMC.Utils
 
             for (int i = 0; i < subChunk.StorageSize; i++) //read real blocks
             {
+                var blocks = subChunk.Blocks;
                 subChunk.BitsPerBlock = reader.ReadByte() >> 1;
                 int blocksPerWord = (int)Math.Floor(32d / subChunk.BitsPerBlock);
                 int wordCount = (int)Math.Ceiling(4096d / blocksPerWord);
@@ -32,7 +33,7 @@ namespace DaemonMC.Utils
                     {
                         if (position >= 4096) continue;
 
-                        subChunk.Blocks[position] = (byte)((word >> ((position % blocksPerWord) * subChunk.BitsPerBlock)) & ((1 << subChunk.BitsPerBlock) - 1));
+                        blocks[position] =(byte)((word >> ((position % blocksPerWord) * subChunk.BitsPerBlock)) & ((1 << subChunk.BitsPerBlock) - 1));
 
                         position++;
                     }
@@ -99,6 +100,40 @@ namespace DaemonMC.Utils
                 }
             }
             return ValidBitsPerBlock[^1];
+        }
+
+        public static void WritePalettedStorage(Stream stream, byte[] indices, IReadOnlyList<int> values)
+        {
+            if (values.Count <= 1)
+            {
+                stream.WriteByte(1); //(0 << 1) | 1
+                VarInt.WriteSInt32(stream, values.Count == 1 ? values[0] : 0); //palette size for 0 bits is 0 ofc
+                return;
+            }
+
+            int bitsPerBlock = GetBitsPerBlock(values.Count);
+            stream.WriteByte((byte)((bitsPerBlock << 1) | 1));
+
+            int blocksPerWord = 32 / bitsPerBlock;
+            int wordCount = (4096 + blocksPerWord - 1) / blocksPerWord;
+            uint mask = (1u << bitsPerBlock) - 1;
+
+            int position = 0;
+            for (int w = 0; w < wordCount; w++)
+            {
+                uint word = 0;
+                for (int b = 0; b < blocksPerWord && position < 4096; b++, position++)
+                {
+                    word |= (indices[position] & mask) << (b * bitsPerBlock);
+                }
+                ToDataTypes.WriteUInt32(stream, word);
+            }
+
+            VarInt.WriteSInt32(stream, values.Count);
+            foreach (int value in values)
+            {
+                VarInt.WriteSInt32(stream, value);
+            }
         }
 
         public static SubChunk CreateEmptySubChunk()

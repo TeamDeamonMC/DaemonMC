@@ -1,1 +1,18 @@
-Fixed custom skins not showing up on 1.21.70
+Huge rework on worlds. Dimension support, world upgrader, varios fixes and more.
+
+**Added** - Built-in world upgrader. You will no longer need to use the latest Minecraft client to update Worlds.
+**Added** - World create feature. Now when first running server with empty Worlds folder it will make a new flat world.
+**Added** - Entity and block entity reading from worlds. Now they will automatically load and spawn.
+**Added** - Support for dimension. You can now spawn and teleport between Nether and End as well.
+**Added** - A lot of optimisation and stability improvements. Teleportation is more reliable and less resource usage including RAM and internet.
+
+**Plugin API changes:**
+* **Added:** [`Player.ChangeDimension(Dimension, Vector3(optional))`](https://github.com/TeamDeamonMC/DaemonMC/wiki/API-%E2%80%90-Player#changedimensiondimension-vector3optional) - To switch to another dimension of the current world.
+
+**Tip:** If you need to switch from one world to another dimension of another world you can do simply use -   [GetDimension(Dimension)](https://github.com/TeamDeamonMC/DaemonMC/wiki/API-%E2%80%90-World#getdimensiondimension) like this:
+`Player.ChangeWorld(world.GetDimension(Dimension.Nether));`  where `world` is target world.
+
+**Warning** - Plugins that depended directly on **Chunk, World and Block** class may no longer work. Plugin API methods listed in [Wiki](https://github.com/TeamDeamonMC/DaemonMC/wiki) are not affected by these internal changes.
+
+Download DaemonMC.zip to get started.
+Download DaemonMC.dll for updating.

@@ -22,7 +22,7 @@ jobs:
     - name: Extract version from .csproj
       run: |
         version=$(grep -oPm1 "(?<=<Version>)[^<]+" DaemonMC/DaemonMC.csproj)
-        echo "VERSION=$version" >> $GITHUB_ENV
+        echo "VERSION=$version" >> "$GITHUB_ENV"
         
     - name: Create Git Tag
       run: |
@@ -32,13 +32,13 @@ jobs:
         
     - name: Read releasenotes
       run: |
-        description=$(head -n 10 releasenotes.txt)
-        echo "DESCRIPTION=$description" >> $GITHUB_ENV
+        head -n 10 releasenotes.txt > release_body.md
+        cat release_body.md
         
     - name: Restore dependencies
       working-directory: DaemonMC
       run: dotnet restore
-      
+
     - name: Build
       working-directory: DaemonMC
       run: dotnet build --no-restore
@@ -63,8 +63,31 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.VERSION }}
+        target_commitish: ${{ github.sha }}
         name: "DaemonMC ${{ env.VERSION }}"
-        body: ${{ env.DESCRIPTION }}
+        body_path: release_body.md
         files: DaemonMC/DaemonMC.zip
       env:
         GITHUB_TOKEN: ${{ secrets.actionpat }}
+
+    - name: Discord
+      env:
+        WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        RELEASE_URL: ${{ steps.release.outputs.url }}
+        FALLBACK_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.VERSION }}
+      run: |
+        url="${RELEASE_URL:-$FALLBACK_URL}"
+        jq -n \
+          --arg title "New release: DaemonMC $VERSION" \
+          --arg url "$url" \
+          --rawfile notes release_body.md \
+          '{
+            username: "DaemonMC",
+            embeds: [{
+              title: $title,
+              url: $url,
+              description: (if ($notes | length) == 0 then "No release notes." else ($notes | .[0:4000]) end)
+            }]
+          }' > discord.json
+        curl -fsS -X POST -H "Content-Type: application/json" \
+          --data @discord.json "$WEBHOOK_URL"

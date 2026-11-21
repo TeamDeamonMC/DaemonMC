@@ -72,6 +72,8 @@ namespace Test
             var doc = JsonDocument.Parse(json);
 
             Directory.CreateDirectory("VanillaItems");
+			
+            var collidingNames = doc.RootElement.EnumerateObject().GroupBy(i => FixCase(i.Name.Split(':')[1]), StringComparer.OrdinalIgnoreCase).Where(g => g.Count() > 1).SelectMany(g => g.Select(i => i.Name)).ToHashSet();
 
             foreach (var item in doc.RootElement.EnumerateObject())
             {
@@ -85,6 +87,11 @@ namespace Test
                 string componentNbt = obj.TryGetProperty("component_nbt", out JsonElement value) ? value.GetString() : "";
 
                 string className = FixCase(name.Split(':')[1]);
+
+                if (collidingNames.Contains(name) && id < 256)
+                {
+                    className += "Block";
+                }
 
                 string content = $@"
 namespace DaemonMC.Items.VanillaItems

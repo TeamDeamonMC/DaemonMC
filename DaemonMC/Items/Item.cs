@@ -16,7 +16,9 @@ namespace DaemonMC.Items
 
         public Item Clone()
         {
-            return (Item)this.MemberwiseClone();
+            var cloned = (Item)this.MemberwiseClone();
+            cloned.Data = (NbtCompound)Data?.Clone();
+            return cloned;
         }
     }
 }

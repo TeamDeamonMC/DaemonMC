@@ -3,8 +3,10 @@ using System.Net;
 using System.Numerics;
 using System.Text;
 using DaemonMC.Biomes;
+using DaemonMC.Blocks;
 using DaemonMC.Entities;
 using DaemonMC.Items;
+using DaemonMC.Level.Format;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Network.NetherNet;
 using DaemonMC.Network.RakNet;
@@ -836,6 +838,16 @@ namespace DaemonMC.Network
             WriteOptional(ContainerName.DynamicId == null || ContainerName.DynamicId == 0 ? null : () => WriteInt((int)ContainerName.DynamicId));
         }
 
+        public int GetItemBlockRuntimeId(Item item)
+        {
+            if (item.BlockRuntimeId == 0 || !StateConverter.NeedsUpgrade(protocolVersion))
+            {
+                return item.BlockRuntimeId;
+            }
+
+            return BlockPalette.blockHashes.TryGetValue(item.BlockRuntimeId, out var block) ? block.GetHash(protocolVersion) : item.BlockRuntimeId;
+        }
+
         public void WriteItemInstance(Item item, bool network = false)
         {
             if (!network && item is Items.VanillaItems.Air)
@@ -861,7 +873,7 @@ namespace DaemonMC.Network
                 }
                 WriteShort(item.Count);
                 WriteVarInt(item.Aux);
-                WriteSignedVarInt(item.BlockRuntimeId);
+                WriteSignedVarInt(GetItemBlockRuntimeId(item));
                 WriteItemData(item.Data);
             }
         }
@@ -902,11 +914,11 @@ namespace DaemonMC.Network
                 WriteBool(false); //has stack net id
                 if (network)
                 {
-                    WriteVarInt(unchecked((uint)item.BlockRuntimeId));
+                    WriteVarInt(unchecked((uint)GetItemBlockRuntimeId(item)));
                 }
                 else
                 {
-                    WriteSignedVarInt(item.BlockRuntimeId);
+                    WriteSignedVarInt(GetItemBlockRuntimeId(item));
                 }
                 WriteItemData(item.Data);
             }

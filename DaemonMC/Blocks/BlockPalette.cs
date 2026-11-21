@@ -5,6 +5,7 @@ namespace DaemonMC.Blocks
     public class BlockPalette
     {
         public static Dictionary<int, Block> blockHashes { get; protected set; } = new Dictionary<int, Block>();
+        private static readonly Dictionary<string, Block> defaultBlocks = new Dictionary<string, Block>(StringComparer.Ordinal);
 
         public static void buildPalette()
         {
@@ -15,6 +16,7 @@ namespace DaemonMC.Blocks
             foreach (var type in blockTypes)
             {
                 Block blockInstance = (Block)Activator.CreateInstance(type);
+                defaultBlocks.TryAdd(blockInstance.Name, blockInstance);
 
                 var stateOptions = new Dictionary<string, object[]>();
                 foreach (var state in blockInstance.States)
@@ -48,6 +50,11 @@ namespace DaemonMC.Blocks
         {
             var block = blockHashes.Values.FirstOrDefault(i => string.Equals(i.Name, blockName, StringComparison.OrdinalIgnoreCase));
             return block == null ? null : block.Clone();
+        }
+
+        public static Block? GetDefaultBlock(string blockName)
+        {
+            return defaultBlocks.TryGetValue(blockName, out var block) ? block.Clone() : null;
         }
 
         private static IEnumerable<Dictionary<string, object>> GetCombinations(Dictionary<string, object[]> options)

@@ -106,7 +106,7 @@ namespace DaemonMC.Level
             }) + "\n";
         }
 
-        private static int[] ToVersionArray(string version)
+        internal static int[] ToVersionArray(string version)
         {
             var parts = version.Split('.').Select(int.Parse).ToList();
             while (parts.Count < 5)

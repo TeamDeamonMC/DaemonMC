@@ -3,6 +3,7 @@ using System.Numerics;
 using DaemonMC.Biomes;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
+using DaemonMC.Level.Format;
 using DaemonMC.Level.Generators;
 using DaemonMC.Network;
 using DaemonMC.Network.Bedrock;
@@ -653,57 +654,76 @@ namespace DaemonMC.Level
 
             Log.info($"Loading world: Worlds\\{LevelName}.mcworld");
 
-            using (ZipArchive archive = ZipFile.OpenRead($"Worlds/{LevelName}.mcworld"))
+            string worldPath = $"Worlds/{LevelName}.mcworld";
+            NbtCompound? levelDat = ReadLevelDat(worldPath);
+            if (levelDat == null)
             {
-                foreach (var entry in archive.Entries)
-                {
-                    if (entry.FullName.EndsWith("level.dat", StringComparison.OrdinalIgnoreCase))
-                    {
-                        using (Stream stream = entry.Open())
-                        {
-                            using (var memoryStream = new MemoryStream())
-                            {
-                                stream.CopyTo(memoryStream);
-
-                                memoryStream.Position = 8;
-
-                                var nbt = new NbtFile
-                                {
-                                    BigEndian = false,
-                                    UseVarInt = false
-                                };
-
-                                nbt.LoadFromStream(memoryStream, NbtCompression.None);
-                                NbtTag tag = nbt.RootTag;
-
-                                RandomSeed = tag["RandomSeed"].LongValue;
-                                LevelDisplayName = tag["LevelName"].StringValue;
-                                Version = tag["NetworkVersion"].IntValue;
-                                SpawnX = tag["SpawnX"].IntValue;
-                                SpawnZ = tag["SpawnZ"].IntValue;
-
-                                if (tag != null && tag["MinimumCompatibleClientVersion"] is NbtList versionList)
-                                {
-                                    string stringVersion = string.Join(".", versionList.Take(3).Select(v => ((NbtInt)v).IntValue));
-                                    if (!LevelDbVersion.Contains(stringVersion))
-                                    {
-                                        Log.error($"Unsupported world version {stringVersion}!");
-                                        Log.warn($"This server software doesn't support world format updating, please open Worlds/{LevelName}.mcworld with Minecraft client {LevelDbVersion.Last()} and export mcworld file again to update world.");
-                                        Server.Crash = true;
-                                    }
-                                }
-
-                                GameRules.Add("showCoordinates", new GameRule(true));
-                            }
-                        }
-                    }
-                }
+                Log.error($"level.dat not found in {worldPath}");
+                Server.Crash = true;
+                return;
             }
 
-            Db = new Database(new DirectoryInfo($"Worlds/{LevelName}.mcworld"));
+            System.Version? worldVersion = WorldUpgrader.GetWorldVersion(levelDat);
+            int worldProtocol;
+            if (worldVersion != null)
+            {
+                if (worldVersion > System.Version.Parse(LevelDbVersion.Last()))
+                {
+                    Log.error($"World {worldPath} was saved with Minecraft {worldVersion}, which is newer than this server supports ({LevelDbVersion.Last()}). Downgrading worlds is not supported.");
+                    Server.Crash = true;
+                    return;
+                }
+                worldProtocol = WorldUpgrader.ToProtocol(worldVersion);
+            }
+            else
+            {
+                worldProtocol = levelDat.TryGet<NbtInt>("NetworkVersion", out var networkVersion) ? networkVersion!.Value : 0;
+            }
+
+            if (StateConverter.NeedsUpgrade(worldProtocol))
+            {
+                if (!WorldUpgrader.Upgrade(worldPath, worldProtocol, worldVersion?.ToString() ?? $"protocol {worldProtocol}"))
+                {
+                    Server.Crash = true;
+                    return;
+                }
+                levelDat = ReadLevelDat(worldPath)!;
+            }
+
+            RandomSeed = levelDat["RandomSeed"].LongValue;
+            LevelDisplayName = levelDat["LevelName"].StringValue;
+            Version = levelDat["NetworkVersion"].IntValue;
+            SpawnX = levelDat["SpawnX"].IntValue;
+            SpawnZ = levelDat["SpawnZ"].IntValue;
+            GameRules.Add("showCoordinates", new GameRule(true));
+
+            Db = new Database(new DirectoryInfo(worldPath));
             Db.Open();
 
             CalculateSpawnY();
+        }
+
+        private static NbtCompound? ReadLevelDat(string mcworldPath)
+        {
+            using ZipArchive archive = ZipFile.OpenRead(mcworldPath);
+            var entry = archive.Entries.FirstOrDefault(e => e.FullName.EndsWith("level.dat", StringComparison.OrdinalIgnoreCase));
+            if (entry == null)
+            {
+                return null;
+            }
+
+            using Stream stream = entry.Open();
+            using var memoryStream = new MemoryStream();
+            stream.CopyTo(memoryStream);
+            memoryStream.Position = 8; // storage version + payload length
+
+            var nbt = new NbtFile
+            {
+                BigEndian = false,
+                UseVarInt = false
+            };
+            nbt.LoadFromStream(memoryStream, NbtCompression.None);
+            return (NbtCompound)nbt.RootTag;
         }
 
         private void CalculateSpawnY()

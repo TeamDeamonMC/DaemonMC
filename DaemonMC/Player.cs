@@ -437,14 +437,14 @@ namespace DaemonMC
             }
         }
 
-        public void ChangeWorld(World world, Dimension dimension = Dimension.Overworld)
+        public void ChangeWorld(World world)
         {
-            doChangeWorld(world.GetDimension(dimension), new Vector3(world.SpawnX, world.SpawnY, world.SpawnZ));
+            doChangeWorld(world, new Vector3(world.SpawnX, world.SpawnY, world.SpawnZ));
         }
 
-        public void ChangeWorld(World world, Vector3 position, Dimension dimension = Dimension.Overworld)
+        public void ChangeWorld(World world, Vector3 position)
         {
-            doChangeWorld(world.GetDimension(dimension), position);
+            doChangeWorld(world, position);
         }
 
         public void ChangeDimension(Dimension dimension)

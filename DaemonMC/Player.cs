@@ -267,15 +267,57 @@ namespace DaemonMC
 
         public void Teleport(Vector3 position)
         {
+            _ = TeleportAsync(position);
+        }
+
+        public async Task TeleportAsync(Vector3 position, int timeoutSeconds = 5)
+        {
+            var world = CurrentWorld;
+            int chunkX = (int)Math.Floor(position.X / 16.0);
+            int chunkZ = (int)Math.Floor(position.Z / 16.0);
+
+            int landingSubChunk = world.GetLandingSubChunk(position);
+            bool waitForChunk = !_player.ClientHasChunk(chunkX, chunkZ);
+            bool wasImmobile = (dataValue & (1L << (int)ActorFlags.NOAI)) != 0;
+
+            Task<bool>? arrival = null;
+            if (waitForChunk)
+            {
+                arrival = _player.WaitForSubChunk(chunkX, landingSubChunk, chunkZ, TimeSpan.FromSeconds(timeoutSeconds));
+                if (!wasImmobile)
+                {
+                    SetFlag(ActorFlags.NOAI, true);
+                    SendMetadata(true);
+                }
+            }
+
             Position = position;
-            var packet = new MovePlayer
+            LastChunkX = chunkX;
+            LastChunkZ = chunkZ;
+            Send(new MovePlayer
             {
                 ActorRuntimeId = EntityID,
                 Position = position,
                 Teleport = true,
                 Tick = Tick
-            };
-            Send(packet);
+            });
+            _player.SendChunks();
+
+            if (arrival == null)
+            {
+                return;
+            }
+
+            if (!await arrival)
+            {
+                Log.debug($"{Username} teleport to X:{position.X} Y:{position.Y} Z:{position.Z} released before sub chunk {chunkX}:{landingSubChunk}:{chunkZ} arrived");
+            }
+
+            if (!wasImmobile && CurrentWorld == world && Server.OnlinePlayers.ContainsValue(this))
+            {
+                SetFlag(ActorFlags.NOAI, false);
+                SendMetadata(true);
+            }
         }
 
         public void MoveTo(Vector3 position)
@@ -494,10 +536,8 @@ namespace DaemonMC
 
             world.AddPlayer(this);
             SendEntities();
-            await Task.Delay(500); //need a little bit time to clear chunk cache and process packets
-            _player.SendChunks();
             await Task.Delay(500);
-            Teleport(position);
+            await TeleportAsync(position);
         }
 
         public void SetNameTag(string nameTag)
@@ -833,35 +873,7 @@ namespace DaemonMC
                     LastChunkX = currentChunkX;
                     LastChunkZ = currentChunkZ;
 
-                    var packet2 = new NetworkChunkPublisherUpdate
-                    {
-                        X = (int)Position.X,
-                        Y = (int)Position.Y,
-                        Z = (int)Position.Z,
-                        Radius = drawDistance
-                    };
-                    Send(packet2);
-
-                    HashSet<(int x, int z)> newChunks = new(ChunkUtils.GetSequence(drawDistance/2, currentChunkX, currentChunkZ));
-
-                    foreach (var chunk in newChunks)
-                    {
-                        if (!_player.sentChunks.Contains(chunk))
-                        {
-                            _player.sentChunks.Add(chunk);
-                            _player.ChunkSendQueue.Enqueue(chunk);
-                        }
-                    }
-
-                    foreach (var chunk in _player.sentChunks.ToList())
-                    {
-                        if (!newChunks.Contains(chunk))
-                        {
-                            _player.sentChunks.Remove(chunk);
-                        }
-                    }
-
-                    _player.ProcessSendQueue();
+                    _player.SendChunks();
                 }
             }
 

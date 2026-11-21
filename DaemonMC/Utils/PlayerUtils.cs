@@ -43,15 +43,20 @@ namespace DaemonMC.Utils
         {
             if (SendQueueBusy) { return; }
             SendQueueBusy = true;
-            while (ChunkSendQueue.Count > 0)
+            while (true)
             {
-                if (!Server.OnlinePlayers.ContainsValue(p))
+                (int x, int z) next;
+                lock (ChunkSendQueue)
                 {
-                    ChunkSendQueue.Clear();
-                    break;
+                    if (ChunkSendQueue.Count == 0) { break; }
+                    if (!Server.OnlinePlayers.ContainsValue(p))
+                    {
+                        ChunkSendQueue.Clear();
+                        break;
+                    }
+                    next = ChunkSendQueue.Dequeue();
                 }
-                var (chunkX, chunkZ) = ChunkSendQueue.Dequeue();
-                SendChunkToPlayer(chunkX, chunkZ);
+                SendChunkToPlayer(next.x, next.z);
 
                 await Task.Delay(10);
             }
@@ -75,23 +80,62 @@ namespace DaemonMC.Utils
             int currentChunkZ = (int)Math.Floor(p.Position.Z / 16.0);
 
             List<(int x, int z)> chunkPositions = ChunkUtils.GetSequence(radius, currentChunkX, currentChunkZ);
+            var inRange = chunkPositions.ToHashSet();
 
-            foreach (var (x, z) in chunkPositions)
+            lock (ChunkSendQueue)
             {
-                if (!sentChunks.Contains((x, z)))
+                var queued = ChunkSendQueue.ToHashSet();
+                ChunkSendQueue.Clear();
+                sentChunks.RemoveWhere(c => !inRange.Contains(c));
+
+                foreach (var pos in chunkPositions)
                 {
-                    sentChunks.Add((x, z));
-                    ChunkSendQueue.Enqueue((x, z));
+                    if (queued.Contains(pos) || sentChunks.Add(pos))
+                    {
+                        ChunkSendQueue.Enqueue(pos);
+                    }
                 }
             }
 
             ProcessSendQueue();
         }
 
+        internal bool ClientHasChunk(int chunkX, int chunkZ)
+        {
+            lock (ChunkSendQueue)
+            {
+                return sentChunks.Contains((chunkX, chunkZ)) && !ChunkSendQueue.Contains((chunkX, chunkZ));
+            }
+        }
+
+        private (int x, int y, int z) arrivalTarget;
+        private TaskCompletionSource<bool>? arrival;
+
+        internal async Task<bool> WaitForSubChunk(int chunkX, int subChunkY, int chunkZ, TimeSpan timeout)
+        {
+            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            lock (ChunkSendQueue)
+            {
+                arrival?.TrySetResult(false);
+                arrival = tcs;
+                arrivalTarget = (chunkX, subChunkY, chunkZ);
+            }
+
+            var finished = await Task.WhenAny(tcs.Task, Task.Delay(timeout));
+            lock (ChunkSendQueue)
+            {
+                if (arrival == tcs) { arrival = null; }
+            }
+            return finished == tcs.Task && tcs.Task.Result;
+        }
+
         internal void ClearChunkCache()
         {
-            ChunkSendQueue.Clear();
-            sentChunks.Clear();
+            lock (ChunkSendQueue)
+            {
+                ChunkSendQueue.Clear();
+                sentChunks.Clear();
+            }
             SendQueueBusy = false;
         }
 
@@ -147,7 +191,9 @@ namespace DaemonMC.Utils
                     entry.Result = SubChunkRequestResult.IndexOutOfBounds;
                     continue;
                 }
-                if (!sentChunks.Contains((chunkX, chunkZ)))
+                bool sent;
+                lock (ChunkSendQueue) { sent = sentChunks.Contains((chunkX, chunkZ)); }
+                if (!sent)
                 {
                     entry.Result = SubChunkRequestResult.LevelChunkDoesntExist;
                     continue;
@@ -175,6 +221,14 @@ namespace DaemonMC.Utils
             }
 
             p.Send(response);
+
+            lock (ChunkSendQueue)
+            {
+                if (arrival != null && !wrongDimension && response.Entries.Exists(e => (request.CenterX + e.OffsetX, request.CenterY + e.OffsetY, request.CenterZ + e.OffsetZ) == arrivalTarget && (e.Result == SubChunkRequestResult.Success || e.Result == SubChunkRequestResult.SuccessAllAir)))
+                {
+                    arrival.TrySetResult(true);
+                }
+            }
         }
 
         internal void UpdateFlags(List<AuthInputData> flags)

@@ -635,6 +635,28 @@ namespace DaemonMC.Level
             return ChunkColumn.HighestNonAirSubChunk(GetColumnHeights(x, z));
         }
 
+        public int GetLandingSubChunk(Vector3 position)
+        {
+            int x = (int)Math.Floor(position.X);
+            int y = (int)Math.Floor(position.Y);
+            int z = (int)Math.Floor(position.Z);
+
+            int height = GetColumnHeights(x >> 4, z >> 4)[((z & 15) << 4) | (x & 15)];
+            int subChunkY;
+            if (height < 0)
+            {
+                subChunkY = MinY >> 4;
+            }
+            else
+            {
+                int ground = MinY + height;
+                subChunkY = (ground <= y ? ground : Math.Clamp(y, MinY, MaxY)) >> 4;
+            }
+
+            GetSubChunk(x >> 4, subChunkY, z >> 4);
+            return subChunkY;
+        }
+
         private byte[] SubChunkKey(int x, int z)
         {
             return ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x2f, 0 });
@@ -847,6 +869,7 @@ namespace DaemonMC.Level
                     }
 
                     var spawnChunk = (SpawnX >> 4, SpawnZ >> 4);
+                    activeAreas.Add((spawnChunk.Item1, spawnChunk.Item1, MinY >> 4, MaxY >> 4, spawnChunk.Item2, spawnChunk.Item2));
                     int removedSubChunks = 0;
 
                     lock (loadLock)
@@ -875,7 +898,7 @@ namespace DaemonMC.Level
                         Log.debug($"Unloaded {removedSubChunks} sub chunks from '{LevelName}' ({Dimension}). {SubChunks.Count} sub chunks still loaded.");
                     }
                 }
-                await Task.Delay(20000);
+                await Task.Delay(30000);
                 UnloadChunks();
             });
         }

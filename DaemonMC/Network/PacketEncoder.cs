@@ -1031,6 +1031,27 @@ namespace DaemonMC.Network
             }
         }
 
+        public void WriteHeightMap(PacketEncoder encoder, HeightMapDataType type, sbyte[] data)
+        {
+            encoder.WriteByte((byte)type);
+            bool hasData = type == HeightMapDataType.HasData;
+            encoder.WriteBool(hasData);
+            if (!hasData) return;
+
+            byte[] bytes = (byte[])(Array)data;
+            if (encoder.protocolVersion >= Info.v1_26_50)
+            {
+                for (int row = 0; row < 256; row += 16)
+                {
+                    encoder.WriteBytes(bytes[row..(row + 16)]);
+                }
+            }
+            else
+            {
+                encoder.WriteBytes(bytes, false);
+            }
+        }
+
         public void WriteOptional(Action writeFunction = null)
         {
             WriteBool(writeFunction != null);

@@ -32,12 +32,9 @@ namespace DaemonMC.Level.Format
 
         public static Version? GetWorldVersion(NbtCompound levelDat)
         {
-            foreach (string name in new[] { "lastOpenedWithVersion", "MinimumCompatibleClientVersion" })
+            if (levelDat.TryGet<NbtList>("MinimumCompatibleClientVersion", out var list)&& list!.Count >= 3 && list.All(t => t is NbtInt))
             {
-                if (levelDat.TryGet<NbtList>(name, out var list) && list!.Count >= 3 && list.All(t => t is NbtInt))
-                {
-                    return new Version(list[0].IntValue, list[1].IntValue, list[2].IntValue);
-                }
+                return new Version(list[0].IntValue, list[1].IntValue, list[2].IntValue);
             }
             return null;
         }

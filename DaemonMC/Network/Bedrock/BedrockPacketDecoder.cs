@@ -100,6 +100,9 @@ namespace DaemonMC.Network.Bedrock
                     case Info.Bedrock.RequestChunkRadius:
                         new RequestChunkRadius().DecodePacket(decoder);
                         break;
+                    case Info.Bedrock.SubChunkRequest:
+                        new SubChunkRequest().DecodePacket(decoder);
+                        break;
                     case Info.Bedrock.MovePlayer:
                         new MovePlayer().DecodePacket(decoder);
                         break;

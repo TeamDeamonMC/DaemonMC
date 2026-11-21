@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using DaemonMC.Level;
 using DaemonMC.Network.Bedrock;
 using DaemonMC.Network.Enumerations;
 
@@ -97,16 +98,85 @@ namespace DaemonMC.Utils
         {
             var world = p.CurrentWorld;
             var chunkRaw = world.GetChunk(chunkX, chunkZ);
+            int limit = Math.Max(chunkRaw.GetHighestNonAirSubChunk() + 1, 1);
 
-            var chunk = new LevelChunk
+            p.Send(new LevelChunk
             {
                 ChunkX = chunkX,
                 ChunkZ = chunkZ,
                 Dimension = (int)world.Dimension,
-                Count = chunkRaw.Chunks.Count,
-                Data = chunkRaw.NetworkSerialize(p)
+                SubChunkLimit = limit,
+                Data = chunkRaw.NetworkSerializeBiomes(world.Dimension)
+            });
+        }
+
+        internal void HandleSubChunkRequest(SubChunkRequest request)
+        {
+            var world = p.CurrentWorld;
+            int minIndex = world.MinY >> 4;
+            int subChunkCount = world.Dimension.SubChunkCount();
+            bool wrongDimension = request.Dimension != (int)world.Dimension;
+
+            var response = new SubChunkPacket
+            {
+                Dimension = request.Dimension,
+                CenterX = request.CenterX,
+                CenterY = request.CenterY,
+                CenterZ = request.CenterZ,
             };
-            p.Send(chunk);
+
+            var heightsCache = new Dictionary<(int x, int z), int[]>();
+
+            foreach (var (ox, oy, oz) in request.Offsets)
+            {
+                var entry = new SubChunkEntry { OffsetX = ox, OffsetY = oy, OffsetZ = oz };
+                response.Entries.Add(entry);
+
+                int chunkX = request.CenterX + ox;
+                int chunkZ = request.CenterZ + oz;
+                int index = request.CenterY + oy - minIndex;
+
+                if (wrongDimension)
+                {
+                    entry.Result = SubChunkRequestResult.WrongDimension;
+                    continue;
+                }
+                if (index < 0 || index >= subChunkCount)
+                {
+                    entry.Result = SubChunkRequestResult.IndexOutOfBounds;
+                    continue;
+                }
+                if (!sentChunks.Contains((chunkX, chunkZ)))
+                {
+                    entry.Result = SubChunkRequestResult.LevelChunkDoesntExist;
+                    continue;
+                }
+
+                var chunk = world.GetChunk(chunkX, chunkZ);
+
+                if (!heightsCache.TryGetValue((chunkX, chunkZ), out var heights))
+                {
+                    heights = chunk.GetColumnHeights();
+                    heightsCache[(chunkX, chunkZ)] = heights;
+                }
+
+                entry.HeightMapType = Chunk.BuildSubChunkHeightMap(heights, index, out var heightMap);
+                entry.HeightMap = heightMap;
+                entry.RenderHeightMapType = entry.HeightMapType;
+                entry.RenderHeightMap = heightMap;
+
+                if (chunk.IsSubChunkAir(index))
+                {
+                    entry.Result = SubChunkRequestResult.SuccessAllAir;
+                }
+                else
+                {
+                    entry.Result = SubChunkRequestResult.Success;
+                    entry.Payload = chunk.NetworkSerializeSubChunk(index, request.CenterY + oy, p);
+                }
+            }
+
+            p.Send(response);
         }
 
         internal void UpdateFlags(List<AuthInputData> flags)

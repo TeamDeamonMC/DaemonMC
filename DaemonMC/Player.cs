@@ -876,6 +876,11 @@ namespace DaemonMC
                 _player.SendChunks();
             }
 
+            if (packet is SubChunkRequest subChunkRequest)
+            {
+                _player.HandleSubChunkRequest(subChunkRequest);
+            }
+
             if (packet is TextMessage textMessage)
             {
                 PluginManager.PlayerSentMessage(this, textMessage);

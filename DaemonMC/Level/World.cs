@@ -195,11 +195,58 @@ namespace DaemonMC.Level
                 int blockIndex = (localY) | (localZ << 4) | (localX << 8);
                 byte stateIndex = (byte)NbtUtils.IndexOf(subChunk.Palette, block.GetState());
                 subChunk.Blocks[blockIndex] = stateIndex;
+
+                chunk.RemoveBlockEntity(x, y, z);
             }
             else
             {
                 Log.warn($"Tried to access unloaded chunk x:{chunkX}; z:{chunkZ}. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
             }
+        }
+
+        public NbtCompound? GetBlockEntity(int x, int y, int z)
+        {
+            if (Cache.TryGetValue(((int)Math.Floor(x / 16f), (int)Math.Floor(z / 16f)), out Chunk chunk))
+            {
+                return chunk.GetBlockEntity(x, y, z);
+            }
+            return null;
+        }
+
+        public bool SetBlockEntity(NbtCompound blockEntity, bool send = true)
+        {
+            if (!Chunk.TryGetPosition(blockEntity, out int x, out int y, out int z))
+            {
+                Log.warn($"Tried to set block entity without x, y, z position in '{LevelName}'");
+                return false;
+            }
+
+            if (!Cache.TryGetValue(((int)Math.Floor(x / 16f), (int)Math.Floor(z / 16f)), out Chunk chunk))
+            {
+                Log.warn($"Tried to set block entity in unloaded chunk. In '{LevelName}' position x:{x}; y:{y}, z:{z}");
+                return false;
+            }
+
+            chunk.SetBlockEntity(blockEntity);
+
+            if (send)
+            {
+                Send(new BlockActorData
+                {
+                    Position = new Vector3(x, y, z),
+                    Nbt = blockEntity
+                });
+            }
+            return true;
+        }
+
+        public bool RemoveBlockEntity(int x, int y, int z)
+        {
+            if (Cache.TryGetValue(((int)Math.Floor(x / 16f), (int)Math.Floor(z / 16f)), out Chunk chunk))
+            {
+                return chunk.RemoveBlockEntity(x, y, z);
+            }
+            return false;
         }
 
         public void SendBlock(Block block, int x, int y, int z)
@@ -559,6 +606,20 @@ namespace DaemonMC.Level
             {
                 chunk.Chunks[i].BiomePalette.Add(BiomeManager.GetBiomeId("plains"));
                 //chunk.Chunks[i].Biomes = Enumerable.Repeat((byte)0x01, 4096).ToArray();
+            }
+
+            byte[] blockEntityData = Db.Get(ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x31 }));
+            if (blockEntityData != null)
+            {
+                try
+                {
+                    chunk.LoadBlockEntities(blockEntityData);
+                }
+                catch (Exception ex)
+                {
+                    Log.error($"Block entities in chunk x:{x}; z:{z} in '{LevelName}' could not be loaded");
+                    Log.error(ex.ToString());
+                }
             }
 
             Cache.TryAdd((x, z), chunk);

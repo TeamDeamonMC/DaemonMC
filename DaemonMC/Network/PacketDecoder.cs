@@ -954,6 +954,24 @@ namespace DaemonMC.Network
             return action;
         }
 
+        public List<(sbyte x, sbyte y, sbyte z)> ReadOffsets(PacketDecoder decoder, int count)
+        {
+            if (count < 0 || count > 8192)
+            {
+                throw new InvalidDataException($"SubChunkRequest offset count out of range: {count}");
+            }
+
+            var offsets = new List<(sbyte x, sbyte y, sbyte z)>(count);
+            for (int i = 0; i < count; i++)
+            {
+                sbyte x = (sbyte)decoder.ReadByte();
+                sbyte y = (sbyte)decoder.ReadByte();
+                sbyte z = (sbyte)decoder.ReadByte();
+                offsets.Add((x, y, z));
+            }
+            return offsets;
+        }
+
         public T? ReadOptional<T>(Func<T> readFunction)
         {
             return ReadBool() ? readFunction() : default;

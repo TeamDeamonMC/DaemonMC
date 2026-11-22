@@ -45,12 +45,15 @@ jobs:
       
     - name: Publish Application
       working-directory: DaemonMC
-      run: dotnet publish -c Release -r win-x64 --no-restore -o DaemonMC
-      
-    - name: Zip Published Application
-      working-directory: DaemonMC
-      run: zip -r DaemonMC.zip DaemonMC/
-      
+      run: |
+        dotnet publish -c Release -r win-x64 -o publish/win-x64
+        dotnet publish -c Release -r linux-x64 -o publish/linux-x64
+        ls -la publish/win-x64 publish/linux-x64
+        test -f publish/win-x64/DaemonMC.exe
+        test -f publish/linux-x64/DaemonMC
+        test "$(ls publish/win-x64 | wc -l)" -eq 1
+        test "$(ls publish/linux-x64 | wc -l)" -eq 1
+
     - name: Publish NuGet Package
       working-directory: DaemonMC
       run: |
@@ -66,7 +69,9 @@ jobs:
         target_commitish: ${{ github.sha }}
         name: "DaemonMC ${{ env.VERSION }}"
         body_path: release_body.md
-        files: DaemonMC/DaemonMC.zip
+        files: |
+          DaemonMC/publish/win-x64/DaemonMC.exe
+          DaemonMC/publish/linux-x64/DaemonMC
       env:
         GITHUB_TOKEN: ${{ secrets.actionpat }}
 

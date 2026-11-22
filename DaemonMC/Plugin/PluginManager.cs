@@ -39,18 +39,31 @@ namespace DaemonMC.Plugin
                 LoadPlugin(file);
             }
 
-            _watcher = new FileSystemWatcher(pluginDirectory, "*.dll")
+            foreach (var file in Directory.GetFiles(pluginDirectory, "*.cs"))
+            {
+                LoadPlugin(file);
+            }
+
+            _watcher = new FileSystemWatcher(pluginDirectory)
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
-                EnableRaisingEvents = true,
                 IncludeSubdirectories = false
             };
+            _watcher.Filters.Add("*.dll");
+            _watcher.Filters.Add("*.cs");
 
             _watcher.Changed += (s, e) => HandlePluginChange(e.FullPath);
             _watcher.Created += (s, e) => HandlePluginChange(e.FullPath);
             _watcher.Deleted += (s, e) => HandlePluginRemoval(e.FullPath);
             _watcher.Renamed += (s, e) => HandlePluginRenamed(e.OldFullPath, e.FullPath);
+            _watcher.EnableRaisingEvents = true;
         }
+
+        private static bool IsScript(string path) =>
+            Path.GetExtension(path).Equals(".cs", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsPluginFile(string path) =>
+            IsScript(path) || Path.GetExtension(path).Equals(".dll", StringComparison.OrdinalIgnoreCase);
 
         public static void LoadLibrary(string filePath)
         {
@@ -71,9 +84,60 @@ namespace DaemonMC.Plugin
         public static void LoadPlugin(string filePath, bool reloaded = false)
         {
             var fullPath = Path.GetFullPath(filePath);
-            var loadContext = new PluginLoadContext(fullPath);
 
+            if (IsScript(fullPath))
+            {
+                var compiled = ScriptCompiler.Compile(fullPath);
+                if (!compiled.Success)
+                {
+                    LogCompileErrors(filePath, compiled);
+                    return;
+                }
+                LoadScript(filePath, compiled, reloaded);
+                return;
+            }
+
+            var loadContext = new PluginLoadContext(fullPath);
             var assembly = loadContext.LoadFromAssemblyPath(fullPath);
+            ActivatePlugins(assembly, loadContext, filePath, reloaded);
+        }
+
+        private static void LoadScript(string filePath, ScriptCompiler.Result compiled, bool reloaded)
+        {
+            var loadContext = new PluginLoadContext();
+            using var dll = new MemoryStream(compiled.Assembly!);
+            using var pdb = new MemoryStream(compiled.Pdb!);
+            var assembly = loadContext.LoadFromStream(dll, pdb);
+            ActivatePlugins(assembly, loadContext, filePath, reloaded);
+        }
+
+        private static void LogCompileErrors(string filePath, ScriptCompiler.Result compiled)
+        {
+            Log.error($"Plugin {filePath} failed to compile:");
+            foreach (var error in compiled.Errors)
+            {
+                Log.error($"  {error}");
+            }
+        }
+
+        private static void ActivatePlugins(Assembly assembly, PluginLoadContext loadContext, string filePath, bool reloaded)
+        {
+            var fullPath = Path.GetFullPath(filePath);
+            var activated = false;
+
+            try
+            {
+                activated = ActivatePluginTypes(assembly, loadContext, filePath, fullPath, reloaded);
+            }
+            finally
+            {
+                if (!activated) loadContext.Unload();
+            }
+        }
+
+        private static bool ActivatePluginTypes(Assembly assembly, PluginLoadContext loadContext, string filePath, string fullPath, bool reloaded)
+        {
+            var added = false;
 
             foreach (var type in assembly.GetTypes())
             {
@@ -87,7 +151,7 @@ namespace DaemonMC.Plugin
                     else
                     {
                         Log.error($"Plugin {filePath} can't be loaded. Missing metadata. Please check DaemonMC/wiki/Plugin-tutorial.");
-                        return;
+                        return added;
                     }
 
                     var pluginInstance = (Plugin)Activator.CreateInstance(type)!;
@@ -97,7 +161,7 @@ namespace DaemonMC.Plugin
                         if (pluginInstance is not HotReload)
                         {
                             Log.error($"Plugin {filePath} can't be loaded. This plugin doesn't support HotReload feature. Please restart server to enable this plugin.");
-                            return;
+                            return added;
                         }
                         pluginInstance.OnReload();
                     }
@@ -112,12 +176,33 @@ namespace DaemonMC.Plugin
                         LoadContext = loadContext,
                         Path = fullPath
                     });
+                    added = true;
                 }
             }
+
+            return added;
         }
 
         public static void ReloadPlugin(string file)
         {
+            if (IsScript(file))
+            {
+                var compiled = ScriptCompiler.Compile(file);
+                if (!compiled.Success)
+                {
+                    LogCompileErrors(file, compiled);
+                    if (_plugins.Any(p => p.Path == Path.GetFullPath(file)))
+                    {
+                        Log.warn($"Keeping previously loaded version of {file}");
+                    }
+                    return;
+                }
+
+                UnloadPlugin(file);
+                LoadScript(file, compiled, true);
+                return;
+            }
+
             UnloadPlugin(file);
             LoadPlugin(file, true);
         }
@@ -191,11 +276,14 @@ namespace DaemonMC.Plugin
 
         private static void HandlePluginRenamed(string oldPath, string newPath)
         {
-            UnloadPlugin(oldPath);
-
-            if (Path.GetExtension(newPath).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+            if (IsPluginFile(oldPath))
             {
-                Task.Delay(500).ContinueWith(_ => LoadPlugin(newPath, true));
+                UnloadPlugin(oldPath);
+            }
+
+            if (IsPluginFile(newPath))
+            {
+                HandlePluginChange(newPath);
             }
         }
 
@@ -376,16 +464,27 @@ namespace DaemonMC.Plugin
 
     public class PluginLoadContext : AssemblyLoadContext
     {
-        private AssemblyDependencyResolver _resolver;
+        private readonly AssemblyDependencyResolver? _resolver;
 
         public PluginLoadContext(string pluginPath) : base(isCollectible: true)
         {
-            _resolver = new AssemblyDependencyResolver(pluginPath);
+            try
+            {
+                _resolver = new AssemblyDependencyResolver(pluginPath);
+            }
+            catch (Exception ex)
+            {
+                Log.warn($"Couldn't create dependency resolver for {pluginPath}: {ex.Message}");
+            }
+        }
+
+        public PluginLoadContext() : base(isCollectible: true)
+        {
         }
 
         protected override Assembly? Load(AssemblyName assemblyName)
         {
-            string? assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+            string? assemblyPath = _resolver?.ResolveAssemblyToPath(assemblyName);
             if (assemblyPath != null)
             {
                 return LoadFromAssemblyPath(assemblyPath);

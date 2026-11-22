@@ -76,7 +76,12 @@ namespace DaemonMC
 
         static void Command()
         {
-            string cmd = Console.ReadLine();
+            string? cmd = Console.ReadLine();
+            if (cmd == null)
+            {
+                Thread.Sleep(Timeout.Infinite);
+                return;
+            }
             switch (cmd)
             {
                 case "/help":
@@ -167,7 +172,12 @@ namespace DaemonMC
 
         static void Command2()
         {
-            string cmd = Console.ReadLine();
+            string? cmd = Console.ReadLine();
+            if (cmd == null)
+            {
+                Thread.Sleep(Timeout.Infinite);
+                return;
+            }
             string[] parts = cmd.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             string command = cmd == "" ? "" : parts[0].ToLower();
             switch (command)

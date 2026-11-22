@@ -776,11 +776,27 @@ namespace DaemonMC.Network
 
         public void WriteBiomes(List<Biome> biomes)
         {
-            ushort BiomeIndex = 0;
+            var strings = new List<string>(biomes.Count);
+            var stringIndex = new Dictionary<string, ushort>();
+            ushort IndexOf(string value)
+            {
+                if (!stringIndex.TryGetValue(value, out ushort index))
+                {
+                    index = (ushort)strings.Count;
+                    strings.Add(value);
+                    stringIndex[value] = index;
+                }
+                return index;
+            }
+            foreach (var biome in biomes)
+            {
+                IndexOf(biome.BiomeName);
+            }
+
             WriteVarInt(biomes.Count);
             foreach (var biome in biomes)
             {
-                WriteShort(BiomeIndex);
+                WriteShort(IndexOf(biome.BiomeName));
                 if (protocolVersion >= Info.v1_21_100)
                 {
                     WriteShort(biome.BiomeData.BiomeID);
@@ -804,17 +820,24 @@ namespace DaemonMC.Network
                 }
                 WriteFloat(biome.BiomeData.Depth);
                 WriteFloat(biome.BiomeData.Scale);
-                WriteFloat(biome.BiomeData.WaterColor);
+                WriteInt(biome.BiomeData.WaterColor);
                 WriteBool(biome.BiomeData.Rain);
-                WriteOptional(); //biome tags. todo?
+                var tags = biome.BiomeData.Tags;
+                WriteOptional(tags.Count == 0 ? null : () =>
+                {
+                    WriteVarInt(tags.Count);
+                    foreach (var tag in tags)
+                    {
+                        WriteShort(IndexOf(tag));
+                    }
+                });
                 WriteOptional(); //not needed, client side chunk gen not supported
-                BiomeIndex++;
             }
 
-            WriteVarInt(biomes.Count);
-            foreach (var biome in biomes)
+            WriteVarInt(strings.Count);
+            foreach (var value in strings)
             {
-                WriteString(biome.BiomeName);
+                WriteString(value);
             }
         }
 

@@ -19,6 +19,7 @@ namespace DaemonMC
         public static int GameMode = 0;
         public static int DrawDistance = 10;
         public static bool UnloadChunks = true;
+        public static bool LoadBiomes = true;
         public static CompressionTypes Compression = CompressionTypes.None;
         internal static string Version = "unknown";
         internal static string GitHash = "unknown";

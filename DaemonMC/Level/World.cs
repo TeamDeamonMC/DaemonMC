@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Numerics;
+using DaemonMC.Biomes;
 using DaemonMC.Blocks;
 using DaemonMC.Entities;
 using DaemonMC.Level.Format;
@@ -543,6 +544,8 @@ namespace DaemonMC.Level
                     column.HighestSubChunk = Generator.SubChunkCount - 1;
                 }
 
+                LoadBiomes(column);
+
                 byte[] blockEntityData = Db.Get(ToDataTypes.GetByteSum(ChunkKey(x, z), new byte[] { 0x31 }));
                 if (blockEntityData != null)
                 {
@@ -565,6 +568,103 @@ namespace DaemonMC.Level
                 }
 
                 return column;
+            }
+        }
+
+        private void LoadBiomes(ChunkColumn column)
+        {
+            if (!DaemonMC.LoadBiomes)
+            {
+                return;
+            }
+            try
+            {
+                int count = Dimension.SubChunkCount();
+                BiomeStorage?[]? storages = null;
+                byte[] data3D = Db.Get(ToDataTypes.GetByteSum(ChunkKey(column.X, column.Z), new byte[] { 0x2b }));
+                if (data3D != null)
+                {
+                    storages = ChunkUtils.DecodeBiomes3D(data3D, count);
+                }
+                else
+                {
+                    byte[] data2D = Db.Get(ToDataTypes.GetByteSum(ChunkKey(column.X, column.Z), new byte[] { 0x2d }));
+                    if (data2D != null) storages = ChunkUtils.DecodeBiomes2D(data2D, count);
+                }
+                if (storages != null)
+                {
+                    Array.Copy(storages, column.Biomes, count);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.error($"Biomes in chunk x:{column.X}; z:{column.Z} in '{LevelName}' could not be loaded, using default biome");
+                Log.error(ex.ToString());
+                Array.Clear(column.Biomes);
+            }
+        }
+
+        private Biome? biomeOverride;
+
+        public Biome? BiomeOverride
+        {
+            get => biomeOverride;
+            set
+            {
+                biomeOverride = value;
+                RefreshChunks();
+            }
+        }
+
+        public Biome GetBiome(int x, int y, int z)
+        {
+            if (biomeOverride != null) return biomeOverride;
+            y = Math.Clamp(y, MinY, MaxY) - MinY;
+            int id = GetColumn(x >> 4, z >> 4).GetBiomeId(x & 15, y >> 4, y & 15, z & 15);
+            return BiomeManager.Get(id) ?? BiomeManager.GetDefault(Dimension);
+        }
+
+        public void SetBiome(int x, int y, int z, Biome biome)
+        {
+            if (!BiomesEnabled()) return;
+            if (y < MinY || y > MaxY) return;
+            y -= MinY;
+            GetColumn(x >> 4, z >> 4).SetBiomeId(x & 15, y >> 4, y & 15, z & 15, biome.Id);
+        }
+
+        public void SetChunkBiome(int chunkX, int chunkZ, Biome biome)
+        {
+            if (!BiomesEnabled()) return;
+            GetColumn(chunkX, chunkZ).FillBiome(biome.Id);
+            RefreshChunk(chunkX, chunkZ);
+        }
+
+        private static bool biomeWarningShown;
+
+        private bool BiomesEnabled()
+        {
+            if (DaemonMC.LoadBiomes) return true;
+            if (!biomeWarningShown)
+            {
+                biomeWarningShown = true;
+                Log.warn("Per block biomes are disabled (loadBiomes: false in DaemonMC.yaml). Use World.BiomeOverride to set one biome for the whole world.");
+            }
+            return false;
+        }
+
+        public void RefreshChunk(int chunkX, int chunkZ)
+        {
+            foreach (var player in OnlinePlayers.Values.ToList())
+            {
+                player.ResendChunk(chunkX, chunkZ);
+            }
+        }
+
+        public void RefreshChunks()
+        {
+            foreach (var player in OnlinePlayers.Values.ToList())
+            {
+                player.ResendChunks();
             }
         }
 

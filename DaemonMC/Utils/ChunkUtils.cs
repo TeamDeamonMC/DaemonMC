@@ -136,6 +136,90 @@ namespace DaemonMC.Utils
             }
         }
 
+        public static BiomeStorage?[] DecodeBiomes3D(ReadOnlySpan<byte> data, int subChunkCount)
+        {
+            var result = new BiomeStorage?[subChunkCount];
+            var reader = new SpanReader(data);
+            reader.Position = 512;
+            BiomeStorage? previous = null;
+
+            for (int i = 0; i < subChunkCount && reader.Position < data.Length; i++)
+            {
+                int bitsPerBlock = reader.ReadByte() >> 1;
+                if (bitsPerBlock == 127)
+                {
+                    if (previous == null) throw new InvalidDataException("First biome storage can't reference previous");
+                    continue;
+
+                }
+
+                var storage = new BiomeStorage();
+                if (bitsPerBlock > 0)
+                {
+                    storage.EnsureIndices();
+                    int blocksPerWord = 32 / bitsPerBlock;
+                    int wordCount = (4096 + blocksPerWord - 1) / blocksPerWord;
+                    uint mask = (1u << bitsPerBlock) - 1;
+                    int position = 0;
+                    for (int w = 0; w < wordCount; w++)
+                    {
+                        uint word = reader.ReadUInt32();
+                        for (int b = 0; b < blocksPerWord && position < 4096; b++, position++)
+                        {
+                            storage.Indices[position] = (byte)((word >> (b * bitsPerBlock)) & mask);
+                        }
+                    }
+                }
+
+                int paletteSize = bitsPerBlock == 0 ? 1 : reader.ReadInt32();
+                for (int p = 0; p < paletteSize; p++)
+                {
+                    storage.Palette.Add(reader.ReadInt32());
+                }
+                if (storage.Palette.Count == 0) throw new InvalidDataException("Empty biome palette");
+                if (storage.Palette.Count == 1)
+                {
+                    storage.Indices = []; //single biome, drop index array
+                }
+                for (int idx = 0; idx < storage.Indices.Length; idx++)
+                {
+                    if (storage.Indices[idx] >= storage.Palette.Count) storage.Indices[idx] = 0;
+                }
+
+                result[i] = storage;
+                previous = storage;
+            }
+            return result;
+        }
+
+        public static BiomeStorage?[] DecodeBiomes2D(ReadOnlySpan<byte> data, int subChunkCount)
+        {
+            var result = new BiomeStorage?[subChunkCount];
+            if (data.Length < 512 + 256) return result;
+
+            var storage = new BiomeStorage();
+            storage.EnsureIndices();
+            for (int x = 0; x < 16; x++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    int id = data[512 + ((z << 4) | x)];
+                    int index = storage.Palette.IndexOf(id);
+                    if (index < 0)
+                    {
+                        index = storage.Palette.Count;
+                        storage.Palette.Add(id);
+                    }
+                    for (int y = 0; y < 16; y++)
+                    {
+                        storage.Indices[SubChunk.Index(x, y, z)] = (byte)index;
+                    }
+                }
+            }
+            result[0] = storage;
+            return result;
+        }
+
         public static SubChunk CreateEmptySubChunk()
         {
             var subChunk = new SubChunk

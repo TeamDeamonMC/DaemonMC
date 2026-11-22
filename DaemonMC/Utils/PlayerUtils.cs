@@ -139,6 +139,27 @@ namespace DaemonMC.Utils
             SendQueueBusy = false;
         }
 
+        internal void ResendChunk(int chunkX, int chunkZ)
+        {
+            if (ClientHasChunk(chunkX, chunkZ))
+            {
+                SendChunkToPlayer(chunkX, chunkZ);
+            }
+        }
+
+        internal void ResendChunks()
+        {
+            List<(int x, int z)> chunks;
+            lock (ChunkSendQueue)
+            {
+                chunks = sentChunks.Where(c => !ChunkSendQueue.Contains(c)).ToList();
+            }
+            foreach (var (x, z) in chunks)
+            {
+                SendChunkToPlayer(x, z);
+            }
+        }
+
         internal void SendChunkToPlayer(int chunkX, int chunkZ)
         {
             var world = p.CurrentWorld;
@@ -151,7 +172,7 @@ namespace DaemonMC.Utils
                 ChunkZ = chunkZ,
                 Dimension = (int)world.Dimension,
                 SubChunkLimit = limit,
-                Data = column.NetworkSerializeBiomes()
+                Data = column.NetworkSerializeBiomes(world.BiomeOverride)
             });
         }
 

@@ -1,4 +1,4 @@
-using DaemonMC.Biomes;
+﻿using DaemonMC.Biomes;
 using DaemonMC.Network.Enumerations;
 using DaemonMC.Utils;
 using fNbt;
@@ -103,17 +103,76 @@ namespace DaemonMC.Level
             return HeightMapDataType.HasData;
         }
 
-        public byte[] NetworkSerializeBiomes()
+        public int GetBiomeId(int localX, int subChunkIndex, int localY, int localZ)
         {
-            int defaultBiome = BiomeManager.GetBiomeId("plains");
+            lock (Biomes)
+            {
+                for (int i = Math.Min(subChunkIndex, Biomes.Length - 1); i >= 0; i--) //empty storages inherit the one below
+                {
+                    var storage = Biomes[i];
+                    if (storage != null && storage.Palette.Count > 0)
+                    {
+                        return storage.Indices.Length == 0 ? storage.Palette[0] : storage.Palette[storage.Indices[SubChunk.Index(localX, localY, localZ)]];
+                    }
+                }
+                return BiomeManager.GetDefault(Dimension).Id;
+            }
+        }
+
+        public void SetBiomeId(int localX, int subChunkIndex, int localY, int localZ, int biomeId)
+        {
+            lock (Biomes)
+            {
+                MaterializeBiomes();
+                var storage = Biomes[subChunkIndex]!;
+                int index = storage.Palette.IndexOf(biomeId);
+                if (index == 0 && storage.Indices.Length == 0) return; //already single biome
+                storage.EnsureIndices();
+                if (index < 0)
+                {
+                    if (storage.Palette.Count >= 256) storage.Compact();
+                    index = storage.Palette.Count;
+                    storage.Palette.Add(biomeId);
+                }
+                storage.Indices[SubChunk.Index(localX, localY, localZ)] = (byte)index;
+            }
+        }
+
+        public void FillBiome(int biomeId)
+        {
+            lock (Biomes)
+            {
+                Array.Clear(Biomes);
+                Biomes[0] = new BiomeStorage { Palette = [biomeId] };
+            }
+        }
+
+        private void MaterializeBiomes()
+        {
+            BiomeStorage? previous = null;
+            for (int i = 0; i < Biomes.Length; i++)
+            {
+                var storage = Biomes[i];
+                if (storage == null || storage.Palette.Count == 0)
+                {
+                    Biomes[i] = previous?.Clone() ?? new BiomeStorage { Palette = [BiomeManager.GetDefault(Dimension).Id] };
+                }
+                previous = Biomes[i];
+            }
+        }
+
+        public byte[] NetworkSerializeBiomes(Biome? biomeOverride = null)
+        {
+            int defaultBiome = (biomeOverride ?? BiomeManager.GetDefault(Dimension)).Id;
 
             using var stream = new MemoryStream();
             byte[]? previous = null;
 
+            lock (Biomes)
             for (int i = 0; i < Biomes.Length; i++)
             {
                 byte[] current;
-                var storage = Biomes[i];
+                var storage = biomeOverride == null ? Biomes[i] : null;
                 if (storage != null && storage.Palette.Count > 0)
                 {
                     using var biomeStream = new MemoryStream();
@@ -247,6 +306,30 @@ namespace DaemonMC.Level
     public class BiomeStorage
     {
         public List<int> Palette { get; set; } = new List<int>(); //ordered biomes
-        public byte[] Indices { get; set; } = new byte[4096]; //3D biomes (index from ordered biomes)
+        public byte[] Indices { get; set; } = []; //3D biomes (index from ordered biomes), empty with single biome, performance thing
+
+        public BiomeStorage Clone() => new BiomeStorage { Palette = new List<int>(Palette), Indices = (byte[])Indices.Clone() };
+
+        internal void EnsureIndices()
+        {
+            if (Indices.Length == 0) Indices = new byte[4096]; //all 0 -> Palette[0]
+        }
+
+        internal void Compact()
+        {
+            if (Indices.Length == 0) return;
+            var used = new bool[Palette.Count];
+            foreach (var index in Indices) used[index] = true;
+            var remap = new byte[Palette.Count];
+            var palette = new List<int>();
+            for (int i = 0; i < Palette.Count; i++)
+            {
+                if (!used[i]) continue;
+                remap[i] = (byte)palette.Count;
+                palette.Add(Palette[i]);
+            }
+            for (int i = 0; i < Indices.Length; i++) Indices[i] = remap[Indices[i]];
+            Palette = palette;
+        }
     }
 }

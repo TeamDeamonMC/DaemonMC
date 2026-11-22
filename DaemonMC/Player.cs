@@ -270,6 +270,10 @@ namespace DaemonMC
             _ = TeleportAsync(position);
         }
 
+        public void ResendChunk(int chunkX, int chunkZ) => _player.ResendChunk(chunkX, chunkZ);
+
+        public void ResendChunks() => _player.ResendChunks();
+
         public async Task TeleportAsync(Vector3 position, int timeoutSeconds = 5)
         {
             var world = CurrentWorld;

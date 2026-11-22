@@ -18,6 +18,7 @@ namespace DaemonMC
         public string DefaultGamemode { get; set; } = "Survival";
         public int DrawDistance { get; set; } = 10;
         public bool UnloadChunks { get; set; } = true;
+        public bool LoadBiomes { get; set; } = true;
         public int Port { get; set; } = 19132;
         public bool ForcePacks { get; set; } = false;
         public bool XboxAuth { get; set; } = true;
@@ -67,6 +68,7 @@ namespace DaemonMC
             DaemonMC.GameMode = ToGameMode(config.DefaultGamemode);
             DaemonMC.DrawDistance = config.DrawDistance;
             DaemonMC.UnloadChunks = config.UnloadChunks;
+            DaemonMC.LoadBiomes = config.LoadBiomes;
             DaemonMC.Compression = ToCompressionType(config.Compression);
             Server.Port = (ushort)config.Port;
             LoginHandler.XboxAuth = config.XboxAuth;

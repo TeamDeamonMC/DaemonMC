@@ -449,7 +449,7 @@ namespace DaemonMC.Network
             WriteString(skin.SkinGeometryDataEngineVersion);
             WriteString(skin.SkinAnimationData);
             WriteString(skin.Cape.CapeId);
-            WriteString(skin.SkinId + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            WriteString(skin.SkinId + Guid.NewGuid().ToString("N"));
             if (v1_26_40)
             {
                 WriteByte(skin.ArmSize); //0 slim, 1 wide

@@ -34,6 +34,7 @@ namespace DaemonMC.Utils
 
             return new Skin()
             {
+                SkinId = Guid.NewGuid().ToString(),
                 ArmSize = 1, //wide
                 PremiumSkin = true,
                 SkinData = Texture.PngToBytes(skinPng),

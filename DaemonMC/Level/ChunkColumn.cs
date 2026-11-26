@@ -16,6 +16,12 @@ namespace DaemonMC.Level
         internal int[]? Heights;
         private readonly List<NbtCompound> BlockEntities = new List<NbtCompound>();
         private static readonly string[] ServerOnlyTags = ["Items"];
+        private volatile Dictionary<(bool Override, int DefaultBiome), byte[]> biomeCache = new();
+        
+        public void InvalidateBiomeCache()
+        {
+            biomeCache = new();
+        }
 
         public ChunkColumn(int x, int z, Dimension dimension)
         {
@@ -135,6 +141,7 @@ namespace DaemonMC.Level
                     storage.Palette.Add(biomeId);
                 }
                 storage.Indices[SubChunk.Index(localX, localY, localZ)] = (byte)index;
+                InvalidateBiomeCache();
             }
         }
 
@@ -144,6 +151,7 @@ namespace DaemonMC.Level
             {
                 Array.Clear(Biomes);
                 Biomes[0] = new BiomeStorage { Palette = [biomeId] };
+                InvalidateBiomeCache();
             }
         }
 
@@ -164,7 +172,24 @@ namespace DaemonMC.Level
         public byte[] NetworkSerializeBiomes(Biome? biomeOverride = null)
         {
             int defaultBiome = (biomeOverride ?? BiomeManager.GetDefault(Dimension)).Id;
+            var key = (biomeOverride != null, defaultBiome);
 
+            var cache = biomeCache;
+            lock (cache)
+            {
+                if (cache.TryGetValue(key, out var cached)) return cached;
+            }
+
+            byte[] result = SerializeBiomes(biomeOverride, defaultBiome);
+            lock (cache)
+            {
+                cache[key] = result;
+            }
+            return result;
+        }
+
+        private byte[] SerializeBiomes(Biome? biomeOverride, int defaultBiome)
+        {
             using var stream = new MemoryStream();
             byte[]? previous = null;
 

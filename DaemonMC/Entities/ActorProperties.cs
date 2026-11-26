@@ -1,4 +1,5 @@
-﻿using fNbt;
+﻿using DaemonMC.Network;
+using fNbt;
 
 namespace DaemonMC.Entities
 {
@@ -54,6 +55,7 @@ namespace DaemonMC.Entities
             rootCompound.Add(new NbtString("type", actorName));
 
             PropertyData.Add(rootCompound);
+            PacketCache.Invalidate();
         }
     }
 

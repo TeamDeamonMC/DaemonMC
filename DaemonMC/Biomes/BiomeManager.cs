@@ -1,4 +1,5 @@
 ﻿using DaemonMC.Level;
+using DaemonMC.Network;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Biomes
@@ -45,6 +46,7 @@ namespace DaemonMC.Biomes
                 byId[biome.Id] = biome;
                 ordered = byId.Values.OrderBy(b => b.Id).ToList();
             }
+            PacketCache.Invalidate();
         }
 
         public static Biome? Get(string biomeName)

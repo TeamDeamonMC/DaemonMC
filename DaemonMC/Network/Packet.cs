@@ -123,6 +123,28 @@ namespace DaemonMC.Network
             }
         }
 
+        internal byte[] Serialize(int protocolVersion)
+        {
+            var encoder = new PacketEncoder(protocolVersion);
+            encoder.PacketId(Id);
+            Encode(encoder);
+            return encoder.byteStream.ToArray();
+        }
+
+        internal void EncodeSerialized(PacketEncoder encoder, byte[] serialized)
+        {
+            lock (encoder.Sync)
+            {
+                if (!PluginManager.PacketSent(encoder.clientEp, this))
+                {
+                    PacketEncoderPool.Return(encoder);
+                    return;
+                }
+                encoder.WriteBytes(serialized, false);
+                encoder.handlePacket();
+            }
+        }
+
         protected abstract void Decode(PacketDecoder decoder);
         protected abstract void Encode(PacketEncoder encoder);
     }

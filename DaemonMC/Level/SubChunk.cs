@@ -1,5 +1,6 @@
 ﻿using DaemonMC.Level.Format;
 using DaemonMC.Network;
+using System.Collections.Concurrent;
 using DaemonMC.Utils;
 using fNbt;
 
@@ -13,13 +14,31 @@ namespace DaemonMC.Level
         public int StorageSize { get; set; } = 0;
         public bool IsRuntime { get; set; } = true;
         public int BitsPerBlock { get; set; } = 0;
-        public List<NbtCompound> Palette { get; set; } = new List<NbtCompound>(); //ordered states
+        private List<NbtCompound> palette = new List<NbtCompound>();
+        public List<NbtCompound> Palette //ordered states
+        {
+            get => palette;
+            set { palette = value; InvalidateNetworkCache(); }
+        }
 
         private byte[]? blocks;
         public byte[] Blocks
         {
             get => blocks ??= new byte[4096];
-            set => blocks = value;
+            set { blocks = value; InvalidateNetworkCache(); }
+        }
+
+        private sealed class NetworkCache
+        {
+            public readonly ConcurrentDictionary<(int Protocol, int AbsoluteY), byte[]> Payloads = new();
+            public int IsAir = -1; // -1 unknown, 0 no, 1 yes
+        }
+
+        private volatile NetworkCache networkCache = new();
+
+        public void InvalidateNetworkCache()
+        {
+            networkCache = new NetworkCache();
         }
 
         public bool IsEmpty => StorageSize == 0 || Palette.Count == 0;
@@ -37,6 +56,17 @@ namespace DaemonMC.Level
         }
 
         public bool IsAir()
+        {
+            var cache = networkCache;
+            int cached = cache.IsAir;
+            if (cached != -1) return cached == 1;
+
+            bool result = ComputeIsAir();
+            cache.IsAir = result ? 1 : 0;
+            return result;
+        }
+
+        private bool ComputeIsAir()
         {
             if (IsEmpty) return true;
 
@@ -78,12 +108,43 @@ namespace DaemonMC.Level
             }
 
             Blocks[Index(localX, localY, localZ)] = (byte)paletteIndex;
+            InvalidateNetworkCache();
         }
 
         public byte[] NetworkSerialize(int absoluteY, int? protocol = null, IEnumerable<NbtCompound>? blockEntities = null)
         {
             int version = protocol ?? Info.ProtocolVersion.Last();
+            byte[] blockData = networkCache.Payloads.GetOrAdd((version, absoluteY), key => SerializeBlocks(key.AbsoluteY, key.Protocol));
 
+            List<byte[]>? entityData = null;
+            int entityLength = 0;
+            if (blockEntities != null)
+            {
+                foreach (var blockEntity in blockEntities)
+                {
+                    var data = ChunkColumn.SerializeNetworkNbt(blockEntity);
+                    (entityData ??= new List<byte[]>()).Add(data);
+                    entityLength += data.Length;
+                }
+            }
+            if (entityData == null)
+            {
+                return blockData;
+            }
+
+            var result = new byte[blockData.Length + entityLength];
+            blockData.CopyTo(result, 0);
+            int offset = blockData.Length;
+            foreach (var data in entityData)
+            {
+                data.CopyTo(result, offset);
+                offset += data.Length;
+            }
+            return result;
+        }
+
+        private byte[] SerializeBlocks(int absoluteY, int version)
+        {
             using var stream = new MemoryStream();
             stream.WriteByte(NetworkSubChunkVersion);
             stream.WriteByte(1); //looks like only layer 0 is stored in SubChunk idk
@@ -95,14 +156,6 @@ namespace DaemonMC.Level
                 runtimeIds[i] = StateConverter.GetHash(Palette[i], version);
             }
             ChunkUtils.WritePalettedStorage(stream, Blocks, runtimeIds);
-
-            if (blockEntities != null)
-            {
-                foreach (var blockEntity in blockEntities)
-                {
-                    stream.Write(ChunkColumn.SerializeNetworkNbt(blockEntity));
-                }
-            }
 
             return stream.ToArray();
         }

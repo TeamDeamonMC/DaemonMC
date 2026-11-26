@@ -194,7 +194,7 @@ namespace DaemonMC.Network.Bedrock
                     {
                         Items = ItemPalette.items
                     };
-                    player.Send(items);
+                    PacketCache.Send(player, items);
 
                     var commands = new AvailableCommands
                     {
@@ -202,27 +202,28 @@ namespace DaemonMC.Network.Bedrock
                         Enums = CommandManager.RealEnums,
                         Commands = CommandManager.AvailableCommands
                     };
-                    player.Send(commands);
+                    PacketCache.Send(player, commands);
 
                     var creativeInventory = new CreativeContent
                     {
                         Groups = CreativeContentManager.Groups,
                     };
-                    player.Send(creativeInventory);
+                    PacketCache.Send(player, creativeInventory);
 
                     var biomes = new BiomeDefinitionList
                     {
                         BiomeData = BiomeManager.Biomes
                     };
-                    player.Send(biomes);
+                    PacketCache.Send(player, biomes);
 
-                    foreach (var actorData in ActorProperties.PropertyData)
+                    var propertyData = ActorProperties.PropertyData;
+                    for (int i = 0; i < propertyData.Count; i++)
                     {
                         var actorProperties = new SyncActorProperty
                         {
-                            Data = actorData,
+                            Data = propertyData[i],
                         };
-                        player.Send(actorProperties);
+                        PacketCache.Send(player, actorProperties, $"SyncActorProperty:{i}");
                     }
 
                     player.Spawned = true;

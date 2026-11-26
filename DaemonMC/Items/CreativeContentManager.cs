@@ -1,4 +1,5 @@
-﻿using DaemonMC.Utils.Game;
+﻿using DaemonMC.Network;
+using DaemonMC.Utils.Game;
 using DaemonMC.Utils.Text;
 
 namespace DaemonMC.Items
@@ -14,6 +15,7 @@ namespace DaemonMC.Items
             if (group == null || itemGroup.Name == "")
             {
                 Groups.Add(itemGroup);
+                PacketCache.Invalidate();
             }
             else
             {
@@ -31,6 +33,7 @@ namespace DaemonMC.Items
             else
             {
                 Groups.Remove(group);
+                PacketCache.Invalidate();
             }
         }
 
@@ -71,6 +74,7 @@ namespace DaemonMC.Items
         public static void Init()
         {
             _creativeItems.Clear();
+            PacketCache.Invalidate();
 
             foreach (var group in Groups)
             {

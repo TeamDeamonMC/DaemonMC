@@ -19,6 +19,7 @@ namespace DaemonMC.Items
 
                 items[itemInstance.Id] = itemInstance;
             }
+            Network.PacketCache.Invalidate();
         }
 
         public static Item? GetItem(string itemName)

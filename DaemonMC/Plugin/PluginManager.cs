@@ -169,6 +169,7 @@ namespace DaemonMC.Plugin
                     {
                         pluginInstance.OnLoad();
                     }
+                    PacketCache.Invalidate();
 
                     _plugins.Add(new LoadedPlugin
                     {
@@ -225,6 +226,7 @@ namespace DaemonMC.Plugin
             }
 
             _plugins.Clear();
+            PacketCache.Invalidate();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -241,6 +243,7 @@ namespace DaemonMC.Plugin
             plugin.PluginInstance.OnUnload();
             plugin.LoadContext.Unload();
             _plugins.Remove(plugin);
+            PacketCache.Invalidate();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

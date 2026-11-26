@@ -594,6 +594,7 @@ namespace DaemonMC.Level
                 if (storages != null)
                 {
                     Array.Copy(storages, column.Biomes, count);
+                    column.InvalidateBiomeCache();
                 }
             }
             catch (Exception ex)
@@ -601,6 +602,7 @@ namespace DaemonMC.Level
                 Log.error($"Biomes in chunk x:{column.X}; z:{column.Z} in '{LevelName}' could not be loaded, using default biome");
                 Log.error(ex.ToString());
                 Array.Clear(column.Biomes);
+                column.InvalidateBiomeCache();
             }
         }
 

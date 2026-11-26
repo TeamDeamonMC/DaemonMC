@@ -36,6 +36,7 @@ namespace DaemonMC
 
         public static void Register(Command command, Action<CommandAction> commandFunction)
         {
+            PacketCache.Invalidate();
             var regCommand = AvailableCommands.FirstOrDefault(p => p.Name == command.Name);
 
             if (regCommand != null)
@@ -81,6 +82,7 @@ namespace DaemonMC
                 return;
             }
             AvailableCommands.Remove(cmd);
+            PacketCache.Invalidate();
         }
 
         public static int GetSymbol(Type type, int enumIndex = -1)

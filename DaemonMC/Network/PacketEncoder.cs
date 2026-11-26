@@ -31,6 +31,12 @@ namespace DaemonMC.Network
             protocolVersion = RakSessionManager.getSession(ep).protocolVersion;
         }
 
+        internal PacketEncoder(int protocolVersion)
+        {
+            byteStream = new MemoryStream();
+            this.protocolVersion = protocolVersion;
+        }
+
         public void handlePacket(string type = "bedrock")
         {
             byte[] trimmedBuffer = byteStream.ToArray()[..(int)byteStream.Position];

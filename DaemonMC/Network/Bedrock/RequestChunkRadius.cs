@@ -15,7 +15,8 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteVarInt(Radius);
+            encoder.WriteByte(MaxRadius);
         }
     }
 }

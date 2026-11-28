@@ -138,7 +138,64 @@ namespace DaemonMC.Network.Bedrock
 
         protected override void Encode(PacketEncoder encoder)
         {
+            bool v1_26_40 = encoder.protocolVersion >= Info.v1_26_40;
+            bool v1_26_50 = encoder.protocolVersion >= Info.v1_26_50;
 
+            encoder.WriteVec2(Rotation);
+            encoder.WriteVec3(Position);
+            encoder.WriteVec2(MoveVector);
+            encoder.WriteFloat(HeadRotation);
+            if (v1_26_40)
+            {
+                if (!v1_26_50)
+                {
+                    encoder.WriteBool(InputData.Count > 0);
+                }
+                if (v1_26_50 || InputData.Count > 0)
+                {
+                    encoder.WriteVarInt(InputData.Count);
+                    foreach (var input in InputData)
+                    {
+                        encoder.WriteSignedVarInt((int)input);
+                    }
+                }
+            }
+            else
+            {
+                ulong flags = 0;
+                foreach (var input in InputData)
+                {
+                    flags |= 1UL << (int)input;
+                }
+                encoder.WriteVarLong(flags);
+            }
+            encoder.WriteVarInt(InputMode);
+            encoder.WriteVarInt(PlayMode);
+            if (v1_26_40)
+            {
+                encoder.WriteSignedVarInt(InteractionModel);
+            }
+            else
+            {
+                encoder.WriteVarInt(InteractionModel);
+            }
+            encoder.WriteVec2(InteractRotation);
+            encoder.WriteVarLong(Tick);
+            encoder.WriteVec3(PosDelta);
+            if (v1_26_40)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    encoder.WriteBool(false);
+                    if (!v1_26_50)
+                    {
+                        encoder.WriteBool(false);
+                    }
+                }
+            }
+            encoder.WriteVec2(AnalogMove);
+            encoder.WriteVec3(CameraOrientation);
+            encoder.WriteVec2(RawMove);
         }
     }
 }

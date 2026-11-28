@@ -24,6 +24,8 @@ namespace DaemonMC.Network.NetherNet
         {
             if (!Enabled || server != null) return;
 
+            int maxPlayers = int.TryParse(DaemonMC.MaxOnline, out int max) ? max : 10;
+
             var options = new NethernetServerOptions
             {
                 Advertisement = new ServerAdvertisement
@@ -32,12 +34,14 @@ namespace DaemonMC.Network.NetherNet
                     Protocol = Info.ProtocolVersion.Last(),
                     Version = Info.Version,
                     Level = DaemonMC.Worldname,
-                    MaxPlayers = int.TryParse(DaemonMC.MaxOnline, out int max) ? max : 10,
+                    MaxPlayers = maxPlayers,
                     GameType = DaemonMC.GameMode,
                     AcceptsOnlineAuth = true,
                     AcceptsSelfSignedAuth = !LoginHandler.XboxAuth,
                 },
                 HttpAddress = new IPEndPoint(IPAddress.Any, Port),
+                MaximumPeers = Math.Max(64, maxPlayers + 16),
+                MaximumQueuedMessages = Math.Max(4096, maxPlayers * 64),
             };
 
             try

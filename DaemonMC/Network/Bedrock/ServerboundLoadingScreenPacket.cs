@@ -15,7 +15,12 @@
 
         protected override void Encode(PacketEncoder encoder)
         {
-
+            encoder.WriteVarInt(ScreenType);
+            encoder.WriteBool(ScreenId.HasValue);
+            if (ScreenId.HasValue)
+            {
+                encoder.WriteInt(ScreenId.Value);
+            }
         }
     }
 }
